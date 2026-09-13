@@ -60,15 +60,27 @@ export class ApiClientService {
   }
 
   /**
+   * Resolves a link to an absolute URL, or `undefined` if it's absent (e.g.
+   * a prerequisite resource hasn't loaded yet, or the caller isn't
+   * permitted to see it). For a read-path URL that legitimately may not be
+   * there yet — use {@link requireLink} instead for a mutation that must
+   * fail loudly when the link is missing.
+   */
+  resolve(link: ILink | undefined): string | undefined {
+    return link ? resolveLink(link, this.apiOrigin) : undefined;
+  }
+
+  /**
    * Resolves a resource's action link (e.g. `provider.links.deleteProvider`)
    * to an absolute URL, or throws `message` when the caller isn't permitted
    * to perform that action — i.e. the API omitted the link.
    */
   requireLink(link: ILink | undefined, message: string): string {
-    if (!link) {
+    const url = this.resolve(link);
+    if (!url) {
       throw new Error(message);
     }
-    return resolveLink(link, this.apiOrigin);
+    return url;
   }
 
   /**

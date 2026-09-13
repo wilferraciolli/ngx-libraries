@@ -1,4 +1,4 @@
-# @wiltech/ngx-api-client
+# @wiliamferraciolli/ngx-api-client
 
 Shared Angular client for Wiltech HTTP APIs: `ApiClientService`
 (GET/POST/PUT/DELETE + envelope-unwrap), the response envelope, HATEOAS-style
@@ -14,7 +14,7 @@ do. Requires `@angular/core`/`@angular/common`/`rxjs` as peer dependencies.
 ## Install
 
 ```bash
-npm install @wiltech/ngx-api-client
+npm install @wiliamferraciolli/ngx-api-client
 ```
 
 `API_ORIGIN` defaults to `''` (same-origin — links resolve as relative
@@ -23,7 +23,7 @@ origin. Only provide it if they're on different origins, in
 `app.config.ts` (or equivalent):
 
 ```ts
-import { API_ORIGIN } from '@wiltech/ngx-api-client';
+import { API_ORIGIN } from '@wiliamferraciolli/ngx-api-client';
 import { environment } from './environments/environment';
 
 export const appConfig: ApplicationConfig = {
@@ -42,7 +42,7 @@ delegates the HTTP mechanics to this instead of hand-rolling
 `firstValueFrom(this.http.x(...))` + `_data[root]` unwrapping per method:
 
 ```ts
-import { ApiClientService, ApiResource } from '@wiltech/ngx-api-client';
+import { ApiClientService, ApiResource } from '@wiliamferraciolli/ngx-api-client';
 
 @Injectable({ providedIn: 'root' })
 export class ProviderApiService {
@@ -86,7 +86,7 @@ export class ProviderApiService {
 instead of `_data[root][]`.
 
 ```ts
-import { ApiEnvelope, SingleEnvelope, CollectionEnvelope, ILink, LinkService } from '@wiltech/ngx-api-client';
+import { ApiEnvelope, SingleEnvelope, CollectionEnvelope, ILink, LinkService } from '@wiliamferraciolli/ngx-api-client';
 
 type ProviderEnvelope = SingleEnvelope<'provider', Provider>;
 
@@ -98,7 +98,7 @@ canDelete(provider: Provider): boolean {
 ```
 
 ```ts
-import { ApiErrorResponse, fieldErrorsByField, summarizeApiError } from '@wiltech/ngx-api-client';
+import { ApiErrorResponse, fieldErrorsByField, summarizeApiError } from '@wiliamferraciolli/ngx-api-client';
 
 // in an HttpClient error handler:
 catchError((err: HttpErrorResponse) => {
@@ -110,7 +110,7 @@ catchError((err: HttpErrorResponse) => {
 ```
 
 ```ts
-import { MetadataService, IdValue } from '@wiltech/ngx-api-client';
+import { MetadataService, IdValue } from '@wiliamferraciolli/ngx-api-client';
 
 constructor(private meta: MetadataService) {}
 
@@ -124,7 +124,7 @@ statusOptions = this.meta.resolveMetadataIdValues(metadata['status'] as IdValue[
 
 ```ts
 // standalone component/pipe usage — import the pipe directly, no NgModule needed
-import { ConvertIdToStringValuePipe } from '@wiltech/ngx-api-client';
+import { ConvertIdToStringValuePipe } from '@wiliamferraciolli/ngx-api-client';
 
 @Component({
   standalone: true,

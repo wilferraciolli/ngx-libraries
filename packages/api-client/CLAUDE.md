@@ -1,4 +1,4 @@
-# @wiltech/ngx-api-client
+# @wiliamferraciolli/ngx-api-client
 
 Angular library for talking to a Wiltech backend's HTTP API: the response
 envelope shape, HATEOAS-style links, field metadata, error shapes, and the
@@ -62,11 +62,19 @@ src/
   (different field names, never actually wired up anywhere); this package
   fixes that instead of carrying the mismatch forward.
 
-## Not yet done
-- Not published to npm yet.
-- Not wired back into `insurly-ui` yet — that repo still has its own,
-  unmodified copies of everything ported here. Swapping those call sites
-  over to this package, and updating `insurly-ui/CLAUDE.md` +
-  `docs/02-architecture.md` to describe the shared-library pattern instead
-  of "one typed `*ApiService` hand-rolling HTTP", is deferred until after
-  the first publish.
+## Status
+- Published to npm as `@wiliamferraciolli/ngx-api-client` (currently
+  `0.1.4`) — see the note in the root `CLAUDE.md` on why the scope is
+  `@wiliamferraciolli`, not `@wiltech`.
+- Wired into `insurly-ui`: every `*ApiService`
+  (`ProviderApiService`/`AdminApiService`/`AccountApiService`/
+  `AdminProfileApiService`/`SystemSettingsService`/`UserSettingsService`/
+  `CarQuoteApiService`) now injects `ApiClientService` instead of
+  hand-rolling `HttpClient` calls, and all the locally-duplicated files
+  (`core/api/api-envelope.ts`, `_services/link.service.ts`,
+  `_services/metadata.service.ts`, `_helpers/convert-id-to-value.pipe.ts`,
+  `shared/response/*`) are deleted from that repo. `insurly-ui/CLAUDE.md`
+  and `docs/02-architecture.md` (in the `insurly` repo) describe this
+  pattern now.
+- No other consumer yet — the two other Angular projects that motivated
+  this package don't exist yet.

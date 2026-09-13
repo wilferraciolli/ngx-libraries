@@ -2,18 +2,18 @@
 Angular ngx libraries
 
 Each package under `packages/*` is a standalone Angular library, published
-independently to npm under the `@wiltech` scope.
+independently to npm under the `@wiliamferraciolli` scope.
 
 ## Publishing a package
 
 1. **Log in once** (per machine) — needs an npm account able to publish
-   under the `@wiltech` scope (the first publish of a package claims it):
+   under the `@wiliamferraciolli` scope (the first publish of a package claims it):
    ```bash
    npm login
    ```
 2. **`cd` into the package you're releasing** (the directory name under
    `packages/`, not the npm name — e.g. `packages/api-client`, which
-   publishes as `@wiltech/ngx-api-client`) and bump its version:
+   publishes as `@wiliamferraciolli/ngx-api-client`) and bump its version:
    ```bash
    cd packages/<package-dir>
    npm version patch   # or minor / major
