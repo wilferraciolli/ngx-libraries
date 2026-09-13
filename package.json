@@ -1,0 +1,13 @@
+{
+  "name": "ngx-libraries",
+  "private": true,
+  "description": "Wiltech shared TypeScript/Angular libraries, published individually to npm.",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "license": "Apache-2.0"
+}
