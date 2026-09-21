@@ -11,6 +11,67 @@ Built as a real Angular library (Angular Package Format, via `ng-packagr`),
 so it links into a consuming Angular app the same way `@angular/*` packages
 do. Requires `@angular/core`/`@angular/common`/`rxjs` as peer dependencies.
 
+### Sample payload
+```json
+    
+{
+	"_data": {
+		"userProfile": {
+			"id": "uuidAsIds",
+			"name": "Jon Doe",
+			"roleIds": [
+				"SDTANDARD",
+				"ADMIN"
+			],
+			"links" : {
+				"self": {
+					"href": "/api/users/uuidsIds"
+				},
+				"updateUser": {
+					"href": "/api/users/uuidsIds"
+				},
+				"deleteUser": {
+					"href": "/api/users/uuidsIds"
+				}
+			}
+		}		
+	},
+	"_metadata" :{
+	  "id": {
+            "readOnly": true,
+            "hidden": true
+        },
+		"name": {
+            "mandatory": true
+        },
+		"roleIds": {
+            "mandatory": true,
+            "values" : [
+				{
+					"id": "ADMIN",
+					"value": "System Administrator"
+				},
+				{
+					"id": "SDTANDARD",
+					"value": "Standard user"
+				}
+			]
+        }
+	},
+	"_metaLinks": {
+		"createUser": {
+			href": "/api/users/template"
+		}
+	},
+	"_messages": [
+		{
+			"type": "INFO",
+			"value": "You cannot remove your own Admin role..."
+		}
+	]
+}
+```
+
 ## Install
 
 ```bash
