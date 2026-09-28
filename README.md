@@ -22,6 +22,7 @@ independently to npm under the `@wiliamferraciolli` scope.
    Angular library and writes a ready-to-publish `package.json` into
    `dist/`:
    ```bash
+   npm i
    npm run build
    ```
 4. **Publish the built output**, not the source folder:
