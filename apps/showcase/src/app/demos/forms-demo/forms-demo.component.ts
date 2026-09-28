@@ -1,18 +1,36 @@
-import { Component, signal } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import type { WritableSignal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatDivider } from '@angular/material/list';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatOption, MatSelect } from '@angular/material/select';
 import { JsonPipe } from '@angular/common';
-import { form } from '@angular/forms/signals';
+import { form, FormField } from '@angular/forms/signals';
+import { Temporal } from 'temporal-polyfill';
 import {
   DynamicForm,
+  UtcDateTimeCustomField,
   defineSchema,
   FormFieldType,
   createEmptyEntity,
   toSchema
 } from '@wiltech-labs/ngx-forms';
-import type { BaseSchema, SchemaConfig } from '@wiltech-labs/ngx-forms';
+import type { BaseSchema, FieldDef, SchemaConfig } from '@wiltech-labs/ngx-forms';
+
+interface TimeZone {
+  id: string;
+  value: string;
+}
+
+const UTC_DEMO_TIMEZONES: TimeZone[] = [
+  { id: 'Europe/London', value: 'London' },
+  { id: 'Asia/Nicosia', value: 'Nicosia' },
+  { id: 'Europe/Athens', value: 'Athens' },
+  { id: 'America/Sao_Paulo', value: 'Sao Paulo' },
+  { id: 'Asia/Kolkata', value: 'Kolkata (UTC+05:30)' },
+  { id: 'Australia/Lord_Howe', value: 'Lord Howe (30 min DST)' }
+];
 
 // Flight Schema
 interface FlightSchema extends BaseSchema {
@@ -30,6 +48,12 @@ interface AppointmentSchema extends BaseSchema {
   startDate: string;
   startTime: string;
   duration: number;
+}
+
+// UTC Appointment Schema (showcases DATE_TIME_UTC / DATE_TIME_UTC_CUSTOM)
+interface UtcAppointmentSchema extends BaseSchema {
+  schemaType: 'utcAppointment';
+  appointment: string;
 }
 
 // All Fields Demo Schema (showcases all field types)
@@ -51,7 +75,19 @@ interface AllFieldsSchema extends BaseSchema {
 @Component({
   selector: 'app-forms-demo',
   standalone: true,
-  imports: [CommonModule, MatTabsModule, DynamicForm, JsonPipe, MatDivider],
+  imports: [
+    CommonModule,
+    MatTabsModule,
+    DynamicForm,
+    UtcDateTimeCustomField,
+    FormField,
+    JsonPipe,
+    MatDivider,
+    MatFormField,
+    MatLabel,
+    MatSelect,
+    MatOption
+  ],
   templateUrl: './forms-demo.component.html',
   styleUrls: ['./forms-demo.component.css']
 })
@@ -221,5 +257,71 @@ export class FormsDemoComponent {
     this.allFieldsEntity.set(this.allFieldsFormConfig.initialValue);
     this.allFieldsForm().reset();
     this.allFieldsSubmitted.set(null);
+  }
+
+  // ============ UTC DATE/TIME DEMO ============
+  protected readonly utcTimezones: TimeZone[] = UTC_DEMO_TIMEZONES;
+  protected readonly utcSelectedTimezone: WritableSignal<string> = signal('Europe/London');
+
+  // Static field shape for the schema — required/minUtc/maxUtc never change, only the
+  // rendered timeZone does (see utcAppointmentFields below), so this is built once.
+  private readonly utcAppointmentFieldsBase: FieldDef[] = [
+    { name: 'id', type: FormFieldType.TEXT, label: 'Id', disabled: true, hidden: true },
+    {
+      name: 'appointment',
+      type: FormFieldType.DATE_TIME_UTC,
+      label: 'Appointment',
+      required: true,
+      dateTimeConfig: { minUtc: '2024-01-01T00:00:00Z' }
+    }
+  ];
+
+  protected readonly utcAppointmentEntity: WritableSignal<UtcAppointmentSchema> = signal(
+    createEmptyEntity<UtcAppointmentSchema>('utcAppointment', { appointment: '2026-05-01T17:00:00Z' })
+  );
+  protected readonly utcAppointmentForm = form(
+    this.utcAppointmentEntity,
+    toSchema<UtcAppointmentSchema>(this.utcAppointmentFieldsBase)
+  );
+
+  // Rebuilds metaInfo with the currently-selected timezone whenever it changes — DynamicForm
+  // itself only ever sees a static per-field config, this is what makes the picker live.
+  protected readonly utcAppointmentFields = computed<FieldDef[]>(() =>
+    this.utcAppointmentFieldsBase.map(fieldDef =>
+      fieldDef.name === 'appointment'
+        ? { ...fieldDef, dateTimeConfig: { ...fieldDef.dateTimeConfig, timeZone: this.utcSelectedTimezone() } }
+        : fieldDef
+    )
+  );
+
+  protected utcAppointmentSubmitted: WritableSignal<UtcAppointmentSchema | null> = signal(null);
+
+  protected handleUtcAppointmentSubmit(): void {
+    this.utcAppointmentSubmitted.set(this.utcAppointmentEntity());
+    console.log('UTC appointment submitted:', this.utcAppointmentEntity());
+  }
+
+  protected handleClearUtcAppointmentForm(): void {
+    this.utcAppointmentEntity.set(createEmptyEntity<UtcAppointmentSchema>('utcAppointment', { appointment: '' }));
+    this.utcAppointmentForm().reset();
+    this.utcAppointmentSubmitted.set(null);
+  }
+
+  /** Converts the current appointment (always stored as a UTC instant) into another timezone's wall-clock time. */
+  protected convertAppointmentToTimeZone(timeZone: string): string {
+    const currentAppointment = this.utcAppointmentEntity().appointment;
+    if (!currentAppointment) {
+      return '';
+    }
+
+    try {
+      return Temporal.Instant.from(currentAppointment)
+        .toZonedDateTimeISO(timeZone)
+        .toPlainDateTime()
+        .toString({ smallestUnit: 'minute' })
+        .replace('T', ' ');
+    } catch {
+      return '';
+    }
   }
 }

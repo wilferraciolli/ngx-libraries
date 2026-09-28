@@ -29,6 +29,12 @@
   margin-bottom: 1rem;
 }
 
+.tab-content h4 {
+  margin: 1.5rem 0 0.75rem;
+  color: #444;
+  font-size: 0.95rem;
+}
+
 .button-group {
   display: flex;
   gap: 1rem;
@@ -98,4 +104,33 @@
 .info-section p {
   color: #666;
   line-height: 1.6;
+}
+
+.utc-info-section {
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.utc-info-section h4 {
+  margin: 0 0 0.5rem;
+}
+
+.utc-info-section ul {
+  margin: 0 0 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.utc-info-section li {
+  color: #666;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+}
+
+.utc-tip {
+  color: #8a5a00;
+  font-size: 0.85rem;
+  font-style: italic;
 }
