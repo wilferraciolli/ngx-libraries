@@ -4,6 +4,9 @@
   "description": "Shared Angular forms library — form builders, validators, and utility services for common form patterns.",
   "license": "Apache-2.0",
   "sideEffects": false,
+  "dependencies": {
+    "temporal-polyfill": "^1.0.5"
+  },
   "peerDependencies": {
     "@angular/core": "^22.0.0",
     "@angular/common": "^22.0.0",

@@ -9,5 +9,7 @@ export enum FormFieldType {
   CHECKBOX = 'checkbox',
   NUMBER = 'number',
   RANGE = 'range',
-  SELECT = 'select'
+  SELECT = 'select',
+  DATE_TIME_UTC = 'date-time-utc',
+  DATE_TIME_UTC_CUSTOM = 'date-time-utc-custom'
 }

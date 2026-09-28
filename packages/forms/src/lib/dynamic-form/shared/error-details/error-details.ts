@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, input, ChangeDetectionStrategy } from '@angular/core';
 import type { FieldState, FieldTree, ValidationError } from '@angular/forms/signals';
 import { MatError } from '@angular/material/form-field';
 
@@ -7,6 +7,7 @@ import { MatError } from '@angular/material/form-field';
   standalone: true,
   imports: [MatError],
   templateUrl: './error-details.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './error-details.scss',
 })
 export class ErrorDetails {

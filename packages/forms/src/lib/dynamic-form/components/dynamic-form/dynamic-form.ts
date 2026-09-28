@@ -1,10 +1,12 @@
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
 import type { InputSignal } from '@angular/core';
 import { FormField } from '@angular/forms/signals';
 import type { FieldState, FieldTree } from '@angular/forms/signals';
-import { ErrorDetails } from '../error-details/error-details';
+import { ErrorDetails } from '../../shared/error-details/error-details';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatButton } from '@angular/material/button';
+import { UtcDateTimeField } from '../utc-date-time-field/utc-date-time-field';
+import { UtcDateTimeCustomField } from '../utc-date-time-custom-field/utc-date-time-custom-field';
 import type { FieldDef } from '../../interfaces/field-definition';
 import type { BaseSchema } from '../../interfaces/base.schema';
 
@@ -15,9 +17,12 @@ import type { BaseSchema } from '../../interfaces/base.schema';
     ErrorDetails,
     MatTabsModule,
     FormField,
-    MatButton
+    MatButton,
+    UtcDateTimeField,
+    UtcDateTimeCustomField
   ],
   templateUrl: './dynamic-form.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './dynamic-form.scss',
 })
 export class DynamicForm<T extends BaseSchema = BaseSchema> {

@@ -1,0 +1,49 @@
+@use '../../styles/field.mixins' as mix;
+
+.utc-date-time-custom-field {
+  &-container {
+    @include mix.field-container;
+  }
+
+  &-label {
+    @include mix.field-label;
+  }
+
+  // Flex wrapper for the two fields side-by-side with responsive wrapping
+  &-inputs-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    width: 100%;
+
+    @media (max-width: 400px) {
+      flex-direction: column; // stacks them vertically on small screens
+    }
+  }
+
+  &-input-box {
+    @include mix.field-outline-box;
+  }
+
+  // Proportions: date box takes ~70%, time box takes ~30%
+  &-date-box {
+    flex: 7;
+  }
+
+  &-time-box {
+    flex: 3;
+  }
+
+  &-date-input,
+  &-time-input {
+    @include mix.field-input-reset;
+  }
+
+  &-hint {
+    @include mix.field-hint;
+  }
+
+  &-notice {
+    @include mix.field-notice;
+  }
+}

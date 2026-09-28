@@ -1,7 +1,15 @@
 import type { FieldDef } from '../interfaces/field-definition';
-import { maxLength, minLength, required, schema } from '@angular/forms/signals';
+import { maxLength, minLength, required, schema, validate } from '@angular/forms/signals';
 import type { Schema } from '@angular/forms/signals';
 import type { BaseSchema, SchemaConfig } from '../interfaces/base.schema';
+import { FormFieldType } from '../constants/form-field.constant';
+import {
+  UTC_DATE_TIME_INVALID_ERROR_LABEL,
+  UTC_DATE_TIME_MAX_ERROR_LABEL,
+  UTC_DATE_TIME_MIN_ERROR_LABEL
+} from '../constants/utc-date-time.constants';
+import { parseUtcInstant } from './utc-date-time.utils';
+import { Temporal } from 'temporal-polyfill';
 
 export function defineSchema<T extends BaseSchema>(config: SchemaConfig<T>): SchemaConfig<T> {
   return config;
@@ -33,6 +41,34 @@ export function toSchema<T extends BaseSchema>(meta: FieldDef[]): Schema<T> {
         }
         if (typeof fieldDef.maxLength !== 'undefined') {
           maxLength(fieldPath, fieldDef.maxLength, { message: `${fieldDef.label} cannot exceed ${fieldDef.maxLength} characters` });
+        }
+
+        if (fieldDef.type === FormFieldType.DATE_TIME_UTC || fieldDef.type === FormFieldType.DATE_TIME_UTC_CUSTOM) {
+          validate(fieldPath, (ctx: any) => {
+            const value = ctx.value() as string | null;
+            if (!value) {
+              return null; // `required` above already covers the empty case
+            }
+
+            const instant = parseUtcInstant(value);
+            if (!instant) {
+              return { kind: 'invalidUtcDateTime', message: UTC_DATE_TIME_INVALID_ERROR_LABEL };
+            }
+
+            const minUtc = fieldDef.dateTimeConfig?.minUtc;
+            const min = parseUtcInstant(minUtc);
+            if (min && Temporal.Instant.compare(instant, min) < 0) {
+              return { kind: 'cannotBeBeforeMinUtcDateTime', message: `${UTC_DATE_TIME_MIN_ERROR_LABEL}${minUtc}` };
+            }
+
+            const maxUtc = fieldDef.dateTimeConfig?.maxUtc;
+            const max = parseUtcInstant(maxUtc);
+            if (max && Temporal.Instant.compare(instant, max) > 0) {
+              return { kind: 'cannotBeAfterMaxUtcDateTime', message: `${UTC_DATE_TIME_MAX_ERROR_LABEL}${maxUtc}` };
+            }
+
+            return null;
+          });
         }
       }
     }

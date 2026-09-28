@@ -1,0 +1,27 @@
+@use '../../styles/field.mixins' as mix;
+
+.utc-date-time-field {
+  &-container {
+    @include mix.field-container;
+  }
+
+  &-label {
+    @include mix.field-label;
+  }
+
+  &-input-container {
+    @include mix.field-outline-box;
+  }
+
+  &-input {
+    @include mix.field-input-reset;
+  }
+
+  &-hint {
+    @include mix.field-hint;
+  }
+
+  &-notice {
+    @include mix.field-notice;
+  }
+}
