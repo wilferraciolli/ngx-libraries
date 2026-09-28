@@ -8,7 +8,17 @@ Shared Angular forms library — form builders, validators, and utility services
 src/
 ├── public-api.ts        # barrel — the entire public surface; nothing outside this is exported
 └── lib/
-    └── (form-related utilities and services)
+    └── dynamic-form/          # Configuration-driven form builder
+        ├── components/
+        │   ├── dynamic-form/      # Main form component (renders form fields & validation)
+        │   └── error-details/     # Error display component
+        ├── interfaces/
+        │   ├── field-definition.ts    # FieldDef, FieldOption
+        │   └── base.schema.ts         # BaseSchema, SchemaConfig
+        ├── constants/
+        │   └── form-field.constant.ts # FormFieldType enum
+        └── utils/
+            └── dynamic-form.utils.ts  # defineSchema, createEmptyEntity, toSchema
 ```
 
 ## Conventions
@@ -19,4 +29,6 @@ src/
 
 ## Status
 
-Not yet published to npm — under development. No consumers yet.
+- **Dynamic Form**: Ported from `AngularTutorials/signal-form-array` — works as a standalone configuration-driven form builder that consumes Angular Signals Forms API.
+- Not yet published to npm — under development.
+- No consumers yet beyond internal experimentation.
