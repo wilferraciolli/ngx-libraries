@@ -1,0 +1,14 @@
+<div class="home-container">
+  <section class="hero">
+    <h2>Welcome to NGX Libraries Showcase</h2>
+    <p>Test and explore the shared Angular libraries built for Wiltech projects</p>
+  </section>
+
+  <section class="packages-grid">
+    <div class="package-card" *ngFor="let pkg of packages">
+      <h3>{{ pkg.name }}</h3>
+      <p>{{ pkg.description }}</p>
+      <a [routerLink]="pkg.route" class="btn">View Demo</a>
+    </div>
+  </section>
+</div>

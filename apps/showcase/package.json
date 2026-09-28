@@ -1,0 +1,36 @@
+{
+  "name": "ngx-showcase",
+  "version": "0.1.0",
+  "description": "Showcase and testing application for ngx-libraries packages",
+  "private": true,
+  "scripts": {
+    "start": "ng serve",
+    "build": "ng build",
+    "lint": "ng lint",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@angular/animations": "^22.0.0",
+    "@angular/common": "^22.0.0",
+    "@angular/compiler": "^22.0.0",
+    "@angular/core": "^22.0.0",
+    "@angular/forms": "^22.0.0",
+    "@angular/platform-browser": "^22.0.0",
+    "@angular/platform-browser-dynamic": "^22.0.0",
+    "@angular/router": "^22.0.0",
+    "@wiltech-labs/ngx-api-client": "*",
+    "@wiltech-labs/ngx-forms": "*",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.14.10"
+  },
+  "devDependencies": {
+    "@angular-cli/core": "^22.0.0",
+    "@angular-cli/schematics": "^22.0.0",
+    "@angular-devkit/build-angular": "^22.0.0",
+    "@angular-devkit/core": "^22.0.0",
+    "@angular/cli": "^22.0.0",
+    "@angular/compiler-cli": "^22.0.0",
+    "typescript": "~6.0.2"
+  }
+}

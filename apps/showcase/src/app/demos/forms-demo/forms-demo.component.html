@@ -1,0 +1,39 @@
+<div class="demo-container">
+  <h2>Dynamic Forms Demo</h2>
+  <p class="subtitle">Test the DynamicForm component with configuration-driven fields</p>
+
+  <div class="form-section">
+    <h3>User Registration Form</h3>
+    <app-dynamic-form
+      [schema]="formConfig"
+      [(ngModel)]="formData"
+      (submit)="onFormSubmit($event)"
+    ></app-dynamic-form>
+
+    <div class="button-group">
+      <button (click)="resetForm()" class="btn btn-secondary">Reset Form</button>
+    </div>
+  </div>
+
+  <div class="response-section" *ngIf="submittedData">
+    <div class="success-box">
+      <strong>Submitted Data:</strong>
+      <pre>{{ submittedData | json }}</pre>
+    </div>
+  </div>
+
+  <div class="info-section">
+    <h3>About Dynamic Forms</h3>
+    <p>
+      The DynamicForm component provides a configuration-driven approach to building forms:
+    </p>
+    <ul>
+      <li><strong>Schema-based:</strong> Define form structure with a configuration object</li>
+      <li><strong>Type-safe:</strong> Full TypeScript support with generics</li>
+      <li><strong>Flexible:</strong> Support for various field types (text, email, select, checkbox, etc.)</li>
+      <li><strong>Validation:</strong> Built-in validation rules and error display</li>
+      <li><strong>Signals-based:</strong> Uses Angular's Signals Forms API</li>
+    </ul>
+    <p>This approach reduces boilerplate and makes forms more maintainable and testable.</p>
+  </div>
+</div>

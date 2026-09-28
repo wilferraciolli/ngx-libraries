@@ -1,0 +1,102 @@
+.demo-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.demo-container h2 {
+  color: #333;
+  margin-top: 0;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.form-section {
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+.form-section h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.button-group {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-secondary {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.btn-secondary:hover {
+  background-color: #d0d0d0;
+}
+
+.response-section {
+  margin-bottom: 2rem;
+}
+
+.success-box {
+  background-color: #efe;
+  border: 1px solid #cfc;
+  border-radius: 4px;
+  color: #060;
+  padding: 1rem;
+  font-family: 'Courier New', monospace;
+}
+
+.success-box pre {
+  margin: 0.5rem 0 0 0;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.info-section {
+  background: #f0f4ff;
+  border: 1px solid #d0deff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+}
+
+.info-section h3 {
+  margin-top: 0;
+  color: #667eea;
+}
+
+.info-section ul {
+  margin: 0 0 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.info-section li {
+  margin-bottom: 0.75rem;
+  color: #666;
+  line-height: 1.6;
+}
+
+.info-section p {
+  color: #666;
+  line-height: 1.6;
+}

@@ -3,7 +3,8 @@
   "private": true,
   "description": "Wiltech shared TypeScript/Angular libraries, published individually to npm.",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "apps/*"
   ],
   "scripts": {
     "build": "npm run build --workspaces --if-present",
