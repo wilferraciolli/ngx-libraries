@@ -12,7 +12,8 @@ import { ApiClientService, ApiEnvelope } from '@wiltech-labs/ngx-api-client';
 })
 export class ApiClientDemoComponent implements OnInit {
   apiUrl = '';
-  responseData: any = null;
+  rootKey = '';
+  responseData: unknown = null;
   error: string | null = null;
   loading = false;
   httpMethod: 'GET' | 'POST' | 'PUT' | 'DELETE' = 'GET';
@@ -22,9 +23,10 @@ export class ApiClientDemoComponent implements OnInit {
 
   ngOnInit() {
     this.apiUrl = 'https://api.example.com/data';
+    this.rootKey = 'data';
   }
 
-  makeRequest() {
+  async makeRequest() {
     this.loading = true;
     this.error = null;
     this.responseData = null;
@@ -34,50 +36,33 @@ export class ApiClientDemoComponent implements OnInit {
 
       switch (this.httpMethod) {
         case 'GET':
-          this.apiClient.get<any>(url).subscribe(
-            response => this.handleSuccess(response),
-            err => this.handleError(err)
-          );
+          this.responseData = await this.apiClient.get(this.rootKey, url);
           break;
-        case 'POST':
+        case 'POST': {
           const postData = this.requestBody ? JSON.parse(this.requestBody) : {};
-          this.apiClient.post<any>(url, postData).subscribe(
-            response => this.handleSuccess(response),
-            err => this.handleError(err)
-          );
+          this.responseData = await this.apiClient.post(this.rootKey, url, postData);
           break;
-        case 'PUT':
+        }
+        case 'PUT': {
           const putData = this.requestBody ? JSON.parse(this.requestBody) : {};
-          this.apiClient.put<any>(url, putData).subscribe(
-            response => this.handleSuccess(response),
-            err => this.handleError(err)
-          );
+          this.responseData = await this.apiClient.put(this.rootKey, url, putData);
           break;
+        }
         case 'DELETE':
-          this.apiClient.delete<any>(url).subscribe(
-            response => this.handleSuccess(response),
-            err => this.handleError(err)
-          );
+          await this.apiClient.delete(url);
+          this.responseData = { message: 'Deleted successfully' };
           break;
       }
-    } catch (e: any) {
-      this.error = `Error: ${e.message}`;
+    } catch (e: unknown) {
+      this.error = e instanceof Error ? e.message : 'An error occurred';
+    } finally {
       this.loading = false;
     }
   }
 
-  private handleSuccess(response: any) {
-    this.responseData = response;
-    this.loading = false;
-  }
-
-  private handleError(error: any) {
-    this.error = error.message || 'An error occurred';
-    this.loading = false;
-  }
-
   resetForm() {
     this.apiUrl = '';
+    this.rootKey = '';
     this.requestBody = '';
     this.responseData = null;
     this.error = null;

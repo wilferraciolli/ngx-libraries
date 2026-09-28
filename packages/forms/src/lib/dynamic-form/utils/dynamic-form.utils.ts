@@ -1,6 +1,7 @@
-import { FieldDef } from '../interfaces/field-definition';
-import { maxLength, minLength, required, schema, Schema } from '@angular/forms/signals';
-import { BaseSchema, SchemaConfig } from '../interfaces/base.schema';
+import type { FieldDef } from '../interfaces/field-definition';
+import { maxLength, minLength, required, schema } from '@angular/forms/signals';
+import type { Schema } from '@angular/forms/signals';
+import type { BaseSchema, SchemaConfig } from '../interfaces/base.schema';
 
 export function defineSchema<T extends BaseSchema>(config: SchemaConfig<T>): SchemaConfig<T> {
   return config;

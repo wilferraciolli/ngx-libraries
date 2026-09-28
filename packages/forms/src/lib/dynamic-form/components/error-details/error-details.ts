@@ -1,5 +1,5 @@
 import { Component, computed, input } from '@angular/core';
-import { FieldState, FieldTree, ValidationError } from '@angular/forms/signals';
+import type { FieldState, FieldTree, ValidationError } from '@angular/forms/signals';
 import { MatError } from '@angular/material/form-field';
 
 @Component({

@@ -6,8 +6,8 @@ export { DynamicForm } from './lib/dynamic-form/components/dynamic-form/dynamic-
 export { ErrorDetails } from './lib/dynamic-form/components/error-details/error-details';
 
 // Dynamic Form Interfaces
-export { BaseSchema, SchemaConfig } from './lib/dynamic-form/interfaces/base.schema';
-export { FieldDef, FieldOption } from './lib/dynamic-form/interfaces/field-definition';
+export type { BaseSchema, SchemaConfig } from './lib/dynamic-form/interfaces/base.schema';
+export type { FieldDef, FieldOption } from './lib/dynamic-form/interfaces/field-definition';
 
 // Dynamic Form Constants
 export { FormFieldType } from './lib/dynamic-form/constants/form-field.constant';

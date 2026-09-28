@@ -1,10 +1,12 @@
-import { Component, input, InputSignal, output } from '@angular/core';
-import { FieldState, FieldTree, FormField } from '@angular/forms/signals';
-import { FieldDef } from '../../interfaces/field-definition';
+import { Component, input, output } from '@angular/core';
+import type { InputSignal } from '@angular/core';
+import { FormField } from '@angular/forms/signals';
+import type { FieldState, FieldTree } from '@angular/forms/signals';
 import { ErrorDetails } from '../error-details/error-details';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatButton } from '@angular/material/button';
-import { BaseSchema } from '../../interfaces/base.schema';
+import type { FieldDef } from '../../interfaces/field-definition';
+import type { BaseSchema } from '../../interfaces/base.schema';
 
 @Component({
   selector: 'app-dynamic-form',

@@ -14,17 +14,19 @@
   font-size: 0.95rem;
 }
 
-.form-section {
-  background: #f9f9f9;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 2rem;
-  margin-bottom: 2rem;
+.tab-content {
+  padding: 1.5rem 0.5rem;
 }
 
-.form-section h3 {
+.tab-content h3 {
   margin-top: 0;
   color: #333;
+}
+
+.tab-content > p {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
 }
 
 .button-group {
@@ -53,10 +55,7 @@
 }
 
 .response-section {
-  margin-bottom: 2rem;
-}
-
-.success-box {
+  margin-top: 1.5rem;
   background-color: #efe;
   border: 1px solid #cfc;
   border-radius: 4px;
@@ -65,7 +64,7 @@
   font-family: 'Courier New', monospace;
 }
 
-.success-box pre {
+.response-section pre {
   margin: 0.5rem 0 0 0;
   overflow-x: auto;
   white-space: pre-wrap;

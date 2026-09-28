@@ -2,7 +2,6 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
-    "baseUrl": "./",
     "paths": {
       "@wiltech-labs/ngx-api-client": ["../../packages/api-client/src/public-api.ts"],
       "@wiltech-labs/ngx-forms": ["../../packages/forms/src/public-api.ts"]
