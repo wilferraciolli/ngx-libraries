@@ -8,8 +8,17 @@ import { MatButton } from '@angular/material/button';
 import { InstantDateTimeField } from '../instant-date-time-field/instant-date-time-field';
 import { BusinessDateField } from '../business-date-field/business-date-field';
 import { BusinessTimeField } from '../business-time-field/business-time-field';
+import { TextField } from '../text-field/text-field';
+import { FormFieldType } from '../../constants/form-field.constant';
 import type { FieldDef } from '../../interfaces/field-definition';
 import type { BaseSchema } from '../../interfaces/base.schema';
+
+// Field types rendered by a Material field component that shows its own hint and errors.
+const SELF_CONTAINED_TYPES: ReadonlySet<FormFieldType> = new Set([
+  FormFieldType.TEXT,
+  FormFieldType.PASSWORD,
+  FormFieldType.SEARCH
+]);
 
 @Component({
   selector: 'app-dynamic-form',
@@ -21,7 +30,8 @@ import type { BaseSchema } from '../../interfaces/base.schema';
     MatButton,
     InstantDateTimeField,
     BusinessDateField,
-    BusinessTimeField
+    BusinessTimeField,
+    TextField
   ],
   templateUrl: './dynamic-form.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -45,6 +55,10 @@ export class DynamicForm<T extends BaseSchema = BaseSchema> {
 
   protected clearForm(): void {
     this.onFormClear.emit();
+  }
+
+  protected isSelfContained(type: FormFieldType): boolean {
+    return SELF_CONTAINED_TYPES.has(type);
   }
 
   /** Tab inserts two spaces instead of moving focus, matching a code editor's behavior. */

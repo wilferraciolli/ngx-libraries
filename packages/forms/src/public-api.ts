@@ -4,6 +4,7 @@
 // Dynamic Form
 export { DynamicForm } from './lib/dynamic-form/components/dynamic-form/dynamic-form';
 export { ErrorDetails } from './lib/dynamic-form/shared/error-details/error-details';
+export { TextField } from './lib/dynamic-form/components/text-field/text-field';
 export { InstantDateTimeField } from './lib/dynamic-form/components/instant-date-time-field/instant-date-time-field';
 export { BusinessDateField } from './lib/dynamic-form/components/business-date-field/business-date-field';
 export { BusinessTimeField } from './lib/dynamic-form/components/business-time-field/business-time-field';

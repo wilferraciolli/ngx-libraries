@@ -16,6 +16,11 @@
           (onFormClear)="handleClearFlightForm()"
         />
 
+        <div class="model-section">
+          <strong>Current value ({{ flightsForm().valid() ? 'valid' : 'invalid' }}):</strong>
+          <pre>{{ flightEntity() | json }}</pre>
+        </div>
+
         @if (flightSubmitted(); as data) {
           <mat-divider/>
           <div class="response-section">
@@ -39,6 +44,11 @@
           (onFormClear)="handleClearAppointmentForm()"
         />
 
+        <div class="model-section">
+          <strong>Current value ({{ appointmentForm().valid() ? 'valid' : 'invalid' }}):</strong>
+          <pre>{{ appointmentEntity() | json }}</pre>
+        </div>
+
         @if (appointmentSubmitted(); as data) {
           <mat-divider/>
           <div class="response-section">
@@ -61,6 +71,11 @@
           (onFormSubmit)="handleAllFieldsSubmit()"
           (onFormClear)="handleClearAllFieldsForm()"
         />
+
+        <div class="model-section">
+          <strong>Current value ({{ allFieldsForm().valid() ? 'valid' : 'invalid' }}):</strong>
+          <pre>{{ allFieldsEntity() | json }}</pre>
+        </div>
 
         @if (allFieldsSubmitted(); as data) {
           <mat-divider/>
@@ -115,6 +130,11 @@
           (onFormClear)="handleClearDateTimeForm()"
         />
 
+        <div class="model-section">
+          <strong>Current value ({{ dateTimeForm().valid() ? 'valid' : 'invalid' }}):</strong>
+          <pre>{{ dateTimeEntity() | json }}</pre>
+        </div>
+
         @if (dateTimeSubmitted(); as data) {
           <mat-divider/>
           <div class="response-section">
@@ -125,8 +145,6 @@
 
         <mat-divider/>
         <div class="utc-info-section">
-          <h4>Stored values:</h4>
-          <pre class="stored-values">{{ dateTimeEntity() | json }}</pre>
           <h4>The appointment instant in each timezone:</h4>
           <ul>
             @for (tz of timezones; track tz.id) {

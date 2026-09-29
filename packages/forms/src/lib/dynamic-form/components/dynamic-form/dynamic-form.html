@@ -4,99 +4,120 @@
 
     @if (!fieldDef.hidden) {
       <div class="dynamic-form-field" [style.--field-max-width]="fieldDef.maxWidth">
-        @if (fieldDef.hint) {
+        @let selfContained = isSelfContained(fieldDef.type);
+
+        @if (fieldDef.hint && !selfContained) {
           <p class="dynamic-form-hint">{{ fieldDef.hint }}</p>
         }
 
-        @if (fieldDef.type === 'radio' && fieldDef.options) {
-          <!-- Radio button group -->
-          <fieldset class="dynamic-form-radio-group"
-                    [disabled]="fieldDef.disabled">
-            <legend class="dynamic-form-radio-legend">{{ fieldDef.label }}</legend>
-            @for (option of fieldDef.options; track option.value) {
-              <label class="dynamic-form-radio-option">
-                <input
-                  [type]=fieldDef.type
-                  [name]="fieldDef.name"
-                  [checked]="field().value() === option.value"
-                  (change)="field().value.set(option.value)"
-                />
-                {{ option.label }}
-              </label>
-            }
-          </fieldset>
-        } @else if (fieldDef.type === 'select' && fieldDef.options) {
-          <!-- dropdown select -->
-          <label>
-            {{ fieldDef.label }}
-            <select
-              [formField]="field"
-              class="dynamic-form-control">
-              @for (option of fieldDef.options; track option.value) {
-                <option [value]="option.value">{{ option.label }}</option>
+        @switch (fieldDef.type) {
+          @case ('text') {
+            <app-text-field [fieldDef]="fieldDef" [field]="field" />
+          }
+          @case ('password') {
+            <app-text-field [fieldDef]="fieldDef" [field]="field" />
+          }
+          @case ('search') {
+            <app-text-field [fieldDef]="fieldDef" [field]="field" />
+          }
+          @case ('radio') {
+            <fieldset class="dynamic-form-radio-group"
+                      [disabled]="fieldDef.disabled">
+              <legend class="dynamic-form-radio-legend">{{ fieldDef.label }}</legend>
+              @for (option of fieldDef.options ?? []; track option.value) {
+                <label class="dynamic-form-radio-option">
+                  <input
+                    [type]=fieldDef.type
+                    [name]="fieldDef.name"
+                    [checked]="field().value() === option.value"
+                    (change)="field().value.set(option.value)"
+                  />
+                  {{ option.label }}
+                </label>
               }
-            </select>
-          </label>
-        } @else if (fieldDef.type === 'instant-date-time') {
-          <app-instant-date-time-field
-            [label]="fieldDef.label"
-            [formField]="field"
-            [config]="fieldDef.dateTimeConfig"
-          />
-        } @else if (fieldDef.type === 'business-date') {
-          <app-business-date-field
-            [label]="fieldDef.label"
-            [formField]="field"
-            [config]="fieldDef.dateTimeConfig"
-          />
-        } @else if (fieldDef.type === 'business-time') {
-          <app-business-time-field
-            [label]="fieldDef.label"
-            [formField]="field"
-            [config]="fieldDef.dateTimeConfig"
-          />
-        } @else if (fieldDef.type === 'range') {
-          <label class="dynamic-form-range-label">
-            {{ fieldDef.label }}
-            <span class="dynamic-form-range-value">{{ field().value() }}</span>
-          </label>
-          <input
-            type="range"
-            [formField]="field"
-            [attr.step]="fieldDef.step"
-            class="dynamic-form-range"
-            [style.--range-percent.%]="rangePercent(fieldDef.min, fieldDef.max, field().value())"
-          />
-        } @else if (fieldDef.type === 'textarea') {
-          <label>
-            {{ fieldDef.label }}
-            <textarea
+            </fieldset>
+          }
+          @case ('select') {
+            <label>
+              {{ fieldDef.label }}
+              <select
+                [formField]="field"
+                class="dynamic-form-control">
+                @for (option of fieldDef.options ?? []; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </label>
+          }
+          @case ('instant-date-time') {
+            <app-instant-date-time-field
+              [label]="fieldDef.label"
               [formField]="field"
-              class="dynamic-form-control dynamic-form-textarea"
-            ></textarea>
-          </label>
-        } @else if (fieldDef.type === 'code') {
-          <label>
-            {{ fieldDef.label }}
-            <textarea
-              [formField]="field"
-              class="dynamic-form-control dynamic-form-code"
-              spellcheck="false"
-              (keydown)="handleCodeKeydown($event, field)"
-            ></textarea>
-          </label>
-        } @else {
-          <label>
-            {{ fieldDef.label }}
-            <input
-              [type]=fieldDef.type
-              [formField]="field"
-              [class.dynamic-form-control]="fieldDef.type !== 'checkbox'"
+              [config]="fieldDef.dateTimeConfig"
             />
-          </label>
+          }
+          @case ('business-date') {
+            <app-business-date-field
+              [label]="fieldDef.label"
+              [formField]="field"
+              [config]="fieldDef.dateTimeConfig"
+            />
+          }
+          @case ('business-time') {
+            <app-business-time-field
+              [label]="fieldDef.label"
+              [formField]="field"
+              [config]="fieldDef.dateTimeConfig"
+            />
+          }
+          @case ('range') {
+            <label class="dynamic-form-range-label">
+              {{ fieldDef.label }}
+              <span class="dynamic-form-range-value">{{ field().value() }}</span>
+            </label>
+            <input
+              type="range"
+              [formField]="field"
+              [attr.step]="fieldDef.step"
+              class="dynamic-form-range"
+              [style.--range-percent.%]="rangePercent(fieldDef.min, fieldDef.max, field().value())"
+            />
+          }
+          @case ('textarea') {
+            <label>
+              {{ fieldDef.label }}
+              <textarea
+                [formField]="field"
+                class="dynamic-form-control dynamic-form-textarea"
+              ></textarea>
+            </label>
+          }
+          @case ('code') {
+            <label>
+              {{ fieldDef.label }}
+              <textarea
+                [formField]="field"
+                class="dynamic-form-control dynamic-form-code"
+                spellcheck="false"
+                (keydown)="handleCodeKeydown($event, field)"
+              ></textarea>
+            </label>
+          }
+          @default {
+            <label>
+              {{ fieldDef.label }}
+              <input
+                [type]=fieldDef.type
+                [formField]="field"
+                [class.dynamic-form-control]="fieldDef.type !== 'checkbox'"
+              />
+            </label>
+          }
         }
 
-        <app-error-details [formField]="field"/>
+        @if (!selfContained) {
+          <app-error-details [formField]="field"/>
+        }
 
       </div>
     }

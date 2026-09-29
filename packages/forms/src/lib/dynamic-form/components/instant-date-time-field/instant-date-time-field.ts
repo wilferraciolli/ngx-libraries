@@ -49,9 +49,15 @@ export class InstantDateTimeField implements FormValueControl<string | null> {
   protected readonly minDate = computed(() => this.zonedDateTime.toDate(this.config()?.min, this.timeZone()));
   protected readonly maxDate = computed(() => this.zonedDateTime.toDate(this.config()?.max, this.timeZone()));
 
+  // Only a change of the actual wall-clock time counts, so '' -> null (still empty) keeps a half-filled pick.
+  private readonly wallClock = computed(
+    () => this.zonedDateTime.toDate(this.value(), this.timeZone()),
+    { equal: (a, b) => a?.getTime() === b?.getTime() }
+  );
+
   // Both pickers follow the bound value, but can hold a half-filled pick until both parts are set.
-  protected readonly date = linkedSignal(() => this.zonedDateTime.toDate(this.value(), this.timeZone()));
-  protected readonly time = linkedSignal(() => this.zonedDateTime.toDate(this.value(), this.timeZone()));
+  protected readonly date = linkedSignal(() => this.wallClock());
+  protected readonly time = linkedSignal(() => this.wallClock());
 
   constructor() {
     effect(() => this.dateAdapter.setLocale(this.config()?.locale || DEFAULT_DATE_TIME_LOCALE));
