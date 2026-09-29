@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { NativeDateAdapter } from '@angular/material/core';
+import type { Provider } from '@angular/core';
+import { DateAdapter, MAT_DATE_FORMATS, MAT_NATIVE_DATE_FORMATS, NativeDateAdapter } from '@angular/material/core';
 
 type DatePart = 'day' | 'month' | 'year';
 
@@ -34,4 +35,15 @@ export class LocaleDateAdapter extends NativeDateAdapter {
       .map(part => part.type)
       .filter((type): type is DatePart => type === 'day' || type === 'month' || type === 'year');
   }
+}
+
+/**
+ * Gives a component its own DateAdapter instance, so each field can call setLocale() with its own
+ * locale without changing the format of every other picker in the app.
+ */
+export function provideLocaleDateAdapter(): Provider[] {
+  return [
+    { provide: DateAdapter, useClass: LocaleDateAdapter },
+    { provide: MAT_DATE_FORMATS, useValue: MAT_NATIVE_DATE_FORMATS }
+  ];
 }

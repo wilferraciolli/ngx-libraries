@@ -6,31 +6,36 @@ import { MatDivider } from '@angular/material/list';
 import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatOption, MatSelect } from '@angular/material/select';
 import { JsonPipe } from '@angular/common';
-import { form, FormField } from '@angular/forms/signals';
+import { form } from '@angular/forms/signals';
 import { Temporal } from 'temporal-polyfill';
 import {
   DynamicForm,
-  UtcDateTimeCustomField,
   defineSchema,
   FormFieldType,
   createEmptyEntity,
   toSchema
 } from '@wiltech-labs/ngx-forms';
 import type { BaseSchema, FieldDef, SchemaConfig } from '@wiltech-labs/ngx-forms';
-import { MaterialDateTimeField } from '../../components/material-date-time-field/material-date-time-field';
 
-interface TimeZone {
+interface DemoOption {
   id: string;
   value: string;
 }
 
-const UTC_DEMO_TIMEZONES: TimeZone[] = [
+const DEMO_TIMEZONES: DemoOption[] = [
   { id: 'Europe/London', value: 'London' },
   { id: 'Asia/Nicosia', value: 'Nicosia' },
   { id: 'Europe/Athens', value: 'Athens' },
   { id: 'America/Sao_Paulo', value: 'Sao Paulo' },
   { id: 'Asia/Kolkata', value: 'Kolkata (UTC+05:30)' },
   { id: 'Australia/Lord_Howe', value: 'Lord Howe (30 min DST)' }
+];
+
+const DEMO_LOCALES: DemoOption[] = [
+  { id: 'en-GB', value: 'English (UK) — 31/12/2026' },
+  { id: 'en-US', value: 'English (US) — 12/31/2026' },
+  { id: 'de-DE', value: 'German — 31.12.2026' },
+  { id: 'ja-JP', value: 'Japanese — 2026/12/31' }
 ];
 
 // Flight Schema
@@ -51,10 +56,13 @@ interface AppointmentSchema extends BaseSchema {
   duration: number;
 }
 
-// UTC Appointment Schema (showcases DATE_TIME_UTC / DATE_TIME_UTC_CUSTOM)
-interface UtcAppointmentSchema extends BaseSchema {
-  schemaType: 'utcAppointment';
+// Date & Time Schema (showcases INSTANT_DATE_TIME / BUSINESS_DATE / BUSINESS_TIME)
+interface DateTimeDemoSchema extends BaseSchema {
+  schemaType: 'dateTimeDemo';
   appointment: string;
+  holiday: string;
+  opensAt: string;
+  closesAt: string;
 }
 
 // All Fields Demo Schema (showcases all field types)
@@ -82,9 +90,6 @@ interface AllFieldsSchema extends BaseSchema {
     CommonModule,
     MatTabsModule,
     DynamicForm,
-    UtcDateTimeCustomField,
-    MaterialDateTimeField,
-    FormField,
     JsonPipe,
     MatDivider,
     MatFormField,
@@ -119,7 +124,7 @@ export class FormsDemoComponent {
       },
       {
         name: 'date',
-        type: FormFieldType.DATE_TIME,
+        type: FormFieldType.INSTANT_DATE_TIME,
         label: 'Departure Date & Time',
         required: true
       },
@@ -157,8 +162,8 @@ export class FormsDemoComponent {
     fields: [
       { name: 'id', type: FormFieldType.TEXT, label: 'Id', disabled: true, hidden: true },
       { name: 'name', type: FormFieldType.TEXT, label: 'Appointment Name', required: true, minLength: 3, maxLength: 30 },
-      { name: 'startDate', type: FormFieldType.DATE, label: 'Date', required: true },
-      { name: 'startTime', type: FormFieldType.TIME, label: 'Time', required: true },
+      { name: 'startDate', type: FormFieldType.BUSINESS_DATE, label: 'Date', required: true },
+      { name: 'startTime', type: FormFieldType.BUSINESS_TIME, label: 'Time', required: true },
       { name: 'duration', type: FormFieldType.NUMBER, label: 'Duration (minutes)', required: true }
     ],
     initialValue: createEmptyEntity<AppointmentSchema>('appointment', {
@@ -218,24 +223,24 @@ export class FormsDemoComponent {
       },
       {
         name: 'birthDate',
-        type: FormFieldType.DATE,
+        type: FormFieldType.BUSINESS_DATE,
         label: 'Birth Date',
         required: true,
-        hint: 'Only a calendar date matters — no time of day.'
+        hint: 'A calendar date with no timezone (stored as YYYY-MM-DD) — birthdays, holidays, due dates.'
       },
       {
         name: 'appointmentTime',
-        type: FormFieldType.TIME,
+        type: FormFieldType.BUSINESS_TIME,
         label: 'Appointment Time',
         required: true,
-        hint: 'Only a time of day matters — no date.'
+        hint: 'A time of day with no date or timezone (stored as HH:mm) — opening hours, daily schedules.'
       },
       {
         name: 'eventDateTime',
-        type: FormFieldType.DATE_TIME,
+        type: FormFieldType.INSTANT_DATE_TIME,
         label: 'Event Date & Time',
         required: true,
-        hint: 'Both a date and a time together, stored as the visitor\'s own local time (not timezone-aware — see the UTC Date & Time tab for that).'
+        hint: 'An exact moment (stored as a UTC instant), edited in a timezone — meetings, deadlines, flights. See the Date & Time tab.'
       },
       {
         name: 'gender',
@@ -312,7 +317,7 @@ export class FormsDemoComponent {
       searchQuery: 'angular signals forms',
       birthDate: '1990-06-15',
       appointmentTime: '14:30',
-      eventDateTime: '2026-11-05T09:00',
+      eventDateTime: '2026-11-05T09:00:00Z',
       gender: 'not_specified',
       country: 'uk',
       acceptTerms: false,
@@ -341,58 +346,96 @@ export class FormsDemoComponent {
     this.allFieldsSubmitted.set(null);
   }
 
-  // ============ UTC DATE/TIME DEMO ============
-  protected readonly utcTimezones: TimeZone[] = UTC_DEMO_TIMEZONES;
-  protected readonly utcSelectedTimezone: WritableSignal<string> = signal('Europe/London');
+  // ============ DATE & TIME DEMO ============
+  protected readonly timezones: DemoOption[] = DEMO_TIMEZONES;
+  protected readonly locales: DemoOption[] = DEMO_LOCALES;
+  protected readonly selectedTimezone: WritableSignal<string> = signal('Europe/London');
+  protected readonly selectedLocale: WritableSignal<string> = signal('en-GB');
 
-  // Static field shape for the schema — required/minUtc/maxUtc never change, only the
-  // rendered timeZone does (see utcAppointmentFields below), so this is built once.
-  private readonly utcAppointmentFieldsBase: FieldDef[] = [
+  // Static field shape for the schema — required/min/max never change, only the rendered
+  // timeZone and locale do (see dateTimeFields below), so this is built once.
+  private readonly dateTimeFieldsBase: FieldDef[] = [
     { name: 'id', type: FormFieldType.TEXT, label: 'Id', disabled: true, hidden: true },
     {
       name: 'appointment',
-      type: FormFieldType.DATE_TIME_UTC,
+      type: FormFieldType.INSTANT_DATE_TIME,
       label: 'Appointment',
       required: true,
-      hint: 'Use when the stored value must be an unambiguous instant (e.g. a meeting time across timezones), while each viewer still sees it in their own local time.',
-      dateTimeConfig: { minUtc: '2024-01-01T00:00:00Z' }
+      hint: 'An exact moment, stored as a UTC instant and edited in the selected timezone — use it for meetings or deadlines shared across timezones.',
+      dateTimeConfig: { min: '2024-01-01T00:00:00Z' }
+    },
+    {
+      name: 'holiday',
+      type: FormFieldType.BUSINESS_DATE,
+      label: 'Closed on',
+      required: true,
+      hint: 'A calendar date with no timezone, stored as YYYY-MM-DD — Christmas Day is the 25th wherever you are.',
+      dateTimeConfig: { min: '2026-01-01', max: '2026-12-31' }
+    },
+    {
+      name: 'opensAt',
+      type: FormFieldType.BUSINESS_TIME,
+      label: 'Opens at',
+      required: true,
+      hint: 'A time of day with no date or timezone, stored as HH:mm — "open from 9" means 09:00 in whichever shop you walk into.',
+      dateTimeConfig: { min: '06:00', max: '12:00' }
+    },
+    {
+      name: 'closesAt',
+      type: FormFieldType.BUSINESS_TIME,
+      label: 'Closes at',
+      required: true,
+      dateTimeConfig: { min: '12:00', max: '23:30' }
     }
   ];
 
-  protected readonly utcAppointmentEntity: WritableSignal<UtcAppointmentSchema> = signal(
-    createEmptyEntity<UtcAppointmentSchema>('utcAppointment', { appointment: '2026-05-01T17:00:00Z' })
+  protected readonly dateTimeEntity: WritableSignal<DateTimeDemoSchema> = signal(
+    createEmptyEntity<DateTimeDemoSchema>('dateTimeDemo', {
+      appointment: '2026-05-01T17:00:00Z',
+      holiday: '2026-12-25',
+      opensAt: '09:00',
+      closesAt: '17:00'
+    })
   );
-  protected readonly utcAppointmentForm = form(
-    this.utcAppointmentEntity,
-    toSchema<UtcAppointmentSchema>(this.utcAppointmentFieldsBase)
+  protected readonly dateTimeForm = form(
+    this.dateTimeEntity,
+    toSchema<DateTimeDemoSchema>(this.dateTimeFieldsBase)
   );
 
-  // Rebuilds metaInfo with the currently-selected timezone whenever it changes — DynamicForm
-  // itself only ever sees a static per-field config, this is what makes the picker live.
-  protected readonly utcAppointmentFields = computed<FieldDef[]>(() =>
-    this.utcAppointmentFieldsBase.map(fieldDef =>
-      fieldDef.name === 'appointment'
-        ? { ...fieldDef, dateTimeConfig: { ...fieldDef.dateTimeConfig, timeZone: this.utcSelectedTimezone() } }
+  // Rebuilds metaInfo with the selected timezone and locale — DynamicForm itself only ever sees
+  // a static per-field config, this is what makes the two pickers above it live.
+  protected readonly dateTimeFields = computed<FieldDef[]>(() =>
+    this.dateTimeFieldsBase.map(fieldDef =>
+      fieldDef.dateTimeConfig
+        ? {
+          ...fieldDef,
+          dateTimeConfig: { ...fieldDef.dateTimeConfig, timeZone: this.selectedTimezone(), locale: this.selectedLocale() }
+        }
         : fieldDef
     )
   );
 
-  protected utcAppointmentSubmitted: WritableSignal<UtcAppointmentSchema | null> = signal(null);
+  protected dateTimeSubmitted: WritableSignal<DateTimeDemoSchema | null> = signal(null);
 
-  protected handleUtcAppointmentSubmit(): void {
-    this.utcAppointmentSubmitted.set(this.utcAppointmentEntity());
-    console.log('UTC appointment submitted:', this.utcAppointmentEntity());
+  protected handleDateTimeSubmit(): void {
+    this.dateTimeSubmitted.set(this.dateTimeEntity());
+    console.log('Date & time submitted:', this.dateTimeEntity());
   }
 
-  protected handleClearUtcAppointmentForm(): void {
-    this.utcAppointmentEntity.set(createEmptyEntity<UtcAppointmentSchema>('utcAppointment', { appointment: '' }));
-    this.utcAppointmentForm().reset();
-    this.utcAppointmentSubmitted.set(null);
+  protected handleClearDateTimeForm(): void {
+    this.dateTimeEntity.set(createEmptyEntity<DateTimeDemoSchema>('dateTimeDemo', {
+      appointment: '',
+      holiday: '',
+      opensAt: '',
+      closesAt: ''
+    }));
+    this.dateTimeForm().reset();
+    this.dateTimeSubmitted.set(null);
   }
 
   /** Converts the current appointment (always stored as a UTC instant) into another timezone's wall-clock time. */
   protected convertAppointmentToTimeZone(timeZone: string): string {
-    const currentAppointment = this.utcAppointmentEntity().appointment;
+    const currentAppointment = this.dateTimeEntity().appointment;
     if (!currentAppointment) {
       return '';
     }

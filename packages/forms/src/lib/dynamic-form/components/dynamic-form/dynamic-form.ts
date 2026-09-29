@@ -5,8 +5,9 @@ import type { FieldState, FieldTree } from '@angular/forms/signals';
 import { ErrorDetails } from '../../shared/error-details/error-details';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatButton } from '@angular/material/button';
-import { UtcDateTimeField } from '../utc-date-time-field/utc-date-time-field';
-import { UtcDateTimeCustomField } from '../utc-date-time-custom-field/utc-date-time-custom-field';
+import { InstantDateTimeField } from '../instant-date-time-field/instant-date-time-field';
+import { BusinessDateField } from '../business-date-field/business-date-field';
+import { BusinessTimeField } from '../business-time-field/business-time-field';
 import type { FieldDef } from '../../interfaces/field-definition';
 import type { BaseSchema } from '../../interfaces/base.schema';
 
@@ -18,8 +19,9 @@ import type { BaseSchema } from '../../interfaces/base.schema';
     MatTabsModule,
     FormField,
     MatButton,
-    UtcDateTimeField,
-    UtcDateTimeCustomField
+    InstantDateTimeField,
+    BusinessDateField,
+    BusinessTimeField
   ],
   templateUrl: './dynamic-form.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

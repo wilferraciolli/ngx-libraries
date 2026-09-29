@@ -1,0 +1,11 @@
+@use '../../styles/field.mixins' as mix;
+
+.business-time-field {
+  &-container {
+    @include mix.field-container;
+  }
+
+  &-form-field {
+    width: 100%;
+  }
+}

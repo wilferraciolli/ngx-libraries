@@ -1,6 +1,6 @@
 @use '../../styles/field.mixins' as mix;
 
-.utc-date-time-field {
+.instant-date-time-field {
   &-container {
     @include mix.field-container;
   }
@@ -9,12 +9,24 @@
     @include mix.field-label;
   }
 
-  &-input-container {
-    @include mix.field-outline-box;
+  &-row {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+
+    @media (max-width: 400px) {
+      flex-direction: column;
+    }
   }
 
-  &-input {
-    @include mix.field-input-reset;
+  &-date {
+    flex: 3;
+    min-width: 0;
+  }
+
+  &-time {
+    flex: 2;
+    min-width: 0;
   }
 
   &-hint {

@@ -1,5 +1,5 @@
 import { FormFieldType } from '../constants/form-field.constant';
-import type { UtcDateTimeConfig } from '../constants/utc-date-time.constants';
+import type { DateTimeConfig } from '../constants/date-time.constants';
 
 export interface FieldOption {
   label: string;
@@ -17,7 +17,7 @@ export interface FieldDef {
   max?: number;                         // For number and range fields
   step?: number;                        // For number and range fields
   options?: FieldOption[];              // For radio buttons and select dropdowns
-  dateTimeConfig?: UtcDateTimeConfig;   // For date-time-utc / date-time-utc-custom
+  dateTimeConfig?: DateTimeConfig;      // For business-date, business-time and instant-date-time
 
   hidden?: boolean;         // Hide the field from display
   disabled?: boolean;       // Disable the field (read-only)

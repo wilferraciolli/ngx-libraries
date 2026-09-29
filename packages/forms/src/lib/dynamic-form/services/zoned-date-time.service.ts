@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Temporal } from 'temporal-polyfill';
-
-export type ZonedDisambiguation = 'earlier' | 'later';
+import type { DateTimeDisambiguation } from '../constants/date-time.constants';
+import { parseInstant } from '../utils/date-time.utils';
 
 export interface ZonedInstantResult {
   instant: string;          // UTC instant, Eg '2024-03-31T01:30:00Z'
@@ -32,7 +32,7 @@ export class ZonedDateTimeService {
     date: Date,
     time: Date,
     timeZone: string,
-    disambiguation: ZonedDisambiguation = 'earlier'
+    disambiguation: DateTimeDisambiguation = 'earlier'
   ): ZonedInstantResult | null {
     try {
       const plainDateTime = Temporal.PlainDateTime.from({
@@ -75,13 +75,10 @@ export class ZonedDateTimeService {
   }
 
   private toZoned(instant: string | null | undefined, timeZone: string): Temporal.ZonedDateTime | null {
-    if (!instant) {
-      return null;
-    }
-
     try {
-      return Temporal.Instant.from(instant).toZonedDateTimeISO(timeZone);
+      return parseInstant(instant)?.toZonedDateTimeISO(timeZone) ?? null;
     } catch {
+      // invalid timezone id
       return null;
     }
   }

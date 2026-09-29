@@ -7,7 +7,7 @@
     <mat-tab label="Flight Form">
       <div class="tab-content">
         <h3>Flight Booking</h3>
-        <p>Demonstrates: text, datetime-local, checkbox fields with required/minLength/maxLength validation.</p>
+        <p>Demonstrates: text, instant date-time, checkbox fields with required/minLength/maxLength validation.</p>
 
         <app-dynamic-form
           [metaInfo]="flightFormConfig.fields"
@@ -30,7 +30,7 @@
     <mat-tab label="Appointment Form">
       <div class="tab-content">
         <h3>Book an Appointment</h3>
-        <p>Demonstrates: date, time, and number fields.</p>
+        <p>Demonstrates: business date, business time, and number fields.</p>
 
         <app-dynamic-form
           [metaInfo]="appointmentFormConfig.fields"
@@ -53,7 +53,7 @@
     <mat-tab label="All Field Types">
       <div class="tab-content">
         <h3>Every Field Type</h3>
-        <p>Demonstrates: text, password, search, date, time, datetime-local, radio, select, checkbox, number, range, textarea, and code.</p>
+        <p>Demonstrates: text, password, search, business date, business time, instant date-time, radio, select, checkbox, number, range, textarea, and code.</p>
 
         <app-dynamic-form
           [metaInfo]="allFieldsFormConfig.fields"
@@ -72,57 +72,50 @@
       </div>
     </mat-tab>
 
-    <!-- ============ UTC DATE/TIME TAB ============ -->
-    <mat-tab label="UTC Date & Time">
+    <!-- ============ DATE & TIME TAB ============ -->
+    <mat-tab label="Date & Time">
       <div class="tab-content">
-        <h3>UTC Date &amp; Time Fields</h3>
+        <h3>Date &amp; Time Fields</h3>
         <p>
-          The value is always stored as a UTC instant (<code>YYYY-MM-DDThh:mm:ssZ</code>) while the
-          fields display and edit it as wall-clock time in the selected timezone.
+          <strong>Instant date-time</strong> stores an exact moment as a UTC instant
+          (<code>YYYY-MM-DDThh:mm:ssZ</code>) and edits it in a timezone.
+          <strong>Business date</strong> (<code>YYYY-MM-DD</code>) and <strong>business time</strong>
+          (<code>HH:mm</code>) ignore timezones entirely. All three display in the chosen locale,
+          not the browser's.
         </p>
 
-        <mat-form-field>
-          <mat-label>Select timezone</mat-label>
-          <mat-select
-            [value]="utcSelectedTimezone()"
-            (selectionChange)="utcSelectedTimezone.set($event.value)">
-            @for (tz of utcTimezones; track tz.id) {
-              <mat-option [value]="tz.id">{{ tz.value }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
+        <div class="date-time-controls">
+          <mat-form-field>
+            <mat-label>Timezone (instant only)</mat-label>
+            <mat-select
+              [value]="selectedTimezone()"
+              (selectionChange)="selectedTimezone.set($event.value)">
+              @for (tz of timezones; track tz.id) {
+                <mat-option [value]="tz.id">{{ tz.value }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
 
-        <h4>Configuration-driven (DynamicForm, DATE_TIME_UTC)</h4>
+          <mat-form-field>
+            <mat-label>Locale (all fields)</mat-label>
+            <mat-select
+              [value]="selectedLocale()"
+              (selectionChange)="selectedLocale.set($event.value)">
+              @for (locale of locales; track locale.id) {
+                <mat-option [value]="locale.id">{{ locale.value }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+
         <app-dynamic-form
-          [metaInfo]="utcAppointmentFields()"
-          [dynamicForm]="utcAppointmentForm"
-          (onFormSubmit)="handleUtcAppointmentSubmit()"
-          (onFormClear)="handleClearUtcAppointmentForm()"
+          [metaInfo]="dateTimeFields()"
+          [dynamicForm]="dateTimeForm"
+          (onFormSubmit)="handleDateTimeSubmit()"
+          (onFormClear)="handleClearDateTimeForm()"
         />
 
-        <h4>Directly bound (DATE_TIME_UTC_CUSTOM, same underlying field)</h4>
-        <p class="tab-content-hint">
-          Same idea, but split into separate date and time inputs — use it when a single combined
-          field feels cramped, or you want the two parts editable independently.
-        </p>
-        <app-utc-date-time-custom-field
-          label="Appointment (date + time)"
-          [formField]="utcAppointmentForm.appointment"
-          [config]="{ timeZone: utcSelectedTimezone(), minUtc: '2024-01-01T00:00:00Z' }"
-        />
-
-        <h4>Material pickers with a fixed locale (new, same underlying field)</h4>
-        <p class="tab-content-hint">
-          Same value again, edited through the Material datepicker and timepicker — use it when the
-          display format must follow a chosen locale (here en-GB, DD/MM/YYYY) instead of the browser's.
-        </p>
-        <app-material-date-time-field
-          label="Appointment (en-GB)"
-          [formField]="utcAppointmentForm.appointment"
-          [config]="{ timeZone: utcSelectedTimezone(), minUtc: '2024-01-01T00:00:00Z', locale: 'en-GB' }"
-        />
-
-        @if (utcAppointmentSubmitted(); as data) {
+        @if (dateTimeSubmitted(); as data) {
           <mat-divider/>
           <div class="response-section">
             <strong>Submitted Data:</strong>
@@ -132,16 +125,17 @@
 
         <mat-divider/>
         <div class="utc-info-section">
-          <h4>Form value (always UTC): {{ utcAppointmentEntity().appointment }}</h4>
-          <h4>The same instant in each timezone:</h4>
+          <h4>Stored values:</h4>
+          <pre class="stored-values">{{ dateTimeEntity() | json }}</pre>
+          <h4>The appointment instant in each timezone:</h4>
           <ul>
-            @for (tz of utcTimezones; track tz.id) {
+            @for (tz of timezones; track tz.id) {
               <li>{{ tz.id }}: {{ convertAppointmentToTimeZone(tz.id) }}</li>
             }
           </ul>
           <p class="utc-tip">
-            Try Europe/London with 2024-03-31 01:30 (does not exist, clocks go forward)
-            or 2024-10-27 01:30 (happens twice, clocks go back).
+            Try Europe/London with 31/03/2024 01:30 (does not exist, clocks go forward)
+            or 27/10/2024 01:30 (happens twice, clocks go back).
           </p>
         </div>
       </div>
@@ -156,7 +150,7 @@
     <ul>
       <li><strong>Schema-based:</strong> Define form structure with an array of field definitions</li>
       <li><strong>Type-safe:</strong> Full TypeScript support with generics extending BaseSchema</li>
-      <li><strong>Flexible:</strong> Supports text, password, search, date, time, datetime-local, radio, select, checkbox, number, range, textarea, code, and UTC date-time fields</li>
+      <li><strong>Flexible:</strong> Supports text, password, search, radio, select, checkbox, number, range, textarea, code, business date, business time, and instant date-time fields</li>
       <li><strong>Validation:</strong> Built-in required/minLength/maxLength rules with inline error display</li>
       <li><strong>Signals-based:</strong> Built on Angular's experimental Signals Forms API (<code>@angular/forms/signals</code>)</li>
     </ul>

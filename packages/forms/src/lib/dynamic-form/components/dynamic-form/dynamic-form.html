@@ -37,14 +37,20 @@
               }
             </select>
           </label>
-        } @else if (fieldDef.type === 'date-time-utc') {
-          <app-utc-date-time-field
+        } @else if (fieldDef.type === 'instant-date-time') {
+          <app-instant-date-time-field
             [label]="fieldDef.label"
             [formField]="field"
             [config]="fieldDef.dateTimeConfig"
           />
-        } @else if (fieldDef.type === 'date-time-utc-custom') {
-          <app-utc-date-time-custom-field
+        } @else if (fieldDef.type === 'business-date') {
+          <app-business-date-field
+            [label]="fieldDef.label"
+            [formField]="field"
+            [config]="fieldDef.dateTimeConfig"
+          />
+        } @else if (fieldDef.type === 'business-time') {
+          <app-business-time-field
             [label]="fieldDef.label"
             [formField]="field"
             [config]="fieldDef.dateTimeConfig"

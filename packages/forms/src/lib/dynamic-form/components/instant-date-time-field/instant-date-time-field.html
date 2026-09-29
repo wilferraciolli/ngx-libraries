@@ -1,8 +1,8 @@
-<div class="material-date-time-field-container">
-  <div class="material-date-time-field-label">{{ label() }}</div>
+<div class="instant-date-time-field-container">
+  <div class="instant-date-time-field-label">{{ label() }}</div>
 
-  <div class="material-date-time-field-row">
-    <mat-form-field class="material-date-time-field-date" appearance="outline" subscriptSizing="dynamic">
+  <div class="instant-date-time-field-row">
+    <mat-form-field class="instant-date-time-field-date" appearance="outline" subscriptSizing="dynamic">
       <mat-label>Date</mat-label>
       <input
         matInput
@@ -11,27 +11,29 @@
         [min]="minDate()"
         [max]="maxDate()"
         [attr.aria-invalid]="invalid() ? true : null"
+        (blur)="touch.emit()"
         (dateChange)="onDateChange($event.value)"
       />
       <mat-datepicker-toggle matIconSuffix [for]="datepicker" />
-      <mat-datepicker #datepicker />
+      <mat-datepicker #datepicker (closed)="touch.emit()" />
     </mat-form-field>
 
-    <mat-form-field class="material-date-time-field-time" appearance="outline" subscriptSizing="dynamic">
+    <mat-form-field class="instant-date-time-field-time" appearance="outline" subscriptSizing="dynamic">
       <mat-label>Time</mat-label>
       <input
         matInput
         [matTimepicker]="timepicker"
         [value]="time()"
         [attr.aria-invalid]="invalid() ? true : null"
+        (blur)="touch.emit()"
         (valueChange)="onTimeChange($event)"
       />
       <mat-timepicker-toggle matIconSuffix [for]="timepicker" />
-      <mat-timepicker #timepicker />
+      <mat-timepicker #timepicker (closed)="touch.emit()" />
     </mat-form-field>
   </div>
 
-  <div class="material-date-time-field-hint">
+  <div class="instant-date-time-field-hint">
     {{ timeZone() }}@if (offset()) { (UTC{{ offset() }})}
     @if (value()) {
       · stored as {{ value() }}
@@ -39,6 +41,6 @@
   </div>
 
   @if (notice()) {
-    <div class="material-date-time-field-notice">{{ notice() }}</div>
+    <div class="instant-date-time-field-notice">{{ notice() }}</div>
   }
 </div>

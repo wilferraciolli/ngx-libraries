@@ -17,7 +17,7 @@
 
   &-hint {
     @include mix.field-hint;
-    margin: 0 0 4px;
+    margin: 0 0 10px; // room for a Material outline label, which floats above its border
   }
 
   &-control {

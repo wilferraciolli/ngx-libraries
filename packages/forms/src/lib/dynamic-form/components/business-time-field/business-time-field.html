@@ -1,0 +1,17 @@
+<div class="business-time-field-container">
+  <mat-form-field class="business-time-field-form-field" appearance="outline" subscriptSizing="dynamic">
+    <mat-label>{{ label() }}</mat-label>
+    <input
+      matInput
+      [matTimepicker]="timepicker"
+      [matTimepickerMin]="minTime()"
+      [matTimepickerMax]="maxTime()"
+      [value]="time()"
+      [attr.aria-invalid]="invalid() ? true : null"
+      (blur)="touch.emit()"
+      (valueChange)="onTimeChange($event)"
+    />
+    <mat-timepicker-toggle matIconSuffix [for]="timepicker" />
+    <mat-timepicker #timepicker (closed)="touch.emit()" />
+  </mat-form-field>
+</div>

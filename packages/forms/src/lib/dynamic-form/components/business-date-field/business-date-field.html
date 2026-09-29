@@ -1,0 +1,17 @@
+<div class="business-date-field-container">
+  <mat-form-field class="business-date-field-form-field" appearance="outline" subscriptSizing="dynamic">
+    <mat-label>{{ label() }}</mat-label>
+    <input
+      matInput
+      [matDatepicker]="datepicker"
+      [value]="date()"
+      [min]="minDate()"
+      [max]="maxDate()"
+      [attr.aria-invalid]="invalid() ? true : null"
+      (blur)="touch.emit()"
+      (dateChange)="onDateChange($event.value)"
+    />
+    <mat-datepicker-toggle matIconSuffix [for]="datepicker" />
+    <mat-datepicker #datepicker (closed)="touch.emit()" />
+  </mat-form-field>
+</div>
