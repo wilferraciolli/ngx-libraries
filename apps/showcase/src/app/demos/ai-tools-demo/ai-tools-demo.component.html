@@ -1,0 +1,34 @@
+<div class="demo-container">
+  <h2>AI Tools Demo</h2>
+  <p class="subtitle">Gradient panels, text boxes and buttons from ngx-ai-tools</p>
+
+  <div class="info-section">
+    <h3>AiSparkleIcon</h3>
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <app-ai-sparkle-icon size="32px" />
+      <app-ai-sparkle-icon size="20px" />
+      <app-ai-sparkle-icon size="16px" />
+    </div>
+  </div>
+
+  <div class="info-section">
+    <h3>AiPanel</h3>
+    <app-ai-panel title="AI Summary" style="max-width: 480px; display: block;">
+      <p>This quarter's revenue grew 12%, driven mainly by new enterprise accounts.</p>
+    </app-ai-panel>
+  </div>
+
+  <div class="info-section">
+    <h3>AiTextBox + AiButton</h3>
+    <div style="max-width: 480px; display: flex; flex-direction: column; gap: 12px;">
+      <app-ai-text-box [(value)]="prompt" placeholder="Ask AI anything…" />
+      <app-ai-button label="Generate" [disabled]="generating()" (clicked)="generate()" />
+      @if (generating()) {
+        <p><em>Generating…</em></p>
+      }
+      @if (result()) {
+        <p>{{ result() }}</p>
+      }
+    </div>
+  </div>
+</div>

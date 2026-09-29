@@ -1,0 +1,28 @@
+.demo-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.demo-container h2 {
+  color: #333;
+  margin-top: 0;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.info-section {
+  background: #f0f4ff;
+  border: 1px solid #d0deff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.info-section h3 {
+  margin-top: 0;
+  color: #667eea;
+}

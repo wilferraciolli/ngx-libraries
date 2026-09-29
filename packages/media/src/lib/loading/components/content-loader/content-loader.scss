@@ -1,0 +1,27 @@
+@use '../../styles/shimmer.mixins' as shimmer;
+
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.content-loader {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+}
+
+.content-loader__line {
+  @include shimmer.shimmer;
+  flex: 1;
+  min-height: 10px;
+  border-radius: 4px;
+
+  &:last-child {
+    width: 60%;
+    flex-grow: 0;
+  }
+}

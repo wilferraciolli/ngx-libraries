@@ -20,6 +20,16 @@ export class HomeComponent {
       name: '@wiltech-labs/ngx-forms',
       description: 'Configuration-driven form builder with dynamic fields and validation support',
       route: '/forms'
+    },
+    {
+      name: '@wiltech-labs/ngx-media',
+      description: 'Skeleton loaders and a YouTube player',
+      route: '/media'
+    },
+    {
+      name: '@wiltech-labs/ngx-ai-tools',
+      description: 'Gradient panels, text boxes and buttons with an AI-assist look and feel',
+      route: '/ai-tools'
     }
   ];
 }

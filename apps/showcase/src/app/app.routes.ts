@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
 import { ApiClientDemoComponent } from './demos/api-client-demo/api-client-demo.component';
 import { FormsDemoComponent } from './demos/forms-demo/forms-demo.component';
+import { MediaDemoComponent } from './demos/media-demo/media-demo.component';
+import { AiToolsDemoComponent } from './demos/ai-tools-demo/ai-tools-demo.component';
 import { HomeComponent } from './home/home.component';
 
 export const routes: Routes = [
@@ -15,5 +17,13 @@ export const routes: Routes = [
   {
     path: 'forms',
     component: FormsDemoComponent
+  },
+  {
+    path: 'media',
+    component: MediaDemoComponent
+  },
+  {
+    path: 'ai-tools',
+    component: AiToolsDemoComponent
   }
 ];

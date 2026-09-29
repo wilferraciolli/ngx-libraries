@@ -1,0 +1,28 @@
+// Animated conic-gradient border: a smooth "AI assist" ring of light running
+// around a panel/textbox, built from a rotating `conic-gradient` rather than a
+// static gradient fill. Colors are themeable via --ngx-ai-gradient-*.
+@property --ngx-ai-border-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes ngx-ai-border-rotate {
+  to {
+    --ngx-ai-border-angle: 360deg;
+  }
+}
+
+@mixin gradient-border($radius: 12px, $thickness: 2px) {
+  position: relative;
+  border-radius: $radius;
+  padding: $thickness;
+  background: conic-gradient(
+    from var(--ngx-ai-border-angle),
+    var(--ngx-ai-gradient-start, #4f7cff),
+    var(--ngx-ai-gradient-mid, #a855f7),
+    var(--ngx-ai-gradient-end, #ec4899),
+    var(--ngx-ai-gradient-start, #4f7cff)
+  );
+  animation: ngx-ai-border-rotate 4s linear infinite;
+}
