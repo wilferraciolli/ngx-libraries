@@ -17,7 +17,15 @@
         />
 
         <div class="model-section">
-          <strong>Current value ({{ flightsForm().valid() ? 'valid' : 'invalid' }}):</strong>
+          @let flightErrors = validationErrors(flightsForm);
+          <strong>Current value ({{ flightErrors.length ? 'invalid' : 'valid' }}):</strong>
+          @if (flightErrors.length) {
+            <ul class="model-errors">
+              @for (error of flightErrors; track error) {
+                <li>{{ error }}</li>
+              }
+            </ul>
+          }
           <pre>{{ flightEntity() | json }}</pre>
         </div>
 
@@ -45,7 +53,15 @@
         />
 
         <div class="model-section">
-          <strong>Current value ({{ appointmentForm().valid() ? 'valid' : 'invalid' }}):</strong>
+          @let appointmentErrors = validationErrors(appointmentForm);
+          <strong>Current value ({{ appointmentErrors.length ? 'invalid' : 'valid' }}):</strong>
+          @if (appointmentErrors.length) {
+            <ul class="model-errors">
+              @for (error of appointmentErrors; track error) {
+                <li>{{ error }}</li>
+              }
+            </ul>
+          }
           <pre>{{ appointmentEntity() | json }}</pre>
         </div>
 
@@ -73,7 +89,15 @@
         />
 
         <div class="model-section">
-          <strong>Current value ({{ allFieldsForm().valid() ? 'valid' : 'invalid' }}):</strong>
+          @let allFieldsErrors = validationErrors(allFieldsForm);
+          <strong>Current value ({{ allFieldsErrors.length ? 'invalid' : 'valid' }}):</strong>
+          @if (allFieldsErrors.length) {
+            <ul class="model-errors">
+              @for (error of allFieldsErrors; track error) {
+                <li>{{ error }}</li>
+              }
+            </ul>
+          }
           <pre>{{ allFieldsEntity() | json }}</pre>
         </div>
 
@@ -131,7 +155,15 @@
         />
 
         <div class="model-section">
-          <strong>Current value ({{ dateTimeForm().valid() ? 'valid' : 'invalid' }}):</strong>
+          @let dateTimeErrors = validationErrors(dateTimeForm);
+          <strong>Current value ({{ dateTimeErrors.length ? 'invalid' : 'valid' }}):</strong>
+          @if (dateTimeErrors.length) {
+            <ul class="model-errors">
+              @for (error of dateTimeErrors; track error) {
+                <li>{{ error }}</li>
+              }
+            </ul>
+          }
           <pre>{{ dateTimeEntity() | json }}</pre>
         </div>
 

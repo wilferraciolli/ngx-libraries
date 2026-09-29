@@ -7,6 +7,7 @@ import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatOption, MatSelect } from '@angular/material/select';
 import { JsonPipe } from '@angular/common';
 import { form } from '@angular/forms/signals';
+import type { FieldTree } from '@angular/forms/signals';
 import { Temporal } from 'temporal-polyfill';
 import {
   DynamicForm,
@@ -32,10 +33,13 @@ const DEMO_TIMEZONES: DemoOption[] = [
 ];
 
 const DEMO_LOCALES: DemoOption[] = [
-  { id: 'en-GB', value: 'English (UK) — 31/12/2026' },
-  { id: 'en-US', value: 'English (US) — 12/31/2026' },
-  { id: 'de-DE', value: 'German — 31.12.2026' },
-  { id: 'ja-JP', value: 'Japanese — 2026/12/31' }
+  { id: 'en-GB', value: 'English (UK) — 31/12/2026 18:05' },
+  { id: 'en-US', value: 'English (US) — 12/31/2026 6:05 PM' },
+  { id: 'en-CY', value: 'English (Cyprus) — 31/12/2026 6:05 pm' },
+  { id: 'el-CY', value: 'Greek (Cyprus) — 31/12/2026 6:05 μ.μ.' },
+  { id: 'pt-BR', value: 'Portuguese (Brazil) — 31/12/2026 18:05' },
+  { id: 'de-DE', value: 'German — 31.12.2026 18:05' },
+  { id: 'ja-JP', value: 'Japanese — 2026/12/31 18:05' }
 ];
 
 // Flight Schema
@@ -101,6 +105,15 @@ interface AllFieldsSchema extends BaseSchema {
   styleUrls: ['./forms-demo.component.css']
 })
 export class FormsDemoComponent {
+  /** Every current validation message in a form, including fields the user hasn't touched yet. */
+  protected validationErrors<T extends BaseSchema>(form: FieldTree<T>): string[] {
+    const fields = form as unknown as Record<string, FieldTree<unknown>>;
+
+    return Object.keys(form().value()).flatMap(name =>
+      fields[name]?.().errors().map(error => error.message ?? `${name}: ${error.kind}`) ?? []
+    );
+  }
+
   // ============ FLIGHTS FORM ============
   protected readonly flightFormConfig: SchemaConfig<FlightSchema> = defineSchema<FlightSchema>({
     schemaType: 'flight',
@@ -273,13 +286,6 @@ export class FormsDemoComponent {
         ]
       },
       {
-        name: 'acceptTerms',
-        type: FormFieldType.CHECKBOX,
-        label: 'Accept Terms & Conditions',
-        required: true,
-        hint: 'A single yes/no toggle.'
-      },
-      {
         name: 'age',
         type: FormFieldType.NUMBER,
         label: 'Age',
@@ -309,6 +315,13 @@ export class FormsDemoComponent {
         label: 'Favorite Code Snippet',
         hint: 'Code or other formatted/monospaced text. Tab inserts spaces instead of moving focus, like an editor.',
         maxWidth: '900px'
+      },
+      {
+        name: 'acceptTerms',
+        type: FormFieldType.CHECKBOX,
+        label: 'Accept Terms & Conditions',
+        required: true,
+        hint: 'A single yes/no toggle.'
       }
     ],
     initialValue: createEmptyEntity<AllFieldsSchema>('allFields', {

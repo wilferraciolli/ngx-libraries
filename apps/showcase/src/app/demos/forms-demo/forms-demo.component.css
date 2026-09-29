@@ -78,6 +78,12 @@
   font-size: 0.85rem;
 }
 
+.model-errors {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+  color: #b00020;
+}
+
 .model-section pre {
   margin: 0.5rem 0 0;
   white-space: pre-wrap;
