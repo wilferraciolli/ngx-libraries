@@ -5,8 +5,8 @@ scratchpad so we don't lose track between sessions. Update as items land or prio
 
 ## Housekeeping (found while looking, not yet fixed)
 
-- [ ] `CLAUDE.md` repo layout only lists `packages/api-client/` — `packages/forms/` exists and is
-      under active development but isn't mentioned there.
+- [x] `CLAUDE.md` repo layout now lists every package (`api-client`, `forms`, `media`, `ai-tools`,
+      `graphs`, `web-sockets`, `i18n`, `dates`) — kept up to date as each new package landed.
 - [x] Confirmed `@wiltech-labs/ngx-*` as the correct, current package scope everywhere it appears:
       both packages' `package.json`, `packages/api-client/README.md` + `CLAUDE.md`, root
       `CLAUDE.md` + `README.md`, and every reference in `apps/showcase` (`package.json`,
