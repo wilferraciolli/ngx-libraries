@@ -22,6 +22,7 @@
     "@angular/router": "^22.0.0",
     "@wiltech-labs/ngx-ai-tools": "*",
     "@wiltech-labs/ngx-api-client": "*",
+    "@wiltech-labs/ngx-dates": "*",
     "@wiltech-labs/ngx-forms": "*",
     "@wiltech-labs/ngx-graphs": "*",
     "@wiltech-labs/ngx-i18n": "*",

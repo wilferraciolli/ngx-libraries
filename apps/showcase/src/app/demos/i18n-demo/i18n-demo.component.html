@@ -35,4 +35,10 @@
     <p>{{ 'demo.formattedDate' | t }}: <strong>{{ formattedDate() }}</strong></p>
     <p>{{ 'demo.formattedNumber' | t }}: <strong>{{ formattedPrice() }}</strong></p>
   </div>
+
+  <div class="info-section">
+    <h3>ngx-dates: relativeTime pipe</h3>
+    <p>Comment posted: <strong>{{ fiveMinutesAgo | relativeTime }}</strong></p>
+    <p>Order placed: <strong>{{ threeDaysAgo | relativeTime }}</strong></p>
+  </div>
 </div>

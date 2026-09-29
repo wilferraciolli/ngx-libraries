@@ -125,7 +125,7 @@ to use which package and the rules for using it in an app.
 | Talk to the backend API | `ngx-api-client` | `ApiClientService`, `LinkService`, `MetadataService`, `convertIdToValues` pipe, `ApiErrorResponse` helpers | Hand-rolled `HttpClient` calls, `_data[root]` unwrapping, local envelope/link/metadata/error helpers |
 | Forms | `ngx-forms` | `formConfig<T>()`, `DynamicForm`, the `*Field` components, `toSchema()` | Hand-written `mat-form-field` markup, template-level validators, a `forms` SCSS partial |
 | Date and time input | `ngx-forms` | `BusinessDateField`, `BusinessTimeField`, `InstantDateTimeField`, `ZonedDateTimeService` | Raw `matDatepicker` bound to `Date` values |
-| Relative times ("5 hours ago") | `ngx-dates` *(planned)* | `relativeTime` pipe | An app-local pipe |
+| Relative times ("5 hours ago") | `ngx-dates` | `relativeTime` pipe, `RelativeTimeService` | An app-local pipe |
 | Loading states | `ngx-media` | `ContentLoader`, `CardLoader` | "Loading…" text, spinners for content, `ngx-skeleton-loader` |
 | Embedded video | `ngx-media` | `YoutubePlayer` | Hand-built `<iframe>` embeds |
 | Charts | `ngx-graphs` | `graphConfig()` + `BarGraph`/`LineGraph`/`PieGraph`/`DoughnutGraph`/`PolarAreaGraph`/`RadarGraph`; `pointGraphConfig()` + `BubbleGraph`/`ScatterGraph` | App-local chart wrappers, direct `ng2-charts` use, hand-drawn charts |
@@ -135,19 +135,25 @@ to use which package and the rules for using it in an app.
 
 ### Setup
 Install only the packages the app uses (`npm i @wiltech-labs/ngx-forms …`).
-Four of them need an app-level provider in `app.config.ts`:
+Five of them need an app-level provider in `app.config.ts`:
 ```ts
+import { inject } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
 import { API_ORIGIN } from '@wiltech-labs/ngx-api-client';
 import { provideWebSocket } from '@wiltech-labs/ngx-web-sockets';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
-import { provideI18n } from '@wiltech-labs/ngx-i18n';
+import { I18nService, provideI18n } from '@wiltech-labs/ngx-i18n';
+import { NGX_DATES_LOCALE } from '@wiltech-labs/ngx-dates';
 
 provideHttpClient(),                                         // ngx-api-client
 { provide: API_ORIGIN, useValue: environment.apiOrigin },    // ngx-api-client — only when the API is on another origin
 provideCharts(withDefaultRegisterables()),                   // ngx-graphs — chart.js registration, once per app
 provideWebSocket({ url: environment.socketUrl }),            // ngx-web-sockets
 provideI18n({ locales: [...], defaultLocale: '...', dictionaries: {...} }), // ngx-i18n
+{                                                             // ngx-dates — wire its locale to ngx-i18n's
+  provide: NGX_DATES_LOCALE,
+  useFactory: () => { const i18n = inject(I18nService); return () => i18n.locale(); }
+},
 ```
 - `API_ORIGIN` is the API's **bare origin** (`https://api.example.com`), not the
   `/api`-prefixed `apiUrl`. It defaults to `''` (same origin).
@@ -160,6 +166,10 @@ provideI18n({ locales: [...], defaultLocale: '...', dictionaries: {...} }), // n
   package README; that's for apps without their own theme.
 - `ngx-i18n` needs at least `locales`/`defaultLocale` plus `dictionaries` or a
   `loader` — see "`ngx-i18n`" below.
+- `ngx-dates` has no dependency on `ngx-i18n` (or any other package here) —
+  `NGX_DATES_LOCALE` defaults to the browser's own language if left unset. The
+  `useFactory` above is what makes a language switch update relative-time text
+  too; skip it in an app with no `ngx-i18n` setup.
 
 ### How the libraries fit the design system
 - **Selectors are `ngx-`** (`<ngx-dynamic-form>`, `<ngx-card-loader>`), so a
@@ -291,12 +301,22 @@ provideI18n({ locales: [...], defaultLocale: '...', dictionaries: {...} }), // n
 - A missing translation key renders as the key itself, not a blank string —
   don't add a second fallback layer on top.
 
-**`ngx-dates`** *(planned)*
-- Will hold the `relativeTime` pipe (see "Dates and times"), reading the
-  current locale from `ngx-i18n`'s `I18nService.locale()` rather than
-  `LOCALE_ID`, for the same reactivity reason. Until it's published, keep an
-  app-local pipe with the same name and behaviour, so the switch is only an
-  import change.
+**`ngx-dates`**
+- The `relativeTime` pipe ("5 minutes ago", "yesterday", "in 2 days") and
+  `RelativeTimeService` for the same text from logic (a toast, a log line).
+  Accepts a UTC instant string, a `Date`, or a `Temporal.Instant` — the same
+  wire format `ngx-forms`' instant-date-time field uses, so a value read from
+  that field needs no conversion first.
+- Locale comes from `NGX_DATES_LOCALE`, not `LOCALE_ID` (fixed at bootstrap,
+  can't react to a runtime switch). Wire it to `ngx-i18n` in `provideI18n`'s
+  setup above; without that wiring it defaults to the browser's own language
+  and won't move when the app's language does.
+- The pipe is impure and self-updates as real time passes (every second while
+  under a minute old, hourly once it's day-or-older) — nothing else needs to
+  trigger change detection for the displayed text to stay current.
+- `ngx-dates` has no dependency on `ngx-i18n`, or on any other package here —
+  see "Inter-package deps" in root `CLAUDE.md` for why, if a package here ever
+  seems like it wants to import another directly.
 
 ### Migrating an existing app
 Work through what the app actually has:
@@ -315,6 +335,8 @@ Work through what the app actually has:
 - [ ] Socket services or `ngx-socket-io` → `ngx-web-sockets`.
 - [ ] An app-local translation store, or raw Transloco use → `ngx-i18n`. Remove
       `@jsverse/transloco` from the app's own `package.json` if it's there.
+- [ ] An app-local "time ago" pipe → `ngx-dates`' `relativeTime` pipe. Wire
+      `NGX_DATES_LOCALE` to `ngx-i18n` if the app has it set up.
 - [ ] Remove any `--ngx-*` override set to a hex value.
 - [ ] Run the review checklist (section 7) on every screen touched, light and
       dark.
@@ -349,10 +371,11 @@ means, not by what the picker looks like:
     (`{{ createdAt | date: 'medium' }}`; it reads a `'YYYY-MM-DD'` string as a
     local date, so the day doesn't shift).
   - Business times: `Temporal.PlainTime.from(t).toLocaleString(locale, { hour: 'numeric', minute: '2-digit' })`.
-  - Relative times: the `relativeTime` pipe, inside `<time [attr.datetime]="iso">`
-    with the full timestamp in `title`.
+  - Relative times: `ngx-dates`' `relativeTime` pipe, inside
+    `<time [attr.datetime]="iso">` with the full timestamp in `title`.
   - All of the above take the locale from `ngx-i18n`'s `I18nService.locale()`
-    in an app that has it, not a hardcoded locale string.
+    in an app that has it (for `ngx-dates`, via `NGX_DATES_LOCALE` — see
+    "Setup" above), not a hardcoded locale string.
 - **Time zones**: show instants in the user's zone by default. A feature tied to
   a place (a flight, a branch, an event venue) shows that place's zone and
   labels it, the same as `InstantDateTimeField`'s `dateTimeConfig.timeZone`.

@@ -52,8 +52,6 @@ Still open:
 - [ ] ai-tools: with a theme whose primary/tertiary/secondary are all one hue (e.g. Material's
       `azure-blue` prebuilt), the AI gradient comes out near-monochrome. Decide whether that's fine or
       whether the gradient should keep fixed AI hues.
-- [ ] New package `ngx-dates`: `relativeTime` pipe on Temporal + `Intl.RelativeTimeFormat`, reading
-      the locale from `ngx-i18n`'s `I18nService.locale()`.
 - [ ] Possibly `ngx-styles` (shared SCSS: breakpoints, spacing, ui mixins, theme) — see discussion.
 
 ## New package `ngx-i18n` — built 2026-09-30
@@ -109,7 +107,58 @@ with Transloco, after confirming it already switches instantly — no reload —
         later, on request, not started.
       - Peak/ICU-heavy features (plurals, gendered forms) aren't exercised by the demo yet, only the
         plain-dictionary/interpolation path.
-      - `ngx-dates`' `relativeTime` and ngx-forms' `dateTimeConfig.locale` default to `activeLocale`.
+      - `ngx-forms`' `dateTimeConfig.locale` still defaults to `DEFAULT_DATE_TIME_LOCALE`
+        (`'en-GB'`), not a reactive resolver — `ngx-dates` (below) is the first package to actually
+        make this pattern real; `ngx-forms` hasn't been touched to match yet.
+
+## New package `ngx-dates` — built 2026-09-30
+
+Built right after `ngx-i18n`, per this file's own note above ("reading the locale from `ngx-i18n`'s
+`I18nService.locale()`"). That note's plan — `ngx-dates` importing `I18nService` directly — turned
+out not to build:
+
+- [x] Tried the direct import first. `ng-packagr` failed with `TS2307: Cannot find module
+      '@wiltech-labs/ngx-i18n'`, even with a `tsconfig` `paths` mapping (which fixes this for `tsc`
+      directly, and is how `apps/showcase` resolves every package — but `ng-packagr` builds each
+      package as a fully standalone publishable unit and doesn't honour it the same way). Root
+      cause: a workspace sibling's *source* `package.json` has no `main`/`types` field — only the
+      `dist/` one `ng-packagr` itself writes does — so there's currently no working way for one
+      package here to depend on another's source at build time, only for an app to depend on
+      several of them side by side. Documented as a new row in root `CLAUDE.md`'s "Locked-in
+      decisions" table ("Inter-package deps: none") so this isn't rediscovered the hard way again.
+- [x] Redesigned around `NGX_DATES_LOCALE` (`InjectionToken<() => string>`, defaults to
+      `navigator.language`) — the exact pattern `ngx-i18n`'s own `NgxI18nConfig.resolveLocale`
+      already uses for app-pluggable resolution, applied one level further out. The app wires the
+      two together itself: `{ provide: NGX_DATES_LOCALE, useFactory: () => { const i18n =
+      inject(I18nService); return () => i18n.locale(); } }`. `ngx-dates` ends up with zero
+      dependency on `ngx-i18n`, or on any i18n setup at all.
+- [x] `RelativeTimeService.relativeTime(value, options?)` — `Temporal` + `Intl.RelativeTimeFormat`,
+      a shared unit ladder (`pickTier()` in `relative-time.utils.ts`) picking the right unit
+      (second/minute/hour/day/week/month/year) from the diff. Accepts a UTC instant string, `Date`,
+      or `Temporal.Instant` (`InstantLike`) — the same wire format `ngx-forms`' instant-date-time
+      field uses.
+- [x] `RelativeTimePipe` (`relativeTime`) — impure for two independent reasons: the text changes as
+      real time passes even with nothing else happening, and it must re-render on a locale switch
+      when `NGX_DATES_LOCALE` is wired to something reactive. Self-schedules its own `setTimeout`
+      refresh (cleared in `ngOnDestroy`) at a delay from the same tier ladder — every second under a
+      minute old, hourly once day-or-older — rather than depending on an unrelated binding to
+      trigger change detection. Locale changes are picked up via an `effect()` that only calls
+      `markForCheck()` (never writes a signal); confirmed that `effect()` still tracks a signal read
+      performed *inside* the injected `resolveLocale()` function call, not just ones read directly
+      in the effect body.
+- [x] Wired into the showcase's existing `/i18n` demo (not a separate route — the point is showing
+      both packages react to the same switch together): `main.ts` wires `NGX_DATES_LOCALE` to
+      `I18nService.locale()`; the demo adds a "5 minutes ago" / "3 days ago" pair. Verified with
+      Playwright in both `en-GB` and `el-GR` — text switches instantly, no console errors.
+- [x] `docs/ANGULAR_APP_CONVENTIONS.md` updated: table row, `Setup` snippet, a real `ngx-dates`
+      subsection (replacing the old "planned" placeholder), migration checklist bullet, "Dates and
+      times" display bullet. Root `CLAUDE.md` repo layout and a new "Inter-package deps" decision row.
+- [ ] Not yet published to npm — under development, no consumers yet.
+- [ ] Not done as part of this: `ngx-forms`' own `dateTimeConfig.locale` still doesn't take a
+      reactive resolver (see the `ngx-i18n` section above) — `ngx-dates` proves the resolver-token
+      pattern works, `ngx-forms` hasn't been changed to use it yet.
+
+## More housekeeping
 - [ ] Showcase: give it the house M3 theme (it uses light-only `azure-blue` + hardcoded greys), so dark
       mode can be checked for real.
 - [ ] Run Prettier over the repo once and commit that separately.
@@ -131,6 +180,14 @@ with Transloco, after confirming it already switches instantly — no reload —
 
 - [ ] Already published and consumed by `insurly-ui`. No known outstanding work beyond routine
       version bumps as needed.
+
+## packages/i18n
+
+See "New package `ngx-i18n` — built 2026-09-30" above for what's built and what's still open.
+
+## packages/dates
+
+See "New package `ngx-dates` — built 2026-09-30" above for what's built and what's still open.
 
 ## packages/media
 

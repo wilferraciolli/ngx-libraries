@@ -6,6 +6,9 @@
       "@wiltech-labs/ngx-api-client": [
         "../../packages/api-client/src/public-api.ts"
       ],
+      "@wiltech-labs/ngx-dates": [
+        "../../packages/dates/src/public-api.ts"
+      ],
       "@wiltech-labs/ngx-forms": [
         "../../packages/forms/src/public-api.ts"
       ],
