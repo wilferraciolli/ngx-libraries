@@ -59,6 +59,7 @@ interface FlightSchema extends BaseSchema {
 interface AppointmentSchema extends BaseSchema {
   schemaType: 'appointment';
   name: string;
+  kind: string;
   startDate: string;
   startTime: string;
   duration: number;
@@ -166,10 +167,15 @@ export class FormsDemoComponent {
   // ============ APPOINTMENT FORM ============
   protected readonly appointmentFormConfig: SchemaConfig<AppointmentSchema> = formConfig<AppointmentSchema>('appointment')
     .text('name', 'Appointment Name', { required: true, minLength: 3, maxLength: 30 })
+    .radio('kind', 'Type', [
+      { label: 'In person', value: 'in_person' },
+      { label: 'Video call', value: 'video' },
+      { label: 'Phone', value: 'phone' }
+    ], { required: true, hint: 'Horizontal radio (the default orientation).' })
     .businessDate('startDate', 'Date', { required: true })
     .businessTime('startTime', 'Time', { required: true })
     .number('duration', 'Duration (minutes)', { required: true, min: 5, max: 480 })
-    .build({ name: '', startDate: '', startTime: '', duration: 30 });
+    .build({ name: '', kind: 'in_person', startDate: '', startTime: '', duration: 30 });
 
   protected readonly appointmentEntity: WritableSignal<AppointmentSchema> = signal(this.appointmentFormConfig.initialValue);
   protected readonly appointmentForm = form(
@@ -231,7 +237,8 @@ export class FormsDemoComponent {
       { label: 'Prefer not to say', value: 'not_specified' }
     ], {
       required: true,
-      hint: 'A small, fixed set of mutually-exclusive options where every choice should be visible at once.'
+      orientation: 'vertical',
+      hint: 'A small, fixed set of mutually-exclusive options where every choice should be visible at once. Shown with orientation: \'vertical\'.'
     })
     .select('country', 'Country', [
       { label: 'United States', value: 'us' },

@@ -19,6 +19,7 @@ export interface FieldDef {
   max?: number;                         // For number and range fields
   step?: number;                        // For number and range fields
   options?: FieldOption[];              // For radio buttons and select dropdowns
+  orientation?: 'horizontal' | 'vertical'; // For radio buttons: a wrapping row (default) or one option per line
   dateTimeConfig?: DateTimeConfig;      // For business-date, business-time and instant-date-time
 
   hidden?: boolean;         // Hide the field from display

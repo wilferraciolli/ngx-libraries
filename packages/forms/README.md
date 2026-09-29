@@ -211,6 +211,7 @@ interface FieldDef {
   max?: number;                     // Number and range fields
   step?: number;                    // Range fields
   options?: FieldOption[];          // Radio and select: [{ label, value }]
+  orientation?: 'horizontal' | 'vertical'; // Radio: a wrapping row (default) or one option per line
   dateTimeConfig?: DateTimeConfig;  // Business date/time and instant date-time
   hidden?: boolean;                 // Part of the model, never rendered
   disabled?: boolean;               // Rendered but not editable
