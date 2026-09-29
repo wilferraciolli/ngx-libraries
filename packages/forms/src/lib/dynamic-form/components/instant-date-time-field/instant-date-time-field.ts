@@ -8,7 +8,7 @@ import { MatInput, MatInputModule } from '@angular/material/input';
 import { MatTimepickerModule } from '@angular/material/timepicker';
 import { Temporal } from 'temporal-polyfill';
 import { provideLocaleDateAdapter } from '../../adapters/locale-date-adapter';
-import { DEFAULT_DATE_TIME_LOCALE } from '../../constants/date-time.constants';
+import { NGX_FORMS_LOCALE } from '../../config/forms-locale.token';
 import type { FieldDef } from '../../interfaces/field-definition';
 import { syncMatInputErrorState } from '../../utils/mat-input-error-state';
 import { ZonedDateTimeService } from '../../services/zoned-date-time.service';
@@ -34,6 +34,7 @@ export class InstantDateTimeField {
 
   private readonly zonedDateTime = inject(ZonedDateTimeService);
   private readonly dateAdapter = inject<DateAdapter<Date>>(DateAdapter);
+  private readonly resolveLocale = inject(NGX_FORMS_LOCALE);
 
   /** Explains how a DST gap or overlap was resolved for the last value picked by the user. */
   protected readonly notice: WritableSignal<string | null> = signal(null);
@@ -59,7 +60,7 @@ export class InstantDateTimeField {
 
   constructor() {
     syncMatInputErrorState(this.inputs, this.state);
-    effect(() => this.dateAdapter.setLocale(this.config()?.locale || DEFAULT_DATE_TIME_LOCALE));
+    effect(() => this.dateAdapter.setLocale(this.config()?.locale || this.resolveLocale()));
   }
 
   protected onDateChange(date: Date | null): void {

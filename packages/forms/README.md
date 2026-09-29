@@ -202,6 +202,29 @@ Use `hidden(name)` on the builder for a field that belongs to the model and its 
 All three display and parse dates in `dateTimeConfig.locale` (default `'en-GB'`, so `31/12/2026`),
 never the browser's locale — typing `31/12/2026` works for any day-first locale.
 
+### App-wide default locale
+
+`dateTimeConfig.locale` set on a field always wins. When it's unset, the fallback comes from
+`NGX_FORMS_LOCALE` (an `InjectionToken<() => string>`), not a hardcoded constant — provide it once
+in `app.config.ts` to change every field's default locale together, e.g. wired to
+[`@wiltech-labs/ngx-i18n`](../i18n):
+
+```ts
+import { inject } from '@angular/core';
+import { NGX_FORMS_LOCALE } from '@wiltech-labs/ngx-forms';
+import { I18nService } from '@wiltech-labs/ngx-i18n';
+
+{
+  provide: NGX_FORMS_LOCALE,
+  useFactory: () => { const i18n = inject(I18nService); return () => i18n.locale(); }
+}
+```
+
+Unlike `ngx-dates`' `NGX_DATES_LOCALE` (read-only display text), this locale also decides which
+*typed* day/month order the picker's input accepts — changing it changes user input behaviour, not
+just wording, so it isn't defaulted to the browser's own language the way `ngx-dates` is. Leave it
+unset and every field keeps today's default (`'en-GB'`).
+
 ## Field definition
 
 ```typescript

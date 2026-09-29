@@ -107,9 +107,8 @@ with Transloco, after confirming it already switches instantly — no reload —
         later, on request, not started.
       - Peak/ICU-heavy features (plurals, gendered forms) aren't exercised by the demo yet, only the
         plain-dictionary/interpolation path.
-      - `ngx-forms`' `dateTimeConfig.locale` still defaults to `DEFAULT_DATE_TIME_LOCALE`
-        (`'en-GB'`), not a reactive resolver — `ngx-dates` (below) is the first package to actually
-        make this pattern real; `ngx-forms` hasn't been touched to match yet.
+      - `ngx-forms`' `dateTimeConfig.locale` fallback — see "`ngx-forms`: `NGX_FORMS_LOCALE`" below,
+        done 2026-09-30, after `ngx-dates`.
 
 ## New package `ngx-dates` — built 2026-09-30
 
@@ -154,9 +153,33 @@ out not to build:
       subsection (replacing the old "planned" placeholder), migration checklist bullet, "Dates and
       times" display bullet. Root `CLAUDE.md` repo layout and a new "Inter-package deps" decision row.
 - [ ] Not yet published to npm — under development, no consumers yet.
-- [ ] Not done as part of this: `ngx-forms`' own `dateTimeConfig.locale` still doesn't take a
-      reactive resolver (see the `ngx-i18n` section above) — `ngx-dates` proves the resolver-token
-      pattern works, `ngx-forms` hasn't been changed to use it yet.
+
+### `ngx-forms`: `NGX_FORMS_LOCALE` — built 2026-09-30
+
+The one loose end `ngx-dates` left (see above): `ngx-forms`' three date/time fields
+(`BusinessDateField`/`BusinessTimeField`/`InstantDateTimeField`) each fell back to the hardcoded
+`DEFAULT_DATE_TIME_LOCALE` constant when a `FieldDef` didn't set `dateTimeConfig.locale`. Replaced
+that fallback with `NGX_FORMS_LOCALE` (`InjectionToken<() => string>`), the same resolver-token
+pattern as `NGX_DATES_LOCALE` — an app can wire it to `ngx-i18n`'s `I18nService.locale()` the same
+way, with zero import-time dependency between the two packages.
+
+- [x] `NGX_FORMS_LOCALE` added (`config/forms-locale.token.ts`), defaulting to
+      `DEFAULT_DATE_TIME_LOCALE` (`'en-GB'`) — **not** the browser's own language the way
+      `NGX_DATES_LOCALE` defaults, and deliberately not wired to `ngx-i18n` in the showcase either:
+      this locale also decides which typed day/month order `LocaleDateAdapter.parse()` accepts, so
+      changing it changes user input behaviour, not just wording. An app opts in on purpose; it
+      isn't a default recommendation the way the `ngx-dates` wiring is.
+- [x] All three field components updated to inject it and use `this.resolveLocale()` as the
+      fallback instead of the constant directly. `dateTimeConfig.locale` set on the field still
+      always wins — no change to that precedence.
+- [x] Exported from `public-api.ts`. Package rebuilds/typechecks clean; full workspace build
+      (all 8 packages + showcase `ng build`) still clean afterward. Showcase's `/forms` demo
+      checked in a browser with the token left unwired (today's real-world default) — renders
+      correctly, no console errors.
+- [x] `packages/forms/README.md` and `CLAUDE.md`, and `docs/ANGULAR_APP_CONVENTIONS.md` (`ngx-forms`
+      subsection, Setup section) updated to explain the token and why it isn't in the main Setup
+      snippet the way `NGX_DATES_LOCALE` is.
+- [ ] Not yet published to npm.
 
 ## More housekeeping
 - [ ] Showcase: give it the house M3 theme (it uses light-only `azure-blue` + hardcoded greys), so dark

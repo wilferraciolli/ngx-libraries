@@ -15,6 +15,7 @@ src/
         │                          #   select, slider, business-date, business-time, instant-date-time)
         ├── builders/              # formConfig<T>() / FormConfigBuilder
         ├── adapters/              # LocaleDateAdapter + provideLocaleDateAdapter() for the pickers
+        ├── config/                # NGX_FORMS_LOCALE — app-wide date/time field locale fallback
         ├── services/              # ZonedDateTimeService (UTC instant <-> picker Date in a timezone)
         ├── shared/field-subscript/ # Hint/error line for controls with no mat-form-field
         ├── interfaces/            # FieldDef, FieldOption, BaseSchema, SchemaConfig
@@ -37,6 +38,14 @@ src/
 - Validation lives in `toSchema()`, driven by `FieldDef`, never in the components.
 - The showcase dev server doesn't watch `packages/forms` (it's only reached through a TS path
   mapping) — restart `ng serve` after library changes.
+- **Date/time field locale**: `dateTimeConfig.locale` on a `FieldDef` always wins; the fallback when
+  it's unset is `NGX_FORMS_LOCALE` (`InjectionToken<() => string>`, defaults to
+  `DEFAULT_DATE_TIME_LOCALE`), not a hardcoded constant read directly — added 2026-09-30, same
+  pattern as `ngx-dates`' `NGX_DATES_LOCALE` (see root `CLAUDE.md`'s "Inter-package deps": no direct
+  import of `ngx-i18n`, an app wires the two together itself). Deliberately *not* defaulted to the
+  browser's own language the way `ngx-dates` is — this locale also decides which typed day/month
+  order `LocaleDateAdapter.parse()` accepts, so changing it changes input behaviour, not just
+  wording, and an app should opt into that rather than have it happen silently.
 
 ## Status
 

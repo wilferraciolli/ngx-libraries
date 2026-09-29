@@ -27,6 +27,10 @@ export type { DateTimeFieldOptions, FieldName, FieldOptions } from './lib/dynami
 export { FormFieldType } from './lib/dynamic-form/constants/form-field.constant';
 export type { DateTimeConfig, DateTimeDisambiguation } from './lib/dynamic-form/constants/date-time.constants';
 
+// Dynamic Form Config
+export { NGX_FORMS_LOCALE } from './lib/dynamic-form/config/forms-locale.token';
+export type { FormsLocaleResolver } from './lib/dynamic-form/config/forms-locale.token';
+
 // Dynamic Form Services
 export { ZonedDateTimeService } from './lib/dynamic-form/services/zoned-date-time.service';
 export type { ZonedInstantResult } from './lib/dynamic-form/services/zoned-date-time.service';

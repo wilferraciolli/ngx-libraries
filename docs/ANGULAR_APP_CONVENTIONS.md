@@ -170,6 +170,11 @@ provideI18n({ locales: [...], defaultLocale: '...', dictionaries: {...} }), // n
   `NGX_DATES_LOCALE` defaults to the browser's own language if left unset. The
   `useFactory` above is what makes a language switch update relative-time text
   too; skip it in an app with no `ngx-i18n` setup.
+- `ngx-forms` has the same `NGX_FORMS_LOCALE` token, deliberately **not** shown
+  above — wiring it to `ngx-i18n` the same way means a language switch changes
+  which typed day/month order a date/time field's input accepts, not just
+  wording, so it's an app's deliberate choice, not a default. See "`ngx-forms`"
+  below.
 
 ### How the libraries fit the design system
 - **Selectors are `ngx-`** (`<ngx-dynamic-form>`, `<ngx-card-loader>`), so a
@@ -222,6 +227,11 @@ provideI18n({ locales: [...], defaultLocale: '...', dictionaries: {...} }), // n
   `mat-form-field`.
 - Short forms still sit in the tonal panel recipe (section 5). The panel is the
   app's; the fields are the library's.
+- Date/time fields display and parse in `dateTimeConfig.locale`, falling back to
+  `NGX_FORMS_LOCALE` when a field doesn't set one — provide it in `app.config.ts`
+  to change every field's default locale together (wire it to `ngx-i18n` the
+  same way as `NGX_DATES_LOCALE`, see "Setup" above). Leave it unset and every
+  field keeps the package's own default (`'en-GB'`).
 
 **`ngx-graphs`**
 - Decide the form first (the "Insights / charts" recipe: KPI row, chart per
