@@ -1,0 +1,33 @@
+:host {
+  display: inline-block;
+}
+
+.ai-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  background: linear-gradient(
+    90deg,
+    var(--ngx-ai-gradient-start, #4f7cff),
+    var(--ngx-ai-gradient-mid, #a855f7),
+    var(--ngx-ai-gradient-end, #ec4899)
+  );
+  transition: opacity 0.2s;
+}
+
+.ai-button:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.ai-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

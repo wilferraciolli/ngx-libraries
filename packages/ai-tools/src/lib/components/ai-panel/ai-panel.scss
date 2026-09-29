@@ -1,0 +1,32 @@
+@use '../../shared/styles/gradient-border.mixins' as border;
+
+:host {
+  display: block;
+}
+
+.ai-panel {
+  @include border.gradient-border(16px, 2px);
+}
+
+.ai-panel__content {
+  background: var(--ngx-ai-surface, #ffffff);
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.ai-panel__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.ai-panel__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  background: linear-gradient(90deg, var(--ngx-ai-gradient-start, #4f7cff), var(--ngx-ai-gradient-mid, #a855f7));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}

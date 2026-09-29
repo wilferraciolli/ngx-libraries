@@ -12,7 +12,10 @@ Note: the npm scope is `@wiltech-labs`, not `@wiltech`.
 ```
 ngx-libraries/
 ├── packages/
-│   └── api-client/        # @wiltech-labs/ngx-api-client — see its own CLAUDE.md
+│   ├── api-client/        # @wiltech-labs/ngx-api-client — see its own CLAUDE.md
+│   ├── forms/              # @wiltech-labs/ngx-forms — see its own CLAUDE.md
+│   ├── media/              # @wiltech-labs/ngx-media — see its own CLAUDE.md
+│   └── ai-tools/           # @wiltech-labs/ngx-ai-tools — see its own CLAUDE.md
 ├── tsconfig.base.json     # shared compiler options, extended by every package
 ├── package.json           # npm workspaces root (packages/*)
 └── LICENSE                # Apache-2.0, applies to every package

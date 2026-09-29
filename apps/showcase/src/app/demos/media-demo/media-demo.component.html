@@ -1,0 +1,35 @@
+<div class="demo-container">
+  <h2>Media Demo</h2>
+  <p class="subtitle">Skeleton loaders and the YouTube player from ngx-media</p>
+
+  <div class="form-section">
+    <button (click)="toggleLoading()" class="btn btn-primary">
+      {{ loading() ? 'Show real content' : 'Show loaders' }}
+    </button>
+  </div>
+
+  <div class="info-section">
+    <h3>CardLoader</h3>
+    @if (loading()) {
+      <app-card-loader style="max-width: 320px; display: block;" />
+    } @else {
+      <div style="max-width: 320px;">Real card content would render here.</div>
+    }
+  </div>
+
+  <div class="info-section">
+    <h3>ContentLoader</h3>
+    @if (loading()) {
+      <app-content-loader [lines]="4" style="display: block; height: 120px;" />
+    } @else {
+      <p>Real paragraph content would render here, once loaded.</p>
+    }
+  </div>
+
+  <div class="info-section">
+    <h3>YoutubePlayer</h3>
+    <div style="max-width: 480px;">
+      <app-youtube-player [videoId]="videoId" />
+    </div>
+  </div>
+</div>
