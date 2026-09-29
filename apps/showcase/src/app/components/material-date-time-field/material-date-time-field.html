@@ -1,0 +1,44 @@
+<div class="material-date-time-field-container">
+  <div class="material-date-time-field-label">{{ label() }}</div>
+
+  <div class="material-date-time-field-row">
+    <mat-form-field class="material-date-time-field-date" appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Date</mat-label>
+      <input
+        matInput
+        [matDatepicker]="datepicker"
+        [value]="date()"
+        [min]="minDate()"
+        [max]="maxDate()"
+        [attr.aria-invalid]="invalid() ? true : null"
+        (dateChange)="onDateChange($event.value)"
+      />
+      <mat-datepicker-toggle matIconSuffix [for]="datepicker" />
+      <mat-datepicker #datepicker />
+    </mat-form-field>
+
+    <mat-form-field class="material-date-time-field-time" appearance="outline" subscriptSizing="dynamic">
+      <mat-label>Time</mat-label>
+      <input
+        matInput
+        [matTimepicker]="timepicker"
+        [value]="time()"
+        [attr.aria-invalid]="invalid() ? true : null"
+        (valueChange)="onTimeChange($event)"
+      />
+      <mat-timepicker-toggle matIconSuffix [for]="timepicker" />
+      <mat-timepicker #timepicker />
+    </mat-form-field>
+  </div>
+
+  <div class="material-date-time-field-hint">
+    {{ timeZone() }}@if (offset()) { (UTC{{ offset() }})}
+    @if (value()) {
+      · stored as {{ value() }}
+    }
+  </div>
+
+  @if (notice()) {
+    <div class="material-date-time-field-notice">{{ notice() }}</div>
+  }
+</div>

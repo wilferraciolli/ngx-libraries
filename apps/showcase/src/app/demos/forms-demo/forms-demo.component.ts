@@ -17,6 +17,7 @@ import {
   toSchema
 } from '@wiltech-labs/ngx-forms';
 import type { BaseSchema, FieldDef, SchemaConfig } from '@wiltech-labs/ngx-forms';
+import { MaterialDateTimeField } from '../../components/material-date-time-field/material-date-time-field';
 
 interface TimeZone {
   id: string;
@@ -82,6 +83,7 @@ interface AllFieldsSchema extends BaseSchema {
     MatTabsModule,
     DynamicForm,
     UtcDateTimeCustomField,
+    MaterialDateTimeField,
     FormField,
     JsonPipe,
     MatDivider,

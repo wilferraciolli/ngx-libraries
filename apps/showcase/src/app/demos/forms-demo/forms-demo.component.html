@@ -111,6 +111,17 @@
           [config]="{ timeZone: utcSelectedTimezone(), minUtc: '2024-01-01T00:00:00Z' }"
         />
 
+        <h4>Material pickers with a fixed locale (new, same underlying field)</h4>
+        <p class="tab-content-hint">
+          Same value again, edited through the Material datepicker and timepicker — use it when the
+          display format must follow a chosen locale (here en-GB, DD/MM/YYYY) instead of the browser's.
+        </p>
+        <app-material-date-time-field
+          label="Appointment (en-GB)"
+          [formField]="utcAppointmentForm.appointment"
+          [config]="{ timeZone: utcSelectedTimezone(), minUtc: '2024-01-01T00:00:00Z', locale: 'en-GB' }"
+        />
+
         @if (utcAppointmentSubmitted(); as data) {
           <mat-divider/>
           <div class="response-section">
