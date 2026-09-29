@@ -1,0 +1,38 @@
+<section class="ChatRoom" [attr.aria-label]="'Chat: ' + roomName()">
+  <div class="ChatRoom-header" role="status">
+    <span class="ChatRoom-connection" [class.is-online]="connected()">
+      {{ connected() ? 'Connected' : 'Connecting…' }}
+    </span>
+    @if (statusMessage()) {
+      <span class="ChatRoom-status">{{ statusMessage() }}</span>
+    }
+  </div>
+
+  <div class="ChatRoom-messages" role="log" aria-label="Messages">
+    @for (message of messages(); track message.id) {
+      <ngx-chat-message-bubble [clientId]="clientId()" [message]="message" />
+    }
+  </div>
+
+  <form class="ChatRoom-composer" (submit)="$event.preventDefault(); sendMessage()">
+    <input
+      class="ChatRoom-input"
+      aria-label="Message"
+      placeholder="Type a message…"
+      autocomplete="off"
+      [value]="draft()"
+      (input)="onDraftInput($event)"
+    />
+    <button
+      type="submit"
+      class="ChatRoom-send"
+      aria-label="Send message"
+      title="Send message"
+      [disabled]="!draft().trim()"
+    >
+      <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+        <path fill="currentColor" d="M3 20V4l19 8-19 8Zm2-3 11.85-5L5 7v3.5l6 1.5-6 1.5V17Z" />
+      </svg>
+    </button>
+  </form>
+</section>

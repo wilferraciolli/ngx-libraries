@@ -1,0 +1,44 @@
+<div class="demo-container">
+  <h2>{{ 'demo.title' | t }}</h2>
+  <p class="subtitle">{{ 'demo.subtitle' | t }}</p>
+
+  <div class="info-section">
+    <h3>{{ 'demo.switchLanguage' | t }}</h3>
+    <div style="display: flex; gap: 8px;">
+      @for (locale of i18n.supportedLocales(); track locale) {
+        <button
+          type="button"
+          [disabled]="i18n.locale() === locale"
+          (click)="switchTo(locale)"
+        >
+          {{ locale }}
+        </button>
+      }
+    </div>
+    <p>{{ 'demo.currentLocale' | t }}: <strong>{{ i18n.locale() }}</strong></p>
+  </div>
+
+  <div class="info-section">
+    <h3>t pipe (template)</h3>
+    <p>{{ 'demo.greeting' | t: { name: 'Ada' } }}</p>
+    <p>{{ 'demo.itemCount' | t: { count: itemCount() } }}</p>
+    <p>{{ 'common.buttons.save' | t }} / {{ 'common.buttons.cancel' | t }}</p>
+  </div>
+
+  <div class="info-section">
+    <h3>I18nService.t() (logic)</h3>
+    <p>metadata.status.active → <strong>{{ statusLabel() }}</strong></p>
+  </div>
+
+  <div class="info-section">
+    <h3>formatDate() / formatNumber()</h3>
+    <p>{{ 'demo.formattedDate' | t }}: <strong>{{ formattedDate() }}</strong></p>
+    <p>{{ 'demo.formattedNumber' | t }}: <strong>{{ formattedPrice() }}</strong></p>
+  </div>
+
+  <div class="info-section">
+    <h3>ngx-dates: relativeTime pipe</h3>
+    <p>Comment posted: <strong>{{ fiveMinutesAgo | relativeTime }}</strong></p>
+    <p>Order placed: <strong>{{ threeDaysAgo | relativeTime }}</strong></p>
+  </div>
+</div>

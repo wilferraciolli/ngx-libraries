@@ -4,52 +4,53 @@
   display: block;
 }
 
-.card-loader {
+// Same surface as an M3 content card, so the skeleton sits where the card will.
+.CardLoader {
   display: flex;
   flex-direction: column;
   gap: 16px;
   padding: 16px;
-  border-radius: 8px;
-  border: 1px solid var(--ngx-media-loader-border, rgba(0, 0, 0, 0.08));
-}
+  border-radius: var(--mat-sys-corner-large, 16px);
+  background: var(--ngx-media-loader-surface, var(--mat-sys-surface-container-low, transparent));
 
-.card-loader__header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+  &-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
 
-.card-loader__avatar {
-  @include shimmer.shimmer;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
+  &-avatar {
+    @include shimmer.shimmer;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--mat-sys-corner-full, 50%);
+    flex-shrink: 0;
+  }
 
-.card-loader__heading {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex: 1;
-  min-width: 0;
-}
+  &-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+  }
 
-.card-loader__title {
-  @include shimmer.shimmer;
-  height: 14px;
-  width: 60%;
-  border-radius: 4px;
-}
+  &-title {
+    @include shimmer.shimmer;
+    height: 14px;
+    width: 60%;
+    border-radius: var(--mat-sys-corner-extra-small, 4px);
+  }
 
-.card-loader__subtitle {
-  @include shimmer.shimmer;
-  height: 10px;
-  width: 40%;
-  border-radius: 4px;
-}
+  &-subtitle {
+    @include shimmer.shimmer;
+    height: 10px;
+    width: 40%;
+    border-radius: var(--mat-sys-corner-extra-small, 4px);
+  }
 
-.card-loader__content {
-  display: block;
-  height: 48px;
+  &-content {
+    display: block;
+    height: 48px;
+  }
 }

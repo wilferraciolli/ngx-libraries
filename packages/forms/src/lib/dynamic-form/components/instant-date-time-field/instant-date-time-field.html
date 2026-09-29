@@ -1,9 +1,9 @@
-<div class="instant-date-time-field-label">
+<div class="InstantDateTimeField-label">
   {{ fieldDef().label }}@if (state().required()) {<span aria-hidden="true"> *</span>}
 </div>
 
-<div class="instant-date-time-field-row">
-  <mat-form-field class="instant-date-time-field-date" appearance="outline" subscriptSizing="dynamic">
+<div class="InstantDateTimeField-row">
+  <mat-form-field class="InstantDateTimeField-date" appearance="outline" subscriptSizing="dynamic">
     <mat-label>Date</mat-label>
     <input
       matInput
@@ -19,7 +19,7 @@
     <mat-datepicker #datepicker (closed)="state().markAsTouched()" />
   </mat-form-field>
 
-  <mat-form-field class="instant-date-time-field-time" appearance="outline" subscriptSizing="dynamic">
+  <mat-form-field class="InstantDateTimeField-time" appearance="outline" subscriptSizing="dynamic">
     <mat-label>Time</mat-label>
     <input
       matInput
@@ -34,7 +34,7 @@
   </mat-form-field>
 </div>
 
-<div class="instant-date-time-field-zone">
+<div class="InstantDateTimeField-zone">
   {{ timeZone() }}@if (offset()) { (UTC{{ offset() }})}
   @if (state().value()) {
     · stored as {{ state().value() }}
@@ -42,7 +42,7 @@
 </div>
 
 @if (notice()) {
-  <div class="instant-date-time-field-notice">{{ notice() }}</div>
+  <div class="InstantDateTimeField-notice">{{ notice() }}</div>
 }
 
-<app-field-subscript [field]="field()" [hint]="fieldDef().hint" />
+<ngx-field-subscript [field]="field()" [hint]="fieldDef().hint" />

@@ -15,7 +15,14 @@ ngx-libraries/
 │   ├── api-client/        # @wiltech-labs/ngx-api-client — see its own CLAUDE.md
 │   ├── forms/              # @wiltech-labs/ngx-forms — see its own CLAUDE.md
 │   ├── media/              # @wiltech-labs/ngx-media — see its own CLAUDE.md
-│   └── ai-tools/           # @wiltech-labs/ngx-ai-tools — see its own CLAUDE.md
+│   ├── ai-tools/           # @wiltech-labs/ngx-ai-tools — see its own CLAUDE.md
+│   ├── graphs/             # @wiltech-labs/ngx-graphs — see its own CLAUDE.md
+│   ├── web-sockets/        # @wiltech-labs/ngx-web-sockets — see its own CLAUDE.md
+│   ├── i18n/               # @wiltech-labs/ngx-i18n — see its own CLAUDE.md
+│   └── dates/              # @wiltech-labs/ngx-dates — see its own CLAUDE.md
+├── docs/
+│   └── ANGULAR_APP_CONVENTIONS.md  # conventions every consuming Angular app follows — its
+│                                   # "Shared libraries" section is the contract these packages meet
 ├── tsconfig.base.json     # shared compiler options, extended by every package
 ├── package.json           # npm workspaces root (packages/*)
 └── LICENSE                # Apache-2.0, applies to every package
@@ -31,6 +38,7 @@ ngx-libraries/
 | Publishing | Public npm packages (not a private registry) — `publishConfig.access: public` is set per package. Publish from that package's `dist/` (the `ng-packagr` output), never the source folder — the source `package.json` has no entry-point fields. |
 | Components | Standalone only, no NgModules — matches every known consumer's convention. |
 | License | Apache-2.0 (repo `LICENSE`, inherited by each package's `package.json`). |
+| Inter-package deps | None — every package builds and publishes standalone. `ng-packagr` needs a real, resolvable module for each import, and a workspace sibling's *source* `package.json` has no `main`/`types` (only its built `dist/` one does — see Publishing above), so one package here can't import another's source the way an app can via a `tsconfig` path mapping. Where a package would otherwise want another (`ngx-dates` wanting `ngx-i18n`'s locale, e.g.), use an app-pluggable resolver token instead (see `ngx-i18n`'s `NgxI18nConfig.resolveLocale` / `ngx-dates`' `NGX_DATES_LOCALE`) and let the *consuming app* wire the two together. |
 
 ## Working in this repo
 - One package = one npm-publishable unit. Organize each package's `src/lib/`
@@ -39,6 +47,18 @@ ngx-libraries/
   `CLAUDE.md`.
 - A package's public surface is exactly what `src/public-api.ts` re-exports
   — nothing else is reachable by consumers.
+- **Every package meets `docs/ANGULAR_APP_CONVENTIONS.md`** — its "Shared
+  libraries" section is the contract. In particular:
+  - component selectors are `ngx-` (never `app-`, which is the consuming apps' prefix);
+  - SCSS classes follow the doc's "Component SCSS class naming" (`.ComponentName-suffix`,
+    `is-*` state classes, max two `&` levels) — no BEM;
+  - colours, type and shape come from `--mat-sys-*` tokens, via `--ngx-<package>-*` overrides
+    with a hex fallback last: `var(--ngx-x, var(--mat-sys-y, #hex))` (a hex fallback keeps
+    Material-free packages usable in an unthemed app);
+  - motion stops under `prefers-reduced-motion`; custom interactive elements get a visible focus
+    ring; decorative pieces are `aria-hidden`;
+  - dates follow the doc's "Dates and times" (`Temporal`, string wire formats).
+  Change the doc and the package together when a rule needs to move.
 - **New package checklist**: `packages/<name>/` containing
   - `package.json` — peer deps pinned to the Angular versions actually in
     use, `publishConfig.access: public`

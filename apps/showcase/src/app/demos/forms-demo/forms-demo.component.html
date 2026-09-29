@@ -9,7 +9,7 @@
         <h3>Flight Booking</h3>
         <p>Demonstrates: text, instant date-time, checkbox fields with required/minLength/maxLength validation.</p>
 
-        <app-dynamic-form
+        <ngx-dynamic-form
           [metaInfo]="flightFormConfig.fields"
           [dynamicForm]="flightsForm"
           (onFormSubmit)="handleFlightSubmit()"
@@ -45,7 +45,7 @@
         <h3>Book an Appointment</h3>
         <p>Demonstrates: text, a horizontal radio, business date, business time, and number fields.</p>
 
-        <app-dynamic-form
+        <ngx-dynamic-form
           [metaInfo]="appointmentFormConfig.fields"
           [dynamicForm]="appointmentForm"
           (onFormSubmit)="handleAppointmentSubmit()"
@@ -81,7 +81,7 @@
         <h3>Every Field Type</h3>
         <p>Demonstrates: text (with a pattern), email, password, search, business date, business time, instant date-time, radio, select, checkbox, number, range, textarea, and code.</p>
 
-        <app-dynamic-form
+        <ngx-dynamic-form
           [metaInfo]="allFieldsFormConfig.fields"
           [dynamicForm]="allFieldsForm"
           (onFormSubmit)="handleAllFieldsSubmit()"
@@ -147,7 +147,7 @@
           </mat-form-field>
         </div>
 
-        <app-dynamic-form
+        <ngx-dynamic-form
           [metaInfo]="dateTimeFields()"
           [dynamicForm]="dateTimeForm"
           (onFormSubmit)="handleDateTimeSubmit()"
@@ -201,10 +201,10 @@
         </p>
 
         <div class="standalone-fields">
-          <app-text-field [fieldDef]="newsletterFields.email" [field]="newsletterForm.email" />
-          <app-business-date-field [fieldDef]="newsletterFields.startDate" [field]="newsletterForm.startDate" />
-          <app-select-field [fieldDef]="newsletterFields.frequency" [field]="newsletterForm.frequency" />
-          <app-checkbox-field [fieldDef]="newsletterFields.agree" [field]="newsletterForm.agree" />
+          <ngx-text-field [fieldDef]="newsletterFields.email" [field]="newsletterForm.email" />
+          <ngx-business-date-field [fieldDef]="newsletterFields.startDate" [field]="newsletterForm.startDate" />
+          <ngx-select-field [fieldDef]="newsletterFields.frequency" [field]="newsletterForm.frequency" />
+          <ngx-checkbox-field [fieldDef]="newsletterFields.agree" [field]="newsletterForm.agree" />
         </div>
 
         <div class="model-section">

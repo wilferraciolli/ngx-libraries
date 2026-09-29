@@ -27,7 +27,7 @@ import { CardLoader } from '@wiltech-labs/ngx-media';
   imports: [CardLoader],
   template: `
     @if (loading()) {
-      <app-card-loader />
+      <ngx-card-loader />
     } @else {
       <!-- real content -->
     }
@@ -47,7 +47,7 @@ like paragraph text — drop it into any component in place of its real content 
 
 ```html
 @if (loading()) {
-  <app-content-loader [lines]="4" />
+  <ngx-content-loader [lines]="4" />
 } @else {
   <p>{{ article().body }}</p>
 }
@@ -55,14 +55,30 @@ like paragraph text — drop it into any component in place of its real content 
 
 ### Theming
 
-Both loaders shimmer using CSS custom properties, so they follow whatever theme the host app sets:
+The loaders use the app's M3 tokens, so they're right in light and dark with no setup: the shimmer
+runs between `surface-container-highest` and `surface-container-high`, and `CardLoader` sits on a
+`surface-container-low` card with `corner-large`, the same surface as a content card. The shimmer
+stops under `prefers-reduced-motion`.
+
+For a genuine one-off, override with a token (never a hex value):
 
 ```css
-:root {
-  --ngx-media-loader-base: #e2e2e2;
-  --ngx-media-loader-highlight: #f0f0f0;
-  --ngx-media-loader-border: rgba(0, 0, 0, 0.08); /* CardLoader's outer border only */
+.MyPage-feed {
+  --ngx-media-loader-surface: var(--mat-sys-surface-container);
 }
+```
+
+Variables: `--ngx-media-loader-base`, `--ngx-media-loader-highlight`, `--ngx-media-loader-surface`.
+
+### Accessibility
+
+Skeletons are decorative (`aria-hidden="true"` on the host). Mark the region being filled busy and
+announce the outcome there:
+
+```html
+<section [attr.aria-busy]="loading()">
+  @if (loading()) { <ngx-card-loader /> } @else { <!-- content --> }
+</section>
 ```
 
 ## `YoutubePlayer`
@@ -76,7 +92,7 @@ import { YoutubePlayer } from '@wiltech-labs/ngx-media';
 @Component({
   selector: 'app-video',
   imports: [YoutubePlayer],
-  template: `<app-youtube-player videoId="dQw4w9WgXcQ" />`
+  template: `<ngx-youtube-player videoId="dQw4w9WgXcQ" />`
 })
 export class VideoComponent {}
 ```

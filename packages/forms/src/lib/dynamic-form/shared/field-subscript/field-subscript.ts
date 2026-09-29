@@ -7,7 +7,7 @@ import { MatError } from '@angular/material/form-field';
  * slider, instant date-time). Matches mat-form-field: errors replace the hint once touched.
  */
 @Component({
-  selector: 'app-field-subscript',
+  selector: 'ngx-field-subscript',
   standalone: true,
   imports: [MatError],
   templateUrl: './field-subscript.html',

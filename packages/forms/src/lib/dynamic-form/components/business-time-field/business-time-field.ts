@@ -6,7 +6,7 @@ import { MatInput, MatInputModule } from '@angular/material/input';
 import { MatTimepickerModule } from '@angular/material/timepicker';
 import { Temporal } from 'temporal-polyfill';
 import { provideLocaleDateAdapter } from '../../adapters/locale-date-adapter';
-import { DEFAULT_DATE_TIME_LOCALE } from '../../constants/date-time.constants';
+import { NGX_FORMS_LOCALE } from '../../config/forms-locale.token';
 import type { FieldDef } from '../../interfaces/field-definition';
 import { syncMatInputErrorState } from '../../utils/mat-input-error-state';
 import { parsePlainTime } from '../../utils/date-time.utils';
@@ -16,7 +16,7 @@ import { parsePlainTime } from '../../utils/date-time.utils';
  * and means the same clock time wherever it is read. The display format follows `dateTimeConfig.locale`.
  */
 @Component({
-  selector: 'app-business-time-field',
+  selector: 'ngx-business-time-field',
   standalone: true,
   imports: [MatFormFieldModule, MatInputModule, MatTimepickerModule],
   providers: [provideLocaleDateAdapter()],
@@ -29,6 +29,7 @@ export class BusinessTimeField {
   public readonly field = input.required<FieldTree<string | null>>();
 
   private readonly dateAdapter = inject<DateAdapter<Date>>(DateAdapter);
+  private readonly resolveLocale = inject(NGX_FORMS_LOCALE);
 
   protected readonly state = computed(() => this.field()());
   protected readonly time = computed(() => toDate(this.state().value()));
@@ -39,7 +40,7 @@ export class BusinessTimeField {
 
   constructor() {
     syncMatInputErrorState(this.inputs, this.state);
-    effect(() => this.dateAdapter.setLocale(this.fieldDef().dateTimeConfig?.locale || DEFAULT_DATE_TIME_LOCALE));
+    effect(() => this.dateAdapter.setLocale(this.fieldDef().dateTimeConfig?.locale || this.resolveLocale()));
   }
 
   protected onTimeChange(time: Date | null): void {

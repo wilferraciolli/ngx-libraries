@@ -1,13 +1,18 @@
-// Shared shimmer animation for skeleton-loader placeholder blocks.
+// Shared shimmer animation for skeleton-loader placeholder blocks. Colors default to M3 surface
+// tokens (so light/dark follow the app theme); --ngx-media-loader-* override them.
 @mixin shimmer {
   background: linear-gradient(
     90deg,
-    var(--ngx-media-loader-base, #e2e2e2) 25%,
-    var(--ngx-media-loader-highlight, #f0f0f0) 50%,
-    var(--ngx-media-loader-base, #e2e2e2) 75%
+    var(--ngx-media-loader-base, var(--mat-sys-surface-container-highest, #e2e2e2)) 25%,
+    var(--ngx-media-loader-highlight, var(--mat-sys-surface-container-high, #f0f0f0)) 50%,
+    var(--ngx-media-loader-base, var(--mat-sys-surface-container-highest, #e2e2e2)) 75%
   );
   background-size: 200% 100%;
   animation: ngx-media-shimmer 1.5s ease-in-out infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
 }
 
 @keyframes ngx-media-shimmer {

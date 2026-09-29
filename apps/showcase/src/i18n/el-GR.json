@@ -1,0 +1,18 @@
+{
+  "common": {
+    "buttons": { "save": "Αποθήκευση", "cancel": "Ακύρωση" }
+  },
+  "demo": {
+    "title": "Επίδειξη Μεταφράσεων",
+    "subtitle": "Άμεση εναλλαγή γλώσσας χωρίς επαναφόρτωση, μια μέθοδος υπηρεσίας t() και ένα t pipe, από το ngx-i18n",
+    "greeting": "Γεια σου, {{name}}!",
+    "itemCount": "Έχετε {{count}} είδη στο καλάθι σας",
+    "switchLanguage": "Αλλαγή γλώσσας",
+    "currentLocale": "Τρέχουσα γλώσσα",
+    "formattedDate": "Μορφοποιημένη ημερομηνία",
+    "formattedNumber": "Μορφοποιημένη τιμή"
+  },
+  "metadata": {
+    "status": { "active": "Ενεργό", "inactive": "Ανενεργό" }
+  }
+}

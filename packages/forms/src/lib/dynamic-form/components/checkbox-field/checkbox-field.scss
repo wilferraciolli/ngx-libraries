@@ -2,8 +2,10 @@
   display: block;
 }
 
-// Lines the hint/error up with the label text rather than the box.
-.checkbox-field-subscript {
-  padding-left: 40px;
-  margin-top: -4px;
+.CheckboxField {
+  // Lines the hint/error up with the label text rather than the box.
+  &-subscript {
+    padding-inline-start: 40px;
+    margin-top: -4px;
+  }
 }

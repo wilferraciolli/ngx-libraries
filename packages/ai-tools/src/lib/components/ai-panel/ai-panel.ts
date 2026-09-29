@@ -3,7 +3,7 @@ import { AiSparkleIcon } from '../ai-sparkle-icon/ai-sparkle-icon';
 
 /** A panel with a smooth animated gradient running around its border, AI-assist style. */
 @Component({
-  selector: 'app-ai-panel',
+  selector: 'ngx-ai-panel',
   standalone: true,
   imports: [AiSparkleIcon],
   templateUrl: './ai-panel.html',

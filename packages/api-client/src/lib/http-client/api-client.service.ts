@@ -87,6 +87,9 @@ export class ApiClientService {
    * Typed `httpResource` wrapper for a single-resource envelope endpoint.
    * `urlFn` returning `undefined` (e.g. while a prerequisite link hasn't
    * loaded yet) leaves the resource unfetched, matching `httpResource`.
+   * `value()` is `undefined` while loading, on error, or before `urlFn`
+   * resolves — it reads through `hasValue()` because a failed
+   * `httpResource` throws from `value()`.
    */
   resource<TRoot extends string, TResource>(
     root: TRoot,
@@ -94,7 +97,7 @@ export class ApiClientService {
   ): ApiResource<TResource | undefined> {
     const res = httpResource<SingleEnvelope<TRoot, TResource>>(urlFn);
     return {
-      value: computed(() => res.value()?._data[root]),
+      value: computed(() => (res.hasValue() ? res.value()._data[root] : undefined)),
       isLoading: res.isLoading,
       error: res.error,
       reload: () => res.reload(),
@@ -111,7 +114,7 @@ export class ApiClientService {
   ): ApiResource<TResource[]> {
     const res = httpResource<CollectionEnvelope<TRoot, TResource>>(urlFn);
     return {
-      value: computed(() => res.value()?._data[root] ?? []),
+      value: computed(() => (res.hasValue() ? res.value()._data[root] : [])),
       isLoading: res.isLoading,
       error: res.error,
       reload: () => res.reload(),

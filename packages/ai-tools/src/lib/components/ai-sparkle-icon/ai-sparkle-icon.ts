@@ -4,7 +4,7 @@ let nextGradientId = 0;
 
 /** The 4-pointed "sparkle"/diamond glyph used to mark AI features. */
 @Component({
-  selector: 'app-ai-sparkle-icon',
+  selector: 'ngx-ai-sparkle-icon',
   standalone: true,
   imports: [],
   templateUrl: './ai-sparkle-icon.html',

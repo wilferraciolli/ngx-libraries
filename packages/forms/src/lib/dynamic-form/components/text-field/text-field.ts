@@ -11,7 +11,7 @@ import type { FieldDef } from '../../interfaces/field-definition';
  * required marker, touched/disabled state and when the errors show.
  */
 @Component({
-  selector: 'app-text-field',
+  selector: 'ngx-text-field',
   standalone: true,
   imports: [FormField, MatFormFieldModule, MatInputModule],
   templateUrl: './text-field.html',

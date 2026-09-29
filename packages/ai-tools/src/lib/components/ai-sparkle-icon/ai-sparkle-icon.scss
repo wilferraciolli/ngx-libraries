@@ -1,7 +1,22 @@
+@use '../../shared/styles/ai-tokens' as ai;
+
 :host {
   display: inline-flex;
 }
 
-svg {
+// `var()` isn't reliable in SVG presentation attributes, so the stops are coloured from CSS.
+.AiSparkleIcon {
   display: block;
+
+  &-stop-start {
+    stop-color: ai.$start;
+  }
+
+  &-stop-mid {
+    stop-color: ai.$mid;
+  }
+
+  &-stop-end {
+    stop-color: ai.$end;
+  }
 }

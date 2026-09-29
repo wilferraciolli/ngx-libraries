@@ -9,7 +9,7 @@ let nextId: number = 0;
 
 /** Material radio group for the radio field type: one choice out of `fieldDef.options`, all visible. */
 @Component({
-  selector: 'app-radio-field',
+  selector: 'ngx-radio-field',
   standalone: true,
   imports: [FormField, MatRadioGroup, MatRadioButton, FieldSubscript],
   templateUrl: './radio-field.html',

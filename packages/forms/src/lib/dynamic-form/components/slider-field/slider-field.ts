@@ -9,7 +9,7 @@ let nextId: number = 0;
 
 /** Material slider for the range field type, bounded by `fieldDef.min`/`max`/`step`. */
 @Component({
-  selector: 'app-slider-field',
+  selector: 'ngx-slider-field',
   standalone: true,
   imports: [FormField, MatSlider, MatSliderThumb, FieldSubscript],
   templateUrl: './slider-field.html',

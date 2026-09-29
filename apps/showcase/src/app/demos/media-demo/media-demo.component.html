@@ -11,7 +11,7 @@
   <div class="info-section">
     <h3>CardLoader</h3>
     @if (loading()) {
-      <app-card-loader style="max-width: 320px; display: block;" />
+      <ngx-card-loader style="max-width: 320px; display: block;" />
     } @else {
       <div style="max-width: 320px;">Real card content would render here.</div>
     }
@@ -20,7 +20,7 @@
   <div class="info-section">
     <h3>ContentLoader</h3>
     @if (loading()) {
-      <app-content-loader [lines]="4" style="display: block; height: 120px;" />
+      <ngx-content-loader [lines]="4" style="display: block; height: 120px;" />
     } @else {
       <p>Real paragraph content would render here, once loaded.</p>
     }
@@ -29,7 +29,7 @@
   <div class="info-section">
     <h3>YoutubePlayer</h3>
     <div style="max-width: 480px;">
-      <app-youtube-player [videoId]="videoId" />
+      <ngx-youtube-player [videoId]="videoId" />
     </div>
   </div>
 </div>

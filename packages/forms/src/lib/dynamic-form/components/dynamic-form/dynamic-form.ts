@@ -14,9 +14,13 @@ import { InstantDateTimeField } from '../instant-date-time-field/instant-date-ti
 import type { FieldDef } from '../../interfaces/field-definition';
 import type { BaseSchema } from '../../interfaces/base.schema';
 
-/** Renders one Material field component per FieldDef, plus Save and Clear buttons. */
+/**
+ * Renders one Material field component per FieldDef, then right-aligned actions: a text
+ * secondary action ("Clear" by default — label it "Cancel" when it leaves the form) and the filled
+ * primary one ("Save"). Name both after what they do.
+ */
 @Component({
-  selector: 'app-dynamic-form',
+  selector: 'ngx-dynamic-form',
   standalone: true,
   imports: [
     MatButton,
@@ -37,6 +41,11 @@ import type { BaseSchema } from '../../interfaces/base.schema';
 export class DynamicForm<T extends BaseSchema = BaseSchema> {
   public metaInfo: InputSignal<FieldDef[]> = input.required<FieldDef[]>();
   public dynamicForm: InputSignal<FieldTree<T>> = input.required<FieldTree<T>>();
+
+  /** Filled primary action. */
+  public readonly submitLabel = input('Save');
+  /** Text secondary action; emits `onFormClear`. */
+  public readonly clearLabel = input('Clear');
 
   public onFormSubmit = output<void>();
   public onFormClear = output<void>();

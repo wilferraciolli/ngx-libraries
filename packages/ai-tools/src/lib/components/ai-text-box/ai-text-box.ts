@@ -3,7 +3,7 @@ import { AiSparkleIcon } from '../ai-sparkle-icon/ai-sparkle-icon';
 
 /** A text box with a smooth animated gradient running around its border, AI-assist style. */
 @Component({
-  selector: 'app-ai-text-box',
+  selector: 'ngx-ai-text-box',
   standalone: true,
   imports: [AiSparkleIcon],
   templateUrl: './ai-text-box.html',
@@ -13,6 +13,8 @@ import { AiSparkleIcon } from '../ai-sparkle-icon/ai-sparkle-icon';
 export class AiTextBox {
   public readonly value = model('');
   public readonly placeholder = input('Ask AI anything…');
+  /** Accessible name of the prompt field — the placeholder alone isn't a label. */
+  public readonly label = input('Ask AI');
 
   protected onInput(event: Event): void {
     this.value.set((event.target as HTMLTextAreaElement).value);

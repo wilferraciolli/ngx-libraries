@@ -1,0 +1,43 @@
+<figure class="GraphFrame">
+  @if (caption()) {
+    <figcaption class="GraphFrame-caption">{{ caption() }}</figcaption>
+  }
+  <div class="GraphFrame-plot">
+    <ng-content />
+  </div>
+  <details class="GraphFrame-data" (toggle)="onToggle($event)">
+    <summary class="GraphFrame-summary">
+      <svg class="GraphFrame-chevron" [class.is-open]="open()" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+        <path fill="currentColor" d="M12 15.4 6 9.4 7.4 8l4.6 4.6L16.6 8 18 9.4Z" />
+      </svg>
+      Show data
+    </summary>
+    <div class="GraphFrame-table-wrap">
+      <table class="GraphFrame-table">
+        @if (caption()) {
+          <caption class="GraphFrame-table-caption">{{ caption() }}</caption>
+        }
+        <thead>
+          <tr>
+            @for (column of table().columns; track $index) {
+              <th scope="col">{{ column }}</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of table().rows; track $index) {
+            <tr>
+              @for (cell of row; track $index) {
+                @if ($first) {
+                  <th scope="row">{{ cell }}</th>
+                } @else {
+                  <td>{{ cell }}</td>
+                }
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </details>
+</figure>
