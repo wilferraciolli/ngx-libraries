@@ -24,6 +24,32 @@ scratchpad so we don't lose track between sessions. Update as items land or prio
   and serving a stale build on a later browser check. `kill -9 <pid>` on the actual listening PID
   (from `ss -ltnp | grep 4200`) is what actually frees the port.
 
+## Align libraries with `docs/ANGULAR_APP_CONVENTIONS.md` (decided 2026-09-29)
+
+The conventions doc's "Shared libraries" section now describes the libraries as they *should* be.
+Bring the packages in line, then migrate the apps:
+
+- [ ] Selectors `app-*` → `ngx-*` in every package (and every README/showcase usage).
+- [ ] SCSS classes → the doc's `.ComponentName-suffix` + `is-*` rule (today kebab/BEM, e.g.
+      `.card-loader__header`, `.chat-message-bubble--self`).
+- [ ] `--ngx-*` variables default to the matching `--mat-sys-*` token, hex only as last fallback
+      (media loaders, ai-tools gradient/surface, web-sockets chat colours), so dark mode works.
+      Chat bubbles to match the doc's chat recipe (`primary-container` / `surface-container-high`,
+      one `extra-small` corner).
+- [ ] graphs: apply the chart recipe as defaults — `--app-chart-1` marks, M3 grid/text tokens resolved
+      via `getComputedStyle` + redraw on colour-scheme change, no legend for one series, bar shape
+      (≤24px, 4px top radius), `aria-label` summary + `<details>` table view. Later: peak label
+      plugin, keyboard tooltips.
+- [ ] ai-tools: gradient stops default to M3 tokens (tertiary/primary). Open question: the rotating
+      border animates on its own, which conflicts with the doc's motion rule 8 — decide (e.g.
+      animate only while busy, static otherwise; always static under reduced motion).
+- [ ] a11y: loaders `aria-hidden`; chat input gets a real label, message list `aria-live="polite"`.
+- [ ] forms: `DynamicForm`'s actions are Save/Clear; the doc's form recipe says Cancel/Save — decide.
+- [ ] New package `ngx-dates`: `relativeTime` pipe on Temporal + `Intl.RelativeTimeFormat`.
+- [ ] Add `.prettierrc` / `.editorconfig` matching the doc's Core rules.
+- [ ] api-client: `resource()`/`collectionResource()` now guard with `hasValue()` (a failed request
+      used to throw from `value()`) — bump + publish 0.1.6, then update consumers.
+
 ## packages/forms
 
 - [ ] No tests yet. Unlike `api-client` (a straight port of exercised `insurly-ui` code), forms

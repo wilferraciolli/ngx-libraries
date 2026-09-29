@@ -18,6 +18,9 @@ ngx-libraries/
 │   ├── ai-tools/           # @wiltech-labs/ngx-ai-tools — see its own CLAUDE.md
 │   ├── graphs/             # @wiltech-labs/ngx-graphs — see its own CLAUDE.md
 │   └── web-sockets/        # @wiltech-labs/ngx-web-sockets — see its own CLAUDE.md
+├── docs/
+│   └── ANGULAR_APP_CONVENTIONS.md  # conventions every consuming Angular app follows — its
+│                                   # "Shared libraries" section is the contract these packages meet
 ├── tsconfig.base.json     # shared compiler options, extended by every package
 ├── package.json           # npm workspaces root (packages/*)
 └── LICENSE                # Apache-2.0, applies to every package
