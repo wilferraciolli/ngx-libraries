@@ -35,8 +35,10 @@ src/
   `loading/`/`youtube/`. A second feature built on the connection layer (e.g. presence, live
   cursors) gets its own sibling folder next to `chat/`, not bolted onto it.
 - Standalone components only, no NgModules.
-- No Angular Material dependency — `ChatRoom`/`ChatMessageBubble` are styled with plain CSS custom
-  properties (`--ngx-chat-*`), same as `media`/`ai-tools`.
+- No Angular Material dependency — `ChatRoom`/`ChatMessageBubble` follow the conventions' chat
+  recipe from M3 tokens (`--ngx-chat-*` override them), same approach as `media`/`ai-tools`.
+- Timestamps come from `Temporal.Now.instant()` (the conventions' dates rule), so
+  `temporal-polyfill` is a regular dependency, same as `forms`.
 - `WebSocketService` is `providedIn: 'root'` — one socket per app. Join/leave whichever rooms you
   need on top of it; don't create a second `WebSocketService`-like thing per room.
 - `ChatRoom` manages exactly **one** room for its lifetime (joins `roomName` in `ngOnInit`, leaves

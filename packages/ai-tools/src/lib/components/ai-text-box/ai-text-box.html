@@ -1,9 +1,10 @@
-<div class="ai-text-box">
-  <div class="ai-text-box__content">
-    <app-ai-sparkle-icon size="18px" class="ai-text-box__icon" />
+<div class="AiTextBox">
+  <div class="AiTextBox-content">
+    <ngx-ai-sparkle-icon size="18px" class="AiTextBox-icon" />
     <textarea
-      class="ai-text-box__input"
+      class="AiTextBox-input"
       rows="1"
+      [attr.aria-label]="label()"
       [placeholder]="placeholder()"
       [value]="value()"
       (input)="onInput($event)"

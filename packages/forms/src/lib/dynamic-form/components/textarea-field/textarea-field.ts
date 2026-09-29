@@ -13,7 +13,7 @@ const CODE_INDENT: string = '  ';
  * Tab indents instead of moving focus, like an editor.
  */
 @Component({
-  selector: 'app-textarea-field',
+  selector: 'ngx-textarea-field',
   standalone: true,
   imports: [FormField, MatFormFieldModule, MatInputModule],
   templateUrl: './textarea-field.html',

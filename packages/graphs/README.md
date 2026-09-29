@@ -39,7 +39,7 @@ import { BarGraph, graphConfig } from '@wiltech-labs/ngx-graphs';
 @Component({
   selector: 'app-sales-chart',
   imports: [BarGraph],
-  template: `<app-bar-graph [graphDef]="salesByQuarter" style="display: block; height: 320px;" />`
+  template: `<ngx-bar-graph [graphDef]="salesByQuarter" />`
 })
 export class SalesChartComponent {
   protected readonly salesByQuarter = graphConfig()
@@ -64,7 +64,7 @@ protected readonly marketShare = graphConfig()
 ```
 
 ```html
-<app-pie-graph [graphDef]="marketShare" style="display: block; height: 320px;" />
+<ngx-pie-graph [graphDef]="marketShare" />
 ```
 
 `RadarGraph` uses `labels` as its axes, one per spoke, with one or more `series` plotted across them:
@@ -79,7 +79,8 @@ protected readonly modelComparison = graphConfig()
   .build();
 ```
 
-Give the host element an explicit height — chart.js fills whatever size its container reports.
+The plot is 280px tall by default; set `--ngx-graph-height` on the graph (or an ancestor) to change
+it. The graph fills the width it's given.
 
 ## Usage — point graphs (`PointGraphDef`)
 
@@ -99,7 +100,7 @@ protected readonly clusterSizes = pointGraphConfig()
 ```
 
 ```html
-<app-bubble-graph [graphDef]="clusterSizes" style="display: block; height: 320px;" />
+<ngx-bubble-graph [graphDef]="clusterSizes" />
 ```
 
 `ScatterGraph` uses the same shape; `r` (bubble radius) is simply ignored.
@@ -123,7 +124,6 @@ protected readonly clusterSizes = pointGraphConfig()
 interface GraphSeries {
   label: string;
   data: number[];
-  color?: string;    // defaults to this package's built-in palette when omitted
 }
 
 interface GraphDef {
@@ -145,7 +145,6 @@ interface PointDatum {
 interface PointSeries {
   label: string;
   data: PointDatum[];
-  color?: string;      // defaults to this package's built-in palette when omitted
 }
 
 interface PointGraphDef {
@@ -154,11 +153,35 @@ interface PointGraphDef {
 }
 ```
 
+## Look and accessibility
+
+Every graph applies the house chart rules itself, so an app passes data, never chart options or
+colours:
+
+- **Colour follows the app's M3 theme.** Series 1 wears `--app-chart-1` when the app defines it;
+  further series take a fixed categorical palette validated for colour-vision deficiency in light
+  and dark (six series; three for bubble/scatter, where every series can touch every other). Text,
+  grid and tooltip use `on-surface`, `on-surface-variant`, `outline-variant` and `inverse-surface`.
+  A canvas can't read CSS variables, so `GraphThemeService` resolves them and every graph redraws
+  when the colour scheme, or the app's theme class/attribute on `<html>`/`<body>`, changes.
+- **Marks:** columns ≤ 24px with 4px rounded tops and a square baseline; 2px lines; a 2px
+  surface-coloured gap between slices and ring around points; horizontal grid only on bar/line.
+- **Legend only when there's more than one thing to tell apart.** A single series is named by the
+  graph's `title`, which renders as the figure caption.
+- **Accessible:** the canvas has an `aria-label` summary, and a collapsed **Show data** table lists
+  every plotted number.
+
+Overrides, for a genuine one-off only and always to a token, never a hex value:
+`--ngx-graph-color-1`…`-6`, `--ngx-graph-text`, `--ngx-graph-muted-text`, `--ngx-graph-grid`,
+`--ngx-graph-surface`, `--ngx-graph-height`.
+
 ## Other exports
 
-- `toChartData(graphDef)` — converts a `GraphDef` into the chart.js `ChartData` shape directly, for
-  building one by hand instead of with `graphConfig()`.
-- `toPointChartData(pointGraphDef)` — the `PointGraphDef` equivalent, for `pointGraphConfig()`.
+- `toChartData(graphDef, theme?)` — converts a `GraphDef` into the chart.js `ChartData` shape
+  directly, coloured from `theme` (a `GraphTheme`).
+- `toPointChartData(pointGraphDef, theme?)` — the `PointGraphDef` equivalent.
+- `GraphThemeService` / `GraphTheme` — the resolved colours and font, for custom chart.js work that
+  should match these graphs.
 
 ## Layout
 
@@ -167,11 +190,12 @@ src/
 ├── public-api.ts        # barrel — the entire public surface; nothing outside this is exported
 └── lib/graph/
     ├── components/       # BarGraph, LineGraph, PieGraph, DoughnutGraph, PolarAreaGraph,
-    │                     # RadarGraph, BubbleGraph, ScatterGraph
+    │                     # RadarGraph, BubbleGraph, ScatterGraph; GraphFrame (caption + data table)
     ├── builders/          # graphConfig()/GraphConfigBuilder, pointGraphConfig()/PointGraphConfigBuilder
     ├── interfaces/        # GraphDef, GraphSeries, PointGraphDef, PointSeries, PointDatum
-    ├── constants/         # DEFAULT_PALETTE
-    └── utils/             # toChartData(), toPointChartData(), withTitle()
+    ├── constants/         # CATEGORICAL_LIGHT/_DARK, MAX_POINT_SERIES
+    ├── theme/             # GraphThemeService — resolves M3 tokens to concrete colours
+    └── utils/             # toChartData(), toPointChartData(), graphOptions(), table/summary, seriesColor()
 ```
 
 ## Status

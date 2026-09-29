@@ -1,3 +1,10 @@
-<div class="scatter-graph">
-  <canvas baseChart type="scatter" [data]="chartData()" [options]="options()"></canvas>
-</div>
+<ngx-graph-frame [caption]="graphDef().title" [table]="table()">
+  <canvas
+    baseChart
+    type="scatter"
+    role="img"
+    [attr.aria-label]="summary()"
+    [data]="chartData()"
+    [options]="options()"
+  ></canvas>
+</ngx-graph-frame>

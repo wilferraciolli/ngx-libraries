@@ -44,6 +44,18 @@ ngx-libraries/
   `CLAUDE.md`.
 - A package's public surface is exactly what `src/public-api.ts` re-exports
   — nothing else is reachable by consumers.
+- **Every package meets `docs/ANGULAR_APP_CONVENTIONS.md`** — its "Shared
+  libraries" section is the contract. In particular:
+  - component selectors are `ngx-` (never `app-`, which is the consuming apps' prefix);
+  - SCSS classes follow the doc's "Component SCSS class naming" (`.ComponentName-suffix`,
+    `is-*` state classes, max two `&` levels) — no BEM;
+  - colours, type and shape come from `--mat-sys-*` tokens, via `--ngx-<package>-*` overrides
+    with a hex fallback last: `var(--ngx-x, var(--mat-sys-y, #hex))` (a hex fallback keeps
+    Material-free packages usable in an unthemed app);
+  - motion stops under `prefers-reduced-motion`; custom interactive elements get a visible focus
+    ring; decorative pieces are `aria-hidden`;
+  - dates follow the doc's "Dates and times" (`Temporal`, string wire formats).
+  Change the doc and the package together when a rule needs to move.
 - **New package checklist**: `packages/<name>/` containing
   - `package.json` — peer deps pinned to the Angular versions actually in
     use, `publishConfig.access: public`

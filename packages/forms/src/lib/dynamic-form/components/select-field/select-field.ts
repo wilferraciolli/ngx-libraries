@@ -7,7 +7,7 @@ import type { FieldDef } from '../../interfaces/field-definition';
 
 /** Material select for the select field type: one choice out of `fieldDef.options`, in a dropdown. */
 @Component({
-  selector: 'app-select-field',
+  selector: 'ngx-select-field',
   standalone: true,
   imports: [FormField, MatFormFieldModule, MatSelect, MatOption],
   templateUrl: './select-field.html',

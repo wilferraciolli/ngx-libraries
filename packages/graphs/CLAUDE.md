@@ -19,8 +19,9 @@ src/
     │   └── scatter-graph/     # ScatterGraph      }
     ├── builders/               # graphConfig()/GraphConfigBuilder, pointGraphConfig()/PointGraphConfigBuilder
     ├── interfaces/             # GraphDef, GraphSeries, PointGraphDef, PointSeries, PointDatum
-    ├── constants/              # DEFAULT_PALETTE — shared by both toChartData() and toPointChartData()
-    └── utils/                  # toChartData(), toPointChartData(), withTitle() option helper
+    ├── constants/              # CATEGORICAL_LIGHT/_DARK (validated palette), MAX_POINT_SERIES
+    ├── theme/                  # GraphThemeService — resolves M3 tokens to concrete colours
+    └── utils/                  # toChartData(), toPointChartData(), graphOptions(), table/summary, seriesColor()
 ```
 
 ## Conventions
@@ -42,12 +43,21 @@ src/
   force point data through `GraphDef` (or vice versa) just to have one interface — the two really
   are different shapes, chart.js treats them differently, and a `GraphDef` support forces fields
   (`labels`) that make no sense for a scatter plot.
-- Both `toChartData()`/`toPointChartData()` pull from the same `DEFAULT_PALETTE` constant
-  (`constants/default-palette.constant.ts`) — add a new fallback color there, not in either util.
-- `withTitle()` (`utils/graph-options.utils.ts`) is the one place that builds the shared
-  `responsive`/`maintainAspectRatio`/title-plugin options every graph component computes from
-  `graphDef().title` — add a new shared option default there, not by duplicating it across all
-  8 components' `options` computed signals.
+- **The conventions doc's chart recipe is this package's spec** (`docs/ANGULAR_APP_CONVENTIONS.md`,
+  "Insights / charts"). Apps pass data only — no chart options, no colours (`GraphSeries` has no
+  `color`).
+- A canvas can't read CSS variables, so `GraphThemeService` (`theme/`) resolves the M3 roles (and
+  `--app-chart-1` for series 1) into concrete colours through a probe element's computed `color` —
+  custom properties hold unresolved text like `light-dark(...)`. It re-resolves on
+  `prefers-color-scheme` changes and on class/style/`data-theme` changes on `<html>`/`<body>`. A theme
+  change made any other way (e.g. swapping a stylesheet) isn't detected.
+- Colours come from `constants/categorical-palette.constant.ts`, in fixed order, never cycled — past
+  the last slot `seriesColor()` warns and falls back to the muted text colour. The palette was
+  validated with the dataviz skill's `validate_palette.js` (adjacent pairs, light and dark; first
+  three all-pairs); re-run it on any change.
+- `graphOptions()` (`utils/graph-options.utils.ts`) is the one place for shared chart.js options
+  (scales by layout, legend only for > 1 entry, tooltip, fonts). `GraphFrame` (internal) renders the
+  caption and the "Show data" table around every canvas — add shared markup there.
 - One component per graph type (`BarGraph`, `LineGraph`, `PieGraph`, `DoughnutGraph`,
   `PolarAreaGraph`, `RadarGraph`, `BubbleGraph`, `ScatterGraph`), same one-component-per-type layout
   as `forms`' field components — resist the urge to collapse these into one generic component with

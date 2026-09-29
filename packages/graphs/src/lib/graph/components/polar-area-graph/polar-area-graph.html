@@ -1,3 +1,10 @@
-<div class="polar-area-graph">
-  <canvas baseChart type="polarArea" [data]="chartData()" [options]="options()"></canvas>
-</div>
+<ngx-graph-frame [caption]="graphDef().title" [table]="table()">
+  <canvas
+    baseChart
+    type="polarArea"
+    role="img"
+    [attr.aria-label]="summary()"
+    [data]="chartData()"
+    [options]="options()"
+  ></canvas>
+</ngx-graph-frame>

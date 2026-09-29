@@ -2,12 +2,14 @@
   display: block;
 }
 
-.textarea-field {
+.TextareaField {
   width: 100%;
-}
 
-.textarea-field-code {
-  font-family: 'Courier New', Consolas, monospace;
-  font-size: 0.85rem;
-  tab-size: 2;
+  &-input {
+    &.is-code {
+      font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+      font-size: 0.875rem;
+      tab-size: 2;
+    }
+  }
 }

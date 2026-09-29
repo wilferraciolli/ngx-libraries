@@ -3,7 +3,7 @@ import { AiSparkleIcon } from '../ai-sparkle-icon/ai-sparkle-icon';
 
 /** A gradient-filled button for AI actions, e.g. "Ask AI" / "Generate". */
 @Component({
-  selector: 'app-ai-button',
+  selector: 'ngx-ai-button',
   standalone: true,
   imports: [AiSparkleIcon],
   templateUrl: './ai-button.html',

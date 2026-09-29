@@ -3,7 +3,7 @@ import type { ChatMessage } from '../../interfaces/chat-message.interface';
 
 /** Renders one `ChatMessage`, aligned right when it's from `clientId` (the viewer). */
 @Component({
-  selector: 'app-chat-message-bubble',
+  selector: 'ngx-chat-message-bubble',
   standalone: true,
   imports: [],
   templateUrl: './chat-message-bubble.html',

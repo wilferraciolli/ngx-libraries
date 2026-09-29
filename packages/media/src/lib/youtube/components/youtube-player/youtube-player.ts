@@ -4,7 +4,7 @@ import type { SafeResourceUrl } from '@angular/platform-browser';
 
 /** Embeds a YouTube video by id, using the privacy-enhanced (youtube-nocookie.com) player. */
 @Component({
-  selector: 'app-youtube-player',
+  selector: 'ngx-youtube-player',
   standalone: true,
   imports: [],
   templateUrl: './youtube-player.html',
@@ -16,6 +16,8 @@ export class YoutubePlayer {
 
   public readonly videoId = input.required<string>();
   public readonly autoplay = input(false);
+  /** Accessible name of the embed — name the video, e.g. "Product tour video". */
+  public readonly title = input('YouTube video player');
 
   protected readonly url = computed<SafeResourceUrl>(() => {
     const params = new URLSearchParams({ autoplay: this.autoplay() ? '1' : '0' });

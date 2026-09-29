@@ -11,7 +11,19 @@ Angular Material + CDK (Material 3 theme), Vitest, Prettier, SCSS.
 starter kit (palette, shared partials, shell, screen recipes) that makes every
 app look and behave the same.
 
-## Design tooling: the `impeccable` skill
+## Design tooling
+Every app built from these conventions uses two Claude Code design aids: the
+`frontend-design` plugin and the `impeccable` skill.
+
+### The `frontend-design` plugin
+Install it once per machine, from inside Claude Code:
+```
+/plugin install frontend-design@claude-plugins-official
+```
+It gives Claude frontend design guidance for building UI. If it doesn't show up in
+a session that was already running when you installed it, start a new session.
+
+### The `impeccable` skill
 This repo has the `impeccable` Claude Code skill installed
 (`.claude/skills/impeccable/`, by pbakaus). **After installing it into a
 project for the first time, start a new Claude Code session before using
@@ -107,10 +119,6 @@ the SCSS naming rule), so using one never reopens a design decision.
 Each package's `README.md` is its API reference. This section covers *when*
 to use which package and the rules for using it in an app.
 
-> The packages are being brought in line with this section (`ngx-` selectors,
-> M3-token theming defaults, class names). Until a package's README says so,
-> check the README for its current selectors and theming variables.
-
 ### What to use for what
 | Need | Package | Use | Replaces in an app |
 |---|---|---|---|
@@ -191,6 +199,9 @@ provideWebSocket({ url: environment.socketUrl }),            // ngx-web-sockets
 - Use `DynamicForm` for a plain create/edit form. When a form needs grouping or
   columns, place the individual field components in your own layout. Every
   field takes the same `[fieldDef]` + `[field]` inputs.
+- `DynamicForm` adds no padding or background, and ends with right-aligned text
+  **Clear** + filled **Save**. Name the actions after what they do
+  (`clearLabel="Cancel"` when that button leaves the form, `submitLabel="Create group"`).
 - The fields already use `appearance="outline"` and `subscriptSizing="dynamic"`
   and render their own label, hint and errors. Don't wrap them in another
   `mat-form-field`.
@@ -208,8 +219,9 @@ provideWebSocket({ url: environment.socketUrl }),            // ngx-web-sockets
   redraws when the colour scheme changes.
 - Several series or slices take the library's categorical palette. Categorical
   data colours are rule 1's allowed exception, so the app never supplies one.
-- Give the graph's host a height (`display: block; height: 320px`); the canvas
-  fills it.
+- The plot is 280px tall and fills the available width; set `--ngx-graph-height`
+  to change the height. Keep to six series (three on bubble/scatter). Past that
+  the library warns: fold the rest into "Other" or use small multiples.
 
 **`ngx-media`**
 - A content loading state is a skeleton shaped like the content:
@@ -233,14 +245,18 @@ provideWebSocket({ url: environment.socketUrl }),            // ngx-web-sockets
     mode.
 - `AiButton` counts as the view's filled button (rule 4). Don't put a second
   filled button beside it.
+- `AiTextBox` needs a `label` (its accessible name); the placeholder isn't one.
+- The border's rotation is the one sanctioned ambient animation (see Motion).
 
 **`ngx-web-sockets`**
 - One socket per app: `WebSocketService` is root-provided. Join and leave rooms
   on it; never create a second connection per feature.
 - `connected` is a signal. Event streams are `Observable`s; subscribe with
   `takeUntilDestroyed()`.
-- `ChatRoom` implements the "Chat / composer" recipe. To switch rooms, render
-  a fresh instance behind `@if`; don't change `roomName` on a live one.
+- `ChatRoom` implements the "Chat / composer" recipe. It fills the height it's
+  given (`--ngx-chat-height`, 400px by default; `100%` inside a fixed-height
+  shell). To switch rooms, render a fresh instance behind `@if`; don't change
+  `roomName` on a live one.
 - The server contract (event names and payloads) is in the package README. A
   backend has to match it.
 
@@ -490,6 +506,9 @@ budget (see gotchas).
   210ms in with a slight scale. Persistent chrome (app bar, rail) carries its own
   `view-transition-name` so only the content region moves.
 - The global `prefers-reduced-motion` rule in `styles.scss` neutralises all of it.
+- One deliberate exception to "nothing animates on its own": the rotating gradient
+  border on `ngx-ai-tools` surfaces, which marks AI at work. It also stops under
+  reduced motion. Don't add others.
 
 #### Accessibility floor
 - Visible keyboard focus on everything interactive: Material components draw
@@ -516,6 +535,8 @@ budget (see gotchas).
 
 ### 2. Set up a new app
 1. Angular 22 app, SCSS, standalone. `npm i @angular/material @angular/cdk`.
+   In Claude Code, install the design plugin if this machine doesn't have it yet:
+   `/plugin install frontend-design@claude-plugins-official` (see "Design tooling").
 2. In `angular.json` → `build.options`: `"stylePreprocessorOptions": { "includePaths": ["src/styles"] }`
    and `"styles": ["src/styles.scss"]`.
 3. Create `src/styles/_theme-colors.scss` — paste the generated palette below, or
@@ -2185,11 +2206,13 @@ square at the baseline, hairline `outline-variant` grid with clean ticks
 through a palette validator for contrast ≥ 3:1, lightness band and chroma in both
 modes — re-validate if you change it). Every chart is interactive: hover and
 arrow keys show a tooltip (value first, date second) and it has an `aria-label`
-summary; every number is also in a table view (`<details>` "Daily numbers").
+summary; every number is also in a table view (`<details>` "Show data"). Not yet in
+`ngx-graphs`: the peak label and arrow-key tooltips — until they land, the table view
+is the keyboard route to the values.
 Filters (a period segmented button) sit in one row above everything they scope;
 switching keeps the previous numbers on screen dimmed until the new ones arrive
-(`linkedSignal` over the resource). Give each graph's host a fixed height; the
-chart sizes itself to the width.
+(`linkedSignal` over the resource). Set a graph's height with `--ngx-graph-height`;
+it sizes itself to the width.
 
 **Expandable detail** (`<details>`): a 32px `label-large` summary with a chevron
 icon that rotates 180° when open; the revealed block on `surface-container`,

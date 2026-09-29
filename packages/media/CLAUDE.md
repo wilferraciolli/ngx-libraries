@@ -25,9 +25,9 @@ src/
   image) gets its own folder alongside `loading/` and `youtube/`.
 - Standalone components only, no NgModules.
 - Skeleton loaders are built natively (no `ngx-skeleton-loader` or similar dependency) — plain
-  CSS shimmer animation shared via `loading/styles/_shimmer.mixins.scss`, themeable through
-  `--ngx-media-loader-base`/`--ngx-media-loader-highlight`/`--ngx-media-loader-border` CSS
-  custom properties rather than a Material theme (this package has no Material dependency).
+  CSS shimmer animation shared via `loading/styles/_shimmer.mixins.scss`, coloured from M3 surface
+  tokens (`--ngx-media-loader-base`/`-highlight`/`-surface` override them). No Material dependency.
+- Loaders are decorative: `aria-hidden` on the host; the consumer marks its region `aria-busy`.
 - `CardLoader` composes `ContentLoader` for its body instead of duplicating the shimmer-line
   markup — keep reusing `ContentLoader` for any new "block of placeholder lines" need.
 - `YoutubePlayer` uses `youtube-nocookie.com` (YouTube's privacy-enhanced embed domain) and

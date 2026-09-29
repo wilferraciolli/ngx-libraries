@@ -1,3 +1,10 @@
-<div class="bar-graph">
-  <canvas baseChart type="bar" [data]="chartData()" [options]="options()"></canvas>
-</div>
+<ngx-graph-frame [caption]="graphDef().title" [table]="table()">
+  <canvas
+    baseChart
+    type="bar"
+    role="img"
+    [attr.aria-label]="summary()"
+    [data]="chartData()"
+    [options]="options()"
+  ></canvas>
+</ngx-graph-frame>

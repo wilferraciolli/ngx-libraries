@@ -4,13 +4,16 @@
   display: block;
 }
 
-.field-subscript-hint {
-  @include mix.field-hint;
-}
+// Matches mat-form-field's own subscript line.
+.FieldSubscript {
+  &-hint {
+    @include mix.field-hint;
+  }
 
-.field-subscript-error {
-  display: block;
-  margin-top: 4px;
-  font-size: 12px;
-  line-height: 1.2;
+  &-error {
+    display: block;
+    margin-top: 4px;
+    font: var(--mat-sys-body-small);
+    letter-spacing: var(--mat-sys-body-small-tracking);
+  }
 }

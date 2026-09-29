@@ -20,7 +20,7 @@ import { FieldSubscript } from '../../shared/field-subscript/field-subscript';
  * The display format follows `dateTimeConfig.locale`, not the browser's.
  */
 @Component({
-  selector: 'app-instant-date-time-field',
+  selector: 'ngx-instant-date-time-field',
   standalone: true,
   imports: [MatFormFieldModule, MatInputModule, MatDatepickerModule, MatTimepickerModule, FieldSubscript],
   providers: [provideLocaleDateAdapter()],

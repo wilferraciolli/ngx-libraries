@@ -1,28 +1,35 @@
-import { ChangeDetectionStrategy, Component, computed, input, type Signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, type Signal } from '@angular/core';
 import { BaseChartDirective } from 'ng2-charts';
 import type { ChartConfiguration } from 'chart.js';
 import type { PointGraphDef } from '../../interfaces/point-graph-definition';
+import { GraphThemeService } from '../../theme/graph-theme';
 import { toPointChartData } from '../../utils/point-graph.utils';
-import { withTitle } from '../../utils/graph-options.utils';
+import { graphOptions } from '../../utils/graph-options.utils';
+import { summarizePointGraph, toPointGraphTable } from '../../utils/graph-table.utils';
+import { GraphFrame } from '../graph-frame/graph-frame';
 
-/** Bubble graph — takes a `PointGraphDef` (see `pointGraphConfig()`), each point plotted at
- *  `(x, y)` with radius `r`. Renders via ng2-charts/chart.js. */
+/** Bubble graph — each point at `(x, y)` sized by `r`, ringed in the surface colour so overlaps read. Takes a `PointGraphDef` (see `pointGraphConfig()`); colours, text and grid follow the app's M3 theme. */
 @Component({
-  selector: 'app-bubble-graph',
+  selector: 'ngx-bubble-graph',
   standalone: true,
-  imports: [BaseChartDirective],
+  imports: [BaseChartDirective, GraphFrame],
   templateUrl: './bubble-graph.html',
   styleUrl: './bubble-graph.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BubbleGraph {
+  private readonly theme = inject(GraphThemeService).theme;
+
   public readonly graphDef = input.required<PointGraphDef>();
 
   protected readonly chartData = computed<ChartConfiguration<'bubble'>['data']>(() =>
-    toPointChartData<'bubble'>(this.graphDef())
+    toPointChartData<'bubble'>(this.graphDef(), this.theme())
   );
 
   protected readonly options: Signal<ChartConfiguration<'bubble'>['options']> = computed(() =>
-    withTitle<'bubble'>(this.graphDef().title)
+    graphOptions<'bubble'>(this.theme(), 'point', this.graphDef().series.length)
   );
+
+  protected readonly table = computed(() => toPointGraphTable(this.graphDef()));
+  protected readonly summary = computed(() => summarizePointGraph(this.graphDef()));
 }

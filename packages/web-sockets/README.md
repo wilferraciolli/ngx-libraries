@@ -104,7 +104,7 @@ import { ChatRoom } from '@wiltech-labs/ngx-web-sockets';
 @Component({
   selector: 'app-support-chat',
   imports: [ChatRoom],
-  template: `<app-chat-room roomName="support" [clientName]="currentUserName" />`
+  template: `<ngx-chat-room roomName="support" [clientName]="currentUserName" />`
 })
 export class SupportChatComponent {
   currentUserName = 'Jordan';
@@ -116,7 +116,7 @@ instance rather than changing `roomName` on a live one:
 
 ```html
 @if (activeRoom(); as room) {
-  <app-chat-room [roomName]="room" [clientName]="clientName" />
+  <ngx-chat-room [roomName]="room" [clientName]="clientName" />
 }
 ```
 
@@ -125,18 +125,19 @@ Changing `activeRoom()` destroys the old `ChatRoom` (leaving its room) and creat
 
 ### Theming
 
-```css
-:root {
-  --ngx-chat-border: rgba(0, 0, 0, 0.12);
-  --ngx-chat-bubble-background: #f0f0f0;
-  --ngx-chat-bubble-color: #1a1a1a;
-  --ngx-chat-bubble-self-background: #4f7cff; /* also the Send button's background */
-  --ngx-chat-bubble-self-color: #ffffff;
-  --ngx-chat-online-color: #16a34a;
-  --ngx-chat-offline-color: #b91c1c;
-  --ngx-chat-status-color: #6b7280;
-}
-```
+`ChatRoom` implements the M3 chat recipe from the app's tokens, so it's right in light and dark with
+no setup: the other party's bubbles in `surface-container-high` (left), the viewer's in
+`primary-container` (right), large corners with an extra-small corner on the speaker's side; an
+outlined message field and a filled **Send message** icon button; the room on a
+`surface-container-low` panel. The message list is a `role="log"` live region and the connection
+line a `role="status"`.
+
+`ChatRoom` fills the height it's given (400px by default) — the list scrolls and the composer stays
+pinned. Size it from a shell with `--ngx-chat-height: 100%`.
+
+For a genuine one-off, override with tokens (never hex values): `--ngx-chat-surface`,
+`--ngx-chat-bubble-background`, `--ngx-chat-bubble-color`, `--ngx-chat-bubble-self-background`,
+`--ngx-chat-bubble-self-color`, `--ngx-chat-height`.
 
 ## Other exports
 

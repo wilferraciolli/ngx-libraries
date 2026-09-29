@@ -1,27 +1,38 @@
-<div class="chat-room">
-  <div class="chat-room__header">
-    <span class="chat-room__connection" [class.chat-room__connection--online]="connected()">
+<section class="ChatRoom" [attr.aria-label]="'Chat: ' + roomName()">
+  <div class="ChatRoom-header" role="status">
+    <span class="ChatRoom-connection" [class.is-online]="connected()">
       {{ connected() ? 'Connected' : 'Connecting…' }}
     </span>
     @if (statusMessage()) {
-      <span class="chat-room__status">{{ statusMessage() }}</span>
+      <span class="ChatRoom-status">{{ statusMessage() }}</span>
     }
   </div>
 
-  <div class="chat-room__messages">
+  <div class="ChatRoom-messages" role="log" aria-label="Messages">
     @for (message of messages(); track message.id) {
-      <app-chat-message-bubble [clientId]="clientId()" [message]="message" />
+      <ngx-chat-message-bubble [clientId]="clientId()" [message]="message" />
     }
   </div>
 
-  <div class="chat-room__composer">
+  <form class="ChatRoom-composer" (submit)="$event.preventDefault(); sendMessage()">
     <input
-      class="chat-room__input"
+      class="ChatRoom-input"
+      aria-label="Message"
+      placeholder="Type a message…"
+      autocomplete="off"
       [value]="draft()"
       (input)="onDraftInput($event)"
-      (keyup.enter)="sendMessage()"
-      placeholder="Type a message…"
     />
-    <button type="button" class="chat-room__send" (click)="sendMessage()">Send</button>
-  </div>
-</div>
+    <button
+      type="submit"
+      class="ChatRoom-send"
+      aria-label="Send message"
+      title="Send message"
+      [disabled]="!draft().trim()"
+    >
+      <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+        <path fill="currentColor" d="M3 20V4l19 8-19 8Zm2-3 11.85-5L5 7v3.5l6 1.5-6 1.5V17Z" />
+      </svg>
+    </button>
+  </form>
+</section>

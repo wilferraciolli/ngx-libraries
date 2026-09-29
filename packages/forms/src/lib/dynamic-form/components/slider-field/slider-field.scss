@@ -4,22 +4,24 @@
   display: block;
 }
 
-.slider-field-label {
-  @include mix.field-label;
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 0;
-}
+.SliderField {
+  &-label {
+    @include mix.field-label;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0;
+  }
 
-.slider-field-value {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--mat-sys-primary, #3f51b5);
-}
+  &-value {
+    color: var(--mat-sys-primary);
+    font: var(--mat-sys-label-large);
+    letter-spacing: var(--mat-sys-label-large-tracking);
+  }
 
-.slider-field-slider {
-  display: block;
-  width: 100%;
-  margin: 0;
+  &-slider {
+    display: block;
+    width: 100%;
+    margin: 0;
+  }
 }

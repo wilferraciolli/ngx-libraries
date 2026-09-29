@@ -16,7 +16,7 @@ import { parsePlainTime } from '../../utils/date-time.utils';
  * and means the same clock time wherever it is read. The display format follows `dateTimeConfig.locale`.
  */
 @Component({
-  selector: 'app-business-time-field',
+  selector: 'ngx-business-time-field',
   standalone: true,
   imports: [MatFormFieldModule, MatInputModule, MatTimepickerModule],
   providers: [provideLocaleDateAdapter()],

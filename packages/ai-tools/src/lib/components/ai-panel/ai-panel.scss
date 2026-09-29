@@ -1,32 +1,34 @@
+@use '../../shared/styles/ai-tokens' as ai;
 @use '../../shared/styles/gradient-border.mixins' as border;
 
 :host {
   display: block;
 }
 
-.ai-panel {
-  @include border.gradient-border(16px, 2px);
-}
+.AiPanel {
+  @include border.gradient-border(var(--mat-sys-corner-large, 16px));
 
-.ai-panel__content {
-  background: var(--ngx-ai-surface, #ffffff);
-  border-radius: 14px;
-  padding: 20px;
-}
+  &-content {
+    padding: 16px;
+    border-radius: calc(var(--mat-sys-corner-large, 16px) - 2px);
+    background: ai.$surface;
+    color: var(--mat-sys-on-surface, inherit);
+  }
 
-.ai-panel__header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-}
+  &-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
 
-.ai-panel__title {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-  background: linear-gradient(90deg, var(--ngx-ai-gradient-start, #4f7cff), var(--ngx-ai-gradient-mid, #a855f7));
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
+  &-title {
+    margin: 0;
+    font: var(--mat-sys-title-medium, 500 1rem / 1.5rem sans-serif);
+    letter-spacing: var(--mat-sys-title-medium-tracking, 0.009375rem);
+    background: linear-gradient(90deg, ai.$start, ai.$mid);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
 }

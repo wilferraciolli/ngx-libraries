@@ -7,7 +7,7 @@ import { FieldSubscript } from '../../shared/field-subscript/field-subscript';
 
 /** Material checkbox for the checkbox field type: a single yes/no value. */
 @Component({
-  selector: 'app-checkbox-field',
+  selector: 'ngx-checkbox-field',
   standalone: true,
   imports: [FormField, MatCheckbox, FieldSubscript],
   templateUrl: './checkbox-field.html',

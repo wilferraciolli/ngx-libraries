@@ -11,8 +11,8 @@ export class GraphConfigBuilder {
     return this;
   }
 
-  public series(label: string, data: number[], color?: string): this {
-    this.seriesList.push({ label, data, color });
+  public series(label: string, data: number[]): this {
+    this.seriesList.push({ label, data });
     return this;
   }
 

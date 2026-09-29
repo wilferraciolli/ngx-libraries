@@ -6,8 +6,8 @@ export class PointGraphConfigBuilder {
   private readonly seriesList: PointSeries[] = [];
   private titleValue?: string;
 
-  public series(label: string, data: PointDatum[], color?: string): this {
-    this.seriesList.push({ label, data, color });
+  public series(label: string, data: PointDatum[]): this {
+    this.seriesList.push({ label, data });
     return this;
   }
 

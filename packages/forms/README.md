@@ -21,7 +21,9 @@ npm install @wiltech-labs/ngx-forms
 Peer dependencies: `@angular/core`, `@angular/common`, `@angular/forms`, `@angular/material` (all `^22`).
 `temporal-polyfill` is installed with the package.
 
-The fields are Angular Material components, so the app needs a Material theme and the Roboto font:
+The fields are Angular Material components and take the app's own M3 theme (`mat.theme()`) — in an
+app that follows the house conventions there's nothing to add. An app without a theme needs one, and
+the Roboto font, e.g.:
 
 ```css
 /* styles.css */
@@ -83,7 +85,7 @@ import type { FlightSchema } from './flight-form.config';
   selector: 'app-flight-form',
   imports: [DynamicForm],
   template: `
-    <app-dynamic-form
+    <ngx-dynamic-form
       [metaInfo]="config.fields"
       [dynamicForm]="flightForm"
       (onFormSubmit)="save()"
@@ -106,6 +108,10 @@ export class FlightFormComponent {
   }
 }
 ```
+
+The actions sit right-aligned: a text **Clear** and a filled **Save**. Name them after what they do
+with `clearLabel`/`submitLabel` — e.g. `clearLabel="Cancel"` when that button leaves the form (it
+still emits `onFormClear`).
 
 `toSchema()` turns the field definitions into Signals Forms validation rules. Save is only enabled
 while the form is valid, and `onFormSubmit` only fires for a valid form.
@@ -134,9 +140,9 @@ interface Newsletter {
   selector: 'app-newsletter',
   imports: [TextField, BusinessDateField, CheckboxField],
   template: `
-    <app-text-field [fieldDef]="fields.email" [field]="newsletterForm.email" />
-    <app-business-date-field [fieldDef]="fields.startDate" [field]="newsletterForm.startDate" />
-    <app-checkbox-field [fieldDef]="fields.agree" [field]="newsletterForm.agree" />
+    <ngx-text-field [fieldDef]="fields.email" [field]="newsletterForm.email" />
+    <ngx-business-date-field [fieldDef]="fields.startDate" [field]="newsletterForm.startDate" />
+    <ngx-checkbox-field [fieldDef]="fields.agree" [field]="newsletterForm.agree" />
     <button [disabled]="newsletterForm().invalid()" (click)="subscribe()">Subscribe</button>
   `
 })
@@ -163,7 +169,8 @@ export class NewsletterComponent {
 ```
 
 Each component renders its own label, hint, required marker and errors, and fills the width of its
-container (`DynamicForm` caps each field at 400px, overridable per field with `maxWidth`).
+container. `DynamicForm` adds no padding or background of its own — put it in the app's surface
+(e.g. a tonal panel); cap a single field with `maxWidth`.
 
 ## Field types
 
@@ -216,7 +223,7 @@ interface FieldDef {
   hidden?: boolean;                 // Part of the model, never rendered
   disabled?: boolean;               // Rendered but not editable
   hint?: string;                    // Help text under the field
-  maxWidth?: string;                // DynamicForm only: overrides the 400px cap, Eg '900px' or '100%'
+  maxWidth?: string;                // DynamicForm only: caps this field's width, Eg '400px'
 }
 
 interface DateTimeConfig {

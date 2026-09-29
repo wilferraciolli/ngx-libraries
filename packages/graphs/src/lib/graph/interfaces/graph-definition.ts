@@ -1,8 +1,7 @@
+/** One series. Colours come from the house categorical palette, in series order — never the app. */
 export interface GraphSeries {
   label: string;
   data: number[];
-  /** Fixed color for this series (bar/line) or, for a single-series pie, use per-slice colors instead. */
-  color?: string;
 }
 
 export interface GraphDef {

@@ -24,31 +24,41 @@ scratchpad so we don't lose track between sessions. Update as items land or prio
   and serving a stale build on a later browser check. `kill -9 <pid>` on the actual listening PID
   (from `ss -ltnp | grep 4200`) is what actually frees the port.
 
-## Align libraries with `docs/ANGULAR_APP_CONVENTIONS.md` (decided 2026-09-29)
+## Align libraries with `docs/ANGULAR_APP_CONVENTIONS.md` (2026-09-29)
 
-The conventions doc's "Shared libraries" section now describes the libraries as they *should* be.
-Bring the packages in line, then migrate the apps:
+The conventions doc's "Shared libraries" section is the contract (rules summarised in root
+`CLAUDE.md`). Done on `feature/new-libraries`, all packages built, showcase checked in a browser in
+light and with a dark M3 token set (no console errors):
 
-- [ ] Selectors `app-*` → `ngx-*` in every package (and every README/showcase usage).
-- [ ] SCSS classes → the doc's `.ComponentName-suffix` + `is-*` rule (today kebab/BEM, e.g.
-      `.card-loader__header`, `.chat-message-bubble--self`).
-- [ ] `--ngx-*` variables default to the matching `--mat-sys-*` token, hex only as last fallback
-      (media loaders, ai-tools gradient/surface, web-sockets chat colours), so dark mode works.
-      Chat bubbles to match the doc's chat recipe (`primary-container` / `surface-container-high`,
-      one `extra-small` corner).
-- [ ] graphs: apply the chart recipe as defaults — `--app-chart-1` marks, M3 grid/text tokens resolved
-      via `getComputedStyle` + redraw on colour-scheme change, no legend for one series, bar shape
-      (≤24px, 4px top radius), `aria-label` summary + `<details>` table view. Later: peak label
-      plugin, keyboard tooltips.
-- [ ] ai-tools: gradient stops default to M3 tokens (tertiary/primary). Open question: the rotating
-      border animates on its own, which conflicts with the doc's motion rule 8 — decide (e.g.
-      animate only while busy, static otherwise; always static under reduced motion).
-- [ ] a11y: loaders `aria-hidden`; chat input gets a real label, message list `aria-live="polite"`.
-- [ ] forms: `DynamicForm`'s actions are Save/Clear; the doc's form recipe says Cancel/Save — decide.
+- [x] Selectors `app-*` → `ngx-*` everywhere (packages, READMEs, showcase).
+- [x] SCSS classes → `.ComponentName-suffix` + `is-*` (no BEM).
+- [x] `--ngx-*` variables default to `--mat-sys-*` tokens, hex last. Chat, loaders and AI surfaces now
+      follow light/dark from the app theme; chat matches the doc's chat recipe; forms mixins use
+      tokens instead of `rgba()` greys; `DynamicForm` lost its own padding/centering/400px cap and has
+      right-aligned text Clear + filled Save (`clearLabel`/`submitLabel`).
+- [x] graphs: chart recipe as defaults — `GraphThemeService` resolves M3 tokens (+ `--app-chart-1`) and
+      redraws on scheme/theme change; validated categorical palette (dataviz validator, light + dark);
+      no legend for one entry; bar shape; hidden radial ticks; `GraphFrame` with caption,
+      `aria-label` summary and "Show data" table; per-series `color` removed from the API.
+- [x] a11y: loaders `aria-hidden`; chat input labelled, `role="log"` list, `role="status"` line,
+      labelled send icon button; `AiTextBox` `label`; focus rings on custom buttons; reduced motion
+      stops shimmer and AI border.
+- [x] AI motion kept as the one sanctioned ambient animation (doc + ai-tools CLAUDE.md).
+- [x] web-sockets timestamps via `Temporal` (`temporal-polyfill` added as a dependency).
+- [x] `.prettierrc` / `.editorconfig` added (Prettier not yet run over the packages).
+
+Still open:
+- [ ] graphs: peak-value label plugin and arrow-key tooltips (the doc says they're not in yet).
+- [ ] ai-tools: with a theme whose primary/tertiary/secondary are all one hue (e.g. Material's
+      `azure-blue` prebuilt), the AI gradient comes out near-monochrome. Decide whether that's fine or
+      whether the gradient should keep fixed AI hues.
 - [ ] New package `ngx-dates`: `relativeTime` pipe on Temporal + `Intl.RelativeTimeFormat`.
-- [ ] Add `.prettierrc` / `.editorconfig` matching the doc's Core rules.
-- [ ] api-client: `resource()`/`collectionResource()` now guard with `hasValue()` (a failed request
-      used to throw from `value()`) — bump + publish 0.1.6, then update consumers.
+- [ ] Possibly `ngx-styles` (shared SCSS: breakpoints, spacing, ui mixins, theme) — see discussion.
+- [ ] Showcase: give it the house M3 theme (it uses light-only `azure-blue` + hardcoded greys), so dark
+      mode can be checked for real.
+- [ ] Run Prettier over the repo once and commit that separately.
+- [ ] api-client: `resource()`/`collectionResource()` now guard with `hasValue()` — bump + publish
+      0.1.6, then update consumers. Other packages: first publish once reviewed.
 
 ## packages/forms
 

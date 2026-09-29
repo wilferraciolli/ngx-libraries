@@ -8,7 +8,6 @@ export interface PointDatum {
 export interface PointSeries {
   label: string;
   data: PointDatum[];
-  color?: string;
 }
 
 /** Data shape for x/y point charts (`BubbleGraph`, `ScatterGraph`) — no shared category `labels`,

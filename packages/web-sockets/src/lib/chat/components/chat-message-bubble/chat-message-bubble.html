@@ -1,4 +1,4 @@
-<div class="chat-message-bubble" [class.chat-message-bubble--self]="isSelf()">
-  <strong class="chat-message-bubble__author">{{ message().clientName }}</strong>
-  <span class="chat-message-bubble__text">{{ message().message }}</span>
+<div class="ChatMessageBubble" [class.is-self]="isSelf()">
+  <span class="ChatMessageBubble-author">{{ message().clientName }}</span>
+  <span class="ChatMessageBubble-text">{{ message().message }}</span>
 </div>

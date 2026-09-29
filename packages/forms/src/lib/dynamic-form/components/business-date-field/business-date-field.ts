@@ -16,7 +16,7 @@ import { parsePlainDate } from '../../utils/date-time.utils';
  * and means the same day wherever it is read. The display format follows `dateTimeConfig.locale`.
  */
 @Component({
-  selector: 'app-business-date-field',
+  selector: 'ngx-business-date-field',
   standalone: true,
   imports: [MatFormFieldModule, MatInputModule, MatDatepickerModule],
   providers: [provideLocaleDateAdapter()],

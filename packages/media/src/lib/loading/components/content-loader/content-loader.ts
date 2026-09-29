@@ -2,7 +2,9 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
 
 /** Fills whatever space its container gives it with paragraph-shaped shimmer lines. */
 @Component({
-  selector: 'app-content-loader',
+  selector: 'ngx-content-loader',
+  // Decorative: put aria-busy="true" on the region being filled, and announce the result there.
+  host: { 'aria-hidden': 'true' },
   standalone: true,
   imports: [],
   templateUrl: './content-loader.html',

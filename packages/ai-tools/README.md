@@ -25,9 +25,9 @@ import { AiPanel } from '@wiltech-labs/ngx-ai-tools';
   selector: 'app-summary',
   imports: [AiPanel],
   template: `
-    <app-ai-panel title="AI Summary">
+    <ngx-ai-panel title="AI Summary">
       <p>This quarter's revenue grew 12%, driven mainly by...</p>
-    </app-ai-panel>
+    </ngx-ai-panel>
   `
 })
 export class SummaryComponent {}
@@ -46,7 +46,7 @@ import { AiTextBox } from '@wiltech-labs/ngx-ai-tools';
 @Component({
   selector: 'app-prompt',
   imports: [AiTextBox],
-  template: `<app-ai-text-box [(value)]="prompt" placeholder="Ask AI anything…" />`
+  template: `<ngx-ai-text-box [(value)]="prompt" label="Ask about your orders" placeholder="Ask AI anything…" />`
 })
 export class PromptComponent {
   prompt = signal('');
@@ -58,7 +58,7 @@ export class PromptComponent {
 A gradient-filled button for triggering an AI action.
 
 ```html
-<app-ai-button label="Generate" [disabled]="loading()" (clicked)="generate()" />
+<ngx-ai-button label="Generate" [disabled]="loading()" (clicked)="generate()" />
 ```
 
 ## `AiSparkleIcon`
@@ -66,24 +66,36 @@ A gradient-filled button for triggering an AI action.
 The 4-pointed "sparkle"/diamond glyph used to mark AI features, usable on its own.
 
 ```html
-<app-ai-sparkle-icon size="20px" />
+<ngx-ai-sparkle-icon size="20px" />
 <!-- on a colored background, use currentColor instead of the built-in gradient fill -->
-<app-ai-sparkle-icon size="16px" [monochrome]="true" />
+<ngx-ai-sparkle-icon size="16px" [monochrome]="true" />
 ```
 
 ## Theming
 
-Every component reads its colors from CSS custom properties, so the whole look follows whatever
-theme the host app sets:
+The gradient is built from the app's M3 roles — `primary` → `tertiary` → `secondary` — so it follows
+the theme and dark mode with no setup. `AiButton` is an M3 filled button (`corner-full`,
+`label-large`, `on-primary` text), and the panel/text box surface is `surface`.
+
+The rotating border is the house style's one deliberate ambient animation; it stops under
+`prefers-reduced-motion`.
+
+For a genuine one-off, override with tokens (never hex values):
 
 ```css
-:root {
-  --ngx-ai-gradient-start: #4f7cff;
-  --ngx-ai-gradient-mid: #a855f7;
-  --ngx-ai-gradient-end: #ec4899;
-  --ngx-ai-surface: #ffffff; /* AiPanel/AiTextBox's inner background, inside the gradient border */
+.MyPage-assistant {
+  --ngx-ai-gradient-end: var(--mat-sys-primary-container);
 }
 ```
+
+Variables: `--ngx-ai-gradient-start`, `--ngx-ai-gradient-mid`, `--ngx-ai-gradient-end`,
+`--ngx-ai-surface`.
+
+## When to use it
+
+AI *interaction* surfaces — where the user asks the AI something or reads its answer. Static AI
+markers (a nav destination, a badge) use the `tertiary-container` role instead. `AiButton` counts as
+the view's one filled button.
 
 ## Layout
 

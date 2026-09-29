@@ -1,0 +1,6 @@
+// The AI gradient: stops default to the app's M3 roles (primary → tertiary → secondary), so the look
+// follows the theme and dark mode; --ngx-ai-gradient-* override them.
+$start: var(--ngx-ai-gradient-start, var(--mat-sys-primary, #4f7cff));
+$mid: var(--ngx-ai-gradient-mid, var(--mat-sys-tertiary, #a855f7));
+$end: var(--ngx-ai-gradient-end, var(--mat-sys-secondary, #ec4899));
+$surface: var(--ngx-ai-surface, var(--mat-sys-surface, #ffffff));

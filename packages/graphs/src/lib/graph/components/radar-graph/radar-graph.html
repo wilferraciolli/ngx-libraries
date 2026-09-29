@@ -1,3 +1,10 @@
-<div class="radar-graph">
-  <canvas baseChart type="radar" [data]="chartData()" [options]="options()"></canvas>
-</div>
+<ngx-graph-frame [caption]="graphDef().title" [table]="table()">
+  <canvas
+    baseChart
+    type="radar"
+    role="img"
+    [attr.aria-label]="summary()"
+    [data]="chartData()"
+    [options]="options()"
+  ></canvas>
+</ngx-graph-frame>

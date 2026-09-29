@@ -9,6 +9,7 @@ import {
   signal
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Temporal } from 'temporal-polyfill';
 import { WebSocketService } from '../../../connection/services/web-socket.service';
 import { SocketEventType } from '../../../connection/constants/socket-event.constant';
 import { SocketMessageType } from '../../../connection/constants/socket-message-type.constant';
@@ -24,7 +25,7 @@ const STATUS_MESSAGE_DURATION_MS = 2000;
  * a fresh instance (e.g. behind an `@if`) rather than changing `roomName` on a live one.
  */
 @Component({
-  selector: 'app-chat-room',
+  selector: 'ngx-chat-room',
   standalone: true,
   imports: [ChatMessageBubble],
   templateUrl: './chat-room.html',
@@ -132,7 +133,7 @@ export class ChatRoom implements OnInit, OnDestroy {
       messageType,
       message: text,
       replyToSender,
-      timestamp: new Date().toISOString()
+      timestamp: Temporal.Now.instant().toString({ smallestUnit: 'second' })
     };
   }
 
