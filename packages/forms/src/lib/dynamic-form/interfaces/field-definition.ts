@@ -18,4 +18,5 @@ export interface FieldDef {
 
   hidden?: boolean;         // Hide the field from display
   disabled?: boolean;       // Disable the field (read-only)
+  hint?: string;            // Short explanatory text shown under the label
 }

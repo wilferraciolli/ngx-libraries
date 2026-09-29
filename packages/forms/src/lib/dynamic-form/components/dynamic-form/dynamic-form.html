@@ -4,6 +4,10 @@
 
     @if (!fieldDef.hidden) {
       <div class="dynamic-form-field">
+        @if (fieldDef.hint) {
+          <p class="dynamic-form-hint">{{ fieldDef.hint }}</p>
+        }
+
         @if (fieldDef.type === 'radio' && fieldDef.options) {
           <!-- Radio button group -->
           <fieldset class="dynamic-form-radio-group"
@@ -45,6 +49,24 @@
             [formField]="field"
             [config]="fieldDef.dateTimeConfig"
           />
+        } @else if (fieldDef.type === 'textarea') {
+          <label>
+            {{ fieldDef.label }}
+            <textarea
+              [formField]="field"
+              class="dynamic-form-control dynamic-form-textarea"
+            ></textarea>
+          </label>
+        } @else if (fieldDef.type === 'code') {
+          <label>
+            {{ fieldDef.label }}
+            <textarea
+              [formField]="field"
+              class="dynamic-form-control dynamic-form-code"
+              spellcheck="false"
+              (keydown)="handleCodeKeydown($event, field)"
+            ></textarea>
+          </label>
         } @else {
           <label>
             {{ fieldDef.label }}

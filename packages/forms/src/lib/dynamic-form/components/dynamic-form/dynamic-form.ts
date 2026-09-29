@@ -44,4 +44,22 @@ export class DynamicForm<T extends BaseSchema = BaseSchema> {
   protected clearForm(): void {
     this.onFormClear.emit();
   }
+
+  /** Tab inserts two spaces instead of moving focus, matching a code editor's behavior. */
+  protected handleCodeKeydown(event: KeyboardEvent, field: FieldTree<unknown>): void {
+    if (event.key !== 'Tab') {
+      return;
+    }
+
+    event.preventDefault();
+
+    const textarea = event.target as HTMLTextAreaElement;
+    const start = textarea.selectionStart ?? 0;
+    const end = textarea.selectionEnd ?? 0;
+    const indented = `${textarea.value.substring(0, start)}  ${textarea.value.substring(end)}`;
+
+    textarea.value = indented;
+    textarea.selectionStart = textarea.selectionEnd = start + 2;
+    field().value.set(indented);
+  }
 }

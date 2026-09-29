@@ -53,7 +53,7 @@
     <mat-tab label="All Field Types">
       <div class="tab-content">
         <h3>Every Field Type</h3>
-        <p>Demonstrates: text, password, search, date, time, datetime-local, radio, select, checkbox, number, and range.</p>
+        <p>Demonstrates: text, password, search, date, time, datetime-local, radio, select, checkbox, number, range, textarea, and code.</p>
 
         <app-dynamic-form
           [metaInfo]="allFieldsFormConfig.fields"
@@ -101,6 +101,10 @@
         />
 
         <h4>Directly bound (DATE_TIME_UTC_CUSTOM, same underlying field)</h4>
+        <p class="tab-content-hint">
+          Same idea, but split into separate date and time inputs — use it when a single combined
+          field feels cramped, or you want the two parts editable independently.
+        </p>
         <app-utc-date-time-custom-field
           label="Appointment (date + time)"
           [formField]="utcAppointmentForm.appointment"
@@ -141,7 +145,7 @@
     <ul>
       <li><strong>Schema-based:</strong> Define form structure with an array of field definitions</li>
       <li><strong>Type-safe:</strong> Full TypeScript support with generics extending BaseSchema</li>
-      <li><strong>Flexible:</strong> Supports text, password, search, date, time, datetime-local, radio, select, checkbox, number, and range fields</li>
+      <li><strong>Flexible:</strong> Supports text, password, search, date, time, datetime-local, radio, select, checkbox, number, range, textarea, code, and UTC date-time fields</li>
       <li><strong>Validation:</strong> Built-in required/minLength/maxLength rules with inline error display</li>
       <li><strong>Signals-based:</strong> Built on Angular's experimental Signals Forms API (<code>@angular/forms/signals</code>)</li>
     </ul>

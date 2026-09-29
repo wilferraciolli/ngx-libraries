@@ -10,6 +10,8 @@ export enum FormFieldType {
   NUMBER = 'number',
   RANGE = 'range',
   SELECT = 'select',
+  TEXTAREA = 'textarea',
+  CODE = 'code',
   DATE_TIME_UTC = 'date-time-utc',
   DATE_TIME_UTC_CUSTOM = 'date-time-utc-custom'
 }

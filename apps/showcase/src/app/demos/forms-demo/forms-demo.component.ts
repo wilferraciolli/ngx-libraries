@@ -70,6 +70,8 @@ interface AllFieldsSchema extends BaseSchema {
   acceptTerms: boolean;
   age: number;
   satisfaction: number;
+  bio: string;
+  snippet: string;
 }
 
 @Component({
@@ -188,17 +190,57 @@ export class FormsDemoComponent {
     schemaType: 'allFields',
     fields: [
       { name: 'id', type: FormFieldType.TEXT, label: 'Id', disabled: true, hidden: true },
-      { name: 'username', type: FormFieldType.TEXT, label: 'Username', required: true, minLength: 3, maxLength: 20 },
-      { name: 'password', type: FormFieldType.PASSWORD, label: 'Password', required: true, minLength: 8 },
-      { name: 'searchQuery', type: FormFieldType.SEARCH, label: 'Search Query', maxLength: 50 },
-      { name: 'birthDate', type: FormFieldType.DATE, label: 'Birth Date', required: true },
-      { name: 'appointmentTime', type: FormFieldType.TIME, label: 'Appointment Time', required: true },
-      { name: 'eventDateTime', type: FormFieldType.DATE_TIME, label: 'Event Date & Time', required: true },
+      {
+        name: 'username',
+        type: FormFieldType.TEXT,
+        label: 'Username',
+        required: true,
+        minLength: 3,
+        maxLength: 20,
+        hint: 'Short, single-line text — names, identifiers, anything that fits on one line.'
+      },
+      {
+        name: 'password',
+        type: FormFieldType.PASSWORD,
+        label: 'Password',
+        required: true,
+        minLength: 8,
+        hint: 'Same as text, but the browser masks what\'s typed.'
+      },
+      {
+        name: 'searchQuery',
+        type: FormFieldType.SEARCH,
+        label: 'Search Query',
+        maxLength: 50,
+        hint: 'Same as text, but some browsers add a clear ("x") button and search-specific keyboard on mobile.'
+      },
+      {
+        name: 'birthDate',
+        type: FormFieldType.DATE,
+        label: 'Birth Date',
+        required: true,
+        hint: 'Only a calendar date matters — no time of day.'
+      },
+      {
+        name: 'appointmentTime',
+        type: FormFieldType.TIME,
+        label: 'Appointment Time',
+        required: true,
+        hint: 'Only a time of day matters — no date.'
+      },
+      {
+        name: 'eventDateTime',
+        type: FormFieldType.DATE_TIME,
+        label: 'Event Date & Time',
+        required: true,
+        hint: 'Both a date and a time together, stored as the visitor\'s own local time (not timezone-aware — see the UTC Date & Time tab for that).'
+      },
       {
         name: 'gender',
         type: FormFieldType.RADIO,
         label: 'Gender',
         required: true,
+        hint: 'A small, fixed set of mutually-exclusive options where every choice should be visible at once.',
         options: [
           { label: 'Male', value: 'male' },
           { label: 'Female', value: 'female' },
@@ -211,6 +253,7 @@ export class FormsDemoComponent {
         type: FormFieldType.SELECT,
         label: 'Country',
         required: true,
+        hint: 'A longer list of mutually-exclusive options, collapsed into a dropdown to save space.',
         options: [
           { label: 'Select a country...', value: '' },
           { label: 'United States', value: 'us' },
@@ -222,22 +265,54 @@ export class FormsDemoComponent {
           { label: 'Japan', value: 'jp' }
         ]
       },
-      { name: 'acceptTerms', type: FormFieldType.CHECKBOX, label: 'Accept Terms & Conditions', required: true },
-      { name: 'age', type: FormFieldType.NUMBER, label: 'Age', required: true },
-      { name: 'satisfaction', type: FormFieldType.RANGE, label: 'Satisfaction Level (1-10)' }
+      {
+        name: 'acceptTerms',
+        type: FormFieldType.CHECKBOX,
+        label: 'Accept Terms & Conditions',
+        required: true,
+        hint: 'A single yes/no toggle.'
+      },
+      {
+        name: 'age',
+        type: FormFieldType.NUMBER,
+        label: 'Age',
+        required: true,
+        hint: 'Numeric input with the browser\'s built-in up/down steppers and numeric keyboard on mobile.'
+      },
+      {
+        name: 'satisfaction',
+        type: FormFieldType.RANGE,
+        label: 'Satisfaction Level (1-10)',
+        hint: 'Picking a value within a known range matters more than typing an exact number.'
+      },
+      {
+        name: 'bio',
+        type: FormFieldType.TEXTAREA,
+        label: 'Bio',
+        maxLength: 500,
+        hint: 'Free-form text that may run to multiple lines — notes, descriptions, comments.'
+      },
+      {
+        name: 'snippet',
+        type: FormFieldType.CODE,
+        label: 'Favorite Code Snippet',
+        hint: 'Code or other formatted/monospaced text. Tab inserts spaces instead of moving focus, like an editor.'
+      }
     ],
     initialValue: createEmptyEntity<AllFieldsSchema>('allFields', {
-      username: '',
+      username: 'jane.doe',
       password: '',
-      searchQuery: '',
-      birthDate: '',
-      appointmentTime: '',
-      eventDateTime: '',
+      searchQuery: 'angular signals forms',
+      birthDate: '1990-06-15',
+      appointmentTime: '14:30',
+      eventDateTime: '2026-11-05T09:00',
       gender: 'not_specified',
-      country: '',
+      country: 'uk',
       acceptTerms: false,
-      age: 0,
-      satisfaction: 5
+      age: 29,
+      satisfaction: 7,
+      bio: 'Full-stack engineer who likes strongly-typed forms and hates YAML.\n\nBased in Cyprus, previously London. Always up for a good debugging story.',
+      snippet: 'function greet(name: string): string {\n  return `Hello, ${name}!`;\n}'
     })
   });
 
@@ -272,6 +347,7 @@ export class FormsDemoComponent {
       type: FormFieldType.DATE_TIME_UTC,
       label: 'Appointment',
       required: true,
+      hint: 'Use when the stored value must be an unambiguous instant (e.g. a meeting time across timezones), while each viewer still sees it in their own local time.',
       dateTimeConfig: { minUtc: '2024-01-01T00:00:00Z' }
     }
   ];
