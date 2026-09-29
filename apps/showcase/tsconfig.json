@@ -6,7 +6,8 @@
       "@wiltech-labs/ngx-api-client": ["../../packages/api-client/src/public-api.ts"],
       "@wiltech-labs/ngx-forms": ["../../packages/forms/src/public-api.ts"],
       "@wiltech-labs/ngx-media": ["../../packages/media/src/public-api.ts"],
-      "@wiltech-labs/ngx-ai-tools": ["../../packages/ai-tools/src/public-api.ts"]
+      "@wiltech-labs/ngx-ai-tools": ["../../packages/ai-tools/src/public-api.ts"],
+      "@wiltech-labs/ngx-graphs": ["../../packages/graphs/src/public-api.ts"]
     },
     "experimentalDecorators": true,
     "useDefineForClassFields": false,

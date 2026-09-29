@@ -30,6 +30,11 @@ export class HomeComponent {
       name: '@wiltech-labs/ngx-ai-tools',
       description: 'Gradient panels, text boxes and buttons with an AI-assist look and feel',
       route: '/ai-tools'
+    },
+    {
+      name: '@wiltech-labs/ngx-graphs',
+      description: 'Bar and pie graphs built on ng2-charts',
+      route: '/graphs'
     }
   ];
 }

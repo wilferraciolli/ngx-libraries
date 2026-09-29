@@ -8,6 +8,7 @@ A demo Angular application for testing and showcasing the shared libraries in th
 - **@wiltech-labs/ngx-forms** — Configuration-driven dynamic form builder
 - **@wiltech-labs/ngx-media** — Skeleton loaders and a YouTube player
 - **@wiltech-labs/ngx-ai-tools** — Gradient panels, text boxes and buttons with an AI-assist look and feel
+- **@wiltech-labs/ngx-graphs** — Bar and pie graphs built on ng2-charts
 
 ## Getting Started
 

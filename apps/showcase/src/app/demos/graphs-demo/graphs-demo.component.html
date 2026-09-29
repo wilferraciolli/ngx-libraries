@@ -1,0 +1,46 @@
+<div class="demo-container">
+  <h2>Graphs Demo</h2>
+  <p class="subtitle">All eight graph types from ngx-graphs, built on ng2-charts</p>
+
+  <div class="grid">
+    <div class="info-section">
+      <h3>BarGraph</h3>
+      <app-bar-graph [graphDef]="salesByQuarter" style="display: block; height: 280px;" />
+    </div>
+
+    <div class="info-section">
+      <h3>LineGraph</h3>
+      <app-line-graph [graphDef]="websiteTraffic" style="display: block; height: 280px;" />
+    </div>
+
+    <div class="info-section">
+      <h3>PieGraph</h3>
+      <app-pie-graph [graphDef]="marketShare" style="display: block; height: 280px;" />
+    </div>
+
+    <div class="info-section">
+      <h3>DoughnutGraph</h3>
+      <app-doughnut-graph [graphDef]="salesChannels" style="display: block; height: 280px;" />
+    </div>
+
+    <div class="info-section">
+      <h3>PolarAreaGraph</h3>
+      <app-polar-area-graph [graphDef]="salesByRegion" style="display: block; height: 280px;" />
+    </div>
+
+    <div class="info-section">
+      <h3>RadarGraph</h3>
+      <app-radar-graph [graphDef]="skillsProfile" style="display: block; height: 280px;" />
+    </div>
+
+    <div class="info-section">
+      <h3>BubbleGraph</h3>
+      <app-bubble-graph [graphDef]="clusterSizes" style="display: block; height: 280px;" />
+    </div>
+
+    <div class="info-section">
+      <h3>ScatterGraph</h3>
+      <app-scatter-graph [graphDef]="measurements" style="display: block; height: 280px;" />
+    </div>
+  </div>
+</div>

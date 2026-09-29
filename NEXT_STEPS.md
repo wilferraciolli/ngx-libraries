@@ -69,18 +69,51 @@ scratchpad so we don't lose track between sessions. Update as items land or prio
 - [ ] No consumers yet.
 - [ ] Package name (`ai-tools`) is still provisional — revisit if a better name comes up.
 
-## packages/graphs (new, not started)
+## packages/graphs
 
-- [ ] New package for data visualization — wraps `ng2-charts` (confirmed working well on Angular 22)
-      rather than building charting from scratch.
-      - Interfaces + a builder (matching the `formConfig<T>()` pattern already used in `packages/forms`)
-        to describe a graph's data/series/labels once and generate the `ng2-charts` config from it,
-        rather than callers hand-building chart.js data objects.
-      - One component per graph type on top of that, Eg `BarGraph`, `PieGraph` — same idea as the
-        `forms` package's one-component-per-field-type layout.
-      - Follows the same new-package checklist as `api-client`/`forms`/`media`/`ai-tools` (see root
-        `CLAUDE.md`): own `package.json`/`ng-package.json`/`tsconfig.json`, `src/public-api.ts`
-        barrel, standalone components only, `@wiltech-labs/ngx-graphs` naming.
+- [x] Initial component set built on `feature/new-libraries` (2026-09-29), wrapping `ng2-charts`
+      6.0.1 / `chart.js` 4.5.1 rather than building charting from scratch: `graphConfig()` /
+      `GraphConfigBuilder` (mirrors `formConfig<T>()` in `packages/forms`) describes a graph's
+      `labels`/`series`/`title` once; `toChartData()` is the one place that turns a `GraphDef` into
+      chart.js's `ChartData` shape, applying a default color palette when a series doesn't specify
+      one (and spreading one color per label when there's a single series, for pie-style charts).
+      `BarGraph` and `PieGraph` wrap ng2-charts' `BaseChartDirective` on a `<canvas>`. `ng2-charts`/
+      `chart.js` are regular `dependencies` of this package (not peers), listed in
+      `ng-package.json`'s `allowedNonPeerDependencies`, same precedent as `forms`' `temporal-polyfill`.
+      Wired into `apps/showcase` at `/graphs`, including the required
+      `provideCharts(withDefaultRegisterables())` app-level provider in `main.ts`, and visually
+      verified in a browser (both graphs render correctly with real data) — no console errors.
+- [x] Fixed: `apps/showcase/main.ts` imports `provideCharts`/`withDefaultRegisterables` directly
+      from `ng2-charts`, but `ng2-charts` was never added to `apps/showcase/package.json` — it only
+      resolved because npm workspaces hoists it up from `packages/graphs`' own dependency. Added
+      `"ng2-charts": "^6.0.0"` as an explicit direct dependency of the showcase app so it isn't a
+      phantom/hoisting-only dependency. (`chart.js` itself isn't imported directly anywhere in
+      `apps/showcase`, only inside `packages/graphs`, so it didn't need the same fix.)
+- [x] Expanded to all 8 non-mixed chart.js chart types (2026-09-29), after reviewing the demo
+      components at `ng-libraries/wt-libraries/projects/wt-graphs/src/lib/components` (a sibling
+      repo's straight copy of the ng2-charts sample gallery — bar/bubble/doughnut/line/pie/
+      polarArea/radar/scatter — with hardcoded demo data, no reusable abstraction). Added
+      `LineGraph`, `DoughnutGraph`, `PolarAreaGraph`, `RadarGraph` (all reuse the existing `GraphDef`/
+      `toChartData()`) plus a new `PointGraphDef`/`pointGraphConfig()`/`toPointChartData()` for
+      `BubbleGraph`/`ScatterGraph`, whose `{x, y[, r]}` point data doesn't fit the label/series
+      shape. Factored the repeated title-options logic (previously duplicated per component) into
+      a shared `withTitle()` helper, and the color palette into `DEFAULT_PALETTE`, used by both
+      `toChartData()` and `toPointChartData()`. All 8 wired into `apps/showcase`'s `/graphs` demo
+      and visually verified in a browser — no console errors, all render with correct data/colors.
+      Deliberately did *not* copy the other repo's per-component hardcoded demo data or its
+      doughnut-specific half-doughnut builder — kept everything driven through the one shared
+      `GraphDef`/`PointGraphDef` abstraction instead.
+- [ ] No tests yet.
+- [ ] Not yet published to npm (`version: 0.1.0`).
+- [ ] No consumers yet.
+- Note for next session: a `page.screenshot({ fullPage: true })` over `<canvas>`-based charts came
+  back completely blank (axes/legend/title visible, no bars/slices/points) in headless Chromium,
+  even though the chart.js instance's internal layout/pixel data (checked via `getImageData` and
+  Angular devtools globals) was correct the whole time. A plain viewport screenshot
+  (`fullPage: false`), or scrolling + multiple viewport shots for a long page, rendered every chart
+  correctly. Compositing/timing quirk specific to full-page screenshots of `<canvas>` in this
+  environment, not an app bug — don't waste time debugging the component if this recurs, just
+  screenshot differently.
 
 ## Repo-wide
 
