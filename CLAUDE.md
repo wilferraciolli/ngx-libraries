@@ -17,7 +17,8 @@ ngx-libraries/
 │   ├── media/              # @wiltech-labs/ngx-media — see its own CLAUDE.md
 │   ├── ai-tools/           # @wiltech-labs/ngx-ai-tools — see its own CLAUDE.md
 │   ├── graphs/             # @wiltech-labs/ngx-graphs — see its own CLAUDE.md
-│   └── web-sockets/        # @wiltech-labs/ngx-web-sockets — see its own CLAUDE.md
+│   ├── web-sockets/        # @wiltech-labs/ngx-web-sockets — see its own CLAUDE.md
+│   └── i18n/               # @wiltech-labs/ngx-i18n — see its own CLAUDE.md
 ├── docs/
 │   └── ANGULAR_APP_CONVENTIONS.md  # conventions every consuming Angular app follows — its
 │                                   # "Shared libraries" section is the contract these packages meet

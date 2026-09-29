@@ -52,8 +52,64 @@ Still open:
 - [ ] ai-tools: with a theme whose primary/tertiary/secondary are all one hue (e.g. Material's
       `azure-blue` prebuilt), the AI gradient comes out near-monochrome. Decide whether that's fine or
       whether the gradient should keep fixed AI hues.
-- [ ] New package `ngx-dates`: `relativeTime` pipe on Temporal + `Intl.RelativeTimeFormat`.
+- [ ] New package `ngx-dates`: `relativeTime` pipe on Temporal + `Intl.RelativeTimeFormat`, reading
+      the locale from `ngx-i18n`'s `I18nService.locale()`.
 - [ ] Possibly `ngx-styles` (shared SCSS: breakpoints, spacing, ui mixins, theme) — see discussion.
+
+## New package `ngx-i18n` — built 2026-09-30
+
+Decided 2026-09-29, revised twice the same day after finding `resource-management-ui`'s existing
+`core/i18n/I18nStore` — its product doc (`docs/features/internationalization-i18n.md`) requires
+"responsive to language changes without reload." First revision dropped reload for a hand-rolled
+instant-switch engine generalizing `I18nStore`; second revision replaced the hand-rolled engine
+with Transloco, after confirming it already switches instantly — no reload — via a signal every
+`translate()`/`translateObject()` call tracks inside `computed()` (its `activeLang` signal), so
+"instant switch" and "own engine" were never actually linked. Built to that final design:
+
+- [x] `provideI18n({ locales, defaultLocale, dictionaries | loader, resolveLocale?, persistLocale? })`
+      wraps `provideTransloco()`. `BundledI18nLoader` is the default (reads `dictionaries`, bundled
+      at build time — matches `resource-management-ui`'s reasoning for a small, finite locale set);
+      pass `loader` instead for many locales or backend-served translations.
+- [x] `I18nService` (root-provided): `locale` (`Signal<string>`, resolution order session override →
+      `resolveLocale()` → `defaultLocale`), `setLocale()` (instant, no reload; persists via
+      `persistLocale()` without awaiting it), `t(key, params)`, `formatDate()`/`formatNumber()` (own
+      `Intl` use, not `LOCALE_ID`/`DateAdapter`, which can't react to a runtime switch),
+      `supportedLocales()`.
+- [x] `TPipe` (`t`) — reimplements Transloco's own pipe mechanism (subscribe to a language-change
+      notification, `markForCheck()`) under our own name rather than re-exporting `TranslocoPipe`
+      verbatim, so app templates never write Transloco's own pipe name.
+- [x] The app never imports `@jsverse/transloco` directly — `TranslocoLoader`/`Translation` types
+      (for a custom `loader`) are re-exported from this package's own barrel.
+- [x] Two bugs found and fixed while wiring the showcase demo (`apps/showcase`'s `/i18n` route),
+      caught by screenshotting both locales rather than just building/typechecking:
+      1. `t()`/`TPipe` called `TranslocoService.translate()` directly, but nothing ever called
+         `.load()` for a language — that's ordinarily the built-in pipe/directive's job. Every key
+         rendered as itself (the missing-key fallback) in *both* locales, not just an untranslated
+         one. Fixed: `I18nService` now calls `.load(locale)` before `setActiveLang()`, both in the
+         constructor's reactive subscription and in `setLocale()`.
+      2. `I18nService.t()` wasn't reactive inside a `computed()` — `TranslocoService.translate()`
+         reads its own plain internal state, not a signal, so a `computed()` wrapping `t()` never
+         reran on a language switch (translated fine via the `t` pipe, not via logic). Fixed: `t()`
+         now passes `this.locale()` explicitly as `translate()`'s `lang` argument, so reading it
+         inside a `computed()` sees the dependency. `TPipe` was changed to call `I18nService.t()`
+         rather than `TranslocoService.translate()` directly, so both paths agree.
+- [x] Wired into `apps/showcase` at `/i18n` (two demo dictionaries, `en-GB`/`el-GR`): a language
+      switcher, `t` pipe usage with params, `I18nService.t()` from a `computed()`, and
+      `formatDate()`/`formatNumber()`. Verified in a browser in both locales, and that switching
+      doesn't reload (a `window` marker set before the switch survives it) — no console errors.
+- [x] `docs/ANGULAR_APP_CONVENTIONS.md`'s "Shared libraries" section, table, setup snippet, and
+      "Dates and times" updated; root `CLAUDE.md` repo layout updated.
+- [ ] Not yet published to npm — under development, no consumers yet.
+- [ ] Still open, not done as part of this:
+      - Per-library text tokens (`NGX_FORMS_TEXT` etc.) so `ngx-forms`/`ngx-graphs`/`ngx-media`/
+        `ngx-web-sockets`/`ngx-ai-tools`'s own strings (Save/Clear, "Show data", "Send message", …)
+        can be translated through `ngx-i18n` — this package only covers app-level translations so far.
+      - `ngx-api-client` sending `Accept-Language` from the active locale.
+      - Migrating `resource-management-ui`'s `I18nStore`/`labels.ts` onto this package — flagged for
+        later, on request, not started.
+      - Peak/ICU-heavy features (plurals, gendered forms) aren't exercised by the demo yet, only the
+        plain-dictionary/interpolation path.
+      - `ngx-dates`' `relativeTime` and ngx-forms' `dateTimeConfig.locale` default to `activeLocale`.
 - [ ] Showcase: give it the house M3 theme (it uses light-only `azure-blue` + hardcoded greys), so dark
       mode can be checked for real.
 - [ ] Run Prettier over the repo once and commit that separately.

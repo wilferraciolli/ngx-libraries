@@ -131,6 +131,7 @@ to use which package and the rules for using it in an app.
 | Charts | `ngx-graphs` | `graphConfig()` + `BarGraph`/`LineGraph`/`PieGraph`/`DoughnutGraph`/`PolarAreaGraph`/`RadarGraph`; `pointGraphConfig()` + `BubbleGraph`/`ScatterGraph` | App-local chart wrappers, direct `ng2-charts` use, hand-drawn charts |
 | AI interaction surfaces | `ngx-ai-tools` | `AiTextBox`, `AiButton`, `AiPanel`, `AiSparkleIcon` | Ad hoc gradient styling |
 | Realtime / websockets | `ngx-web-sockets` | `provideWebSocket()`, `WebSocketService`, `ChatRoom`, `ChatMessageBubble` | `ngx-socket-io`, hand-rolled socket services |
+| Translations | `ngx-i18n` | `provideI18n()`, `I18nService`, the `t` pipe | An app-local translation store (see `ngx-i18n` below), raw Transloco use |
 
 ### Setup
 Install only the packages the app uses (`npm i @wiltech-labs/ngx-forms …`).
@@ -140,11 +141,13 @@ import { provideHttpClient } from '@angular/common/http';
 import { API_ORIGIN } from '@wiltech-labs/ngx-api-client';
 import { provideWebSocket } from '@wiltech-labs/ngx-web-sockets';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
+import { provideI18n } from '@wiltech-labs/ngx-i18n';
 
 provideHttpClient(),                                         // ngx-api-client
 { provide: API_ORIGIN, useValue: environment.apiOrigin },    // ngx-api-client — only when the API is on another origin
 provideCharts(withDefaultRegisterables()),                   // ngx-graphs — chart.js registration, once per app
 provideWebSocket({ url: environment.socketUrl }),            // ngx-web-sockets
+provideI18n({ locales: [...], defaultLocale: '...', dictionaries: {...} }), // ngx-i18n
 ```
 - `API_ORIGIN` is the API's **bare origin** (`https://api.example.com`), not the
   `/api`-prefixed `apiUrl`. It defaults to `''` (same origin).
@@ -155,6 +158,8 @@ provideWebSocket({ url: environment.socketUrl }),            // ngx-web-sockets
 - `ngx-forms` fields are Angular Material components and take the house M3 theme
   from "Design system: Material 3". Skip the prebuilt-theme import in the
   package README; that's for apps without their own theme.
+- `ngx-i18n` needs at least `locales`/`defaultLocale` plus `dictionaries` or a
+  `loader` — see "`ngx-i18n`" below.
 
 ### How the libraries fit the design system
 - **Selectors are `ngx-`** (`<ngx-dynamic-form>`, `<ngx-card-loader>`), so a
@@ -260,10 +265,38 @@ provideWebSocket({ url: environment.socketUrl }),            // ngx-web-sockets
 - The server contract (event names and payloads) is in the package README. A
   backend has to match it.
 
+**`ngx-i18n`**
+- Depend on `@wiltech-labs/ngx-i18n` alone — never import `@jsverse/transloco`
+  directly (the app's own `package.json` shouldn't list it). The engine
+  underneath can change without any template or service call changing with it.
+- Inject `I18nService` for logic (`i18n.t(key, params)`, a `computed()`, a
+  toast message); use the `t` pipe in templates (`{{ 'common.buttons.save' | t }}`).
+  Both read live — a language switch shows up on the next read, nothing is
+  cached stale.
+- **Switching language never reloads the app.** `I18nService.setLocale(locale)`
+  updates every `t()`/`t` pipe call and `formatDate()`/`formatNumber()`
+  immediately; persisting the choice happens in the background afterward and
+  never blocks or reverts the switch.
+- Resolution order: this session's `setLocale()` choice, then the app's own
+  `resolveLocale` (read reactively — a signed-in user's saved language,
+  say), then `defaultLocale`. Provide `resolveLocale`/`persistLocale` in
+  `provideI18n()`, not as separate ad hoc code elsewhere.
+- Translating an id from the API: key convention `'metadata.<field>.<id>'`
+  (e.g. `i18n.t('metadata.status.active')`), which pairs with `ngx-api-client`'s
+  `MetadataService`/`convertIdToValues`.
+- `formatDate()`/`formatNumber()` read `Intl` against the current locale
+  directly — use them (or the `date`/`number` pipes with a locale that follows
+  `I18nService.locale()`) rather than `LOCALE_ID`, which is fixed at bootstrap
+  and can't react to a runtime switch.
+- A missing translation key renders as the key itself, not a blank string —
+  don't add a second fallback layer on top.
+
 **`ngx-dates`** *(planned)*
-- Will hold the `relativeTime` pipe (see "Dates and times"). Until it's
-  published, keep an app-local pipe with the same name and behaviour, so the
-  switch is only an import change.
+- Will hold the `relativeTime` pipe (see "Dates and times"), reading the
+  current locale from `ngx-i18n`'s `I18nService.locale()` rather than
+  `LOCALE_ID`, for the same reactivity reason. Until it's published, keep an
+  app-local pipe with the same name and behaviour, so the switch is only an
+  import change.
 
 ### Migrating an existing app
 Work through what the app actually has:
@@ -280,6 +313,8 @@ Work through what the app actually has:
 - [ ] Ad hoc AI styling → `ngx-ai-tools` surfaces. Static AI markers stay
       `tertiary-container`.
 - [ ] Socket services or `ngx-socket-io` → `ngx-web-sockets`.
+- [ ] An app-local translation store, or raw Transloco use → `ngx-i18n`. Remove
+      `@jsverse/transloco` from the app's own `package.json` if it's there.
 - [ ] Remove any `--ngx-*` override set to a hex value.
 - [ ] Run the review checklist (section 7) on every screen touched, light and
       dark.
@@ -316,6 +351,8 @@ means, not by what the picker looks like:
   - Business times: `Temporal.PlainTime.from(t).toLocaleString(locale, { hour: 'numeric', minute: '2-digit' })`.
   - Relative times: the `relativeTime` pipe, inside `<time [attr.datetime]="iso">`
     with the full timestamp in `title`.
+  - All of the above take the locale from `ngx-i18n`'s `I18nService.locale()`
+    in an app that has it, not a hardcoded locale string.
 - **Time zones**: show instants in the user's zone by default. A feature tied to
   a place (a flight, a branch, an event venue) shows that place's zone and
   labels it, the same as `InstantDateTimeField`'s `dateTimeConfig.timeZone`.

@@ -35,6 +35,11 @@ export class HomeComponent {
       name: '@wiltech-labs/ngx-graphs',
       description: 'Bar and pie graphs built on ng2-charts',
       route: '/graphs'
+    },
+    {
+      name: '@wiltech-labs/ngx-i18n',
+      description: 'Instant, no-reload language switching on Transloco, a t() service method and a t pipe',
+      route: '/i18n'
     }
   ];
 }

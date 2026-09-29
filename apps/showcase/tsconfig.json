@@ -3,15 +3,29 @@
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
     "paths": {
-      "@wiltech-labs/ngx-api-client": ["../../packages/api-client/src/public-api.ts"],
-      "@wiltech-labs/ngx-forms": ["../../packages/forms/src/public-api.ts"],
-      "@wiltech-labs/ngx-media": ["../../packages/media/src/public-api.ts"],
-      "@wiltech-labs/ngx-ai-tools": ["../../packages/ai-tools/src/public-api.ts"],
-      "@wiltech-labs/ngx-graphs": ["../../packages/graphs/src/public-api.ts"]
+      "@wiltech-labs/ngx-api-client": [
+        "../../packages/api-client/src/public-api.ts"
+      ],
+      "@wiltech-labs/ngx-forms": [
+        "../../packages/forms/src/public-api.ts"
+      ],
+      "@wiltech-labs/ngx-media": [
+        "../../packages/media/src/public-api.ts"
+      ],
+      "@wiltech-labs/ngx-ai-tools": [
+        "../../packages/ai-tools/src/public-api.ts"
+      ],
+      "@wiltech-labs/ngx-graphs": [
+        "../../packages/graphs/src/public-api.ts"
+      ],
+      "@wiltech-labs/ngx-i18n": [
+        "../../packages/i18n/src/public-api.ts"
+      ]
     },
     "experimentalDecorators": true,
     "useDefineForClassFields": false,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "resolveJsonModule": true
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
@@ -19,6 +33,11 @@
     "strictInputAccessModifiers": true,
     "strictTemplates": true
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

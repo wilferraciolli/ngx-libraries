@@ -1,0 +1,18 @@
+{
+  "common": {
+    "buttons": { "save": "Save", "cancel": "Cancel" }
+  },
+  "demo": {
+    "title": "Translations Demo",
+    "subtitle": "Instant, no-reload language switching, a t() service method and a t pipe, from ngx-i18n",
+    "greeting": "Hello, {{name}}!",
+    "itemCount": "You have {{count}} items in your cart",
+    "switchLanguage": "Switch language",
+    "currentLocale": "Current locale",
+    "formattedDate": "Formatted date",
+    "formattedNumber": "Formatted price"
+  },
+  "metadata": {
+    "status": { "active": "Active", "inactive": "Inactive" }
+  }
+}
