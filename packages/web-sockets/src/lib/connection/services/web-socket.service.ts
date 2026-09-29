@@ -1,4 +1,5 @@
 import { Injectable, inject, signal, type Signal } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { io, type Socket } from 'socket.io-client';
 import { Observable } from 'rxjs';
 import { WEBSOCKET_CONFIG } from '../config/web-socket-config.token';
@@ -23,6 +24,10 @@ export class WebSocketService {
   private readonly _connected = signal(false);
   /** Reflects the socket's actual `connect`/`disconnect` events — not just that `connect()` was called. */
   public readonly connected: Signal<boolean> = this._connected.asReadonly();
+  /** RxJS-interop companion to `connected`, for combining with the `Observable`-returning methods
+   *  below (e.g. `combineLatest([this.connected$, this.onError()])`) instead of mixing signal reads
+   *  into RxJS pipelines by hand. */
+  public readonly connected$: Observable<boolean> = toObservable(this.connected);
 
   constructor() {
     this.socket.on('connect', () => this._connected.set(true));

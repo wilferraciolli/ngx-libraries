@@ -1,5 +1,14 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, inject, input, signal } from '@angular/core';
-import { Subscription } from 'rxjs';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnDestroy,
+  OnInit,
+  inject,
+  input,
+  signal
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { WebSocketService } from '../../../connection/services/web-socket.service';
 import { SocketEventType } from '../../../connection/constants/socket-event.constant';
 import { SocketMessageType } from '../../../connection/constants/socket-message-type.constant';
@@ -24,6 +33,7 @@ const STATUS_MESSAGE_DURATION_MS = 2000;
 })
 export class ChatRoom implements OnInit, OnDestroy {
   private readonly webSocket = inject(WebSocketService);
+  private readonly destroyRef = inject(DestroyRef);
 
   public readonly roomName = input.required<string>();
   public readonly clientName = input.required<string>();
@@ -34,12 +44,13 @@ export class ChatRoom implements OnInit, OnDestroy {
   protected readonly statusMessage = signal<string | null>(null);
   protected readonly clientId = signal('');
 
-  private readonly subscriptions = new Subscription();
   private statusTimeout?: ReturnType<typeof setTimeout>;
 
   public async ngOnInit(): Promise<void> {
-    this.subscriptions.add(
-      this.webSocket.on<ChatMessage>(SocketEventType.MESSAGE_REPLY).subscribe((message) => {
+    this.webSocket
+      .on<ChatMessage>(SocketEventType.MESSAGE_REPLY)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((message) => {
         if (message.roomName !== this.roomName()) {
           return;
         }
@@ -49,23 +60,27 @@ export class ChatRoom implements OnInit, OnDestroy {
         } else if (message.messageType === ChatMessageType.USER_TYPING) {
           this.showStatus(`${message.clientName} is typing…`);
         }
-      })
-    );
+      });
 
-    this.subscriptions.add(
-      this.webSocket.onClientConnected().subscribe(() => this.showStatus('A client connected'))
-    );
-    this.subscriptions.add(
-      this.webSocket.onClientDisconnected().subscribe(() => this.showStatus('A client disconnected'))
-    );
-    this.subscriptions.add(
-      this.webSocket.onError().subscribe((error) => this.showStatus(`Error: ${error.message}`))
-    );
-    this.subscriptions.add(
-      this.webSocket
-        .onConnectionError()
-        .subscribe((error) => this.showStatus(`Connection error: ${error.message}`))
-    );
+    this.webSocket
+      .onClientConnected()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.showStatus('A client connected'));
+
+    this.webSocket
+      .onClientDisconnected()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.showStatus('A client disconnected'));
+
+    this.webSocket
+      .onError()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((error) => this.showStatus(`Error: ${error.message}`));
+
+    this.webSocket
+      .onConnectionError()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((error) => this.showStatus(`Connection error: ${error.message}`));
 
     if (!this.webSocket.connected()) {
       this.webSocket.connect();
@@ -76,7 +91,6 @@ export class ChatRoom implements OnInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
     clearTimeout(this.statusTimeout);
     void this.webSocket.leaveRoom({ roomName: this.roomName() });
   }

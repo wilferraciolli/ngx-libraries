@@ -103,6 +103,13 @@ scratchpad so we don't lose track between sessions. Update as items land or prio
       Deliberately did *not* copy the other repo's per-component hardcoded demo data or its
       doughnut-specific half-doughnut builder — kept everything driven through the one shared
       `GraphDef`/`PointGraphDef` abstraction instead.
+- [x] Upgraded `ng2-charts` from `6.0.1` to latest (`11.0.0`, 2026-09-29) — it was 5 majors behind;
+      latest now requires Angular `>=22.0.0` (matches us) but also newly peer-depends on
+      `@angular/cdk`, added as a peer here and in `apps/showcase` (which already had `cdk` from
+      Material). No API changes needed — `BaseChartDirective`/`provideCharts`/
+      `withDefaultRegisterables` are unchanged; typecheck, build, and a live re-check of all 8
+      chart types in the browser all passed with no differences. `chart.js` (`4.5.1`) and
+      `socket.io-client` (`4.8.4`, in `packages/web-sockets`) were already at latest.
 - [ ] No tests yet.
 - [ ] Not yet published to npm (`version: 0.1.0`).
 - [ ] No consumers yet.
@@ -136,6 +143,14 @@ scratchpad so we don't lose track between sessions. Update as items land or prio
       `FormsModule`/`[(ngModel)]` for the composer, matching `ai-tools`' `AiTextBox` pattern. Split
       into a generic `connection/` layer (reusable for any websocket feature) and a `chat/` feature
       built on top, mirroring `media`'s `loading/`/`youtube/` split.
+- [x] Signal/RxJS interop pass (2026-09-29): added `WebSocketService.connected$`, a `toObservable()`
+      companion to the `connected` signal, for consumers combining it with the `Observable`-returning
+      methods in an RxJS pipeline. Replaced `ChatRoom`'s manual `Subscription` container with
+      `takeUntilDestroyed()` (`@angular/core/rxjs-interop`) — since the subscriptions are set up in
+      `ngOnInit` rather than a constructor/field initializer, it needs an explicit `DestroyRef`
+      (`takeUntilDestroyed(this.destroyRef)`), and it has to be called fresh in each `.pipe()` rather
+      than hoisted into one shared `const` — hoisting made TypeScript infer it against only the first
+      call site's generic type, silently turning every other subscription's payload into `unknown`.
 - [ ] Deliberately **not** wired into `apps/showcase` — there's no server for it to connect to yet,
       so a demo page would have nothing real to show. Add one once a NestJS (or other Socket.IO)
       backend exists to point it at.

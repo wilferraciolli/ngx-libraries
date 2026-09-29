@@ -81,6 +81,17 @@ export class PresenceComponent implements OnInit {
 }
 ```
 
+`connected` is a `Signal<boolean>` — read it directly in a template or `computed()`. If you need it
+in an RxJS pipeline instead (e.g. combined with `onError()`), use the `connected$` companion:
+
+```ts
+import { combineLatest } from 'rxjs';
+
+combineLatest([this.webSocket.connected$, this.webSocket.onError()]).subscribe(([connected, error]) => {
+  // ...
+});
+```
+
 ## `ChatRoom`
 
 A ready-to-drop-in chat UI: joins `roomName` on init, leaves it on destroy, shows the message

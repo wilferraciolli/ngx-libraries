@@ -47,6 +47,16 @@ src/
   a NestJS Socket.IO gateway) — same spirit as `api-client` mirroring `insurly-api`'s error shape.
   If a consumer's server uses different event names, adjust `SocketEventType`/`SocketMessageType`
   directly rather than trying to make them configurable per-call.
+- **Signal/RxJS interop, both directions.** `WebSocketService.connected` is the source of truth
+  (a `Signal<boolean>`); `connected$` is a `toObservable()` companion for consumers who want to
+  combine it with the `Observable`-returning methods (`onError()`, etc.) in an RxJS pipeline —
+  don't add a second independent `BehaviorSubject` for the same state. Going the other way,
+  `ChatRoom` subscribes to `WebSocketService`'s event `Observable`s with `takeUntilDestroyed()`
+  (from `@angular/core/rxjs-interop`, given an explicit `DestroyRef` since the subscriptions are
+  set up in `ngOnInit`, not a constructor/field initializer) instead of hand-rolling a `Subscription`
+  container — call `takeUntilDestroyed(this.destroyRef)` fresh in each `.pipe()`, not hoisted into a
+  shared `const`, or TypeScript infers it against only the first call site and every other
+  `.pipe()` sees `unknown`.
 
 ## Modernized from the source
 The original prototype worked, but had accumulated rough edges this rewrite deliberately fixes
