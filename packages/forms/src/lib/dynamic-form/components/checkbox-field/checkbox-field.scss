@@ -1,0 +1,9 @@
+:host {
+  display: block;
+}
+
+// Lines the hint/error up with the label text rather than the box.
+.checkbox-field-subscript {
+  padding-left: 40px;
+  margin-top: -4px;
+}

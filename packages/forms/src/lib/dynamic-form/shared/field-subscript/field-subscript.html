@@ -1,0 +1,8 @@
+@let state = field()();
+@if (state.touched() && state.invalid()) {
+  @for (error of errors(); track error.kind) {
+    <mat-error class="field-subscript-error">{{ error.message ?? error.kind }}</mat-error>
+  }
+} @else if (hint()) {
+  <div class="field-subscript-hint">{{ hint() }}</div>
+}

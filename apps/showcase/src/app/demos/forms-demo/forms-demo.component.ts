@@ -10,10 +10,14 @@ import { form } from '@angular/forms/signals';
 import type { FieldTree } from '@angular/forms/signals';
 import { Temporal } from 'temporal-polyfill';
 import {
+  BusinessDateField,
+  CheckboxField,
   DynamicForm,
-  defineSchema,
   FormFieldType,
+  SelectField,
+  TextField,
   createEmptyEntity,
+  formConfig,
   toSchema
 } from '@wiltech-labs/ngx-forms';
 import type { BaseSchema, FieldDef, SchemaConfig } from '@wiltech-labs/ngx-forms';
@@ -69,6 +73,14 @@ interface DateTimeDemoSchema extends BaseSchema {
   closesAt: string;
 }
 
+// Standalone fields model — a plain object, no BaseSchema needed when not using DynamicForm
+interface NewsletterModel {
+  email: string;
+  startDate: string;
+  frequency: string;
+  agree: boolean;
+}
+
 // All Fields Demo Schema (showcases all field types)
 interface AllFieldsSchema extends BaseSchema {
   schemaType: 'allFields';
@@ -94,6 +106,10 @@ interface AllFieldsSchema extends BaseSchema {
     CommonModule,
     MatTabsModule,
     DynamicForm,
+    TextField,
+    BusinessDateField,
+    SelectField,
+    CheckboxField,
     JsonPipe,
     MatDivider,
     MatFormField,
@@ -106,50 +122,27 @@ interface AllFieldsSchema extends BaseSchema {
 })
 export class FormsDemoComponent {
   /** Every current validation message in a form, including fields the user hasn't touched yet. */
-  protected validationErrors<T extends BaseSchema>(form: FieldTree<T>): string[] {
+  protected validationErrors<T extends object>(form: FieldTree<T>): string[] {
     const fields = form as unknown as Record<string, FieldTree<unknown>>;
 
-    return Object.keys(form().value()).flatMap(name =>
-      fields[name]?.().errors().map(error => error.message ?? `${name}: ${error.kind}`) ?? []
-    );
+    // Skips the message-less duplicates some Material controls add next to the schema's own errors.
+    return Object.keys(form().value()).flatMap(name => {
+      const errors = fields[name]?.().errors() ?? [];
+      const described = new Set(errors.filter(error => error.message).map(error => error.kind));
+
+      return errors
+        .filter(error => error.message || !described.has(error.kind))
+        .map(error => error.message ?? `${name}: ${error.kind}`);
+    });
   }
 
   // ============ FLIGHTS FORM ============
-  protected readonly flightFormConfig: SchemaConfig<FlightSchema> = defineSchema<FlightSchema>({
-    schemaType: 'flight',
-    fields: [
-      { name: 'id', type: FormFieldType.TEXT, label: 'Id', disabled: true, hidden: true },
-      {
-        name: 'from',
-        type: FormFieldType.TEXT,
-        label: 'Departure City',
-        required: true,
-        minLength: 3,
-        maxLength: 20,
-      },
-      {
-        name: 'to',
-        type: FormFieldType.TEXT,
-        label: 'Destination City',
-        required: true,
-        minLength: 3,
-        maxLength: 20
-      },
-      {
-        name: 'date',
-        type: FormFieldType.INSTANT_DATE_TIME,
-        label: 'Departure Date & Time',
-        required: true
-      },
-      { name: 'delayed', type: FormFieldType.CHECKBOX, label: 'Delayed' }
-    ],
-    initialValue: createEmptyEntity<FlightSchema>('flight', {
-      from: '',
-      to: '',
-      date: '',
-      delayed: false
-    })
-  });
+  protected readonly flightFormConfig: SchemaConfig<FlightSchema> = formConfig<FlightSchema>('flight')
+    .text('from', 'Departure City', { required: true, minLength: 3, maxLength: 20 })
+    .text('to', 'Destination City', { required: true, minLength: 3, maxLength: 20 })
+    .instantDateTime('date', 'Departure Date & Time', { required: true })
+    .checkbox('delayed', 'Delayed')
+    .build({ from: '', to: '', date: '', delayed: false });
 
   protected readonly flightEntity: WritableSignal<FlightSchema> = signal(this.flightFormConfig.initialValue);
   protected readonly flightsForm = form(
@@ -170,22 +163,12 @@ export class FormsDemoComponent {
   }
 
   // ============ APPOINTMENT FORM ============
-  protected readonly appointmentFormConfig: SchemaConfig<AppointmentSchema> = defineSchema<AppointmentSchema>({
-    schemaType: 'appointment',
-    fields: [
-      { name: 'id', type: FormFieldType.TEXT, label: 'Id', disabled: true, hidden: true },
-      { name: 'name', type: FormFieldType.TEXT, label: 'Appointment Name', required: true, minLength: 3, maxLength: 30 },
-      { name: 'startDate', type: FormFieldType.BUSINESS_DATE, label: 'Date', required: true },
-      { name: 'startTime', type: FormFieldType.BUSINESS_TIME, label: 'Time', required: true },
-      { name: 'duration', type: FormFieldType.NUMBER, label: 'Duration (minutes)', required: true }
-    ],
-    initialValue: createEmptyEntity<AppointmentSchema>('appointment', {
-      name: '',
-      startDate: '',
-      startTime: '',
-      duration: 0
-    })
-  });
+  protected readonly appointmentFormConfig: SchemaConfig<AppointmentSchema> = formConfig<AppointmentSchema>('appointment')
+    .text('name', 'Appointment Name', { required: true, minLength: 3, maxLength: 30 })
+    .businessDate('startDate', 'Date', { required: true })
+    .businessTime('startTime', 'Time', { required: true })
+    .number('duration', 'Duration (minutes)', { required: true, min: 5, max: 480 })
+    .build({ name: '', startDate: '', startTime: '', duration: 30 });
 
   protected readonly appointmentEntity: WritableSignal<AppointmentSchema> = signal(this.appointmentFormConfig.initialValue);
   protected readonly appointmentForm = form(
@@ -206,125 +189,81 @@ export class FormsDemoComponent {
   }
 
   // ============ ALL FIELDS DEMO ============
-  protected readonly allFieldsFormConfig: SchemaConfig<AllFieldsSchema> = defineSchema<AllFieldsSchema>({
-    schemaType: 'allFields',
-    fields: [
-      { name: 'id', type: FormFieldType.TEXT, label: 'Id', disabled: true, hidden: true },
-      {
-        name: 'username',
-        type: FormFieldType.TEXT,
-        label: 'Username',
-        required: true,
-        minLength: 3,
-        maxLength: 20,
-        hint: 'Short, single-line text — names, identifiers, anything that fits on one line.'
-      },
-      {
-        name: 'password',
-        type: FormFieldType.PASSWORD,
-        label: 'Password',
-        required: true,
-        minLength: 8,
-        hint: 'Same as text, but the browser masks what\'s typed.'
-      },
-      {
-        name: 'searchQuery',
-        type: FormFieldType.SEARCH,
-        label: 'Search Query',
-        maxLength: 50,
-        hint: 'Same as text, but some browsers add a clear ("x") button and search-specific keyboard on mobile.'
-      },
-      {
-        name: 'birthDate',
-        type: FormFieldType.BUSINESS_DATE,
-        label: 'Birth Date',
-        required: true,
-        hint: 'A calendar date with no timezone (stored as YYYY-MM-DD) — birthdays, holidays, due dates.'
-      },
-      {
-        name: 'appointmentTime',
-        type: FormFieldType.BUSINESS_TIME,
-        label: 'Appointment Time',
-        required: true,
-        hint: 'A time of day with no date or timezone (stored as HH:mm) — opening hours, daily schedules.'
-      },
-      {
-        name: 'eventDateTime',
-        type: FormFieldType.INSTANT_DATE_TIME,
-        label: 'Event Date & Time',
-        required: true,
-        hint: 'An exact moment (stored as a UTC instant), edited in a timezone — meetings, deadlines, flights. See the Date & Time tab.'
-      },
-      {
-        name: 'gender',
-        type: FormFieldType.RADIO,
-        label: 'Gender',
-        required: true,
-        hint: 'A small, fixed set of mutually-exclusive options where every choice should be visible at once.',
-        options: [
-          { label: 'Male', value: 'male' },
-          { label: 'Female', value: 'female' },
-          { label: 'Other', value: 'other' },
-          { label: 'Prefer not to say', value: 'not_specified' }
-        ]
-      },
-      {
-        name: 'country',
-        type: FormFieldType.SELECT,
-        label: 'Country',
-        required: true,
-        hint: 'A longer list of mutually-exclusive options, collapsed into a dropdown to save space.',
-        options: [
-          { label: 'Select a country...', value: '' },
-          { label: 'United States', value: 'us' },
-          { label: 'United Kingdom', value: 'uk' },
-          { label: 'Canada', value: 'ca' },
-          { label: 'Australia', value: 'au' },
-          { label: 'Germany', value: 'de' },
-          { label: 'France', value: 'fr' },
-          { label: 'Japan', value: 'jp' }
-        ]
-      },
-      {
-        name: 'age',
-        type: FormFieldType.NUMBER,
-        label: 'Age',
-        required: true,
-        hint: 'Numeric input with the browser\'s built-in up/down steppers and numeric keyboard on mobile.'
-      },
-      {
-        name: 'satisfaction',
-        type: FormFieldType.RANGE,
-        label: 'Satisfaction Level (1-10)',
-        hint: 'Picking a value within a known range matters more than typing an exact number.',
-        min: 1,
-        max: 10,
-        step: 1
-      },
-      {
-        name: 'bio',
-        type: FormFieldType.TEXTAREA,
-        label: 'Bio',
-        maxLength: 500,
-        hint: 'Free-form text that may run to multiple lines — notes, descriptions, comments.',
-        maxWidth: '900px'
-      },
-      {
-        name: 'snippet',
-        type: FormFieldType.CODE,
-        label: 'Favorite Code Snippet',
-        hint: 'Code or other formatted/monospaced text. Tab inserts spaces instead of moving focus, like an editor.',
-        maxWidth: '900px'
-      },
-      {
-        name: 'acceptTerms',
-        type: FormFieldType.CHECKBOX,
-        label: 'Accept Terms & Conditions',
-        required: true,
-        hint: 'A single yes/no toggle.'
-      }
-    ],
-    initialValue: createEmptyEntity<AllFieldsSchema>('allFields', {
+  protected readonly allFieldsFormConfig: SchemaConfig<AllFieldsSchema> = formConfig<AllFieldsSchema>('allFields')
+    .text('username', 'Username', {
+      required: true,
+      minLength: 3,
+      maxLength: 20,
+      hint: 'Short, single-line text — names, identifiers, anything that fits on one line.'
+    })
+    .password('password', 'Password', {
+      required: true,
+      minLength: 8,
+      hint: 'Same as text, but the browser masks what\'s typed.'
+    })
+    .search('searchQuery', 'Search Query', {
+      maxLength: 50,
+      hint: 'Same as text, but some browsers add a clear ("x") button and search-specific keyboard on mobile.'
+    })
+    .businessDate('birthDate', 'Birth Date', {
+      required: true,
+      hint: 'A calendar date with no timezone (stored as YYYY-MM-DD) — birthdays, holidays, due dates.'
+    })
+    .businessTime('appointmentTime', 'Appointment Time', {
+      required: true,
+      hint: 'A time of day with no date or timezone (stored as HH:mm) — opening hours, daily schedules.'
+    })
+    .instantDateTime('eventDateTime', 'Event Date & Time', {
+      required: true,
+      hint: 'An exact moment (stored as a UTC instant), edited in a timezone — meetings, deadlines, flights. See the Date & Time tab.'
+    })
+    .radio('gender', 'Gender', [
+      { label: 'Male', value: 'male' },
+      { label: 'Female', value: 'female' },
+      { label: 'Other', value: 'other' },
+      { label: 'Prefer not to say', value: 'not_specified' }
+    ], {
+      required: true,
+      hint: 'A small, fixed set of mutually-exclusive options where every choice should be visible at once.'
+    })
+    .select('country', 'Country', [
+      { label: 'United States', value: 'us' },
+      { label: 'United Kingdom', value: 'uk' },
+      { label: 'Canada', value: 'ca' },
+      { label: 'Australia', value: 'au' },
+      { label: 'Germany', value: 'de' },
+      { label: 'France', value: 'fr' },
+      { label: 'Japan', value: 'jp' }
+    ], {
+      required: true,
+      hint: 'A longer list of mutually-exclusive options, collapsed into a dropdown to save space.'
+    })
+    .number('age', 'Age', {
+      required: true,
+      min: 0,
+      max: 130,
+      hint: 'A whole number, with a numeric keyboard on mobile.'
+    })
+    .range('satisfaction', 'Satisfaction Level (1-10)', {
+      min: 1,
+      max: 10,
+      step: 1,
+      hint: 'Picking a value within a known range matters more than typing an exact number.'
+    })
+    .textarea('bio', 'Bio', {
+      maxLength: 500,
+      maxWidth: '900px',
+      hint: 'Free-form text that may run to multiple lines — notes, descriptions, comments.'
+    })
+    .code('snippet', 'Favorite Code Snippet', {
+      maxWidth: '900px',
+      hint: 'Code or other formatted/monospaced text. Tab inserts spaces instead of moving focus, like an editor.'
+    })
+    .checkbox('acceptTerms', 'Accept Terms & Conditions', {
+      required: true,
+      hint: 'A single yes/no toggle.'
+    })
+    .build({
       username: 'jane.doe',
       password: '',
       searchQuery: 'angular signals forms',
@@ -338,8 +277,7 @@ export class FormsDemoComponent {
       satisfaction: 7,
       bio: 'Full-stack engineer who likes strongly-typed forms and hates YAML.\n\nBased in Cyprus, previously London. Always up for a good debugging story.',
       snippet: 'function greet(name: string): string {\n  return `Hello, ${name}!`;\n}'
-    })
-  });
+    });
 
   protected readonly allFieldsEntity: WritableSignal<AllFieldsSchema> = signal(this.allFieldsFormConfig.initialValue);
   protected readonly allFieldsForm = form(
@@ -367,58 +305,38 @@ export class FormsDemoComponent {
 
   // Static field shape for the schema — required/min/max never change, only the rendered
   // timeZone and locale do (see dateTimeFields below), so this is built once.
-  private readonly dateTimeFieldsBase: FieldDef[] = [
-    { name: 'id', type: FormFieldType.TEXT, label: 'Id', disabled: true, hidden: true },
-    {
-      name: 'appointment',
-      type: FormFieldType.INSTANT_DATE_TIME,
-      label: 'Appointment',
+  private readonly dateTimeFormConfig: SchemaConfig<DateTimeDemoSchema> = formConfig<DateTimeDemoSchema>('dateTimeDemo')
+    .instantDateTime('appointment', 'Appointment', {
       required: true,
       hint: 'An exact moment, stored as a UTC instant and edited in the selected timezone — use it for meetings or deadlines shared across timezones.',
       dateTimeConfig: { min: '2024-01-01T00:00:00Z' }
-    },
-    {
-      name: 'holiday',
-      type: FormFieldType.BUSINESS_DATE,
-      label: 'Closed on',
+    })
+    .businessDate('holiday', 'Closed on', {
       required: true,
       hint: 'A calendar date with no timezone, stored as YYYY-MM-DD — Christmas Day is the 25th wherever you are.',
       dateTimeConfig: { min: '2026-01-01', max: '2026-12-31' }
-    },
-    {
-      name: 'opensAt',
-      type: FormFieldType.BUSINESS_TIME,
-      label: 'Opens at',
+    })
+    .businessTime('opensAt', 'Opens at', {
       required: true,
       hint: 'A time of day with no date or timezone, stored as HH:mm — "open from 9" means 09:00 in whichever shop you walk into.',
       dateTimeConfig: { min: '06:00', max: '12:00' }
-    },
-    {
-      name: 'closesAt',
-      type: FormFieldType.BUSINESS_TIME,
-      label: 'Closes at',
+    })
+    .businessTime('closesAt', 'Closes at', {
       required: true,
       dateTimeConfig: { min: '12:00', max: '23:30' }
-    }
-  ];
-
-  protected readonly dateTimeEntity: WritableSignal<DateTimeDemoSchema> = signal(
-    createEmptyEntity<DateTimeDemoSchema>('dateTimeDemo', {
-      appointment: '2026-05-01T17:00:00Z',
-      holiday: '2026-12-25',
-      opensAt: '09:00',
-      closesAt: '17:00'
     })
-  );
+    .build({ appointment: '2026-05-01T17:00:00Z', holiday: '2026-12-25', opensAt: '09:00', closesAt: '17:00' });
+
+  protected readonly dateTimeEntity: WritableSignal<DateTimeDemoSchema> = signal(this.dateTimeFormConfig.initialValue);
   protected readonly dateTimeForm = form(
     this.dateTimeEntity,
-    toSchema<DateTimeDemoSchema>(this.dateTimeFieldsBase)
+    toSchema<DateTimeDemoSchema>(this.dateTimeFormConfig.fields)
   );
 
   // Rebuilds metaInfo with the selected timezone and locale — DynamicForm itself only ever sees
   // a static per-field config, this is what makes the two pickers above it live.
   protected readonly dateTimeFields = computed<FieldDef[]>(() =>
-    this.dateTimeFieldsBase.map(fieldDef =>
+    this.dateTimeFormConfig.fields.map(fieldDef =>
       fieldDef.dateTimeConfig
         ? {
           ...fieldDef,
@@ -463,4 +381,38 @@ export class FormsDemoComponent {
       return '';
     }
   }
+
+  // ============ STANDALONE FIELDS ============
+  // The same field components DynamicForm uses, placed one by one in your own layout.
+  protected readonly newsletterFields = {
+    email: { name: 'email', type: FormFieldType.TEXT, label: 'Email', required: true, hint: 'Where the newsletter goes.' },
+    startDate: {
+      name: 'startDate',
+      type: FormFieldType.BUSINESS_DATE,
+      label: 'Start from',
+      required: true,
+      dateTimeConfig: { min: '2026-01-01' }
+    },
+    frequency: {
+      name: 'frequency',
+      type: FormFieldType.SELECT,
+      label: 'How often',
+      options: [
+        { label: 'Weekly', value: 'weekly' },
+        { label: 'Monthly', value: 'monthly' }
+      ]
+    },
+    agree: { name: 'agree', type: FormFieldType.CHECKBOX, label: 'I agree to receive emails', required: true }
+  } satisfies Record<keyof NewsletterModel, FieldDef>;
+
+  protected readonly newsletterModel: WritableSignal<NewsletterModel> = signal({
+    email: '',
+    startDate: '',
+    frequency: 'weekly',
+    agree: false
+  });
+  protected readonly newsletterForm = form(
+    this.newsletterModel,
+    toSchema<NewsletterModel>(Object.values(this.newsletterFields))
+  );
 }

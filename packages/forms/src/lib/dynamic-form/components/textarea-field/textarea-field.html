@@ -1,0 +1,20 @@
+<mat-form-field class="textarea-field" appearance="outline" subscriptSizing="dynamic">
+  <mat-label>{{ fieldDef().label }}</mat-label>
+  <textarea
+    matInput
+    [formField]="field()"
+    cdkTextareaAutosize
+    [cdkAutosizeMinRows]="isCode() ? 8 : 4"
+    [class.textarea-field-code]="isCode()"
+    [attr.spellcheck]="isCode() ? 'false' : null"
+    (keydown)="onKeydown($event)"
+  ></textarea>
+
+  @if (fieldDef().hint) {
+    <mat-hint>{{ fieldDef().hint }}</mat-hint>
+  }
+
+  @for (error of field()().errors(); track error.kind) {
+    <mat-error>{{ error.message }}</mat-error>
+  }
+</mat-form-field>

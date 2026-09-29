@@ -1,10 +1,10 @@
 @use '../../styles/field.mixins' as mix;
 
-.instant-date-time-field {
-  &-container {
-    @include mix.field-container;
-  }
+:host {
+  display: block;
+}
 
+.instant-date-time-field {
   &-label {
     @include mix.field-label;
   }
@@ -29,7 +29,7 @@
     min-width: 0;
   }
 
-  &-hint {
+  &-zone {
     @include mix.field-hint;
   }
 

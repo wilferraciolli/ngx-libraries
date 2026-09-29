@@ -1,17 +1,24 @@
-<div class="business-time-field-container">
-  <mat-form-field class="business-time-field-form-field" appearance="outline" subscriptSizing="dynamic">
-    <mat-label>{{ label() }}</mat-label>
-    <input
-      matInput
-      [matTimepicker]="timepicker"
-      [matTimepickerMin]="minTime()"
-      [matTimepickerMax]="maxTime()"
-      [value]="time()"
-      [attr.aria-invalid]="invalid() ? true : null"
-      (blur)="touch.emit()"
-      (valueChange)="onTimeChange($event)"
-    />
-    <mat-timepicker-toggle matIconSuffix [for]="timepicker" />
-    <mat-timepicker #timepicker (closed)="touch.emit()" />
-  </mat-form-field>
-</div>
+<mat-form-field class="business-time-field" appearance="outline" subscriptSizing="dynamic">
+  <mat-label>{{ fieldDef().label }}</mat-label>
+  <input
+    matInput
+    [matTimepicker]="timepicker"
+    [matTimepickerMin]="minTime()"
+    [matTimepickerMax]="maxTime()"
+    [value]="time()"
+    [required]="state().required()"
+    [disabled]="state().disabled()"
+    (blur)="state().markAsTouched()"
+    (valueChange)="onTimeChange($event)"
+  />
+  <mat-timepicker-toggle matIconSuffix [for]="timepicker" />
+  <mat-timepicker #timepicker (closed)="state().markAsTouched()" />
+
+  @if (fieldDef().hint) {
+    <mat-hint>{{ fieldDef().hint }}</mat-hint>
+  }
+
+  @for (error of state().errors(); track error.kind) {
+    <mat-error>{{ error.message }}</mat-error>
+  }
+</mat-form-field>

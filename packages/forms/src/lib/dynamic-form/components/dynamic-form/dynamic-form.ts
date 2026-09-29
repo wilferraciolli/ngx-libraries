@@ -1,37 +1,34 @@
 import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
 import type { InputSignal } from '@angular/core';
-import { FormField } from '@angular/forms/signals';
 import type { FieldState, FieldTree } from '@angular/forms/signals';
-import { ErrorDetails } from '../../shared/error-details/error-details';
-import { MatTabsModule } from '@angular/material/tabs';
 import { MatButton } from '@angular/material/button';
-import { InstantDateTimeField } from '../instant-date-time-field/instant-date-time-field';
+import { TextField } from '../text-field/text-field';
+import { TextareaField } from '../textarea-field/textarea-field';
+import { CheckboxField } from '../checkbox-field/checkbox-field';
+import { RadioField } from '../radio-field/radio-field';
+import { SelectField } from '../select-field/select-field';
+import { SliderField } from '../slider-field/slider-field';
 import { BusinessDateField } from '../business-date-field/business-date-field';
 import { BusinessTimeField } from '../business-time-field/business-time-field';
-import { TextField } from '../text-field/text-field';
-import { FormFieldType } from '../../constants/form-field.constant';
+import { InstantDateTimeField } from '../instant-date-time-field/instant-date-time-field';
 import type { FieldDef } from '../../interfaces/field-definition';
 import type { BaseSchema } from '../../interfaces/base.schema';
 
-// Field types rendered by a Material field component that shows its own hint and errors.
-const SELF_CONTAINED_TYPES: ReadonlySet<FormFieldType> = new Set([
-  FormFieldType.TEXT,
-  FormFieldType.PASSWORD,
-  FormFieldType.SEARCH
-]);
-
+/** Renders one Material field component per FieldDef, plus Save and Clear buttons. */
 @Component({
   selector: 'app-dynamic-form',
   standalone: true,
   imports: [
-    ErrorDetails,
-    MatTabsModule,
-    FormField,
     MatButton,
-    InstantDateTimeField,
+    TextField,
+    TextareaField,
+    CheckboxField,
+    RadioField,
+    SelectField,
+    SliderField,
     BusinessDateField,
     BusinessTimeField,
-    TextField
+    InstantDateTimeField
   ],
   templateUrl: './dynamic-form.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -55,40 +52,5 @@ export class DynamicForm<T extends BaseSchema = BaseSchema> {
 
   protected clearForm(): void {
     this.onFormClear.emit();
-  }
-
-  protected isSelfContained(type: FormFieldType): boolean {
-    return SELF_CONTAINED_TYPES.has(type);
-  }
-
-  /** Tab inserts two spaces instead of moving focus, matching a code editor's behavior. */
-  protected handleCodeKeydown(event: KeyboardEvent, field: FieldTree<unknown>): void {
-    if (event.key !== 'Tab') {
-      return;
-    }
-
-    event.preventDefault();
-
-    const textarea = event.target as HTMLTextAreaElement;
-    const start = textarea.selectionStart ?? 0;
-    const end = textarea.selectionEnd ?? 0;
-    const indented = `${textarea.value.substring(0, start)}  ${textarea.value.substring(end)}`;
-
-    textarea.value = indented;
-    textarea.selectionStart = textarea.selectionEnd = start + 2;
-    field().value.set(indented);
-  }
-
-  /** 0-100 position of `value` between `min` and `max`, for the range track's fill. */
-  protected rangePercent(min: number | undefined, max: number | undefined, value: unknown): number {
-    const lo = min ?? 0;
-    const hi = max ?? 100;
-    const numericValue = typeof value === 'number' ? value : lo;
-
-    if (hi <= lo) {
-      return 0;
-    }
-
-    return Math.max(0, Math.min(100, ((numericValue - lo) / (hi - lo)) * 100));
   }
 }

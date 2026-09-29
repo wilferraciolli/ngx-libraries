@@ -190,6 +190,37 @@
         </div>
       </div>
     </mat-tab>
+
+    <!-- ============ STANDALONE FIELDS TAB ============ -->
+    <mat-tab label="Standalone Fields">
+      <div class="tab-content">
+        <h3>Field Components Without DynamicForm</h3>
+        <p>
+          Every field component takes a <code>[fieldDef]</code> and a <code>[field]</code>, so you can place
+          them one by one in your own layout — no Save/Clear buttons, and the model can be any plain object.
+        </p>
+
+        <div class="standalone-fields">
+          <app-text-field [fieldDef]="newsletterFields.email" [field]="newsletterForm.email" />
+          <app-business-date-field [fieldDef]="newsletterFields.startDate" [field]="newsletterForm.startDate" />
+          <app-select-field [fieldDef]="newsletterFields.frequency" [field]="newsletterForm.frequency" />
+          <app-checkbox-field [fieldDef]="newsletterFields.agree" [field]="newsletterForm.agree" />
+        </div>
+
+        <div class="model-section">
+          @let newsletterErrors = validationErrors(newsletterForm);
+          <strong>Current value ({{ newsletterErrors.length ? 'invalid' : 'valid' }}):</strong>
+          @if (newsletterErrors.length) {
+            <ul class="model-errors">
+              @for (error of newsletterErrors; track error) {
+                <li>{{ error }}</li>
+              }
+            </ul>
+          }
+          <pre>{{ newsletterModel() | json }}</pre>
+        </div>
+      </div>
+    </mat-tab>
   </mat-tab-group>
 
   <div class="info-section">

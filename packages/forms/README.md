@@ -1,13 +1,16 @@
 # @wiltech-labs/ngx-forms
 
-Shared Angular forms library — form builders, validators, and utility services for common form patterns used across Wiltech Angular applications.
+Configuration-driven Angular forms built on the **Signals Forms API** (`@angular/forms/signals`)
+and **Angular Material**. Describe your fields once, then either render the whole form with
+`DynamicForm` or place individual field components in your own layout.
 
 ## Features
 
-- **Dynamic Form Builder**: Configuration-driven form generator with built-in validation
-- Custom validators
-- Form utility services
-- Support for multiple field types (text, password, date, select, radio, checkbox, range, etc.)
+- **`DynamicForm`** — renders a full form (fields + Save/Clear) from a list of field definitions
+- **Field components** — every field type is a standalone Material component you can use on its own
+- **`formConfig<T>()` builder** — fluent, type-checked way to write the config; field names are checked against your model
+- **Validation from config** — `required`, `minLength`/`maxLength`, `min`/`max`, date/time ranges and `disabled`, shown inline under each field once touched
+- **Date and time done properly** — timezone-aware instants and timezone-free business dates/times, displayed in a chosen locale rather than the browser's
 
 ## Installation
 
@@ -15,165 +18,238 @@ Shared Angular forms library — form builders, validators, and utility services
 npm install @wiltech-labs/ngx-forms
 ```
 
-## Dynamic Form Usage
+Peer dependencies: `@angular/core`, `@angular/common`, `@angular/forms`, `@angular/material` (all `^22`).
+`temporal-polyfill` is installed with the package.
 
-The dynamic form builder allows you to create reactive forms from a configuration object without manually building form groups.
+The fields are Angular Material components, so the app needs a Material theme and the Roboto font:
 
-### Basic Example
+```css
+/* styles.css */
+@import '@angular/material/prebuilt-themes/azure-blue.css';
+```
+
+```html
+<!-- index.html -->
+<link rel="preconnect" href="https://fonts.gstatic.com" />
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet" />
+```
+
+## Usage with DynamicForm
+
+### 1. Describe the model and its fields
+
+```typescript
+import { formConfig } from '@wiltech-labs/ngx-forms';
+import type { BaseSchema, SchemaConfig } from '@wiltech-labs/ngx-forms';
+
+export interface FlightSchema extends BaseSchema {   // BaseSchema adds `id` and `schemaType`
+  schemaType: 'flight';
+  from: string;
+  to: string;
+  departure: string;
+  cabin: string;
+  delayed: boolean;
+}
+
+export const flightFormConfig: SchemaConfig<FlightSchema> = formConfig<FlightSchema>('flight')
+  .text('from', 'Departure City', { required: true, minLength: 3, maxLength: 20 })
+  .text('to', 'Destination City', { required: true, minLength: 3, maxLength: 20 })
+  .instantDateTime('departure', 'Departure', {
+    required: true,
+    hint: 'Local time at the departure airport',
+    dateTimeConfig: { timeZone: 'Europe/London', min: '2026-01-01T00:00:00Z' }
+  })
+  .select('cabin', 'Cabin', [
+    { label: 'Economy', value: 'economy' },
+    { label: 'Business', value: 'business' }
+  ], { required: true })
+  .checkbox('delayed', 'Delayed')
+  .build({ from: '', to: '', departure: '', cabin: 'economy', delayed: false });
+```
+
+`build()` returns `{ schemaType, fields, initialValue }`, with `id` and `schemaType` filled in on the
+initial value. A misspelled or renamed field name is a compile error.
+
+### 2. Render it
 
 ```typescript
 import { Component, signal } from '@angular/core';
 import { form } from '@angular/forms/signals';
-import {
-  DynamicForm,
-  FormFieldType,
-  BaseSchema,
-  SchemaConfig,
-  defineSchema,
-  createEmptyEntity,
-  toSchema
-} from '@wiltech-labs/ngx-forms';
-
-// 1. Define your entity schema
-interface FlightSchema extends BaseSchema {
-  schemaType: 'flight';
-  from: string;
-  to: string;
-  date: string;
-  delayed: boolean;
-}
-
-// 2. Define the form configuration
-const flightFormConfig: SchemaConfig<FlightSchema> = defineSchema<FlightSchema>({
-  schemaType: 'flight',
-  fields: [
-    { name: 'id', type: FormFieldType.TEXT, label: 'Id', disabled: true, hidden: true },
-    { name: 'from', type: FormFieldType.TEXT, label: 'From', required: true, minLength: 3, maxLength: 20 },
-    { name: 'to', type: FormFieldType.TEXT, label: 'To', required: true, minLength: 3, maxLength: 20 },
-    { name: 'date', type: FormFieldType.INSTANT_DATE_TIME, label: 'Departure', required: true, dateTimeConfig: { timeZone: 'Europe/London' } },
-    { name: 'delayed', type: FormFieldType.CHECKBOX, label: 'Delayed' }
-  ],
-  initialValue: createEmptyEntity<FlightSchema>('flight', {
-    from: '',
-    to: '',
-    date: '',
-    delayed: false
-  })
-});
+import { DynamicForm, toSchema } from '@wiltech-labs/ngx-forms';
+import { flightFormConfig } from './flight-form.config';
+import type { FlightSchema } from './flight-form.config';
 
 @Component({
   selector: 'app-flight-form',
-  standalone: true,
   imports: [DynamicForm],
   template: `
     <app-dynamic-form
-      [metaInfo]="flightFormConfig.fields"
+      [metaInfo]="config.fields"
       [dynamicForm]="flightForm"
-      (onFormSubmit)="handleSubmit()"
-      (onFormClear)="handleClear()"
+      (onFormSubmit)="save()"
+      (onFormClear)="clear()"
     />
   `
 })
 export class FlightFormComponent {
-  readonly flightFormConfig = flightFormConfig;
-  readonly flightEntity = signal(flightFormConfig.initialValue);
-  readonly flightForm = form(
-    this.flightEntity,
-    toSchema<FlightSchema>(flightFormConfig.fields)
-  );
+  protected readonly config = flightFormConfig;
+  protected readonly flight = signal(flightFormConfig.initialValue);
+  protected readonly flightForm = form(this.flight, toSchema<FlightSchema>(flightFormConfig.fields));
 
-  protected handleSubmit(): void {
-    console.log('Flight data:', this.flightEntity());
+  protected save(): void {
+    console.log('Saved', this.flight());
   }
 
-  protected handleClear(): void {
-    this.flightEntity.set(flightFormConfig.initialValue);
+  protected clear(): void {
+    this.flight.set(flightFormConfig.initialValue);
     this.flightForm().reset();
   }
 }
 ```
 
-### Field Types
+`toSchema()` turns the field definitions into Signals Forms validation rules. Save is only enabled
+while the form is valid, and `onFormSubmit` only fires for a valid form.
 
-The dynamic form supports the following field types (via `FormFieldType` enum):
+## Usage with individual fields
 
-- `TEXT` - Text input
-- `PASSWORD` - Password input
-- `SEARCH` - Search input
-- `RADIO` - Radio button group (requires `options`)
-- `SELECT` - Dropdown select (requires `options`)
-- `CHECKBOX` - Checkbox input
-- `NUMBER` - Number input
-- `RANGE` - Range slider (`min`/`max`/`step`)
-- `TEXTAREA` - Multi-line text
-- `CODE` - Monospaced multi-line text, Tab indents
-- `BUSINESS_DATE` - Calendar date with no timezone, value `'YYYY-MM-DD'` (Eg Christmas Day)
-- `BUSINESS_TIME` - Time of day with no timezone, value `'HH:mm'` (Eg opens at 09:00)
-- `INSTANT_DATE_TIME` - Exact moment, value a UTC instant `'YYYY-MM-DDThh:mm:ssZ'`, edited in `dateTimeConfig.timeZone`
-
-The three date/time fields use the Angular Material datepicker/timepicker and share `dateTimeConfig`:
+Every field component takes the same two inputs — a `[fieldDef]` and the `[field]` from your
+Signals Form — so you can use them without `DynamicForm`, in any layout. The model can be any plain
+object; it doesn't need `id` or `schemaType`.
 
 ```typescript
-interface DateTimeConfig {
-  locale?: string;          // Display and typing format, Eg 'en-GB' (31/03/2024) or 'en-US'. Defaults to 'en-GB'.
-  min?: string;             // In the field's own value format: '2024-12-25', '09:00' or '2024-01-01T00:00:00Z'
-  max?: string;
-  timeZone?: string;        // INSTANT_DATE_TIME only. Defaults to the user's timezone.
-  disambiguation?: 'earlier' | 'later';  // INSTANT_DATE_TIME only: which occurrence when a time happens twice
+import { Component, signal } from '@angular/core';
+import { form } from '@angular/forms/signals';
+import {
+  BusinessDateField, CheckboxField, FormFieldType, TextField, toSchema
+} from '@wiltech-labs/ngx-forms';
+import type { FieldDef } from '@wiltech-labs/ngx-forms';
+
+interface Newsletter {
+  email: string;
+  startDate: string;
+  agree: boolean;
+}
+
+@Component({
+  selector: 'app-newsletter',
+  imports: [TextField, BusinessDateField, CheckboxField],
+  template: `
+    <app-text-field [fieldDef]="fields.email" [field]="newsletterForm.email" />
+    <app-business-date-field [fieldDef]="fields.startDate" [field]="newsletterForm.startDate" />
+    <app-checkbox-field [fieldDef]="fields.agree" [field]="newsletterForm.agree" />
+    <button [disabled]="newsletterForm().invalid()" (click)="subscribe()">Subscribe</button>
+  `
+})
+export class NewsletterComponent {
+  protected readonly fields = {
+    email: { name: 'email', type: FormFieldType.TEXT, label: 'Email', required: true },
+    startDate: {
+      name: 'startDate',
+      type: FormFieldType.BUSINESS_DATE,
+      label: 'Start from',
+      required: true,
+      dateTimeConfig: { min: '2026-01-01', locale: 'en-GB' }
+    },
+    agree: { name: 'agree', type: FormFieldType.CHECKBOX, label: 'I agree to receive emails', required: true }
+  } satisfies Record<keyof Newsletter, FieldDef>;
+
+  protected readonly newsletter = signal<Newsletter>({ email: '', startDate: '', agree: false });
+  protected readonly newsletterForm = form(this.newsletter, toSchema<Newsletter>(Object.values(this.fields)));
+
+  protected subscribe(): void {
+    console.log(this.newsletter());
+  }
 }
 ```
 
-The format follows `locale`, never the browser's, because each field has its own `DateAdapter`.
-`ZonedDateTimeService` is exported too, for converting between UTC instants and picker `Date`s in a timezone.
+Each component renders its own label, hint, required marker and errors, and fills the width of its
+container (`DynamicForm` caps each field at 400px, overridable per field with `maxWidth`).
 
-### Field Configuration
+## Field types
 
-Each field in the `fields` array supports:
+| `FormFieldType` | Builder method | Component | Value | Material control |
+|---|---|---|---|---|
+| `TEXT` | `text()` | `TextField` | `string` | `matInput` |
+| `PASSWORD` | `password()` | `TextField` | `string` | `matInput` (masked) |
+| `SEARCH` | `search()` | `TextField` | `string` | `matInput` |
+| `NUMBER` | `number()` | `TextField` | `number` | `matInput` |
+| `TEXTAREA` | `textarea()` | `TextareaField` | `string` | `matInput` textarea, auto-growing |
+| `CODE` | `code()` | `TextareaField` | `string` | Monospaced textarea, Tab indents |
+| `CHECKBOX` | `checkbox()` | `CheckboxField` | `boolean` | `mat-checkbox` |
+| `RADIO` | `radio(name, label, choices)` | `RadioField` | option value | `mat-radio-group` |
+| `SELECT` | `select(name, label, choices)` | `SelectField` | option value | `mat-select` |
+| `RANGE` | `range()` | `SliderField` | `number` | `mat-slider` (`min`/`max`/`step`, default 0–100) |
+| `BUSINESS_DATE` | `businessDate()` | `BusinessDateField` | `'YYYY-MM-DD'` | Datepicker |
+| `BUSINESS_TIME` | `businessTime()` | `BusinessTimeField` | `'HH:mm'` | Timepicker |
+| `INSTANT_DATE_TIME` | `instantDateTime()` | `InstantDateTimeField` | UTC `'YYYY-MM-DDThh:mm:ssZ'` | Datepicker + timepicker |
+
+Use `hidden(name)` on the builder for a field that belongs to the model and its validation but is never shown.
+
+### Choosing a date/time field
+
+- **`BUSINESS_DATE`** — a calendar date with no timezone: birthdays, holidays, due dates. Christmas Day is the 25th wherever it's read.
+- **`BUSINESS_TIME`** — a time of day with no date or timezone: opening hours, daily schedules. "Opens at 09:00" means 09:00 in whichever shop you walk into.
+- **`INSTANT_DATE_TIME`** — an exact moment, stored in UTC and edited as the wall-clock time of `dateTimeConfig.timeZone`: meetings, deadlines, flights. When a time falls in a daylight-saving gap or overlap, the field explains how it was resolved.
+
+All three display and parse dates in `dateTimeConfig.locale` (default `'en-GB'`, so `31/12/2026`),
+never the browser's locale — typing `31/12/2026` works for any day-first locale.
+
+## Field definition
 
 ```typescript
 interface FieldDef {
-  name: string;              // Property name in the schema
-  type: FormFieldType;       // Field type from enum
-  label: string;             // Display label
-  required?: boolean;        // Validation: field is required
-  minLength?: number;        // Validation: minimum string length
-  maxLength?: number;        // Validation: maximum string length
-  min?: number;              // For number and range fields
-  max?: number;              // For number and range fields
-  step?: number;             // For number and range fields
-  options?: FieldOption[];   // For radio/select: [ { label, value }, ... ]
-  dateTimeConfig?: DateTimeConfig; // For business-date, business-time and instant-date-time
-  hidden?: boolean;          // Hide from UI but keep in form
-  disabled?: boolean;        // Disable input (read-only)
-  hint?: string;             // Short explanatory text shown under the label
-  maxWidth?: string;         // CSS max-width override, Eg '900px'. Defaults to 400px.
+  name: string;                     // Property name in the model
+  type: FormFieldType;
+  label: string;
+  required?: boolean;
+  minLength?: number;               // Text fields
+  maxLength?: number;               // Text fields
+  min?: number;                     // Number and range fields
+  max?: number;                     // Number and range fields
+  step?: number;                    // Range fields
+  options?: FieldOption[];          // Radio and select: [{ label, value }]
+  dateTimeConfig?: DateTimeConfig;  // Business date/time and instant date-time
+  hidden?: boolean;                 // Part of the model, never rendered
+  disabled?: boolean;               // Rendered but not editable
+  hint?: string;                    // Help text under the field
+  maxWidth?: string;                // DynamicForm only: overrides the 400px cap, Eg '900px' or '100%'
+}
+
+interface DateTimeConfig {
+  locale?: string;                  // Display/typing format, Eg 'en-GB', 'en-US', 'el-CY'. Default 'en-GB'.
+  min?: string;                     // In the field's own value format: '2026-12-25', '09:00' or '2026-01-01T00:00:00Z'
+  max?: string;
+  timeZone?: string;                // Instant only: IANA zone, Eg 'Europe/London'. Default: the user's timezone.
+  disambiguation?: 'earlier' | 'later';  // Instant only: which occurrence when a time happens twice
 }
 ```
 
-### Utility Functions
+## Other exports
 
-- `defineSchema()` - Type-safe schema configuration helper
-- `createEmptyEntity()` - Create an empty entity with required base properties
-- `toSchema()` - Convert field definitions to validation schema
+- `toSchema(fields)` — field definitions to Signals Forms rules
+- `createEmptyEntity(schemaType, values)` / `defineSchema(config)` — build a `SchemaConfig` by hand instead of with the builder
+- `ZonedDateTimeService` — converts between UTC instants and picker `Date`s in a given timezone, resolving daylight-saving gaps and overlaps
 
 ## Layout
 
 ```
 src/
 ├── public-api.ts        # barrel — the entire public surface; nothing outside this is exported
-└── lib/
-    └── (form-related utilities and services)
+└── lib/dynamic-form/
+    ├── components/      # DynamicForm + one Material component per field type
+    ├── builders/        # formConfig<T>() / FormConfigBuilder
+    ├── adapters/        # Locale-aware DateAdapter for the pickers
+    ├── services/        # ZonedDateTimeService
+    ├── shared/          # Hint/error line for controls without a mat-form-field
+    ├── interfaces/      # FieldDef, FieldOption, BaseSchema, SchemaConfig
+    ├── constants/       # FormFieldType, DateTimeConfig
+    ├── styles/          # Shared SCSS mixins
+    └── utils/           # toSchema, date/time parsing and validation
 ```
-
-## Conventions
-
-- Real Angular constructs (`@Injectable`, `@Directive`, `@Pipe`) — not framework-agnostic functions
-- One folder per concern under `src/lib/` — organize by feature or type (e.g. `validators/`, `builders/`, `directives/`)
-- A new concern gets its own folder, not a file dropped flat
 
 ## Status
 
-Not yet published to npm — under development.
+Not yet published to npm — under development. The `apps/showcase` app demonstrates every field type.
 
 ## Publishing
 
@@ -181,6 +257,8 @@ To publish this package to npm:
 
 ```bash
 cd packages/forms
+npm run build
+cd dist
 npm publish
 ```
 

@@ -1,0 +1,16 @@
+@use '../../styles/field.mixins' as mix;
+
+:host {
+  display: block;
+}
+
+.field-subscript-hint {
+  @include mix.field-hint;
+}
+
+.field-subscript-error {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.2;
+}

@@ -1,42 +1,36 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, linkedSignal, model, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, linkedSignal, signal, viewChildren } from '@angular/core';
 import type { WritableSignal } from '@angular/core';
-import type { FormValueControl } from '@angular/forms/signals';
+import type { FieldTree } from '@angular/forms/signals';
 import { DateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
+import { MatInput, MatInputModule } from '@angular/material/input';
 import { MatTimepickerModule } from '@angular/material/timepicker';
 import { Temporal } from 'temporal-polyfill';
 import { provideLocaleDateAdapter } from '../../adapters/locale-date-adapter';
 import { DEFAULT_DATE_TIME_LOCALE } from '../../constants/date-time.constants';
-import type { DateTimeConfig } from '../../constants/date-time.constants';
+import type { FieldDef } from '../../interfaces/field-definition';
+import { syncMatInputErrorState } from '../../utils/mat-input-error-state';
 import { ZonedDateTimeService } from '../../services/zoned-date-time.service';
+import { FieldSubscript } from '../../shared/field-subscript/field-subscript';
 
 /**
  * Date and time field whose form value is a UTC instant (YYYY-MM-DDThh:mm:ssZ), edited through the
- * Material datepicker and timepicker as the wall-clock time of `config.timeZone`.
- * The display format follows `config.locale`, not the browser's.
+ * Material datepicker and timepicker as the wall-clock time of `dateTimeConfig.timeZone`.
+ * The display format follows `dateTimeConfig.locale`, not the browser's.
  */
 @Component({
   selector: 'app-instant-date-time-field',
   standalone: true,
-  imports: [MatFormFieldModule, MatInputModule, MatDatepickerModule, MatTimepickerModule],
+  imports: [MatFormFieldModule, MatInputModule, MatDatepickerModule, MatTimepickerModule, FieldSubscript],
   providers: [provideLocaleDateAdapter()],
   templateUrl: './instant-date-time-field.html',
   styleUrl: './instant-date-time-field.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class InstantDateTimeField implements FormValueControl<string | null> {
-  public value = model<string | null>(null);
-
-  public label = input<string>('Date and time');
-  public config = input<DateTimeConfig | null | undefined>(null);
-
-  /** FormUiControl contract: kept in sync with the bound field's validity by the Field directive. */
-  public readonly invalid = input<boolean>(false);
-
-  /** FormUiControl contract: marks the bound field touched, so its errors start showing. */
-  public readonly touch = output<void>();
+export class InstantDateTimeField {
+  public readonly fieldDef = input.required<FieldDef>();
+  public readonly field = input.required<FieldTree<string | null>>();
 
   private readonly zonedDateTime = inject(ZonedDateTimeService);
   private readonly dateAdapter = inject<DateAdapter<Date>>(DateAdapter);
@@ -44,14 +38,16 @@ export class InstantDateTimeField implements FormValueControl<string | null> {
   /** Explains how a DST gap or overlap was resolved for the last value picked by the user. */
   protected readonly notice: WritableSignal<string | null> = signal(null);
 
+  protected readonly state = computed(() => this.field()());
+  protected readonly config = computed(() => this.fieldDef().dateTimeConfig);
   protected readonly timeZone = computed(() => this.config()?.timeZone || Temporal.Now.timeZoneId());
-  protected readonly offset = computed(() => this.zonedDateTime.offset(this.value(), this.timeZone()));
+  protected readonly offset = computed(() => this.zonedDateTime.offset(this.state().value(), this.timeZone()));
   protected readonly minDate = computed(() => this.zonedDateTime.toDate(this.config()?.min, this.timeZone()));
   protected readonly maxDate = computed(() => this.zonedDateTime.toDate(this.config()?.max, this.timeZone()));
 
   // Only a change of the actual wall-clock time counts, so '' -> null (still empty) keeps a half-filled pick.
   private readonly wallClock = computed(
-    () => this.zonedDateTime.toDate(this.value(), this.timeZone()),
+    () => this.zonedDateTime.toDate(this.state().value(), this.timeZone()),
     { equal: (a, b) => a?.getTime() === b?.getTime() }
   );
 
@@ -59,7 +55,10 @@ export class InstantDateTimeField implements FormValueControl<string | null> {
   protected readonly date = linkedSignal(() => this.wallClock());
   protected readonly time = linkedSignal(() => this.wallClock());
 
+  private readonly inputs = viewChildren(MatInput);
+
   constructor() {
+    syncMatInputErrorState(this.inputs, this.state);
     effect(() => this.dateAdapter.setLocale(this.config()?.locale || DEFAULT_DATE_TIME_LOCALE));
   }
 
@@ -87,16 +86,17 @@ export class InstantDateTimeField implements FormValueControl<string | null> {
 
     const date = this.date();
     const time = this.time();
+    const value = this.state().value;
 
     if (!isValidDate(date) || !isValidDate(time)) {
-      if (this.value() !== null) {
-        this.value.set(null);
+      if (value() !== null) {
+        value.set(null);
       }
       return;
     }
 
     const result = this.zonedDateTime.toInstant(date, time, this.timeZone(), this.config()?.disambiguation);
-    this.value.set(result?.instant ?? null);
+    value.set(result?.instant ?? null);
     this.notice.set(result?.notice ?? null);
   }
 }

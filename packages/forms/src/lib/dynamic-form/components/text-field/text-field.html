@@ -1,6 +1,6 @@
 <mat-form-field class="text-field" appearance="outline" subscriptSizing="dynamic">
   <mat-label>{{ fieldDef().label }}</mat-label>
-  <input matInput [type]="fieldDef().type" [formField]="field()" />
+  <input matInput [type]="fieldDef().type" [formField]="formField()" />
 
   @if (fieldDef().hint) {
     <mat-hint>{{ fieldDef().hint }}</mat-hint>

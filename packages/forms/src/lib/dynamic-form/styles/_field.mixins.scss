@@ -1,6 +1,5 @@
-// Shared visual language for dynamic-form fields: a centered, max-width
-// column with a Material-outline-simulated input box, plus the small
-// hint/notice/error text that sits under a field.
+// Shared layout and small-text styles for the field components. The fields themselves are
+// Angular Material controls, so these only cover what sits around them.
 
 // $max-width is the compile-time default. Any consumer can override it per-instance
 // at runtime by setting the --field-max-width custom property on the element (e.g.
@@ -14,73 +13,22 @@
   font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
+// Label above a control that has no mat-form-field of its own (radio group, slider, instant date-time).
 @mixin field-label {
   margin-bottom: 6px;
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 14px;
   color: rgba(0, 0, 0, 0.6);
-
-  label {
-    font-weight: lighter;
-  }
-}
-
-// The border/background/focus-within look of a Material-outline-simulated
-// box, with no layout opinion — safe for a fieldset or any multi-child
-// container whose own children need normal block flow.
-@mixin field-outline-container {
-  border: 1px solid rgba(0, 0, 0, 0.38);
-  border-radius: 4px;
-  padding: 10px 12px;
-  background-color: #fff;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-
-  &:focus-within {
-    border-color: #3f51b5;
-    border-width: 2px;
-    padding: 9px 11px; // compensate for thicker border to prevent layout shifts
-  }
-}
-
-// field-outline-container plus a single-line flex row — for a wrapper
-// around exactly one input, or a row of at most a few inline controls.
-@mixin field-outline-box {
-  @include field-outline-container;
-  display: flex;
-  align-items: center;
-}
-
-// Strips default input styling so it blends into a field-outline-box wrapper.
-@mixin field-input-reset {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-  background: transparent;
-  font: inherit;
-  font-size: 13px;
-  color: rgba(0, 0, 0, 0.87);
-  width: 100%;
-  box-sizing: border-box;
-
-  &::-webkit-calendar-picker-indicator {
-    cursor: pointer;
-    opacity: 0.6;
-
-    &:hover {
-      opacity: 1;
-    }
-  }
 }
 
 @mixin field-hint {
-  font-size: 11px;
+  font-size: 12px;
   color: rgba(0, 0, 0, 0.6);
   margin-top: 4px;
   line-height: 1.2;
 }
 
 @mixin field-notice {
-  font-size: 11px;
+  font-size: 12px;
   color: #8a5a00;
   margin-top: 4px;
 }

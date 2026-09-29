@@ -1,0 +1,4 @@
+<mat-checkbox [formField]="field()">
+  {{ fieldDef().label }}@if (field()().required()) {<span aria-hidden="true"> *</span>}
+</mat-checkbox>
+<app-field-subscript class="checkbox-field-subscript" [field]="field()" [hint]="fieldDef().hint" />

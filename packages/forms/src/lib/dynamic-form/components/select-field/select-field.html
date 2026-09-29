@@ -1,0 +1,16 @@
+<mat-form-field class="select-field" appearance="outline" subscriptSizing="dynamic">
+  <mat-label>{{ fieldDef().label }}</mat-label>
+  <mat-select [formField]="field()">
+    @for (option of fieldDef().options ?? []; track option.value) {
+      <mat-option [value]="option.value">{{ option.label }}</mat-option>
+    }
+  </mat-select>
+
+  @if (fieldDef().hint) {
+    <mat-hint>{{ fieldDef().hint }}</mat-hint>
+  }
+
+  @for (error of field()().errors(); track error.kind) {
+    <mat-error>{{ error.message }}</mat-error>
+  }
+</mat-form-field>

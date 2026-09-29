@@ -1,17 +1,24 @@
-<div class="business-date-field-container">
-  <mat-form-field class="business-date-field-form-field" appearance="outline" subscriptSizing="dynamic">
-    <mat-label>{{ label() }}</mat-label>
-    <input
-      matInput
-      [matDatepicker]="datepicker"
-      [value]="date()"
-      [min]="minDate()"
-      [max]="maxDate()"
-      [attr.aria-invalid]="invalid() ? true : null"
-      (blur)="touch.emit()"
-      (dateChange)="onDateChange($event.value)"
-    />
-    <mat-datepicker-toggle matIconSuffix [for]="datepicker" />
-    <mat-datepicker #datepicker (closed)="touch.emit()" />
-  </mat-form-field>
-</div>
+<mat-form-field class="business-date-field" appearance="outline" subscriptSizing="dynamic">
+  <mat-label>{{ fieldDef().label }}</mat-label>
+  <input
+    matInput
+    [matDatepicker]="datepicker"
+    [value]="date()"
+    [min]="minDate()"
+    [max]="maxDate()"
+    [required]="state().required()"
+    [disabled]="state().disabled()"
+    (blur)="state().markAsTouched()"
+    (dateChange)="onDateChange($event.value)"
+  />
+  <mat-datepicker-toggle matIconSuffix [for]="datepicker" />
+  <mat-datepicker #datepicker (closed)="state().markAsTouched()" />
+
+  @if (fieldDef().hint) {
+    <mat-hint>{{ fieldDef().hint }}</mat-hint>
+  }
+
+  @for (error of state().errors(); track error.kind) {
+    <mat-error>{{ error.message }}</mat-error>
+  }
+</mat-form-field>

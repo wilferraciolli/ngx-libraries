@@ -1,5 +1,5 @@
 import type { FieldDef } from '../interfaces/field-definition';
-import { max, maxLength, min, minLength, required, schema, validate } from '@angular/forms/signals';
+import { disabled, max, maxLength, min, minLength, required, schema, validate } from '@angular/forms/signals';
 import type { Schema } from '@angular/forms/signals';
 import type { BaseSchema, SchemaConfig } from '../interfaces/base.schema';
 import { dateTimeError, isDateTimeField } from './date-time.utils';
@@ -16,7 +16,8 @@ export function createEmptyEntity<T extends BaseSchema>(schemaType: T['schemaTyp
   } as T;
 }
 
-export function toSchema<T extends BaseSchema>(meta: FieldDef[]): Schema<T> {
+/** Turns field definitions into Signals Forms rules. The model can be any object, not just a BaseSchema. */
+export function toSchema<T>(meta: FieldDef[]): Schema<T> {
   return schema<T>((path: any) => {
       for (const fieldDef of meta) {
         const property: string = fieldDef.name;
@@ -26,6 +27,9 @@ export function toSchema<T extends BaseSchema>(meta: FieldDef[]): Schema<T> {
           continue;
         }
 
+        if (fieldDef.disabled) {
+          disabled(fieldPath);
+        }
         if (fieldDef.required) {
           required(fieldPath, { message: `${fieldDef.label} is required` });
         }
