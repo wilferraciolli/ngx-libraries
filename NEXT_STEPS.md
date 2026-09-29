@@ -99,9 +99,7 @@ with Transloco, after confirming it already switches instantly — no reload —
       "Dates and times" updated; root `CLAUDE.md` repo layout updated.
 - [ ] Not yet published to npm — under development, no consumers yet.
 - [ ] Still open, not done as part of this:
-      - Per-library text tokens (`NGX_FORMS_TEXT` etc.) so `ngx-forms`/`ngx-graphs`/`ngx-media`/
-        `ngx-web-sockets`/`ngx-ai-tools`'s own strings (Save/Clear, "Show data", "Send message", …)
-        can be translated through `ngx-i18n` — this package only covers app-level translations so far.
+      - Per-library text tokens — see "Per-library text tokens" below, done 2026-09-30.
       - `ngx-api-client` sending `Accept-Language` from the active locale.
       - Migrating `resource-management-ui`'s `I18nStore`/`labels.ts` onto this package — flagged for
         later, on request, not started.
@@ -180,6 +178,46 @@ way, with zero import-time dependency between the two packages.
       subsection, Setup section) updated to explain the token and why it isn't in the main Setup
       snippet the way `NGX_DATES_LOCALE` is.
 - [ ] Not yet published to npm.
+
+## Per-library text tokens — built 2026-09-30
+
+Surveyed all 5 non-i18n packages (`ngx-forms`, `ngx-graphs`, `ngx-media`, `ngx-web-sockets`,
+`ngx-ai-tools`) for hardcoded UI strings before designing anything, rather than assuming all five
+needed the same treatment:
+
+- [x] `ngx-forms`' `DynamicForm.submitLabel`/`clearLabel` and `ngx-ai-tools`' `AiTextBox.placeholder`
+      are already per-instance `input()`s with defaults — already app-overridable without a token.
+      Left alone; adding a token on top would be a redundant second override mechanism for the same
+      thing.
+- [x] `ngx-media` has no hardcoded UI text at all (loaders are visual only, `YoutubePlayer` takes an
+      id). Nothing to do.
+- [x] `ngx-graphs`' `GraphFrame` had exactly one genuinely hardcoded, non-overridable string:
+      the "Show data" table-toggle text. Added `NGX_GRAPHS_TEXT`
+      (`config/graphs-text.token.ts`, `InjectionToken<() => GraphsText>`, `GraphsText { showData:
+      string }`), same resolver-token pattern as `NGX_DATES_LOCALE`/`NGX_FORMS_LOCALE`. `GraphFrame`
+      reads it via `computed(() => this.resolveText())`, so a resolver wired to `ngx-i18n` stays
+      reactive to a language switch. Exported from `public-api.ts`.
+- [x] `ngx-web-sockets`' `ChatRoom` had six: connection status ("Connected"/"Connecting…"), the
+      messages-region and composer `aria-label`s, the composer placeholder, and the send button's
+      `aria-label`/`title` — plus five more in *transient status messages* that were easy to miss on
+      a first pass (`showStatus()` calls for "A client connected"/"A client disconnected", the
+      per-client "X is typing…", and the two error messages). Added `NGX_CHAT_TEXT`
+      (`config/chat-text.token.ts`, `ChatText` — the two parameterized ones, `clientTyping` and
+      `error`/`connectionError`, are functions rather than interpolation-placeholder strings, to
+      avoid building a template-parsing mini-engine for two call sites). Message *bodies* are
+      untouched — still plain app/server data.
+- [x] Both packages rebuild/typecheck clean; full workspace build (8 packages + showcase `ng build`)
+      still clean. `ngx-graphs`' "Show data" toggle checked live in the showcase's `/graphs` demo
+      (all 8 chart types) with Playwright — renders and still toggles correctly, no console errors.
+      `ngx-web-sockets` isn't wired into the showcase (no backend to connect to, a pre-existing,
+      deliberate gap — see its own `CLAUDE.md`), so `ChatRoom`'s wiring couldn't be checked live;
+      typecheck/build are the only verification it got.
+- [x] `packages/graphs/README.md`+`CLAUDE.md`, `packages/web-sockets/README.md`+`CLAUDE.md`, and
+      `docs/ANGULAR_APP_CONVENTIONS.md` (`ngx-graphs`/`ngx-web-sockets` subsections) updated with the
+      new tokens and an `ngx-i18n`-wiring recipe for each.
+- [ ] Neither token is wired into the showcase's own `main.ts` (unlike `NGX_DATES_LOCALE`) — left at
+      their English defaults there. Wiring one in is a small follow-up if a demo of the translated
+      path is ever wanted; not done here to keep this change to the packages themselves.
 
 ## More housekeeping
 - [ ] Showcase: give it the house M3 theme (it uses light-only `azure-blue` + hardcoded greys), so dark

@@ -175,6 +175,28 @@ Overrides, for a genuine one-off only and always to a token, never a hex value:
 `--ngx-graph-color-1`…`-6`, `--ngx-graph-text`, `--ngx-graph-muted-text`, `--ngx-graph-grid`,
 `--ngx-graph-surface`, `--ngx-graph-height`.
 
+### Translating "Show data"
+
+That toggle text comes from `NGX_GRAPHS_TEXT` (defaults to English), not a hardcoded string.
+Override it once in `app.config.ts`, e.g. wired to [`@wiltech-labs/ngx-i18n`](../i18n):
+
+```ts
+import { inject } from '@angular/core';
+import { NGX_GRAPHS_TEXT } from '@wiltech-labs/ngx-graphs';
+import { I18nService } from '@wiltech-labs/ngx-i18n';
+
+{
+  provide: NGX_GRAPHS_TEXT,
+  useFactory: () => {
+    const i18n = inject(I18nService);
+    return () => ({ showData: i18n.t('graphs.showData') });
+  }
+}
+```
+
+No dependency on `ngx-i18n` from this package — the resolver is a plain function, same as
+`ngx-dates`' `NGX_DATES_LOCALE`.
+
 ## Other exports
 
 - `toChartData(graphDef, theme?)` — converts a `GraphDef` into the chart.js `ChartData` shape

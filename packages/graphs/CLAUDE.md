@@ -19,6 +19,7 @@ src/
     │   └── scatter-graph/     # ScatterGraph      }
     ├── builders/               # graphConfig()/GraphConfigBuilder, pointGraphConfig()/PointGraphConfigBuilder
     ├── interfaces/             # GraphDef, GraphSeries, PointGraphDef, PointSeries, PointDatum
+    ├── config/                 # NGX_GRAPHS_TEXT — GraphFrame's own overridable UI text
     ├── constants/              # CATEGORICAL_LIGHT/_DARK (validated palette), MAX_POINT_SERIES
     ├── theme/                  # GraphThemeService — resolves M3 tokens to concrete colours
     └── utils/                  # toChartData(), toPointChartData(), graphOptions(), table/summary, seriesColor()
@@ -58,6 +59,13 @@ src/
 - `graphOptions()` (`utils/graph-options.utils.ts`) is the one place for shared chart.js options
   (scales by layout, legend only for > 1 entry, tooltip, fonts). `GraphFrame` (internal) renders the
   caption and the "Show data" table around every canvas — add shared markup there.
+- **`GraphFrame`'s "Show data" text comes from `NGX_GRAPHS_TEXT`** (`InjectionToken<() =>
+  GraphsText>`, added 2026-09-30), not a hardcoded string — the one piece of this package's own UI
+  text, everything else being app-supplied data. Same resolver-token pattern as `ngx-dates`'
+  `NGX_DATES_LOCALE`/`ngx-forms`' `NGX_FORMS_LOCALE`: a plain function, so this package has no
+  build-time dependency on `ngx-i18n` (see root `CLAUDE.md`'s "Inter-package deps"). Read inside a
+  `computed()` in `GraphFrame`, so a resolver wired to `ngx-i18n` stays reactive to a language
+  switch.
 - One component per graph type (`BarGraph`, `LineGraph`, `PieGraph`, `DoughnutGraph`,
   `PolarAreaGraph`, `RadarGraph`, `BubbleGraph`, `ScatterGraph`), same one-component-per-type layout
   as `forms`' field components — resist the urge to collapse these into one generic component with

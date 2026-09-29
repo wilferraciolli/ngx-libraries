@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
+import { NGX_GRAPHS_TEXT } from '../../config/graphs-text.token';
 import type { GraphTable } from '../../utils/graph-table.utils';
 
 /**
@@ -17,6 +18,9 @@ import type { GraphTable } from '../../utils/graph-table.utils';
 export class GraphFrame {
   public readonly caption = input<string>();
   public readonly table = input.required<GraphTable>();
+
+  private readonly resolveText = inject(NGX_GRAPHS_TEXT);
+  protected readonly text = computed(() => this.resolveText());
 
   protected readonly open = signal(false);
 

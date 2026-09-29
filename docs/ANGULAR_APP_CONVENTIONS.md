@@ -247,6 +247,8 @@ provideI18n({ locales: [...], defaultLocale: '...', dictionaries: {...} }), // n
 - The plot is 280px tall and fills the available width; set `--ngx-graph-height`
   to change the height. Keep to six series (three on bubble/scatter). Past that
   the library warns: fold the rest into "Other" or use small multiples.
+- The "Show data" toggle text comes from `NGX_GRAPHS_TEXT` — override it (e.g.
+  wired to `ngx-i18n`) to translate it; leave it unset and it stays English.
 
 **`ngx-media`**
 - A content loading state is a skeleton shaped like the content:
@@ -284,6 +286,9 @@ provideI18n({ locales: [...], defaultLocale: '...', dictionaries: {...} }), // n
   `roomName` on a live one.
 - The server contract (event names and payloads) is in the package README. A
   backend has to match it.
+- Connection status, the composer placeholder and transient status messages
+  come from `NGX_CHAT_TEXT` — override it (e.g. wired to `ngx-i18n`) to
+  translate it; message *bodies* are always app/server data either way.
 
 **`ngx-i18n`**
 - Depend on `@wiltech-labs/ngx-i18n` alone — never import `@jsverse/transloco`

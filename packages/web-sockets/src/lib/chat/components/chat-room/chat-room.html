@@ -1,14 +1,14 @@
 <section class="ChatRoom" [attr.aria-label]="'Chat: ' + roomName()">
   <div class="ChatRoom-header" role="status">
     <span class="ChatRoom-connection" [class.is-online]="connected()">
-      {{ connected() ? 'Connected' : 'Connecting…' }}
+      {{ connected() ? text().connected : text().connecting }}
     </span>
     @if (statusMessage()) {
       <span class="ChatRoom-status">{{ statusMessage() }}</span>
     }
   </div>
 
-  <div class="ChatRoom-messages" role="log" aria-label="Messages">
+  <div class="ChatRoom-messages" role="log" [attr.aria-label]="text().messagesLabel">
     @for (message of messages(); track message.id) {
       <ngx-chat-message-bubble [clientId]="clientId()" [message]="message" />
     }
@@ -17,8 +17,8 @@
   <form class="ChatRoom-composer" (submit)="$event.preventDefault(); sendMessage()">
     <input
       class="ChatRoom-input"
-      aria-label="Message"
-      placeholder="Type a message…"
+      [attr.aria-label]="text().messageLabel"
+      [placeholder]="text().composerPlaceholder"
       autocomplete="off"
       [value]="draft()"
       (input)="onDraftInput($event)"
@@ -26,8 +26,8 @@
     <button
       type="submit"
       class="ChatRoom-send"
-      aria-label="Send message"
-      title="Send message"
+      [attr.aria-label]="text().sendMessage"
+      [attr.title]="text().sendMessage"
       [disabled]="!draft().trim()"
     >
       <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
