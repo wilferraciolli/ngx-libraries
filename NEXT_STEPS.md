@@ -7,6 +7,12 @@ scratchpad so we don't lose track between sessions. Update as items land or prio
 
 - [x] `CLAUDE.md` repo layout now lists every package (`api-client`, `forms`, `media`, `ai-tools`,
       `graphs`, `web-sockets`, `i18n`, `dates`) — kept up to date as each new package landed.
+- [x] `apps/showcase/README.md` and its home page tile list had gone stale as demos were added —
+      still said "Bar and pie graphs" (now 8 chart types) and listed only 3 of the 6 wired-in demos
+      (missing media/ai-tools/graphs/i18n from "Testing the Libraries" and "Project Structure").
+      Found while double-checking for anything not yet tracked here, not from a specific task.
+      Fixed 2026-09-30; nothing else found stale on the same pass (root `README.md`, every package's
+      own README/CLAUDE.md, `docs/ANGULAR_APP_CONVENTIONS.md`).
 - [x] Confirmed `@wiltech-labs/ngx-*` as the correct, current package scope everywhere it appears:
       both packages' `package.json`, `packages/api-client/README.md` + `CLAUDE.md`, root
       `CLAUDE.md` + `README.md`, and every reference in `apps/showcase` (`package.json`,
