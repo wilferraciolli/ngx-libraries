@@ -1,0 +1,27 @@
+<div class="chat-room">
+  <div class="chat-room__header">
+    <span class="chat-room__connection" [class.chat-room__connection--online]="connected()">
+      {{ connected() ? 'Connected' : 'Connecting…' }}
+    </span>
+    @if (statusMessage()) {
+      <span class="chat-room__status">{{ statusMessage() }}</span>
+    }
+  </div>
+
+  <div class="chat-room__messages">
+    @for (message of messages(); track message.id) {
+      <app-chat-message-bubble [clientId]="clientId()" [message]="message" />
+    }
+  </div>
+
+  <div class="chat-room__composer">
+    <input
+      class="chat-room__input"
+      [value]="draft()"
+      (input)="onDraftInput($event)"
+      (keyup.enter)="sendMessage()"
+      placeholder="Type a message…"
+    />
+    <button type="button" class="chat-room__send" (click)="sendMessage()">Send</button>
+  </div>
+</div>

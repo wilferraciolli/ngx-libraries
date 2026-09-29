@@ -1,0 +1,68 @@
+:host {
+  display: block;
+  max-width: 480px;
+}
+
+.chat-room {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--ngx-chat-border, rgba(0, 0, 0, 0.12));
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.chat-room__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  border-bottom: 1px solid var(--ngx-chat-border, rgba(0, 0, 0, 0.12));
+}
+
+.chat-room__connection {
+  color: var(--ngx-chat-offline-color, #b91c1c);
+
+  &--online {
+    color: var(--ngx-chat-online-color, #16a34a);
+  }
+}
+
+.chat-room__status {
+  color: var(--ngx-chat-status-color, #6b7280);
+  font-style: italic;
+}
+
+.chat-room__messages {
+  display: flex;
+  flex-direction: column;
+  height: 320px;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.chat-room__composer {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  border-top: 1px solid var(--ngx-chat-border, rgba(0, 0, 0, 0.12));
+}
+
+.chat-room__input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--ngx-chat-border, rgba(0, 0, 0, 0.12));
+  border-radius: 6px;
+  font: inherit;
+}
+
+.chat-room__send {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background: var(--ngx-chat-bubble-self-background, #4f7cff);
+  color: #ffffff;
+  font: inherit;
+  cursor: pointer;
+}

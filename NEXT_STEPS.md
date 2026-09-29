@@ -115,6 +115,34 @@ scratchpad so we don't lose track between sessions. Update as items land or prio
   environment, not an app bug — don't waste time debugging the component if this recurs, just
   screenshot differently.
 
+## packages/web-sockets
+
+- [x] Built on `feature/new-libraries` (2026-09-29), ported and modernized from the prototype at
+      `ng-libraries/wt-libraries/projects/wt-websockets`. Kept the shape (config token, provider,
+      service, room join/leave, a chat list + chat message component) but not the implementation —
+      see `packages/web-sockets/CLAUDE.md`'s "Modernized from the source" section for the full list.
+      Highlights: dropped the `ngx-socket-io` wrapper dependency in favor of `socket.io-client`
+      directly (also dropped the now-unnecessary `@types/socket.io-client`); connection state is a
+      `Signal<boolean>` driven by the socket's real `connect`/`disconnect` events (the original set
+      it to `true` immediately after calling `.connect()`, before the handshake succeeded — a real
+      bug); one generic `on<T>(event)` replaced five near-identical hand-rolled `Observable`
+      wrappers plus two `Subject`s; removed dead code (an unused `SocketConfig` interface marked
+      `// TODO what is this interface for??????`, duplicate `joinRoom1`/`leaveRoom1` methods, a
+      commented-out old config example); `ChatRoom` takes `roomName`/`clientName` as inputs instead
+      of the original's hardcoded "Chat 1/2/3" room switcher and hardcoded `clientName: 'Client Name'`
+      baked into the library; real `crypto.randomUUID()` ids and `Date.toISOString()` timestamps
+      instead of hardcoded placeholders; no Angular Material dependency (plain CSS, themeable via
+      `--ngx-chat-*`, matching `media`/`ai-tools`); manual signal + `(input)` event instead of
+      `FormsModule`/`[(ngModel)]` for the composer, matching `ai-tools`' `AiTextBox` pattern. Split
+      into a generic `connection/` layer (reusable for any websocket feature) and a `chat/` feature
+      built on top, mirroring `media`'s `loading/`/`youtube/` split.
+- [ ] Deliberately **not** wired into `apps/showcase` — there's no server for it to connect to yet,
+      so a demo page would have nothing real to show. Add one once a NestJS (or other Socket.IO)
+      backend exists to point it at.
+- [ ] No tests yet.
+- [ ] Not yet published to npm (`version: 0.1.0`).
+- [ ] No consumers yet.
+
 ## Repo-wide
 
 - [ ] No CI configured yet (build/typecheck/publish are all manual, per each package's README).
