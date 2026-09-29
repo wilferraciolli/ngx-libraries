@@ -85,6 +85,7 @@ interface NewsletterModel {
 interface AllFieldsSchema extends BaseSchema {
   schemaType: 'allFields';
   username: string;
+  email: string;
   password: string;
   searchQuery: string;
   birthDate: string;
@@ -194,7 +195,13 @@ export class FormsDemoComponent {
       required: true,
       minLength: 3,
       maxLength: 20,
-      hint: 'Short, single-line text — names, identifiers, anything that fits on one line.'
+      pattern: '[a-z0-9.]+',
+      patternMessage: 'Username can only use lowercase letters, digits and dots',
+      hint: 'Short, single-line text — names, identifiers. This one also has a pattern: lowercase letters, digits and dots.'
+    })
+    .email('email', 'Email', {
+      required: true,
+      hint: 'Text with the email keyboard on mobile, browser autofill, and a valid-address check.'
     })
     .password('password', 'Password', {
       required: true,
@@ -261,10 +268,11 @@ export class FormsDemoComponent {
     })
     .checkbox('acceptTerms', 'Accept Terms & Conditions', {
       required: true,
-      hint: 'A single yes/no toggle.'
+      hint: 'A single yes/no toggle. On a checkbox, required means it must be ticked.'
     })
     .build({
       username: 'jane.doe',
+      email: 'jane.doe@example.com',
       password: '',
       searchQuery: 'angular signals forms',
       birthDate: '1990-06-15',
@@ -385,7 +393,7 @@ export class FormsDemoComponent {
   // ============ STANDALONE FIELDS ============
   // The same field components DynamicForm uses, placed one by one in your own layout.
   protected readonly newsletterFields = {
-    email: { name: 'email', type: FormFieldType.TEXT, label: 'Email', required: true, hint: 'Where the newsletter goes.' },
+    email: { name: 'email', type: FormFieldType.EMAIL, label: 'Email', required: true, hint: 'Where the newsletter goes.' },
     startDate: {
       name: 'startDate',
       type: FormFieldType.BUSINESS_DATE,

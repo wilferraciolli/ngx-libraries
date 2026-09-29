@@ -1,5 +1,6 @@
 export enum FormFieldType {
   TEXT = 'text',
+  EMAIL = 'email',
   PASSWORD = 'password',
   SEARCH = 'search',
   RADIO = 'radio',

@@ -79,7 +79,7 @@
     <mat-tab label="All Field Types">
       <div class="tab-content">
         <h3>Every Field Type</h3>
-        <p>Demonstrates: text, password, search, business date, business time, instant date-time, radio, select, checkbox, number, range, textarea, and code.</p>
+        <p>Demonstrates: text (with a pattern), email, password, search, business date, business time, instant date-time, radio, select, checkbox, number, range, textarea, and code.</p>
 
         <app-dynamic-form
           [metaInfo]="allFieldsFormConfig.fields"
@@ -231,8 +231,8 @@
     <ul>
       <li><strong>Schema-based:</strong> Define form structure with an array of field definitions</li>
       <li><strong>Type-safe:</strong> Full TypeScript support with generics extending BaseSchema</li>
-      <li><strong>Flexible:</strong> Supports text, password, search, radio, select, checkbox, number, range, textarea, code, business date, business time, and instant date-time fields</li>
-      <li><strong>Validation:</strong> Built-in required/minLength/maxLength rules with inline error display</li>
+      <li><strong>Flexible:</strong> Supports text, email, password, search, radio, select, checkbox, number, range, textarea, code, business date, business time, and instant date-time fields</li>
+      <li><strong>Validation:</strong> Built-in required, minLength/maxLength, min/max, email, pattern and date/time range rules with inline error display</li>
       <li><strong>Signals-based:</strong> Built on Angular's experimental Signals Forms API (<code>@angular/forms/signals</code>)</li>
     </ul>
     <p>This approach reduces boilerplate and makes forms more maintainable and testable.</p>

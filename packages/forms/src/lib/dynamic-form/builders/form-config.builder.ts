@@ -33,6 +33,11 @@ export class FormConfigBuilder<T extends BaseSchema> {
     return this.add(FormFieldType.TEXT, name, label, options);
   }
 
+  /** Text input with the email keyboard/autofill and a valid-email check. */
+  public email(name: FieldName<T>, label: string, options?: FieldOptions): this {
+    return this.add(FormFieldType.EMAIL, name, label, options);
+  }
+
   public password(name: FieldName<T>, label: string, options?: FieldOptions): this {
     return this.add(FormFieldType.PASSWORD, name, label, options);
   }

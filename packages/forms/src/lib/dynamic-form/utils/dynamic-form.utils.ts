@@ -1,6 +1,9 @@
 import type { FieldDef } from '../interfaces/field-definition';
-import { disabled, max, maxLength, min, minLength, required, schema, validate } from '@angular/forms/signals';
+import {
+  disabled, email, max, maxLength, min, minLength, pattern, required, schema, validate
+} from '@angular/forms/signals';
 import type { Schema } from '@angular/forms/signals';
+import { FormFieldType } from '../constants/form-field.constant';
 import type { BaseSchema, SchemaConfig } from '../interfaces/base.schema';
 import { dateTimeError, isDateTimeField } from './date-time.utils';
 
@@ -39,6 +42,14 @@ export function toSchema<T>(meta: FieldDef[]): Schema<T> {
         if (typeof fieldDef.maxLength !== 'undefined') {
           maxLength(fieldPath, fieldDef.maxLength, { message: `${fieldDef.label} cannot exceed ${fieldDef.maxLength} characters` });
         }
+        if (fieldDef.type === FormFieldType.EMAIL) {
+          email(fieldPath, { message: `${fieldDef.label} must be a valid email address` });
+        }
+        if (typeof fieldDef.pattern !== 'undefined') {
+          pattern(fieldPath, toRegExp(fieldDef.pattern), {
+            message: fieldDef.patternMessage ?? `${fieldDef.label} is not in the expected format`
+          });
+        }
         if (typeof fieldDef.min !== 'undefined') {
           min(fieldPath, fieldDef.min, { message: `${fieldDef.label} must be at least ${fieldDef.min}` });
         }
@@ -52,4 +63,10 @@ export function toSchema<T>(meta: FieldDef[]): Schema<T> {
       }
     }
   );
+}
+
+// A string pattern must match the whole value, like HTML's `pattern` attribute and Validators.pattern;
+// a RegExp is used as given, so its author controls anchoring.
+function toRegExp(value: RegExp | string): RegExp {
+  return value instanceof RegExp ? value : new RegExp(`^(?:${value})$`);
 }

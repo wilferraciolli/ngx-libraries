@@ -13,6 +13,8 @@ export interface FieldDef {
   required?: boolean;
   minLength?: number;
   maxLength?: number;
+  pattern?: RegExp | string;            // A RegExp is used as-is; a string must match the whole value
+  patternMessage?: string;              // Shown when `pattern` doesn't match. Defaults to "<label> is not in the expected format".
   min?: number;                         // For number and range fields
   max?: number;                         // For number and range fields
   step?: number;                        // For number and range fields

@@ -6,7 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import type { FieldDef } from '../../interfaces/field-definition';
 
 /**
- * Single-line Material input for the text, password, search and number field types.
+ * Single-line Material input for the text, email, password, search and number field types.
  * `[formField]` sits on the native input, so Signals Forms and MatInput handle the value,
  * required marker, touched/disabled state and when the errors show.
  */

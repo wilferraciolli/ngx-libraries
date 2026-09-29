@@ -170,6 +170,7 @@ container (`DynamicForm` caps each field at 400px, overridable per field with `m
 | `FormFieldType` | Builder method | Component | Value | Material control |
 |---|---|---|---|---|
 | `TEXT` | `text()` | `TextField` | `string` | `matInput` |
+| `EMAIL` | `email()` | `TextField` | `string` | `matInput` (`type="email"`), plus a valid-address check |
 | `PASSWORD` | `password()` | `TextField` | `string` | `matInput` (masked) |
 | `SEARCH` | `search()` | `TextField` | `string` | `matInput` |
 | `NUMBER` | `number()` | `TextField` | `number` | `matInput` |
@@ -204,6 +205,8 @@ interface FieldDef {
   required?: boolean;
   minLength?: number;               // Text fields
   maxLength?: number;               // Text fields
+  pattern?: RegExp | string;        // Text fields: a RegExp is used as-is; a string must match the whole value
+  patternMessage?: string;          // Error when `pattern` doesn't match. Default: "<label> is not in the expected format"
   min?: number;                     // Number and range fields
   max?: number;                     // Number and range fields
   step?: number;                    // Range fields
@@ -223,6 +226,38 @@ interface DateTimeConfig {
   disambiguation?: 'earlier' | 'later';  // Instant only: which occurrence when a time happens twice
 }
 ```
+
+## Validation
+
+`toSchema()` turns each `FieldDef` into Signals Forms rules, with messages built from the label:
+
+| Config | Rule | Message |
+|---|---|---|
+| `required: true` | `required()` | "Email is required" |
+| `minLength` / `maxLength` | `minLength()` / `maxLength()` | "Username must be at least 3 characters" |
+| `min` / `max` | `min()` / `max()` | "Age must be at least 18" |
+| type `EMAIL` | `email()` | "Email must be a valid email address" |
+| `pattern` (+ `patternMessage`) | `pattern()` | your `patternMessage`, or "Username is not in the expected format" |
+| `dateTimeConfig.min` / `max` | custom | "Closed on cannot be after 2026-12-31" |
+| `disabled: true` | `disabled()` | — (field shown but not editable) |
+
+There's no separate `requiredTrue`: `required` treats `false` as empty, so `required: true` on a
+checkbox means it must be ticked (Eg "Accept terms").
+
+```typescript
+formConfig<SignUp>('signUp')
+  .text('username', 'Username', {
+    required: true,
+    pattern: '[a-z0-9.]+',                 // whole value must match
+    patternMessage: 'Use lowercase letters, digits and dots only'
+  })
+  .email('email', 'Email', { required: true })
+  .checkbox('terms', 'I accept the terms', { required: true })
+  .build({ username: '', email: '', terms: false });
+```
+
+A string `pattern` is wrapped as `^(?:…)$`, like HTML's `pattern` attribute, and can be stored in
+JSON config. Pass a `RegExp` instead when you want a partial match or flags.
 
 ## Other exports
 
