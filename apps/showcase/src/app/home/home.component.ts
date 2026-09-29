@@ -33,7 +33,7 @@ export class HomeComponent {
     },
     {
       name: '@wiltech-labs/ngx-graphs',
-      description: 'Bar and pie graphs built on ng2-charts',
+      description: 'All 8 non-mixed chart.js chart types, built on ng2-charts',
       route: '/graphs'
     },
     {

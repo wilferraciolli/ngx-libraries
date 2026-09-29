@@ -26,3 +26,7 @@ export { ChatMessageType } from './lib/chat/constants/chat-message-type.constant
 
 // Chat — interfaces
 export type { ChatMessage } from './lib/chat/interfaces/chat-message.interface';
+
+// Chat — config (ChatRoom's own overridable UI text)
+export { DEFAULT_CHAT_TEXT, NGX_CHAT_TEXT } from './lib/chat/config/chat-text.token';
+export type { ChatText, ChatTextResolver } from './lib/chat/config/chat-text.token';

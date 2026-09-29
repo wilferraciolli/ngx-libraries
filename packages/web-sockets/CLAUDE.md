@@ -23,6 +23,7 @@ src/
         ├── components/
         │   ├── chat-room/          # ChatRoom — joins/leaves one room, message list + composer
         │   └── chat-message-bubble/ # ChatMessageBubble — renders one ChatMessage
+        ├── config/                 # NGX_CHAT_TEXT — ChatRoom's own overridable UI text
         ├── constants/              # ChatMessageType (comment-added / user-typing)
         └── interfaces/             # ChatMessage
 ```
@@ -59,6 +60,14 @@ src/
   container — call `takeUntilDestroyed(this.destroyRef)` fresh in each `.pipe()`, not hoisted into a
   shared `const`, or TypeScript infers it against only the first call site and every other
   `.pipe()` sees `unknown`.
+- **`ChatRoom`'s own UI text (connection status, composer placeholder, transient status messages)
+  comes from `NGX_CHAT_TEXT`** (`InjectionToken<() => ChatText>`, added 2026-09-30), not hardcoded
+  strings — message *bodies* stay app/server data, untouched by this. Same resolver-token pattern
+  as `ngx-dates`' `NGX_DATES_LOCALE`/`ngx-forms`' `NGX_FORMS_LOCALE`/`ngx-graphs`'
+  `NGX_GRAPHS_TEXT`: a plain function, so this package has no build-time dependency on `ngx-i18n`
+  (see root `CLAUDE.md`'s "Inter-package deps"). The two parameterized messages (`clientTyping`,
+  `error`/`connectionError`) are functions rather than interpolation-placeholder strings, to avoid
+  building a template-parsing mini-engine for two call sites.
 
 ## Modernized from the source
 The original prototype worked, but had accumulated rough edges this rewrite deliberately fixes

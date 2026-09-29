@@ -28,3 +28,7 @@ export { toPointChartData } from './lib/graph/utils/point-graph.utils';
 // Theme — the resolved M3 colours every graph draws with (for custom chart.js work alongside these)
 export { GraphThemeService } from './lib/graph/theme/graph-theme';
 export type { GraphTheme } from './lib/graph/theme/graph-theme';
+
+// Config — this package's own overridable UI text (the "Show data" toggle)
+export { NGX_GRAPHS_TEXT } from './lib/graph/config/graphs-text.token';
+export type { GraphsText, GraphsTextResolver } from './lib/graph/config/graphs-text.token';

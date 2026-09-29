@@ -139,6 +139,37 @@ For a genuine one-off, override with tokens (never hex values): `--ngx-chat-surf
 `--ngx-chat-bubble-background`, `--ngx-chat-bubble-color`, `--ngx-chat-bubble-self-background`,
 `--ngx-chat-bubble-self-color`, `--ngx-chat-height`.
 
+### Translating `ChatRoom`'s text
+
+Connection status, the composer placeholder, and transient status messages ("A client connected",
+"X is typing…") come from `NGX_CHAT_TEXT` (defaults to English), not hardcoded strings — message
+*bodies* are still app/server data, untouched by this. Override it once in `app.config.ts`, e.g.
+wired to [`@wiltech-labs/ngx-i18n`](../i18n):
+
+```ts
+import { inject } from '@angular/core';
+import { DEFAULT_CHAT_TEXT, NGX_CHAT_TEXT } from '@wiltech-labs/ngx-web-sockets';
+import { I18nService } from '@wiltech-labs/ngx-i18n';
+
+{
+  provide: NGX_CHAT_TEXT,
+  useFactory: () => {
+    const i18n = inject(I18nService);
+    return () => ({
+      ...DEFAULT_CHAT_TEXT,
+      connected: i18n.t('chat.connected'),
+      connecting: i18n.t('chat.connecting'),
+      composerPlaceholder: i18n.t('chat.composerPlaceholder'),
+      clientTyping: (clientName: string) => i18n.t('chat.clientTyping', { clientName })
+      // ...override only the keys the app actually wants translated; the rest fall back to English.
+    });
+  }
+}
+```
+
+No dependency on `ngx-i18n` from this package — the resolver is a plain function, same as
+`ngx-dates`' `NGX_DATES_LOCALE`.
+
 ## Other exports
 
 - `ChatMessageBubble` — renders a single `ChatMessage`, used internally by `ChatRoom`; exported in
