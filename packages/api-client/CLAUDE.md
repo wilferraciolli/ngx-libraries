@@ -1,4 +1,4 @@
-# @wiliamferraciolli/ngx-api-client
+# @wiltech-labs/ngx-api-client
 
 Angular library for talking to a Wiltech backend's HTTP API: the response
 envelope shape, HATEOAS-style links, field metadata, error shapes, and the
@@ -63,9 +63,8 @@ src/
   fixes that instead of carrying the mismatch forward.
 
 ## Status
-- Published to npm as `@wiliamferraciolli/ngx-api-client` (currently
-  `0.1.4`) — see the note in the root `CLAUDE.md` on why the scope is
-  `@wiliamferraciolli`, not `@wiltech`.
+- Published to npm as `@wiltech-labs/ngx-api-client` — see the note in the
+  root `CLAUDE.md` on why the scope is `@wiltech-labs`, not `@wiltech`.
 - Wired into `insurly-ui`: every `*ApiService`
   (`ProviderApiService`/`AdminApiService`/`AccountApiService`/
   `AdminProfileApiService`/`SystemSettingsService`/`UserSettingsService`/
