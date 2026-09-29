@@ -2,10 +2,13 @@
 // column with a Material-outline-simulated input box, plus the small
 // hint/notice/error text that sits under a field.
 
+// $max-width is the compile-time default. Any consumer can override it per-instance
+// at runtime by setting the --field-max-width custom property on the element (e.g.
+// DynamicForm sets it from FieldDef.maxWidth) — the CSS var wins when present.
 @mixin field-container($max-width: 400px) {
   display: flex;
   flex-direction: column;
-  max-width: $max-width;
+  max-width: var(--field-max-width, #{$max-width});
   width: 100%;
   margin: 0 auto; // centers the field horizontally
   font-family: Roboto, "Helvetica Neue", sans-serif;

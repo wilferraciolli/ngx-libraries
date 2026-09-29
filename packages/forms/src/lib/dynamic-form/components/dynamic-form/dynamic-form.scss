@@ -48,6 +48,78 @@
     tab-size: 2;
   }
 
+  &-range-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  &-range-value {
+    font-weight: 600;
+    color: #3f51b5;
+    font-size: 0.9rem;
+  }
+
+  // Native range inputs don't fill their track to reflect the value (only Firefox does,
+  // via ::-moz-range-progress) — the --range-percent gradient makes Chrome/Safari/Edge
+  // visually show how close to min/max the thumb actually is.
+  &-range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(
+      to right,
+      #3f51b5 0%,
+      #3f51b5 var(--range-percent, 0%),
+      #ddd var(--range-percent, 0%),
+      #ddd 100%
+    );
+    outline: none;
+    cursor: pointer;
+    margin: 8px 0;
+
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #3f51b5;
+      cursor: pointer;
+      border: 2px solid #fff;
+      box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+    }
+
+    &::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #3f51b5;
+      cursor: pointer;
+      border: 2px solid #fff;
+      box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+    }
+
+    &::-moz-range-track {
+      background: #ddd;
+      height: 6px;
+      border-radius: 3px;
+    }
+
+    &::-moz-range-progress {
+      background: #3f51b5;
+      height: 6px;
+      border-radius: 3px;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+
   &-radio-group {
     @include mix.field-outline-container;
     padding: 1rem; // fieldset needs more breathing room than a single input

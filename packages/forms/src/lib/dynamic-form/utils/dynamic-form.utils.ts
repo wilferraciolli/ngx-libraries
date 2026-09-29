@@ -1,5 +1,5 @@
 import type { FieldDef } from '../interfaces/field-definition';
-import { maxLength, minLength, required, schema, validate } from '@angular/forms/signals';
+import { max, maxLength, min, minLength, required, schema, validate } from '@angular/forms/signals';
 import type { Schema } from '@angular/forms/signals';
 import type { BaseSchema, SchemaConfig } from '../interfaces/base.schema';
 import { FormFieldType } from '../constants/form-field.constant';
@@ -41,6 +41,12 @@ export function toSchema<T extends BaseSchema>(meta: FieldDef[]): Schema<T> {
         }
         if (typeof fieldDef.maxLength !== 'undefined') {
           maxLength(fieldPath, fieldDef.maxLength, { message: `${fieldDef.label} cannot exceed ${fieldDef.maxLength} characters` });
+        }
+        if (typeof fieldDef.min !== 'undefined') {
+          min(fieldPath, fieldDef.min, { message: `${fieldDef.label} must be at least ${fieldDef.min}` });
+        }
+        if (typeof fieldDef.max !== 'undefined') {
+          max(fieldPath, fieldDef.max, { message: `${fieldDef.label} cannot exceed ${fieldDef.max}` });
         }
 
         if (fieldDef.type === FormFieldType.DATE_TIME_UTC || fieldDef.type === FormFieldType.DATE_TIME_UTC_CUSTOM) {

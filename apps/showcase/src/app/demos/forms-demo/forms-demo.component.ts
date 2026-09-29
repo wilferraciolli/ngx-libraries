@@ -283,20 +283,25 @@ export class FormsDemoComponent {
         name: 'satisfaction',
         type: FormFieldType.RANGE,
         label: 'Satisfaction Level (1-10)',
-        hint: 'Picking a value within a known range matters more than typing an exact number.'
+        hint: 'Picking a value within a known range matters more than typing an exact number.',
+        min: 1,
+        max: 10,
+        step: 1
       },
       {
         name: 'bio',
         type: FormFieldType.TEXTAREA,
         label: 'Bio',
         maxLength: 500,
-        hint: 'Free-form text that may run to multiple lines — notes, descriptions, comments.'
+        hint: 'Free-form text that may run to multiple lines — notes, descriptions, comments.',
+        maxWidth: '900px'
       },
       {
         name: 'snippet',
         type: FormFieldType.CODE,
         label: 'Favorite Code Snippet',
-        hint: 'Code or other formatted/monospaced text. Tab inserts spaces instead of moving focus, like an editor.'
+        hint: 'Code or other formatted/monospaced text. Tab inserts spaces instead of moving focus, like an editor.',
+        maxWidth: '900px'
       }
     ],
     initialValue: createEmptyEntity<AllFieldsSchema>('allFields', {

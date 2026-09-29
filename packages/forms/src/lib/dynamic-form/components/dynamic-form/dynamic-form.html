@@ -3,7 +3,7 @@
     @let field = $any(dynamicForm())[fieldDef.name];
 
     @if (!fieldDef.hidden) {
-      <div class="dynamic-form-field">
+      <div class="dynamic-form-field" [style.--field-max-width]="fieldDef.maxWidth">
         @if (fieldDef.hint) {
           <p class="dynamic-form-hint">{{ fieldDef.hint }}</p>
         }
@@ -48,6 +48,18 @@
             [label]="fieldDef.label"
             [formField]="field"
             [config]="fieldDef.dateTimeConfig"
+          />
+        } @else if (fieldDef.type === 'range') {
+          <label class="dynamic-form-range-label">
+            {{ fieldDef.label }}
+            <span class="dynamic-form-range-value">{{ field().value() }}</span>
+          </label>
+          <input
+            type="range"
+            [formField]="field"
+            [attr.step]="fieldDef.step"
+            class="dynamic-form-range"
+            [style.--range-percent.%]="rangePercent(fieldDef.min, fieldDef.max, field().value())"
           />
         } @else if (fieldDef.type === 'textarea') {
           <label>

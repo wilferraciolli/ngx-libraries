@@ -62,4 +62,17 @@ export class DynamicForm<T extends BaseSchema = BaseSchema> {
     textarea.selectionStart = textarea.selectionEnd = start + 2;
     field().value.set(indented);
   }
+
+  /** 0-100 position of `value` between `min` and `max`, for the range track's fill. */
+  protected rangePercent(min: number | undefined, max: number | undefined, value: unknown): number {
+    const lo = min ?? 0;
+    const hi = max ?? 100;
+    const numericValue = typeof value === 'number' ? value : lo;
+
+    if (hi <= lo) {
+      return 0;
+    }
+
+    return Math.max(0, Math.min(100, ((numericValue - lo) / (hi - lo)) * 100));
+  }
 }
