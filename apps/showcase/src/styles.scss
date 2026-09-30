@@ -14,18 +14,18 @@ html {
         tertiary: theme.$tertiary-palette,
       ),
       typography: (
-          plain-family: (
-            Roboto,
-            system-ui,
-            sans-serif,
-          ),
-          brand-family: (
-            'Roboto Flex',
-            Roboto,
-            system-ui,
-            sans-serif,
-          ),
+        plain-family: (
+          Roboto,
+          system-ui,
+          sans-serif,
         ),
+        brand-family: (
+          'Roboto Flex',
+          Roboto,
+          system-ui,
+          sans-serif,
+        ),
+      ),
       density: 0,
     )
   );

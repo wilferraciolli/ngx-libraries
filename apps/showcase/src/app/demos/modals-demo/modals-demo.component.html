@@ -7,9 +7,7 @@
 
   <div class="form-section">
     <h3>Scenario 1: approve/reject with data passed in</h3>
-    <button (click)="openApprovalModal()" class="btn btn-primary">
-      Approve holiday request
-    </button>
+    <button (click)="openApprovalModal()" class="btn btn-primary">Approve holiday request</button>
     <h4>Last close result</h4>
     @if (lastApprovalResult(); as result) {
       <pre>{{ result | json }}</pre>

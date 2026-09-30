@@ -1,8 +1,10 @@
 # @wiltech-labs/ngx-notifications
 
-A notification bell + badge + dropdown panel, polling-based, fully app-pluggable — this package
-never touches an HTTP client or a HATEOAS link directly. See root `../../CLAUDE.md` for repo-wide
-conventions.
+A notification bell + badge + right-docked panel (full viewport height, a third of the screen wide
+by default, full screen below the CDK's `XSmall` breakpoint — the same visual contract as
+`@wiltech-labs/ngx-modals`' panel, see "Panel positioning" below for why it's not literally that
+package), polling-based, fully app-pluggable — this package never touches an HTTP client or a
+HATEOAS link directly. See root `../../CLAUDE.md` for repo-wide conventions.
 
 Decided 2026-09-30: deliberately **not** folded into `ngx-media` (presentational/stateless, no
 service layer) and deliberately **not** extending the `ngx-api-client`/`ngx-auth` sanctioned
@@ -22,7 +24,7 @@ src/
     ├── providers/
     │   └── provide-notifications.ts   # provideNotifications()
     └── components/
-        └── notifications-widget/      # NotificationsWidget — bell/badge/panel
+        └── notifications-widget/      # NotificationsWidget — bell/badge/right-docked panel
 ```
 
 ## Conventions
@@ -62,13 +64,36 @@ src/
   server), matching `ngx-region-settings`' `save()`/`reset()` → `resource.reload()` pattern, rather
   than this package maintaining its own guess at post-dismiss state.
 - **Deep-link and dismiss are both app-supplied callbacks, not routes** — `openNotification` is
-  called on item click (not the dismiss button); the app does its own `Router.navigate()` inside it.
-  This package never imports `@angular/router`.
+  called from the item's explicit action button (labelled `text().action`, default "View"), not the
+  dismiss button; the app does its own `Router.navigate()` inside it. This package never imports
+  `@angular/router`.
+- **The item's own content is not a click target, decided 2026-09-30** — it was originally a big
+  `<button>` wrapping the whole projected template, so clicking anywhere on an item (title, body, an
+  accidental mis-click near the dismiss button) fired `openNotification()`. Changed to a plain `<div>`
+  plus one explicit action button per item: scanning/reading a notification and _acting_ on it are
+  now two distinct gestures, matching the dismiss button's own always-explicit affordance rather than
+  having one implicit giant hit target and one explicit small one sitting next to each other.
 - **Material-free, resolved as CDK Overlay + `@angular/cdk/a11y`'s `cdkTrapFocus`** — matches the
   `media`/`ai-tools`/`graphs`/`web-sockets` family rather than `forms`/`modals`. `NotificationsWidget`
-  peer-depends on `@angular/cdk` directly (not `@angular/material`) — the `cdkConnectedOverlay`/
-  `cdkOverlayOrigin` directives (`OverlayModule`) handle positioning/backdrop-dismiss, `cdkTrapFocus`
-  handles focus containment while the panel is open. No `MatBadge`/`MatMenu`.
+  peer-depends on `@angular/cdk` directly (not `@angular/material`) — `Overlay`/`OverlayRef` (from
+  `@angular/cdk/overlay`) handle positioning/backdrop-dismiss, `cdkTrapFocus` handles focus
+  containment while the panel is open. No `MatBadge`/`MatMenu`.
+- **Panel positioning, decided 2026-09-30**: right-docked, full height, `--ngx-notifications-width`
+  (default `33vw`), full screen below `Breakpoints.XSmall` — deliberately the same visual contract as
+  `ngx-modals`' panel, since a user opening either shouldn't see two different interaction patterns
+  for "a panel slid in from the edge." Started as a small dropdown anchored under the trigger button
+  (`cdkConnectedOverlay`/`cdkOverlayOrigin`, CDK's `FlexibleConnectedPositionStrategy`) — changed
+  because that read as a cramped, half-finished modal rather than an intentional panel. **Not**
+  implemented as a dependency on `@wiltech-labs/ngx-modals`: that's not one of root `CLAUDE.md`'s two
+  sanctioned inter-package-dependency exceptions (`ngx-api-client`/`ngx-auth` only), so this package
+  builds the same layout natively instead — imperative `Overlay.create()` with a global position
+  strategy (`overlay.position().global().top('0').right('0')`, `width`/`height` in the `OverlayConfig`,
+  `BreakpointObserver.observe(Breakpoints.XSmall)` calling `overlayRef.updateSize()` to go full-width
+  below that breakpoint) rather than the `cdkConnectedOverlay` structural directive, which only
+  supports origin-relative positioning, not a global dock. `NotificationsWidget` now owns its overlay
+  lifecycle directly (`open()`/`close()`) instead of the declarative `[cdkConnectedOverlayOpen]`
+  binding — `OverlayModule` is still imported for `Overlay`'s own provider (it isn't `providedIn:
+'root'`), even though none of its structural directives are used anymore.
 - **`NotificationsWidget<TNotification>` is generic**, same pattern as `ngx-region-settings`'
   `CurrentUserStore<TMe, TProfile>` — the item shape is genuinely unknowable by this package (no
   canonical API convention to default to here, unlike `ngx-region-settings`' `Me`/`RegionSettings`).
@@ -90,5 +115,13 @@ json }}` dump inside the panel — clearly a debug view, not a real empty state;
 - New package: `provideNotifications()`, `NotificationsService`, `NotificationsWidget`,
   `NotificationsConfig`/`NotificationsPage`, `NGX_NOTIFICATIONS_TEXT`.
 - `tsc --noEmit` and `ng-packagr build` both clean.
+- Wired into `apps/showcase` at `/notifications` (in-memory fake data, no backend). Checked live in a
+  headless browser 2026-09-30 (no interactive browser-automation tool was available in earlier
+  sessions, unlike the Playwright checks other demos got — this session used a Puppeteer script
+  against system Chrome instead): panel opens right-docked at 33vw/100vh, the header icon well/title/
+  "N unread" subtitle render, each item's "View" button marks it read and closes the panel (badge
+  count drops), the X button dismisses without opening, Escape closes the panel, and both light and
+  emulated dark `prefers-color-scheme` render correctly (all colours resolve through `--mat-sys-*`).
+  No console errors in any of these checks.
 - Not yet published to npm — under development.
 - No consumers yet within this monorepo.

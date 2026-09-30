@@ -79,18 +79,33 @@ TData>` as `open()`'s `TResult`.
 - Real Angular constructs (`@Injectable`, `@Component`), Material-based (inherits the app theme
   directly, same as `ngx-forms` — no `--ngx-*` colour indirection needed, per
   `docs/ANGULAR_APP_CONVENTIONS.md`'s "Material-based packages inherit the app theme directly").
+- **The shell's close button is a `<mat-icon>` ligature ("close"), which renders as literal text
+  instead of a glyph if the consuming app never links the Material Symbols font** — caught
+  2026-09-30 in `apps/showcase`, which was missing it entirely (no icon anywhere in the app used
+  `mat-icon` before this package). Not a bug in this package: it's `docs/ANGULAR_APP_CONVENTIONS.md`'s
+  own documented "Foundations" step (the Material Symbols `<link>` in `index.html`, plus
+  `MAT_ICON_DEFAULT_OPTIONS` → `fontSet: 'material-symbols-outlined'` in the app's providers) — an app
+  that follows the doc's setup gets a correct icon for free. Fixed in the showcase itself rather than
+  here, since routing around it (e.g. an inline SVG instead of `mat-icon`) would contradict the
+  "Material-based, inherits the app theme directly" decision above.
+- **Header title uses `headline-small`, not `title-large`** — decided 2026-09-30, changed from
+  `title-large` specifically to read as distinct from `ngx-notifications`' own right-docked panel
+  header (which uses `title-large`, an icon well and a subtitle): this shell _is_ the whole view while
+  it's open, not an auxiliary panel, so it gets the page-title type scale
+  (`docs/ANGULAR_APP_CONVENTIONS.md`'s "Type" table) instead.
 
 ## Status
 
 - New package: `ModalService` (`open()`/`confirm()`), `ModalCloseAction`/`ModalCloseResult`,
   `ModalContent`/`hasUnsavedChanges()`, `ModalConfig`, `ConfirmDialogComponent`/`ConfirmDialogData`.
-- `tsc --noEmit` and `ng-packagr build` both clean. Wired into `apps/showcase` at `/modals` (a
-  holiday-approval demo exercising data-in, the dirty-check guard, and a typed close result) and
-  confirmed the app itself builds clean with it — **not yet clicked through in an actual browser**
-  (no browser-automation tool available in this session, unlike the Playwright verification other
-  demos in this repo got). The dynamic-component/`MatDialogRef` injection mechanism above is sound
-  per Angular's documented `ViewContainerRef`/injector-hierarchy behaviour, but flagging this
-  explicitly rather than claiming a check that didn't happen — worth an actual browser pass before
-  this is considered done.
+- `tsc --noEmit` and `ng-packagr build` both clean. Wired into `apps/showcase` at `/modals` with two
+  scenarios: a holiday-approval demo (data passed in, the dirty-check guard, a typed close result)
+  and a signup-form demo (name/email/agree-to-terms, typed form value returned via
+  `MatDialogRef.close(result)` on submit). Checked live in a headless browser 2026-09-30 (a Puppeteer
+  script against system Chrome, no interactive browser-automation tool was available in earlier
+  sessions unlike the Playwright checks other demos got): the close icon renders correctly, empty-form
+  submit shows field-level validation and stays open, a valid submit closes with the typed
+  `{name, email, agreedToTerms}` payload, and both light and emulated dark `prefers-color-scheme`
+  render correctly. No console errors in any of these checks.
 - Not yet published to npm — under development.
 - No consumers yet within this monorepo.

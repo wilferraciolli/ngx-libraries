@@ -266,6 +266,67 @@ string }`), same resolver-token pattern as `NGX_DATES_LOCALE`/`NGX_FORMS_LOCALE`
       `apps/showcase` doesn't have wired up yet; that part of the gap stays open (see each package's
       own "not yet wired into apps/showcase" note).
 
+## Showcase M3 theme + modals/notifications browser pass — 2026-09-30
+
+Prompted by feedback after actually looking at the showcase: the app was still on Material's
+light-only `azure-blue` prebuilt theme (never switched to the house M3 theme, so dark mode couldn't
+be checked for real), the modal's close icon rendered as broken/blank, and the notifications panel
+and its item interaction needed a real design pass rather than the placeholder it launched with.
+
+- [x] **Showcase M3 theme.** Replaced `styles.css` + `@import '@angular/material/prebuilt-themes/
+azure-blue.css'` with `styles.scss` + `@include mat.theme(...)` using the house palette (seeds
+      `#0A7E8C` primary / `#8A6D1C` tertiary — copied verbatim from
+      `docs/ANGULAR_APP_CONVENTIONS.md`'s "Design system: Material 3" embed, into a new
+      `src/styles/_theme-colors.scss`), `color-scheme: light dark`, Roboto/Roboto Flex. Only the
+      theme foundation from that doc's full recipe — not the whole nav-rail/shell/breakpoints/spacing
+      system, which is a separate, much larger change nobody asked for here. Known gap: most demo
+      pages' own CSS (`modals-demo.component.css`, home page tiles, etc.) still hardcodes hex colours
+      from before this pass and doesn't follow dark mode — pre-existing, out of scope of this fix,
+      worth a follow-up if the showcase's own demo-page chrome (as opposed to the packages it's
+      demoing) needs to look right in dark mode too.
+- [x] **Modal close icon was rendering broken/blank.** Root cause: `ModalShellComponent`'s close
+      button is a `<mat-icon>close</mat-icon>` ligature (a real Angular Material icon font glyph, not
+      a raster image) — the showcase never linked the Material Symbols font or set
+      `MAT_ICON_DEFAULT_OPTIONS`, so the ligature name rendered as literal text (or nothing, depending
+      on font-loading timing) instead of a glyph. Not a package bug: `docs/ANGULAR_APP_CONVENTIONS.md`
+      already documents this exact `<head>` link + provider as part of its "Foundations" setup step;
+      the showcase just hadn't done it (no other package's demo used `mat-icon` before `ngx-modals`,
+      so the gap was never hit). Fixed in `apps/showcase/src/index.html` (Material Symbols Outlined
+      `<link>`) and `main.ts` (`{ provide: MAT_ICON_DEFAULT_OPTIONS, useValue: { fontSet:
+'material-symbols-outlined' } }`) — see `packages/modals/CLAUDE.md` for the full note.
+- [x] **`ngx-modals` header restyled** to `headline-small` (was `title-large`) with more vertical
+      padding — page-title scale, not panel-title scale, so it reads as distinct from the
+      notifications panel's own header now that both are visually similar right-docked panels.
+- [x] **`ngx-notifications` panel repositioned and restyled.** Was a small `cdkConnectedOverlay`
+      dropdown anchored under the bell (360px wide, max 480px tall) — changed to the same right-docked
+      contract as `ngx-modals` (full height, `--ngx-notifications-width` default `33vw`, full screen
+      below `Breakpoints.XSmall`). **Not** done by adding `ngx-modals` as a dependency — that's not
+      one of root `CLAUDE.md`'s two sanctioned inter-package-dependency exceptions
+      (`ngx-api-client`/`ngx-auth` only) — instead rebuilt natively with CDK's imperative `Overlay`
+      API (global position strategy) instead of the `cdkConnectedOverlay` structural directive, which
+      only supports origin-relative positioning. Also restyled: a proper header (icon well, title,
+      "N unread" subtitle, `title-large` — kept distinct from `ngx-modals`' now-`headline-small`
+      header), list items get a hover surface and rounded corners instead of full-bleed hairline rows.
+      See `packages/notifications/CLAUDE.md`'s "Panel positioning" note for the full mechanism.
+- [x] **Notification item interaction changed.** Was a single big `<button>` wrapping the whole
+      projected item template, so clicking anywhere on an item (title, body, a mis-click near dismiss)
+      fired `openNotification()` — changed to a plain `<div>` (not clickable) plus one explicit "View"
+      action button (`NGX_NOTIFICATIONS_TEXT.action`, new field, default `'View'`) that's the only
+      thing triggering the action; the X dismiss button is unchanged. See
+      `packages/notifications/CLAUDE.md`'s "item's own content is not a click target" note.
+- [x] **Second `ngx-modals` showcase scenario**: a signup form (name/email/agree-to-terms,
+      `ReactiveFormsModule`) alongside the existing holiday-approval one — demonstrates getting a
+      typed value _back out_ of a modal on close (`MatDialogRef.close({action, data})` from a valid
+      submit), not just data passed in. New `signup-modal-content.component.ts`/`.html` in
+      `apps/showcase/src/app/demos/modals-demo/`.
+- [x] **Verified in a headless browser** (Puppeteer driving system Chrome from a scratchpad script —
+      no interactive browser-automation tool was available in this session, so this was a one-off
+      check rather than a repeatable suite): both modal scenarios (including form validation and the
+      typed close result), the notifications panel's open/View/dismiss/Escape interactions and badge
+      count, and light + emulated-dark `prefers-color-scheme` for all of the above. No console errors
+      in any of these checks. `npm run typecheck` and `npm run build` (full repo, including the
+      showcase app) both pass clean.
+
 ## New package `ngx-modals` — built 2026-09-30
 
 Idea captured 2026-09-30, refined the same day with a layout spec and a real prior-art reference,
@@ -690,13 +751,13 @@ See "New package `ngx-region-settings` — built 2026-09-30" above for what's bu
 
 ## packages/modals
 
-See "New package `ngx-modals` — built 2026-09-30" above for what's built and what's still open —
-in particular, the not-yet-browser-verified flag.
+See "New package `ngx-modals` — built 2026-09-30" and "Showcase M3 theme + modals/notifications
+browser pass — 2026-09-30" above for what's built and what's still open.
 
 ## packages/notifications
 
-See "New package `ngx-notifications` — built 2026-09-30" above for what's built and what's still
-open — in particular, the not-yet-browser-verified flag.
+See "New package `ngx-notifications` — built 2026-09-30" and "Showcase M3 theme + modals/
+notifications browser pass — 2026-09-30" above for what's built and what's still open.
 
 ## packages/styles
 
