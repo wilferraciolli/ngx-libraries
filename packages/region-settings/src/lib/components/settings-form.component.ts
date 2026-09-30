@@ -1,9 +1,9 @@
 import { Component, computed, inject, input, linkedSignal, output } from '@angular/core';
-import { form } from '@angular/forms/signals';
+import { form, FormRoot } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import { RegionSettingsPayload } from '../models/region-settings.model';
 import { ValueViewValue } from '@wiltech-labs/ngx-api-client';
-import { SelectField, type FieldOption } from '@wiltech-labs/ngx-forms';
+import { SelectField, FormFieldType, type FieldDef } from '@wiltech-labs/ngx-forms';
 import { NGX_REGION_SETTINGS_FORM_TEXT } from '../config/settings-form-text.token';
 
 type RegionSettingsOptions = Partial<Record<string, ValueViewValue[]>>;
@@ -15,7 +15,7 @@ function toPayload(settings: RegionSettingsPayload): RegionSettingsPayload {
 
 @Component({
   selector: 'ngx-region-settings-form',
-  imports: [SelectField, MatButtonModule],
+  imports: [SelectField, MatButtonModule, FormRoot],
   templateUrl: './settings-form.component.html',
   styleUrl: './settings-form.component.scss',
 })
@@ -35,27 +35,23 @@ export class RegionSettingsFormComponent {
     () => JSON.stringify(this.model()) !== JSON.stringify(toPayload(this.settings())),
   );
 
-  protected readonly timezoneOptions = computed<FieldOption[]>(() =>
-    this.options()['timezone']?.map((v) => ({ label: v.viewValue, value: v.value })) ?? [],
-  );
-  protected readonly languageOptions = computed<FieldOption[]>(() =>
-    this.options()['language']?.map((v) => ({ label: v.viewValue, value: v.value })) ?? [],
-  );
-  protected readonly localeOptions = computed<FieldOption[]>(() =>
-    this.options()['locale']?.map((v) => ({ label: v.viewValue, value: v.value })) ?? [],
-  );
-  protected readonly currencyOptions = computed<FieldOption[]>(() =>
-    this.options()['currency']?.map((v) => ({ label: v.viewValue, value: v.value })) ?? [],
-  );
-  protected readonly themeOptions = computed<FieldOption[]>(() =>
-    this.options()['theme']?.map((v) => ({ label: v.viewValue, value: v.value })) ?? [],
-  );
+  // ngx-forms' SelectField reads its choices from `fieldDef.options`, not a separate input —
+  // each field's static definition and its API-provided options are merged into one FieldDef here.
+  private fieldDef(key: string, label: string): FieldDef {
+    return {
+      name: key,
+      type: FormFieldType.SELECT,
+      label,
+      required: true,
+      options: this.options()[key]?.map((v) => ({ label: v.viewValue, value: v.value })) ?? [],
+    };
+  }
 
-  protected readonly timezoneField = { name: 'timezone', type: 'select', label: 'Timezone', required: true };
-  protected readonly languageField = { name: 'language', type: 'select', label: 'Language', required: true };
-  protected readonly localeField = { name: 'locale', type: 'select', label: 'Locale', required: true };
-  protected readonly currencyField = { name: 'currency', type: 'select', label: 'Currency', required: true };
-  protected readonly themeField = { name: 'theme', type: 'select', label: 'Theme', required: true };
+  protected readonly timezoneField = computed(() => this.fieldDef('timezone', 'Timezone'));
+  protected readonly languageField = computed(() => this.fieldDef('language', 'Language'));
+  protected readonly localeField = computed(() => this.fieldDef('locale', 'Locale'));
+  protected readonly currencyField = computed(() => this.fieldDef('currency', 'Currency'));
+  protected readonly themeField = computed(() => this.fieldDef('theme', 'Theme'));
 
   protected readonly settingsForm = form(this.model, {
     submission: {

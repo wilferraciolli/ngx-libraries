@@ -717,7 +717,45 @@ Two different things were bundled under "auth" in the doc, and only one belongs 
       demo once one does, same as every other package's showcase wiring.
 - [ ] Not yet published to npm — under development, no consumers yet.
 
-## packages/forms
+## `ngx-region-settings` gains `RegionSettingsFormComponent` — 2026-09-30
+
+An external consuming app (`PythonTutorials/showcase`, a separate repo not part of this workspace)
+had already built its own `RegionSettingsForm` — the exact form-per-app duplication
+`ngx-region-settings` exists to prevent, since the store only ever exposed data, never a UI to edit
+it.
+
+- [x] Extracted that form into this package as `RegionSettingsFormComponent`
+      (`settings`/`options`/`saving` inputs, `save` output), rendering the five region fields
+      (timezone/language/locale/currency/theme) as `@wiltech-labs/ngx-forms` `SelectField`s. Ported
+      the dirty-check (`linkedSignal` re-seeding from `settings()`, comparing against the edited
+      model) and the `@angular/forms/signals` `form()`/`FormRoot` wiring as-is.
+- [x] This required extending root `CLAUDE.md`'s "Inter-package deps" sanctioned-exception list to
+      include `@wiltech-labs/ngx-forms` alongside the existing `ngx-api-client`/`ngx-auth` two —
+      asked first rather than just doing it, since the doc explicitly calls out not extending it
+      without revisiting. Same `file:../forms/dist` mechanism, `scripts/build-packages.sh` updated
+      to build `ngx-forms` before `ngx-region-settings` too.
+- [x] Dropped the direct `@jsverse/transloco` dependency the original app-level form had (its Save/
+      Saving button text) — this package already has a standing "no dependency on `ngx-translations`"
+      decision, so that text now goes through a new `NGX_REGION_SETTINGS_FORM_TEXT` resolver token
+      instead, same pattern as `ngx-notifications`' `NGX_NOTIFICATIONS_TEXT`.
+- [x] `SelectField`'s actual contract turned out to be `[fieldDef]`/`[field]` only — no separate
+      `[options]` input like the app-level form assumed; options live on `fieldDef.options`. Caught
+      by `ng-packagr build` (`tsc --noEmit` alone didn't catch it — it doesn't type-check templates
+      the same way). Fixed by merging each field's static definition and its live API options into
+      one computed `FieldDef` per field.
+- [x] Own SCSS (a two-column responsive grid) deliberately hardcodes its two spacing values and one
+      breakpoint instead of depending on `@wiltech-labs/ngx-styles` — that package has no confirmed
+      way to resolve its Sass partials from `ng-packagr`'s own build step (only from a consuming
+      app's `stylePreprocessorOptions.includePaths`, a different build entirely), and no package here
+      has tried yet. Not worth the risk for two pixel values and one breakpoint.
+- [x] `tsc --noEmit`, `ng-packagr build`, and a full `scripts/build-packages.sh` run all clean.
+- [ ] **Not yet switched over in `PythonTutorials/showcase` itself** — that app's own
+      `RegionSettingsForm` still exists as a local copy; it hasn't been repointed to import
+      `RegionSettingsFormComponent` from `@wiltech-labs/ngx-region-settings` instead. Do this (and
+      delete the local copy) once that app is set up to consume this monorepo's packages — see the
+      "Housekeeping" section's note on starting that as its own session.
+- [ ] Not yet exercised in `apps/showcase` here either (this package has no showcase demo route at
+      all yet, form included).
 
 - [ ] No tests yet. Unlike `api-client` (a straight port of exercised `insurly-ui` code), forms
       has grown real logic that isn't already covered elsewhere: `toSchema()` validation rules,
@@ -747,7 +785,8 @@ See "New package `ngx-auth` — built 2026-09-30" above for what's built and wha
 
 ## packages/region-settings
 
-See "New package `ngx-region-settings` — built 2026-09-30" above for what's built and what's still open.
+See "New package `ngx-region-settings` — built 2026-09-30" and "`ngx-region-settings` gains
+`RegionSettingsFormComponent` — 2026-09-30" above for what's built and what's still open.
 
 ## packages/modals
 

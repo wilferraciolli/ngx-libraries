@@ -11,9 +11,10 @@ hand except the one `/me` bootstrap request.
 npm install @wiltech-labs/ngx-region-settings
 ```
 
-Peer dependencies: `@angular/core`, `@angular/common`, `rxjs`. This package also depends directly on
-`@wiltech-labs/ngx-api-client` and `@wiltech-labs/ngx-auth` — install both alongside it and wire
-`provideAuth()`/`API_ORIGIN` as their own READMEs describe.
+Peer dependencies: `@angular/core`, `@angular/common`, `@angular/forms`, `@angular/material`, `rxjs`.
+This package also depends directly on `@wiltech-labs/ngx-api-client`, `@wiltech-labs/ngx-auth`, and
+`@wiltech-labs/ngx-forms` — install all three alongside it and wire `provideAuth()`/`API_ORIGIN` as
+their own READMEs describe.
 
 ## Usage
 
@@ -80,6 +81,25 @@ export class MySettingsPage {
 `SystemSettingsStore` is the admin-only equivalent — same API, reading/writing through the profile's
 `systemSettings` link instead of `userSettings`. Use it exactly the same way.
 
+### Ready-made settings form
+
+`RegionSettingsFormComponent` renders the five region fields (timezone, language, locale, currency,
+theme) as `@wiltech-labs/ngx-forms` `SelectField`s, wired to whichever store's `settings()`/`options()`
+you pass in — no need to build this form yourself:
+
+```html
+<ngx-region-settings-form
+  [settings]="store.settings()"
+  [options]="store.options()"
+  [saving]="store.saving()"
+  (save)="store.save($event)"
+/>
+```
+
+Override the Save/Saving button text by providing `NGX_REGION_SETTINGS_FORM_TEXT` (a
+`() => RegionSettingsFormText` resolver — same pattern as `ngx-notifications`' text token); it stays
+English by default.
+
 ### A different payload shape
 
 Both stores are generic. If your API's `/me`, `userProfile`, or settings payload genuinely differs
@@ -116,7 +136,9 @@ src/
 ├── public-api.ts        # barrel — the entire public surface; nothing outside this is exported
 └── lib/
     ├── models/             # Identifiable, Me/UserProfile, RegionSettings/RegionSettingsPayload
-    └── stores/             # CurrentUserStore, RegionSettingsStore + UserSettingsStore/SystemSettingsStore
+    ├── stores/             # CurrentUserStore, RegionSettingsStore + UserSettingsStore/SystemSettingsStore
+    ├── config/             # NGX_REGION_SETTINGS_FORM_TEXT
+    └── components/         # RegionSettingsFormComponent
 ```
 
 ## Status
@@ -134,14 +156,15 @@ npm run build
 
 Then, **before** `npm publish`: `ng-packagr` copies `dependencies` verbatim into
 `dist/package.json`, including this package's own `file:../api-client/dist` /
-`file:../auth/dist` entries (see this package's `CLAUDE.md` for why they're `file:` references at
-all) — those are meaningless outside this monorepo, so hand-edit `dist/package.json` to point them
-at the real published version ranges first, e.g.:
+`file:../auth/dist` / `file:../forms/dist` entries (see this package's `CLAUDE.md` for why they're
+`file:` references at all) — those are meaningless outside this monorepo, so hand-edit
+`dist/package.json` to point them at the real published version ranges first, e.g.:
 
 ```json
 "dependencies": {
   "@wiltech-labs/ngx-api-client": "^1.0.0",
-  "@wiltech-labs/ngx-auth": "^1.0.0"
+  "@wiltech-labs/ngx-auth": "^1.0.0",
+  "@wiltech-labs/ngx-forms": "^1.0.0"
 }
 ```
 
