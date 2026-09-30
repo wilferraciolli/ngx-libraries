@@ -1,0 +1,31 @@
+{
+  "name": "@wiltech-labs/ngx-region-settings",
+  "version": "1.0.0",
+  "description": "Shared Angular current-user and region-settings stores — /me, userProfile, userSettings/systemSettings, all followed via HATEOAS links, never a hand-built URL.",
+  "license": "Apache-2.0",
+  "sideEffects": false,
+  "dependencies": {
+    "@wiltech-labs/ngx-api-client": "file:../api-client/dist",
+    "@wiltech-labs/ngx-auth": "file:../auth/dist"
+  },
+  "peerDependencies": {
+    "@angular/core": "^22.0.0",
+    "@angular/common": "^22.0.0",
+    "rxjs": "^7.4.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "ng-packagr -p ng-package.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@angular/common": "^22.0.0",
+    "@angular/compiler-cli": "^22.0.0",
+    "@angular/core": "^22.0.0",
+    "ng-packagr": "^22.0.0",
+    "rxjs": "~7.8.0",
+    "typescript": "~6.0.2"
+  }
+}

@@ -325,11 +325,11 @@ request in the panel while their team's availability stays visible on the left).
       packages here started — closer to a redesign of the prior-art app above, adapted to a
       layout that prior art never had.
 
-## Planned package `ngx-region-settings` (not started)
+## New package `ngx-region-settings` — built 2026-09-30
 
-Idea captured 2026-09-30. Prior art reviewed in a *different* reference app than the one behind
-`ngx-modals` above (`current-user.store.ts`, `region-settings.store.ts`). That app isn't a
-`@wiltech-labs/*` consumer itself (its own personal-scope API-client fork, a hand-rolled
+Idea captured 2026-09-30, built the same day. Prior art reviewed in a *different* reference app than
+the one behind `ngx-modals` above (`current-user.store.ts`, `region-settings.store.ts`). That app
+isn't a `@wiltech-labs/*` consumer itself (its own personal-scope API-client fork, a hand-rolled
 `AuthStore`/`TranslationService`), so — same caveat as every other prior-art reference here — port
 the *shape*, not the code.
 
@@ -368,23 +368,59 @@ roots.
       (`ngx-region-settings → ngx-api-client`), same shape as `ngx-translations → @jsverse/transloco`.
       A cycle would require `ngx-api-client` to depend back on `ngx-region-settings`, which nothing
       calls for and the foundation-leaf rule above forbids.
-- [ ] **Fixed shape vs. generic payload**: the reference's `RegionSettings` (timezone/language/
-      locale/currency/theme) is one plausible common shape, but the store should probably be generic
-      (`SettingsStore<TSettings, TPayload>`) rather than hardcoding those five fields, so it's usable
-      even where an app's idea of "region settings" differs. Still open.
-- [ ] Naming follows the reference project's own name for this exact pattern: `packages/
+- [x] **Resolved 2026-09-30 — generic, defaulting to the reference's real shape**: both
+      `RegionSettingsStore<TSettings, TPayload>` and `CurrentUserStore<TMe, TProfile>` are generic,
+      settled via an explicit question to the user rather than picked unilaterally. Immediately
+      after answering "generic" for both, the user added the actual reasoning: every consuming app's
+      API payload shape is fixed (backend-owned, not something this package or an app's UI can
+      renegotiate) and "every Angular app will be updated to match the exact payload the API sends"
+      — the reference app's shapes (`Me`/`UserProfile`/`RegionSettings`/`RegionSettingsPayload`, five
+      settings fields: `timezone`/`language`/`locale`/`currency`/`theme`, plus `owner_type` on the
+      user's own settings) are "the latest api convention" every app converges on, not just one
+      possible shape among many. So the type parameters default to those exact concrete shapes
+      (mirroring the reference field-for-field, including `owner_type`), rather than to something
+      invented or left abstract — the common case (now effectively every app) needs zero type
+      arguments; the generics exist for the rare app whose payload genuinely still differs.
+- [x] Naming follows the reference project's own name for this exact pattern: `packages/
       region-settings` / `@wiltech-labs/ngx-region-settings`.
-- [ ] `Me`/`UserProfile` field shapes (`roleIds`, `email`, `externalId`, etc.) are app-specific in the
-      reference — decide whether `CurrentUserStore` is generic over those (`CurrentUserStore<TMe,
-      TProfile>`) or ships a minimal fixed shape (`{ id, links }`) with apps extending it. Still open.
 - [x] **Resolved 2026-09-30**: `ngx-region-settings` also takes a real dependency on `ngx-auth`,
       gating `CurrentUserStore`'s `/me` fetch on `AuthStore.isSignedIn()` directly, the same way the
       reference code does. This is the second sanctioned exception to root `CLAUDE.md`'s
       "Inter-package deps" rule — see that row for why it's safe (both `ngx-api-client` and
       `ngx-auth` are kept strict foundation leaves).
-- [ ] Build order: `ngx-auth` first (no dependencies of its own, fully exercised spec already),
-      `ngx-region-settings` after — it depends on both `ngx-auth` and `ngx-api-client`.
-- [ ] No consumer yet. Design before building, same as every other package here.
+- [x] Build order followed as planned: `ngx-auth` first (built earlier the same day), then
+      `ngx-region-settings`, which depends on both it and `ngx-api-client`.
+- [x] **Solved the real `ng-packagr`/npm-workspaces resolution problem this section's design
+      decisions above assumed was solvable**: a bare semver range in `ngx-region-settings`'
+      `dependencies` resolves to npm workspaces' own auto-link-by-name behaviour, pointing at the
+      sibling's *unpublished source* folder — the exact `TS2307` dead end hit and documented under
+      `ngx-dates` above. Fix: an explicit `"file:../api-client/dist"` / `"file:../auth/dist"`
+      reference in `dependencies` instead — npm then nests a local `node_modules/@wiltech-labs/ngx-x`
+      inside `packages/region-settings` pointing at the literal path given (the sibling's *built*
+      output, which has real `main`/`types`), rather than the root-hoisted source symlink. Confirmed
+      working end to end: `npm install`, `tsc --noEmit`, and `ng-packagr build` all succeeded.
+      A root-level npm `overrides` entry was tried first (to avoid a `file:` path in `dependencies`
+      at all) — npm refused it (`EOVERRIDE ... conflicts with direct dependency`) because
+      `ngx-api-client`/`ngx-auth` are workspace members, treated as a direct dependency of the
+      workspace root. Two consequences, documented in `ngx-region-settings`'s own `CLAUDE.md`: (1)
+      `ngx-api-client`/`ngx-auth` must be *built* (their `dist/` must exist) before
+      `ngx-region-settings` builds — root `CLAUDE.md`'s "Inter-package deps" row now documents this;
+      (2) `ng-packagr` copies `dependencies` verbatim into `dist/package.json`, `file:` paths
+      included, so publishing needs a manual fixup first (replace the `file:` entries with real
+      semver ranges) — documented as an explicit step in the package's README "Publishing" section.
+- [x] **Scope boundary decisions made while building, not pre-designed**: no dependency on
+      `ngx-translations` (`RegionSettingsStore.options` returns raw `_metadata`-derived
+      `{value, viewValue}` pairs, no label-translation step — an app maps labels itself, same
+      "app owns presentation" boundary `ngx-notifications` draws for its callbacks below); no
+      `isAdmin`-style helper on `CurrentUserStore` (the reference's `roleIds.includes('ADMIN')` bakes
+      in a role-name literal that's an app policy choice, not identity mechanics — `me()?.roleIds` is
+      exposed raw instead); errors exposed raw as `Signal<unknown>`, not humanized (the reference ran
+      them through an app's own i18n error-describer — out of scope here for the same reason).
+- [x] Package scaffolded (`package.json`, `ng-package.json`, `tsconfig.json`, `README.md`,
+      `CLAUDE.md`), builds and typechecks clean. Root `CLAUDE.md` repo layout and "Inter-package
+      deps" row updated with the real resolution mechanism above.
+- [ ] Not yet wired into `apps/showcase` — no route in that app actually needs sign-in/settings yet.
+- [ ] Not yet published to npm — under development, no consumers yet.
 
 ## Planned package `ngx-notifications` (not started)
 
@@ -539,6 +575,10 @@ See "New package `ngx-dates` — built 2026-09-30" above for what's built and wh
 ## packages/auth
 
 See "New package `ngx-auth` — built 2026-09-30" above for what's built and what's still open.
+
+## packages/region-settings
+
+See "New package `ngx-region-settings` — built 2026-09-30" above for what's built and what's still open.
 
 ## packages/media
 

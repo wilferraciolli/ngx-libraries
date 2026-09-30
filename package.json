@@ -8,6 +8,7 @@
   ],
   "scripts": {
     "build": "npm run build --workspaces --if-present",
+    "build:packages": "for d in packages/*/; do npm run build --workspace=\"${d%/}\" --if-present || exit 1; done",
     "typecheck": "npm run typecheck --workspaces --if-present"
   },
   "license": "Apache-2.0"
