@@ -4,6 +4,7 @@ Shared Angular media components — skeleton loaders shown while data is fetched
 player. See root `../../CLAUDE.md` for repo-wide conventions.
 
 ## Layout
+
 ```
 src/
 ├── public-api.ts        # barrel — the entire public surface; nothing outside this is exported
@@ -19,6 +20,7 @@ src/
 ```
 
 ## Conventions
+
 - Real Angular constructs (`@Component`) — not framework-agnostic functions. Every known consumer
   is Angular, so idiomatic DI beats a generic-TS compromise.
 - One folder per concern under `src/lib/` — don't let it go flat. A new concern (e.g. audio,
@@ -36,6 +38,7 @@ src/
   beyond what this package constructs itself.
 
 ## Status
+
 - New package, initial component set only (`CardLoader`, `ContentLoader`, `YoutubePlayer`).
 - Not yet published to npm — under development.
 - No consumers yet.

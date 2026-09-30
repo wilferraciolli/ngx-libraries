@@ -11,6 +11,7 @@ this package existed — genuinely copy-pasted each time, not a from-scratch des
 here) takes a real dependency on two siblings instead of an app-pluggable resolver token.
 
 ## Layout
+
 ```
 src/
 ├── public-api.ts        # barrel — the entire public surface; nothing outside this is exported
@@ -25,6 +26,7 @@ src/
 ```
 
 ## Conventions
+
 - **Real npm dependency on `@wiltech-labs/ngx-api-client` and `@wiltech-labs/ngx-auth`** — the
   sanctioned exception to root `CLAUDE.md`'s default "no inter-package deps." `CurrentUserStore`
   gates its `/me` fetch on `AuthStore.isSignedIn()`; both packages are kept strict foundation leaves
@@ -32,8 +34,8 @@ src/
 - **How the dependency actually resolves, in this monorepo specifically**: `package.json` points at
   `"@wiltech-labs/ngx-api-client": "file:../api-client/dist"` and
   `"@wiltech-labs/ngx-auth": "file:../auth/dist"` — an explicit `file:` reference to the sibling's
-  *built* `dist/` output, not a bare semver range. A bare range (`"^1.0.0"`, `"*"`, ...) resolves to
-  npm workspaces' own auto-link-by-name behaviour instead, which points at the sibling's *source*
+  _built_ `dist/` output, not a bare semver range. A bare range (`"^1.0.0"`, `"*"`, ...) resolves to
+  npm workspaces' own auto-link-by-name behaviour instead, which points at the sibling's _source_
   folder — whose `package.json` has no `main`/`types` (only the `dist/` one `ng-packagr` writes
   does), the exact `ng-packagr` `TS2307: Cannot find module` failure hit and documented while
   building `ngx-dates` against `ngx-translations`. An explicit `file:../x/dist` path sidesteps that:
@@ -52,10 +54,10 @@ src/
   `NEXT_STEPS.md`'s "Repo-wide" section); worth a small script if this pattern gets reused by a third
   package.
 - **Build-order requirement this creates**: `ngx-api-client` and `ngx-auth` must be built (their
-  `dist/` must exist) *before* this package builds — `file:../api-client/dist` is a dangling
+  `dist/` must exist) _before_ this package builds — `file:../api-client/dist` is a dangling
   reference otherwise. `npm install` itself never fails on this (it happily symlinks to a
   not-yet-existing path, and the symlink self-heals once that path's target appears — no re-install
-  needed), so this only ever surfaces as a *build* failure, not an install one, and it's easy to
+  needed), so this only ever surfaces as a _build_ failure, not an install one, and it's easy to
   mistake for "needs another `npm install`." `dist/` is gitignored, so this bites on every fresh
   clone. Root `package.json`'s `build:packages` script used to get this right only by accident
   (alphabetical directory order happened to put `api-client`/`auth` before `region-settings`) — hit
@@ -72,7 +74,7 @@ src/
   `ngx-translations`/`@jsverse/transloco` and `ngx-auth`/`@clerk/clerk-js`: this package controls the
   exact version it's built against. Listed in `ng-package.json`'s `allowedNonPeerDependencies`.
 - **Everything else stays generic, deliberately not fixed to one payload shape.** `CurrentUserStore<TMe,
-  TProfile>` and `RegionSettingsStore<TSettings, TPayload>` are both parameterized, defaulting to
+TProfile>` and `RegionSettingsStore<TSettings, TPayload>` are both parameterized, defaulting to
   concrete types (`Me`/`UserProfile`/`RegionSettings`/`RegionSettingsPayload`) that mirror an already
   fully-exercised, real API's actual response shape — not an invented "reasonable-looking" shape.
   The reasoning: an individual app's API payload shape is fixed (owned by that app's backend, not
@@ -101,6 +103,7 @@ src/
   HATEOAS link the API itself handed out — never a URL this package or an app constructs.
 
 ## Status
+
 - New package: `CurrentUserStore`, `RegionSettingsStore` (abstract), `UserSettingsStore`,
   `SystemSettingsStore`, plus the `Identifiable`/`Me`/`UserProfile`/`RegionSettings`/
   `RegionSettingsPayload` types.

@@ -1,6 +1,9 @@
 import { EnvironmentProviders, makeEnvironmentProviders } from '@angular/core';
 import { provideTransloco } from '@jsverse/transloco';
-import { NGX_TRANSLATIONS_CONFIG, type NgxTranslationsConfig } from '../config/translations-config.token';
+import {
+  NGX_TRANSLATIONS_CONFIG,
+  type NgxTranslationsConfig,
+} from '../config/translations-config.token';
 import { BundledTranslationsLoader } from './bundled-translations.loader';
 
 /**
@@ -20,9 +23,9 @@ export function provideTranslations(config: NgxTranslationsConfig): EnvironmentP
         // Every app of ours re-renders on a language switch — that's the whole point of instant
         // switching. See the config's own defaults for what this flag changes.
         reRenderOnLangChange: true,
-        missingHandler: { logMissingKey: true, useFallbackTranslation: true, allowEmpty: false }
+        missingHandler: { logMissingKey: true, useFallbackTranslation: true, allowEmpty: false },
       },
-      loader: config.loader ?? BundledTranslationsLoader
-    })
+      loader: config.loader ?? BundledTranslationsLoader,
+    }),
   ];
 }

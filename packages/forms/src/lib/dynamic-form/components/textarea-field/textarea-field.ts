@@ -18,7 +18,7 @@ const CODE_INDENT: string = '  ';
   imports: [FormField, MatFormFieldModule, MatInputModule],
   templateUrl: './textarea-field.html',
   styleUrl: './textarea-field.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TextareaField {
   public readonly fieldDef = input.required<FieldDef>();

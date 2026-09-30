@@ -1,6 +1,11 @@
 import { Injectable } from '@angular/core';
 import type { Provider } from '@angular/core';
-import { DateAdapter, MAT_DATE_FORMATS, MAT_NATIVE_DATE_FORMATS, NativeDateAdapter } from '@angular/material/core';
+import {
+  DateAdapter,
+  MAT_DATE_FORMATS,
+  MAT_NATIVE_DATE_FORMATS,
+  NativeDateAdapter,
+} from '@angular/material/core';
 
 type DatePart = 'day' | 'month' | 'year';
 
@@ -20,7 +25,7 @@ export class LocaleDateAdapter extends NativeDateAdapter {
     }
 
     const parts: Partial<Record<DatePart, number>> = {};
-    this.partOrder().forEach((part, index) => parts[part] = Number(match[index + 1]));
+    this.partOrder().forEach((part, index) => (parts[part] = Number(match[index + 1])));
 
     try {
       return this.createDate(parts.year!, parts.month! - 1, parts.day!);
@@ -32,7 +37,7 @@ export class LocaleDateAdapter extends NativeDateAdapter {
   private partOrder(): DatePart[] {
     return new Intl.DateTimeFormat(this.locale)
       .formatToParts(new Date(2000, 10, 22))
-      .map(part => part.type)
+      .map((part) => part.type)
       .filter((type): type is DatePart => type === 'day' || type === 'month' || type === 'year');
   }
 }
@@ -44,6 +49,6 @@ export class LocaleDateAdapter extends NativeDateAdapter {
 export function provideLocaleDateAdapter(): Provider[] {
   return [
     { provide: DateAdapter, useClass: LocaleDateAdapter },
-    { provide: MAT_DATE_FORMATS, useValue: MAT_NATIVE_DATE_FORMATS }
+    { provide: MAT_DATE_FORMATS, useValue: MAT_NATIVE_DATE_FORMATS },
   ];
 }

@@ -18,7 +18,7 @@ export interface ModalsDemoResult {
   selector: 'app-modals-demo-content',
   standalone: true,
   imports: [FormsModule, MatButtonModule, MatFormFieldModule, MatInputModule],
-  templateUrl: './modals-demo-content.component.html'
+  templateUrl: './modals-demo-content.component.html',
 })
 export class ModalsDemoContentComponent implements ModalContent {
   data = input<ModalsDemoData>();
@@ -26,7 +26,12 @@ export class ModalsDemoContentComponent implements ModalContent {
   protected readonly note = signal('');
   protected readonly dirty = signal(false);
 
-  private readonly dialogRef = inject(MatDialogRef<ModalsDemoContentComponent, ModalCloseResult<ModalCloseAction, ModalsDemoResult | undefined>>);
+  private readonly dialogRef = inject(
+    MatDialogRef<
+      ModalsDemoContentComponent,
+      ModalCloseResult<ModalCloseAction, ModalsDemoResult | undefined>
+    >,
+  );
 
   protected onNoteChange(value: string): void {
     this.note.set(value);
@@ -40,7 +45,7 @@ export class ModalsDemoContentComponent implements ModalContent {
   protected save(): void {
     this.dialogRef.close({
       action: ModalCloseAction.Updated,
-      data: { employeeName: this.data()?.employeeName ?? '' }
+      data: { employeeName: this.data()?.employeeName ?? '' },
     });
   }
 

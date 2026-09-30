@@ -16,7 +16,7 @@ import type { FieldDef } from '../../interfaces/field-definition';
   imports: [FormField, MatFormFieldModule, MatInputModule],
   templateUrl: './text-field.html',
   styleUrl: './text-field.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TextField {
   public readonly fieldDef = input.required<FieldDef>();

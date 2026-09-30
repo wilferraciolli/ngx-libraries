@@ -28,7 +28,7 @@ import { AiPanel } from '@wiltech-labs/ngx-ai-tools';
     <ngx-ai-panel title="AI Summary">
       <p>This quarter's revenue grew 12%, driven mainly by...</p>
     </ngx-ai-panel>
-  `
+  `,
 })
 export class SummaryComponent {}
 ```
@@ -46,7 +46,11 @@ import { AiTextBox } from '@wiltech-labs/ngx-ai-tools';
 @Component({
   selector: 'app-prompt',
   imports: [AiTextBox],
-  template: `<ngx-ai-text-box [(value)]="prompt" label="Ask about your orders" placeholder="Ask AI anything…" />`
+  template: `<ngx-ai-text-box
+    [(value)]="prompt"
+    label="Ask about your orders"
+    placeholder="Ask AI anything…"
+  />`,
 })
 export class PromptComponent {
   prompt = signal('');
@@ -93,7 +97,7 @@ Variables: `--ngx-ai-gradient-start`, `--ngx-ai-gradient-mid`, `--ngx-ai-gradien
 
 ## When to use it
 
-AI *interaction* surfaces — where the user asks the AI something or reads its answer. Static AI
+AI _interaction_ surfaces — where the user asks the AI something or reads its answer. Static AI
 markers (a nav destination, a badge) use the `tertiary-container` role instead. `AiButton` counts as
 the view's one filled button.
 

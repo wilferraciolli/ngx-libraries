@@ -4,33 +4,15 @@
     "outDir": "../../dist/out-tsc",
     "rootDir": "../..",
     "paths": {
-      "@wiltech-labs/ngx-api-client": [
-        "../../packages/api-client/src/public-api.ts"
-      ],
-      "@wiltech-labs/ngx-dates": [
-        "../../packages/dates/src/public-api.ts"
-      ],
-      "@wiltech-labs/ngx-forms": [
-        "../../packages/forms/src/public-api.ts"
-      ],
-      "@wiltech-labs/ngx-media": [
-        "../../packages/media/src/public-api.ts"
-      ],
-      "@wiltech-labs/ngx-ai-tools": [
-        "../../packages/ai-tools/src/public-api.ts"
-      ],
-      "@wiltech-labs/ngx-graphs": [
-        "../../packages/graphs/src/public-api.ts"
-      ],
-      "@wiltech-labs/ngx-translations": [
-        "../../packages/translations/src/public-api.ts"
-      ],
-      "@wiltech-labs/ngx-modals": [
-        "../../packages/modals/src/public-api.ts"
-      ],
-      "@wiltech-labs/ngx-notifications": [
-        "../../packages/notifications/src/public-api.ts"
-      ]
+      "@wiltech-labs/ngx-api-client": ["../../packages/api-client/src/public-api.ts"],
+      "@wiltech-labs/ngx-dates": ["../../packages/dates/src/public-api.ts"],
+      "@wiltech-labs/ngx-forms": ["../../packages/forms/src/public-api.ts"],
+      "@wiltech-labs/ngx-media": ["../../packages/media/src/public-api.ts"],
+      "@wiltech-labs/ngx-ai-tools": ["../../packages/ai-tools/src/public-api.ts"],
+      "@wiltech-labs/ngx-graphs": ["../../packages/graphs/src/public-api.ts"],
+      "@wiltech-labs/ngx-translations": ["../../packages/translations/src/public-api.ts"],
+      "@wiltech-labs/ngx-modals": ["../../packages/modals/src/public-api.ts"],
+      "@wiltech-labs/ngx-notifications": ["../../packages/notifications/src/public-api.ts"]
     },
     "experimentalDecorators": true,
     "useDefineForClassFields": false,
@@ -43,11 +25,6 @@
     "strictInputAccessModifiers": true,
     "strictTemplates": true
   },
-  "include": [
-    "src/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }

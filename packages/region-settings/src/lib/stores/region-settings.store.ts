@@ -1,6 +1,12 @@
 import { httpResource } from '@angular/common/http';
 import { Injectable, computed, inject } from '@angular/core';
-import { ApiClientService, ApiEnvelope, ILink, MetadataService, ValueViewValue } from '@wiltech-labs/ngx-api-client';
+import {
+  ApiClientService,
+  ApiEnvelope,
+  ILink,
+  MetadataService,
+  ValueViewValue,
+} from '@wiltech-labs/ngx-api-client';
 
 import type { Identifiable } from '../models/identifiable.model.js';
 import type { RegionSettings, RegionSettingsPayload } from '../models/region-settings.model.js';

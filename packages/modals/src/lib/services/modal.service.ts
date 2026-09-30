@@ -4,7 +4,10 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Observable, map } from 'rxjs';
 
 import { ModalShellComponent } from '../components/modal-shell/modal-shell.component.js';
-import { ConfirmDialogComponent, ConfirmDialogData } from '../components/confirm-dialog/confirm-dialog.component.js';
+import {
+  ConfirmDialogComponent,
+  ConfirmDialogData,
+} from '../components/confirm-dialog/confirm-dialog.component.js';
 import type { ModalConfig, ModalShellData } from '../models/modal-config.model.js';
 import type { ModalCloseResult } from '../models/modal-close-result.model.js';
 
@@ -33,24 +36,29 @@ export class ModalService {
   ): MatDialogRef<unknown, TResult> {
     const width = config.width ?? DEFAULT_WIDTH;
 
-    const dialogRef = this.dialog.open<ModalShellComponent, ModalShellData<TData>, TResult>(ModalShellComponent, {
-      position: { top: '0', right: '0' },
-      height: '100vh',
-      maxHeight: '100vh',
-      width,
-      maxWidth: '100vw',
-      disableClose: true,
-      ariaLabel: config.ariaLabel ?? config.title,
-      data: {
-        contentComponent: component,
-        contentData: config.data,
-        title: config.title,
+    const dialogRef = this.dialog.open<ModalShellComponent, ModalShellData<TData>, TResult>(
+      ModalShellComponent,
+      {
+        position: { top: '0', right: '0' },
+        height: '100vh',
+        maxHeight: '100vh',
+        width,
+        maxWidth: '100vw',
+        disableClose: true,
+        ariaLabel: config.ariaLabel ?? config.title,
+        data: {
+          contentComponent: component,
+          contentData: config.data,
+          title: config.title,
+        },
       },
-    });
+    );
 
-    const breakpointSubscription = this.breakpointObserver.observe(Breakpoints.XSmall).subscribe(({ matches }) => {
-      dialogRef.updateSize(matches ? '100vw' : width, '100vh');
-    });
+    const breakpointSubscription = this.breakpointObserver
+      .observe(Breakpoints.XSmall)
+      .subscribe(({ matches }) => {
+        dialogRef.updateSize(matches ? '100vw' : width, '100vh');
+      });
     dialogRef.afterClosed().subscribe(() => breakpointSubscription.unsubscribe());
 
     return dialogRef;

@@ -1,6 +1,9 @@
 import { Injectable, Signal, inject, signal } from '@angular/core';
 
-import { NGX_NOTIFICATIONS_CONFIG, NotificationsConfig } from '../config/notifications-config.model.js';
+import {
+  NGX_NOTIFICATIONS_CONFIG,
+  NotificationsConfig,
+} from '../config/notifications-config.model.js';
 
 const DEFAULT_POLL_INTERVAL_MS = 5 * 60 * 1000;
 

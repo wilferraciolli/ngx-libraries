@@ -10,23 +10,30 @@ export interface GraphTable {
 export function toGraphTable(graphDef: GraphDef): GraphTable {
   return {
     columns: ['', ...graphDef.series.map((series) => series.label)],
-    rows: graphDef.labels.map((label, index) => [label, ...graphDef.series.map((series) => series.data[index])])
+    rows: graphDef.labels.map((label, index) => [
+      label,
+      ...graphDef.series.map((series) => series.data[index]),
+    ]),
   };
 }
 
 export function toPointGraphTable(graphDef: PointGraphDef): GraphTable {
-  const hasRadius = graphDef.series.some((series) => series.data.some((point) => point.r !== undefined));
+  const hasRadius = graphDef.series.some((series) =>
+    series.data.some((point) => point.r !== undefined),
+  );
   return {
     columns: hasRadius ? ['Series', 'x', 'y', 'Size'] : ['Series', 'x', 'y'],
     rows: graphDef.series.reduce<(string | number)[][]>(
       (rows, series) =>
         rows.concat(
           series.data.map((point) =>
-            hasRadius ? [series.label, point.x, point.y, point.r ?? ''] : [series.label, point.x, point.y]
-          )
+            hasRadius
+              ? [series.label, point.x, point.y, point.r ?? '']
+              : [series.label, point.x, point.y],
+          ),
         ),
-      []
-    )
+      [],
+    ),
   };
 }
 

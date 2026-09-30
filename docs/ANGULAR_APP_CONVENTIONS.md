@@ -12,18 +12,23 @@ starter kit (palette, shared partials, shell, screen recipes) that makes every
 app look and behave the same.
 
 ## Design tooling
+
 Every app built from these conventions uses two Claude Code design aids: the
 `frontend-design` plugin and the `impeccable` skill.
 
 ### The `frontend-design` plugin
+
 Install it once per machine, from inside Claude Code:
+
 ```
 /plugin install frontend-design@claude-plugins-official
 ```
+
 It gives Claude frontend design guidance for building UI. If it doesn't show up in
 a session that was already running when you installed it, start a new session.
 
 ### The `impeccable` skill
+
 This repo has the `impeccable` Claude Code skill installed
 (`.claude/skills/impeccable/`, by pbakaus). **After installing it into a
 project for the first time, start a new Claude Code session before using
@@ -43,13 +48,14 @@ full list and what each one is for). Invoke it as `/impeccable <command>
 [target]`, or with no argument for its context-aware menu. It also owns
 this project's `PRODUCT.md`/`DESIGN.md` (via its `init`/`document`
 commands) — generate those from this project's own code rather than
-copying another project's, since they capture *this* app's product intent
+copying another project's, since they capture _this_ app's product intent
 and existing visual language.
 
 Whichever design skill you use, the "Design system: Material 3" section below is
 the brief: it wins over a skill's generic aesthetic defaults.
 
 ## Core rules
+
 - Standalone components only — no `NgModule` declarations anywhere in new
   code.
 - Signals API (`signal()` / `computed()` / `linkedSignal()` / `resource()`
@@ -81,6 +87,7 @@ the brief: it wins over a skill's generic aesthetic defaults.
 - `.editorconfig`: 2-space indent everywhere, single quotes in `*.ts`.
 
 ## Folder structure — one folder per component
+
 Follow the Angular style guide: feature folders, but **every component
 gets its own folder** holding its four files — `name.ts`, `name.html`,
 `name.scss`, `name.spec.ts`. **No component — and no component
@@ -110,37 +117,41 @@ src/app/
 ```
 
 ## Shared libraries (`@wiltech-labs/ngx-*`)
+
 Recurring building blocks — API client, forms, loaders, charts, AI surfaces,
 websockets — are published as standalone Angular libraries on npm under the
 `@wiltech-labs` scope. Apps install them instead of keeping local copies. The
 libraries are built to this document's rules (standalone, signals, M3 tokens,
 the SCSS naming rule), so using one never reopens a design decision.
 
-Each package's `README.md` is its API reference. This section covers *when*
+Each package's `README.md` is its API reference. This section covers _when_
 to use which package and the rules for using it in an app.
 
 ### What to use for what
-| Need | Package | Use | Replaces in an app |
-|---|---|---|---|
-| Talk to the backend API | `ngx-api-client` | `ApiClientService`, `LinkService`, `MetadataService`, `convertIdToValues` pipe, `ApiErrorResponse` helpers | Hand-rolled `HttpClient` calls, `_data[root]` unwrapping, local envelope/link/metadata/error helpers |
-| Forms | `ngx-forms` | `formConfig<T>()`, `DynamicForm`, the `*Field` components, `toSchema()` | Hand-written `mat-form-field` markup, template-level validators, a `forms` SCSS partial |
-| Date and time input | `ngx-forms` | `BusinessDateField`, `BusinessTimeField`, `InstantDateTimeField`, `ZonedDateTimeService` | Raw `matDatepicker` bound to `Date` values |
-| Relative times ("5 hours ago") | `ngx-dates` | `relativeTime` pipe, `RelativeTimeService` | An app-local pipe |
-| Loading states | `ngx-media` | `ContentLoader`, `CardLoader` | "Loading…" text, spinners for content, `ngx-skeleton-loader` |
-| Embedded video | `ngx-media` | `YoutubePlayer` | Hand-built `<iframe>` embeds |
-| Charts | `ngx-graphs` | `graphConfig()` + `BarGraph`/`LineGraph`/`PieGraph`/`DoughnutGraph`/`PolarAreaGraph`/`RadarGraph`; `pointGraphConfig()` + `BubbleGraph`/`ScatterGraph` | App-local chart wrappers, direct `ng2-charts` use, hand-drawn charts |
-| AI interaction surfaces | `ngx-ai-tools` | `AiTextBox`, `AiButton`, `AiPanel`, `AiSparkleIcon` | Ad hoc gradient styling |
-| Realtime / websockets | `ngx-web-sockets` | `provideWebSocket()`, `WebSocketService`, `ChatRoom`, `ChatMessageBubble` | `ngx-socket-io`, hand-rolled socket services |
-| Translations | `ngx-translations` | `provideTranslations()`, `TranslationsService`, the `t` pipe | An app-local translation store (see `ngx-translations` below), raw Transloco use |
-| Clerk sign-in state, guard, HTTP token | `ngx-auth` | `provideAuth()`, `AuthStore`, `authGuard`, `authInterceptor` | The hand-rolled `AuthStore`/`signalStore` this doc's own "Authentication (Clerk)" section describes |
-| Current user / region settings | `ngx-region-settings` | `CurrentUserStore`, `RegionSettingsStore` (`UserSettingsStore`/`SystemSettingsStore`) | An app-local `/me` → `userProfile` → `userSettings`/`systemSettings` link-following chain |
-| A side panel / modal | `ngx-modals` | `ModalService.open()`, `ModalCloseAction`/`ModalCloseResult`, `ModalContent` | Hand-rolled `MatDialog.open()` calls, an app-local close-reason enum per feature |
-| Notification bell | `ngx-notifications` | `provideNotifications()`, `NotificationsService`, `<ngx-notifications>` | An app-local bell/badge/panel, a hand-rolled polling interval |
-| Shared Sass (breakpoints, spacing, M3 mixins) | `ngx-styles` | `@use 'breakpoints'`/`'spacing'`/`'ui'` from `stylePreprocessorOptions.includePaths` | A `src/styles/_breakpoints.scss`/`_spacing.scss`/`_ui.scss` copy-pasted per app |
+
+| Need                                          | Package               | Use                                                                                                                                                    | Replaces in an app                                                                                   |
+| --------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| Talk to the backend API                       | `ngx-api-client`      | `ApiClientService`, `LinkService`, `MetadataService`, `convertIdToValues` pipe, `ApiErrorResponse` helpers                                             | Hand-rolled `HttpClient` calls, `_data[root]` unwrapping, local envelope/link/metadata/error helpers |
+| Forms                                         | `ngx-forms`           | `formConfig<T>()`, `DynamicForm`, the `*Field` components, `toSchema()`                                                                                | Hand-written `mat-form-field` markup, template-level validators, a `forms` SCSS partial              |
+| Date and time input                           | `ngx-forms`           | `BusinessDateField`, `BusinessTimeField`, `InstantDateTimeField`, `ZonedDateTimeService`                                                               | Raw `matDatepicker` bound to `Date` values                                                           |
+| Relative times ("5 hours ago")                | `ngx-dates`           | `relativeTime` pipe, `RelativeTimeService`                                                                                                             | An app-local pipe                                                                                    |
+| Loading states                                | `ngx-media`           | `ContentLoader`, `CardLoader`                                                                                                                          | "Loading…" text, spinners for content, `ngx-skeleton-loader`                                         |
+| Embedded video                                | `ngx-media`           | `YoutubePlayer`                                                                                                                                        | Hand-built `<iframe>` embeds                                                                         |
+| Charts                                        | `ngx-graphs`          | `graphConfig()` + `BarGraph`/`LineGraph`/`PieGraph`/`DoughnutGraph`/`PolarAreaGraph`/`RadarGraph`; `pointGraphConfig()` + `BubbleGraph`/`ScatterGraph` | App-local chart wrappers, direct `ng2-charts` use, hand-drawn charts                                 |
+| AI interaction surfaces                       | `ngx-ai-tools`        | `AiTextBox`, `AiButton`, `AiPanel`, `AiSparkleIcon`                                                                                                    | Ad hoc gradient styling                                                                              |
+| Realtime / websockets                         | `ngx-web-sockets`     | `provideWebSocket()`, `WebSocketService`, `ChatRoom`, `ChatMessageBubble`                                                                              | `ngx-socket-io`, hand-rolled socket services                                                         |
+| Translations                                  | `ngx-translations`    | `provideTranslations()`, `TranslationsService`, the `t` pipe                                                                                           | An app-local translation store (see `ngx-translations` below), raw Transloco use                     |
+| Clerk sign-in state, guard, HTTP token        | `ngx-auth`            | `provideAuth()`, `AuthStore`, `authGuard`, `authInterceptor`                                                                                           | The hand-rolled `AuthStore`/`signalStore` this doc's own "Authentication (Clerk)" section describes  |
+| Current user / region settings                | `ngx-region-settings` | `CurrentUserStore`, `RegionSettingsStore` (`UserSettingsStore`/`SystemSettingsStore`)                                                                  | An app-local `/me` → `userProfile` → `userSettings`/`systemSettings` link-following chain            |
+| A side panel / modal                          | `ngx-modals`          | `ModalService.open()`, `ModalCloseAction`/`ModalCloseResult`, `ModalContent`                                                                           | Hand-rolled `MatDialog.open()` calls, an app-local close-reason enum per feature                     |
+| Notification bell                             | `ngx-notifications`   | `provideNotifications()`, `NotificationsService`, `<ngx-notifications>`                                                                                | An app-local bell/badge/panel, a hand-rolled polling interval                                        |
+| Shared Sass (breakpoints, spacing, M3 mixins) | `ngx-styles`          | `@use 'breakpoints'`/`'spacing'`/`'ui'` from `stylePreprocessorOptions.includePaths`                                                                   | A `src/styles/_breakpoints.scss`/`_spacing.scss`/`_ui.scss` copy-pasted per app                      |
 
 ### Setup
+
 Install only the packages the app uses (`npm i @wiltech-labs/ngx-forms …`).
 Six of them need an app-level provider in `app.config.ts`:
+
 ```ts
 import { inject } from '@angular/core';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
@@ -165,6 +176,7 @@ provideAuth({                                                // ngx-auth
   apiOrigin: environment.apiOrigin,
 }),
 ```
+
 - `API_ORIGIN` is the API's **bare origin** (`https://api.example.com`), not the
   `/api`-prefixed `apiUrl`. It defaults to `''` (same origin).
 - `apiOrigin`/`socketUrl` live in the environment files, like `apiUrl` (see
@@ -196,6 +208,7 @@ provideAuth({                                                // ngx-auth
   below.
 
 ### How the libraries fit the design system
+
 - **Selectors are `ngx-`** (`<ngx-dynamic-form>`, `<ngx-card-loader>`), so a
   template shows at a glance what is library and what is the app's own
   component.
@@ -213,7 +226,9 @@ provideAuth({                                                // ngx-auth
   `--ngx-*` variable is missing: add it to the library instead.
 
 ### Using each package
+
 **`ngx-api-client`**
+
 - Each feature keeps its own typed `*ApiService`. `ApiClientService` owns the
   HTTP mechanics (GET/POST/PUT/DELETE, envelope unwrap, link guard). URL
   construction and "reload the list after a mutation" stay in the feature
@@ -232,6 +247,7 @@ provideAuth({                                                // ngx-auth
   its label.
 
 **`ngx-forms`**
+
 - Describe a form once with `formConfig<T>()`; a misspelled field name is a
   compile error. Validation lives in that config (turned into Signals Forms
   rules by `toSchema()`), never in the template or the component.
@@ -253,6 +269,7 @@ provideAuth({                                                // ngx-auth
   field keeps the package's own default (`'en-GB'`).
 
 **`ngx-graphs`**
+
 - Decide the form first (the "Insights / charts" recipe: KPI row, chart per
   metric, small multiples), then pick the component.
 - Describe data with `graphConfig()` or `pointGraphConfig()`. Don't pass chart.js
@@ -270,6 +287,7 @@ provideAuth({                                                // ngx-auth
   wired to `ngx-translations`) to translate it; leave it unset and it stays English.
 
 **`ngx-media`**
+
 - A content loading state is a skeleton shaped like the content:
   `ContentLoader [lines]` for a text block, and `CardLoader` repeated for a
   list of cards (as many as the page usually shows). No bare "Loading…" text
@@ -281,6 +299,7 @@ provideAuth({                                                // ngx-auth
 - `YoutubePlayer` takes a video id, never a URL or embed code.
 
 **`ngx-ai-tools`**
+
 - The AI accent has two jobs:
   - **Static AI markers** (an AI destination in the nav, an AI badge, an icon
     well) use `tertiary-container`, per the colour-role table.
@@ -295,6 +314,7 @@ provideAuth({                                                // ngx-auth
 - The border's rotation is the one sanctioned ambient animation (see Motion).
 
 **`ngx-web-sockets`**
+
 - One socket per app: `WebSocketService` is root-provided. Join and leave rooms
   on it; never create a second connection per feature.
 - `connected` is a signal. Event streams are `Observable`s; subscribe with
@@ -307,9 +327,10 @@ provideAuth({                                                // ngx-auth
   backend has to match it.
 - Connection status, the composer placeholder and transient status messages
   come from `NGX_CHAT_TEXT` — override it (e.g. wired to `ngx-translations`) to
-  translate it; message *bodies* are always app/server data either way.
+  translate it; message _bodies_ are always app/server data either way.
 
 **`ngx-translations`**
+
 - Depend on `@wiltech-labs/ngx-translations` alone — never import `@jsverse/transloco`
   directly (the app's own `package.json` shouldn't list it). The engine
   underneath can change without any template or service call changing with it.
@@ -336,6 +357,7 @@ provideAuth({                                                // ngx-auth
   don't add a second fallback layer on top.
 
 **`ngx-dates`**
+
 - The `relativeTime` pipe ("5 minutes ago", "yesterday", "in 2 days") and
   `RelativeTimeService` for the same text from logic (a toast, a log line).
   Accepts a UTC instant string, a `Date`, or a `Temporal.Instant` — the same
@@ -353,6 +375,7 @@ provideAuth({                                                // ngx-auth
   seems like it wants to import another directly.
 
 **`ngx-auth`**
+
 - Packages up the shape this doc's own "Authentication (Clerk)" section above describes — an app
   using `ngx-auth` doesn't hand-roll that `AuthStore`/guard/interceptor itself, it imports them.
   `provideAuth({ clerkPublishableKey, apiOrigin })` runs `AuthStore.init()` via
@@ -368,6 +391,7 @@ provideAuth({                                                // ngx-auth
   when a named JWT template is actually needed.
 
 **`ngx-region-settings`**
+
 - `CurrentUserStore` (root-provided): `/me` → its `userProfile` link → the profile, gated on
   `AuthStore.isSignedIn()` from `ngx-auth` — a sign-out clears the chain, a sign-in refetches it, no
   manual `ensureLoaded()`/`reset()` calls. `inject(CurrentUserStore)` anywhere; `.me()`/`.profile()`/
@@ -386,6 +410,7 @@ provideAuth({                                                // ngx-auth
   fetches and exposes state, an app maps/translates/authorizes at the call site.
 
 **`ngx-modals`**
+
 - `ModalService.open(component, config)` is the only way to open one — never call `MatDialog.open()`
   directly for a right-panel modal (a plain centered dialog that isn't this pattern is still fine
   via `MatDialog` directly). The content component takes a `data` input and injects `MatDialogRef`
@@ -403,6 +428,7 @@ provideAuth({                                                // ngx-auth
   uses, for anything else that wants it (a delete confirmation, say).
 
 **`ngx-notifications`**
+
 - `provideNotifications(() => ({ fetchNotifications, dismissNotification, openNotification }))` —
   a **factory**, not a plain config object, because the callbacks run later (a poll tick, a dismiss
   click), outside any injection context — `inject()` anything you need once, inside the factory, and
@@ -419,6 +445,7 @@ provideAuth({                                                // ngx-auth
   unset and it stays English.
 
 **`ngx-styles`**
+
 - Not a component/service package — pure Sass, no `ng-packagr` build, no `app.config.ts` provider.
   Add `node_modules/@wiltech-labs/ngx-styles/src` to `angular.json`'s
   `stylePreprocessorOptions.includePaths`, then `@use 'breakpoints'`/`'spacing'`/`'ui'` from any
@@ -432,7 +459,9 @@ provideAuth({                                                // ngx-auth
   define them since they're app-owned motion constants, not `--mat-sys-*` tokens.
 
 ### Migrating an existing app
+
 Work through what the app actually has:
+
 - [ ] Local API envelope/link/metadata/error helpers → delete them and move each
       `*ApiService` onto `ApiClientService`. Mutation URLs come from links.
 - [ ] Hand-written form markup and validators → `formConfig<T>()` with
@@ -455,14 +484,15 @@ Work through what the app actually has:
       dark.
 
 ## Dates and times
+
 Every date or time is one of three kinds. Choose the kind by what the value
 means, not by what the picker looks like:
 
-| Kind | Examples | Wire and model format | Compute with | Form field |
-|---|---|---|---|---|
-| Business date | Birthday, holiday, due date | `'YYYY-MM-DD'` | `Temporal.PlainDate` | `BusinessDateField` |
-| Business time | Opening hours, a daily schedule | `'HH:mm'` | `Temporal.PlainTime` | `BusinessTimeField` |
-| Instant | Meeting, deadline, "created at" | UTC ISO `'YYYY-MM-DDTHH:mm:ssZ'` | `Temporal.Instant` (`ZonedDateTime` to show it in a zone) | `InstantDateTimeField` |
+| Kind          | Examples                        | Wire and model format            | Compute with                                              | Form field             |
+| ------------- | ------------------------------- | -------------------------------- | --------------------------------------------------------- | ---------------------- |
+| Business date | Birthday, holiday, due date     | `'YYYY-MM-DD'`                   | `Temporal.PlainDate`                                      | `BusinessDateField`    |
+| Business time | Opening hours, a daily schedule | `'HH:mm'`                        | `Temporal.PlainTime`                                      | `BusinessTimeField`    |
+| Instant       | Meeting, deadline, "created at" | UTC ISO `'YYYY-MM-DDTHH:mm:ssZ'` | `Temporal.Instant` (`ZonedDateTime` to show it in a zone) | `InstantDateTimeField` |
 
 - **Strings everywhere except where you compute.** Models, API payloads, signals
   and form values hold the string. Parse to `Temporal` only to compare,
@@ -494,14 +524,15 @@ means, not by what the picker looks like:
   labels it, the same as `InstantDateTimeField`'s `dateTimeConfig.timeZone`.
 
 ## Authentication (Clerk)
+
 Clerk is the auth provider. One gotcha hits every new app that reaches for
 `@clerk/clerk-js`'s embedded UI:
 
 - **Never call `clerk.mountSignIn()` / `mountUserButton()` / any other
-  `mount*` method.** The npm build of `@clerk/clerk-js` ships *without*
+  `mount*` method.** The npm build of `@clerk/clerk-js` ships _without_
   the embedded UI components bundle (that's only available through
   Clerk's React SDK) — a `mount*` call throws `Error: Clerk was not
-  loaded with Ui components` at runtime, not at build time, so it slips
+loaded with Ui components` at runtime, not at build time, so it slips
   past a typecheck and a first glance. Headless/CI browsers make it
   worse: Clerk's own bot detection can withhold the UI chunk even where a
   mount call would otherwise render.
@@ -511,8 +542,10 @@ Clerk is the auth provider. One gotcha hits every new app that reaches for
   bundle, and it behaves identically in a real browser and in Playwright.
 
 ### `AuthStore` shape
+
 A root-provided `signalStore` (see Core rules) is the single source of
 truth for "who is signed in":
+
 - State holds the raw `user`/`session` from `Clerk['user']`/`Clerk['session']`
   — not a hand-rolled DTO. Read fields directly where needed:
   `user()?.primaryEmailAddress?.emailAddress`, `user()?.firstName`, etc.
@@ -529,6 +562,7 @@ truth for "who is signed in":
 - `signOut()` calls `clerk?.signOut()`.
 
 ### Routing
+
 Keep at least one route public (a landing/home page) instead of gating
 the whole app behind sign-in in the root component — it gives the app
 something to render, and something to smoke-test the Clerk wiring
@@ -538,6 +572,7 @@ else with a `CanActivateFn` guard (`authGuard`) that checks
 mounted/embedded sign-in widget on a route — see above.
 
 ### Testing
+
 - Component/unit tests don't need to mock Clerk specifically — `init()`
   only runs from the app-level initializer, never from a component
   constructor.
@@ -552,6 +587,7 @@ mounted/embedded sign-in widget on a route — see above.
   hosted sign-in form through the UI.
 
 ## Environment config
+
 - `src/environments/environment.ts` — dev defaults (used by `ng serve` and
   any build without an explicit `production` configuration). Points
   `apiUrl` at the local backend.
@@ -565,6 +601,7 @@ mounted/embedded sign-in widget on a route — see above.
   API keys or credentials, since they ship in the client bundle.
 
 ## Design system: Material 3
+
 Every app built from these conventions looks and behaves the same: the
 [Material 3](https://m3.material.io) (M3) design language, implemented with
 Angular Material's M3 theme, a house palette, one adaptive shell and a small set
@@ -585,6 +622,7 @@ the doc has drifted (run it before committing). When you copy this file into a
 new app, copy `scripts/sync-conventions.mjs` and the two npm scripts with it.
 
 ### 1. The rules
+
 1. **Tokens, never values.** Colour, type, shape, elevation and state layers come
    from the `--mat-sys-*` variables emitted by `mat.theme()`. No hex codes, no
    raw pixel radii (`--mat-sys-corner-*`), no ad hoc shadows, no `rgba()` greys.
@@ -599,7 +637,7 @@ new app, copy `scripts/sync-conventions.mjs` and the two npm scripts with it.
    drawer at `level1`) are the only ones.
 4. **One filled button per view.** Filled = the primary action; tonal = the
    secondary; text = the tertiary; outlined = a neutral alternative (rare).
-   A page's *create* action is a FAB. Rarely-used actions go in an overflow menu.
+   A page's _create_ action is a FAB. Rarely-used actions go in an overflow menu.
 5. **Lists are one grouped surface** with a hairline between rows — never a
    stack of identical bordered cards.
 6. **Navigation is adaptive** (see section 4): modal drawer on compact windows,
@@ -610,53 +648,56 @@ new app, copy `scripts/sync-conventions.mjs` and the two npm scripts with it.
    own. Everything respects `prefers-reduced-motion`.
 
 #### Colour roles — what goes where
-| Role | Use |
-|---|---|
-| `surface` | Page background, top app bar, rail |
-| `surface-container-low` | Grouped lists, tonal panels (forms), tiles, feed cards, modal drawer |
-| `surface-container` | Top app bar once scrolled; code/tool output; nested lists inside a panel |
-| `surface-container-high` | The other party's chat bubble |
-| `on-surface` | Primary text and icons |
-| `on-surface-variant` | Secondary text, inactive icons, meta lines, supporting copy |
-| `outline` | Field and chip borders, footer version marker |
-| `outline-variant` | Hairlines between list rows, tab underline, dividers |
-| `primary` | Filled buttons, links, the selected check, active tab indicator |
-| `primary-container` / `on-primary-container` | Avatars, icon wells, the user's chat bubble |
-| `secondary-container` / `on-secondary-container` | Selected nav indicator, secondary avatars |
-| `tertiary-container` / `on-tertiary-container` | The one semantic accent (in this house style: static AI markers such as nav destinations and badges, and "Owner" badges). AI *interaction* surfaces use `ngx-ai-tools`, whose gradient is built from these tokens |
-| `error` / `error-container` / `on-error-container` | Failures, banners, overdue, destructive actions |
-| `--app-chart-1` (app token, not M3) | Chart marks only: bars, lines, dots. Never text. `ngx-graphs` reads it, so every chart picks it up |
-| `scrim` | Modal scrim at 32% |
+
+| Role                                               | Use                                                                                                                                                                                                               |
+| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `surface`                                          | Page background, top app bar, rail                                                                                                                                                                                |
+| `surface-container-low`                            | Grouped lists, tonal panels (forms), tiles, feed cards, modal drawer                                                                                                                                              |
+| `surface-container`                                | Top app bar once scrolled; code/tool output; nested lists inside a panel                                                                                                                                          |
+| `surface-container-high`                           | The other party's chat bubble                                                                                                                                                                                     |
+| `on-surface`                                       | Primary text and icons                                                                                                                                                                                            |
+| `on-surface-variant`                               | Secondary text, inactive icons, meta lines, supporting copy                                                                                                                                                       |
+| `outline`                                          | Field and chip borders, footer version marker                                                                                                                                                                     |
+| `outline-variant`                                  | Hairlines between list rows, tab underline, dividers                                                                                                                                                              |
+| `primary`                                          | Filled buttons, links, the selected check, active tab indicator                                                                                                                                                   |
+| `primary-container` / `on-primary-container`       | Avatars, icon wells, the user's chat bubble                                                                                                                                                                       |
+| `secondary-container` / `on-secondary-container`   | Selected nav indicator, secondary avatars                                                                                                                                                                         |
+| `tertiary-container` / `on-tertiary-container`     | The one semantic accent (in this house style: static AI markers such as nav destinations and badges, and "Owner" badges). AI _interaction_ surfaces use `ngx-ai-tools`, whose gradient is built from these tokens |
+| `error` / `error-container` / `on-error-container` | Failures, banners, overdue, destructive actions                                                                                                                                                                   |
+| `--app-chart-1` (app token, not M3)                | Chart marks only: bars, lines, dots. Never text. `ngx-graphs` reads it, so every chart picks it up                                                                                                                |
+| `scrim`                                            | Modal scrim at 32%                                                                                                                                                                                                |
 
 #### Type — which token for which job
+
 Use `font: var(--mat-sys-…)` (which sets size, weight and line-height together)
 plus the matching `letter-spacing: var(--mat-sys-…-tracking)`. The mixins below
 wrap the common ones.
 
-| Job | Token |
-|---|---|
-| Hero headline | `headline-large` compact, `display-small` from medium up |
-| Page title (`h1`) | `ui.page-title` = `headline-small` → `headline-medium` |
-| Section / tile / panel title | `title-large` (`ui.section-title`); denser rows `title-medium` |
-| Body text, list primary line | `body-large` (default on `body`) |
-| Supporting text, list secondary line | `body-medium`, `on-surface-variant` (`ui.supporting-text`) |
-| Meta, timestamps, captions | `body-small` or `label-large` at weight 400 |
-| Buttons, tabs, chips, links-as-labels | `label-large` |
-| Rail captions, badges | `label-medium` / `label-small` |
+| Job                                   | Token                                                          |
+| ------------------------------------- | -------------------------------------------------------------- |
+| Hero headline                         | `headline-large` compact, `display-small` from medium up       |
+| Page title (`h1`)                     | `ui.page-title` = `headline-small` → `headline-medium`         |
+| Section / tile / panel title          | `title-large` (`ui.section-title`); denser rows `title-medium` |
+| Body text, list primary line          | `body-large` (default on `body`)                               |
+| Supporting text, list secondary line  | `body-medium`, `on-surface-variant` (`ui.supporting-text`)     |
+| Meta, timestamps, captions            | `body-small` or `label-large` at weight 400                    |
+| Buttons, tabs, chips, links-as-labels | `label-large`                                                  |
+| Rail captions, badges                 | `label-medium` / `label-small`                                 |
 
 Brand face (Roboto Flex) is used automatically for display/headline/title; plain
 face (Roboto) for body/label. Keep running text to ~65 characters
 (`max-width: 65ch`), sentence case everywhere, never ALL CAPS labels.
 
 #### Shape — which corner for which surface
-| Token | px | Use |
-|---|---|---|
-| `corner-extra-small` | 4 | Text fields (built in), focus-ring radius, the small corner of a chat bubble |
-| `corner-small` | 8 | Chips, suggestion chips, badges, small hover backgrounds |
-| `corner-medium` | 12 | Banners, code blocks, the media picker, small icon wells |
-| `corner-large` | 16 | Lists, tonal panels, tiles, feed cards, chat bubbles, FAB, drawer end |
-| `corner-extra-large` | 28 | Dialogs (built in), large empty-state icon wells |
-| `corner-full` | pill | Buttons (built in), avatars, the rail indicator, nav rows |
+
+| Token                | px   | Use                                                                          |
+| -------------------- | ---- | ---------------------------------------------------------------------------- |
+| `corner-extra-small` | 4    | Text fields (built in), focus-ring radius, the small corner of a chat bubble |
+| `corner-small`       | 8    | Chips, suggestion chips, badges, small hover backgrounds                     |
+| `corner-medium`      | 12   | Banners, code blocks, the media picker, small icon wells                     |
+| `corner-large`       | 16   | Lists, tonal panels, tiles, feed cards, chat bubbles, FAB, drawer end        |
+| `corner-extra-large` | 28   | Dialogs (built in), large empty-state icon wells                             |
+| `corner-full`        | pill | Buttons (built in), avatars, the rail indicator, nav rows                    |
 
 Prefer logical corner properties for asymmetric radii
 (`border-radius: var(--mat-sys-corner-large); border-end-end-radius: var(--mat-sys-corner-extra-small);`)
@@ -664,6 +705,7 @@ Prefer logical corner properties for asymmetric radii
 budget (see gotchas).
 
 #### Spacing, touch and layout
+
 - 4px grid (`spacing.space(n)`); 8px inside a group, 16px between blocks, 24px
   between sections. Page gutter 16px on compact, 24px from medium up.
 - Touch targets ≥ 48px (icon buttons are 48; list rows ≥ 56, two-line rows 72).
@@ -671,6 +713,7 @@ budget (see gotchas).
   expanded ≥ `md` (840), large ≥ `lg` (1200).
 
 #### Motion
+
 - Easing tokens: `--app-ease-standard` (on-screen movement), `--app-ease-decelerate`
   (things entering), `--app-ease-accelerate` (things leaving).
 - Durations: `--app-duration-short` 200ms (state changes, exits),
@@ -684,6 +727,7 @@ budget (see gotchas).
   reduced motion. Don't add others.
 
 #### Accessibility floor
+
 - Visible keyboard focus on everything interactive: Material components draw
   their own; custom elements use `ui.focus-ring`.
 - Current destination: `routerLinkActive` + `ariaCurrentWhenActive="page"`.
@@ -699,6 +743,7 @@ budget (see gotchas).
   colours.
 
 #### Copy
+
 - Sentence case. Buttons name the action: **Save**, **New todo**, **Delete** —
   not Submit/OK. The same word runs through the flow (Delete → confirm "Delete").
 - Empty states say what to do next ("No todos here yet. Use New todo to add
@@ -707,6 +752,7 @@ budget (see gotchas).
 - No unnecessary eyebrow labels above headings; no `→` appended to links.
 
 ### 2. Set up a new app
+
 1. Angular 22 app, SCSS, standalone. `npm i @angular/material @angular/cdk`.
    In Claude Code, install the design plugin if this machine doesn't have it yet:
    `/plugin install frontend-design@claude-plugins-official` (see "Design tooling").
@@ -734,6 +780,7 @@ budget (see gotchas).
 ### 3. Foundations — copy these files
 
 `src/index.html` `<head>`:
+
 ```html
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <!-- Browser chrome follows the app's surface colour (neutral tone 98 light / 6 dark). -->
@@ -752,10 +799,12 @@ budget (see gotchas).
   rel="stylesheet"
 />
 ```
+
 (The `theme-color` values are neutral tone 98 / 6 of the house palette — recompute
 them if you change the seeds.)
 
 `src/app/app.config.ts` — add to `providers`:
+
 ```ts
 import { MAT_ICON_DEFAULT_OPTIONS } from '@angular/material/icon';
 import { provideRouter, withComponentInputBinding, withViewTransitions } from '@angular/router';
@@ -772,6 +821,7 @@ provideAnimationsAsync(),
 **`src/styles/_theme-colors.scss`**
 
 <!-- embed: src/styles/_theme-colors.scss -->
+
 ```scss
 // This file was generated by running 'ng generate @angular/material:theme-color'.
 // Proceed with caution if making changes to this file.
@@ -911,11 +961,13 @@ $_rest: (
 $primary-palette: map.merge(map.get($_palettes, primary), $_rest);
 $tertiary-palette: map.merge(map.get($_palettes, tertiary), $_rest);
 ```
+
 <!-- /embed -->
 
 **`src/styles/_breakpoints.scss`**
 
 <!-- embed: src/styles/_breakpoints.scss -->
+
 ```scss
 // Shared breakpoint scale — Material 3's window size classes: compact is
 // everything below `sm` (phones; navigation is a modal drawer), medium
@@ -956,11 +1008,13 @@ $breakpoints: (
   }
 }
 ```
+
 <!-- /embed -->
 
 **`src/styles/_spacing.scss`**
 
 <!-- embed: src/styles/_spacing.scss -->
+
 ```scss
 // Shared spacing scale. `@use 'spacing';` from any stylesheet (src/styles
 // is on the Sass include path). 4px base unit — `spacing.space(2)` is 8px,
@@ -995,11 +1049,13 @@ $padding-desktop: 20px;
 // than the padding scale above (e.g. a wide gap between nav items).
 $spacing-large: 30px;
 ```
+
 <!-- /embed -->
 
 **`src/styles/_ui.scss`**
 
 <!-- embed: src/styles/_ui.scss -->
+
 ```scss
 // Material 3 building blocks shared by component stylesheets. `@use 'ui';`
 // from any stylesheet (src/styles is on the Sass include path) and
@@ -1152,11 +1208,13 @@ $spacing-large: 30px;
   }
 }
 ```
+
 <!-- /embed -->
 
 **`src/styles.scss`**
 
 <!-- embed: src/styles.scss -->
+
 ```scss
 // Material 3 theme. `mat.theme()` defines the --mat-sys-* CSS variables
 // (colour roles, type scale, shape scale, elevation, state layers) that
@@ -1362,34 +1420,35 @@ a {
   }
 }
 ```
-<!-- /embed -->
 
+<!-- /embed -->
 
 What the `_ui` mixins are for:
 
-| Mixin | Use |
-|---|---|
-| `ui.page-title` | The `h1` of a page (responsive headline) |
-| `ui.section-title` | A panel, tile or section heading (`title-large`) |
-| `ui.supporting-text` | Secondary copy: `body-medium` in `on-surface-variant` |
-| `ui.banner(error \| info)` | A page-level message in an error/secondary container; put it on the component's own `-error` class and set `role="alert"` in the template |
-| `ui.state-layer($color)` | Hover 8% / focus-press 10% overlay for a custom interactive surface (list row, tile, chip) |
-| `ui.focus-ring` | 3px secondary outline, 2px offset, for custom interactive elements |
-| `ui.fab-position` | Fixed bottom-right, above the safe area (pair with `<a matFab extended>`) |
-| `ui.empty-state` | Centred icon + one line of guidance for an empty list or pane |
-| `ui.filled-icon-button` | Re-tokens a `matIconButton` as an M3 *filled* icon button (send, etc.) |
-| `ui.danger-button` / `ui.danger-button(filled)` | Error-role text button (Delete, Remove) / filled confirming button in a dialog |
+| Mixin                                           | Use                                                                                                                                       |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `ui.page-title`                                 | The `h1` of a page (responsive headline)                                                                                                  |
+| `ui.section-title`                              | A panel, tile or section heading (`title-large`)                                                                                          |
+| `ui.supporting-text`                            | Secondary copy: `body-medium` in `on-surface-variant`                                                                                     |
+| `ui.banner(error \| info)`                      | A page-level message in an error/secondary container; put it on the component's own `-error` class and set `role="alert"` in the template |
+| `ui.state-layer($color)`                        | Hover 8% / focus-press 10% overlay for a custom interactive surface (list row, tile, chip)                                                |
+| `ui.focus-ring`                                 | 3px secondary outline, 2px offset, for custom interactive elements                                                                        |
+| `ui.fab-position`                               | Fixed bottom-right, above the safe area (pair with `<a matFab extended>`)                                                                 |
+| `ui.empty-state`                                | Centred icon + one line of guidance for an empty list or pane                                                                             |
+| `ui.filled-icon-button`                         | Re-tokens a `matIconButton` as an M3 _filled_ icon button (send, etc.)                                                                    |
+| `ui.danger-button` / `ui.danger-button(filled)` | Error-role text button (Delete, Remove) / filled confirming button in a dialog                                                            |
 
 Include them on the component's **own namespaced class**
 (`&-title { @include ui.page-title; }`) — never `@extend`, never a global class.
 Global helpers in `styles.scss` stay `.App-…`.
 
 ### 4. The adaptive shell
+
 Signed-in users get **destinations as a navigation rail** on medium windows and up
 (≥ 600px) and as a **modal navigation drawer**, opened from the top app bar, on
 compact ones. Signed-out visitors have nowhere to go, so they get just the bar
 (with Sign in) and the public home page. The bar sits on `surface` and takes a
-`surface-container` tint once the page scrolls. The rail sits *under* the bar and
+`surface-container` tint once the page scrolls. The rail sits _under_ the bar and
 sticks; the drawer slides in over a 32% scrim with a focus trap.
 
 Destinations are declared **once** and read by the rail, the drawer and the Home
@@ -1399,6 +1458,7 @@ destination whose API link is missing shows "Not found" instead of a dead link.
 **`src/app/shared/destinations.ts`** — the shape, then an example list (declare your own):
 
 <!-- embed: src/app/shared/destinations.ts until="export const DESTINATIONS" -->
+
 ```ts
 // The app's top-level destinations, in navigation order. NavMenu (rail and
 // drawer) and the Home cards both read this list, so a destination is
@@ -1425,11 +1485,20 @@ export interface Destination {
   homeCard?: false;
 }
 ```
+
 <!-- /embed -->
 
 ```ts
 export const DESTINATIONS: readonly Destination[] = [
-  { path: '/', label: 'Home', icon: 'home', title: 'Home', lead: '', tone: 'primary', homeCard: false },
+  {
+    path: '/',
+    label: 'Home',
+    icon: 'home',
+    title: 'Home',
+    lead: '',
+    tone: 'primary',
+    homeCard: false,
+  },
   {
     path: '/todos',
     label: 'Todos',
@@ -1463,6 +1532,7 @@ export const DESTINATIONS: readonly Destination[] = [
 **`src/app/shared/nav-menu/nav-menu.ts`**
 
 <!-- embed: src/app/shared/nav-menu/nav-menu.ts -->
+
 ```ts
 import { Component, computed, inject, input, output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
@@ -1495,11 +1565,13 @@ export class NavMenu {
   );
 }
 ```
+
 <!-- /embed -->
 
 **`src/app/shared/nav-menu/nav-menu.html`**
 
 <!-- embed: src/app/shared/nav-menu/nav-menu.html -->
+
 ```html
 <nav
   class="NavMenu"
@@ -1508,27 +1580,29 @@ export class NavMenu {
   aria-label="Main"
 >
   @for (destination of destinations(); track destination.path) {
-    <a
-      class="NavMenu-item"
-      [routerLink]="destination.path"
-      routerLinkActive="is-active"
-      ariaCurrentWhenActive="page"
-      [routerLinkActiveOptions]="{ exact: destination.path === '/' }"
-      (click)="navigated.emit()"
-    >
-      <span class="NavMenu-indicator">
-        <mat-icon class="NavMenu-icon">{{ destination.icon }}</mat-icon>
-      </span>
-      <span class="NavMenu-label">{{ destination.label }}</span>
-    </a>
+  <a
+    class="NavMenu-item"
+    [routerLink]="destination.path"
+    routerLinkActive="is-active"
+    ariaCurrentWhenActive="page"
+    [routerLinkActiveOptions]="{ exact: destination.path === '/' }"
+    (click)="navigated.emit()"
+  >
+    <span class="NavMenu-indicator">
+      <mat-icon class="NavMenu-icon">{{ destination.icon }}</mat-icon>
+    </span>
+    <span class="NavMenu-label">{{ destination.label }}</span>
+  </a>
   }
 </nav>
 ```
+
 <!-- /embed -->
 
 **`src/app/shared/nav-menu/nav-menu.scss`**
 
 <!-- embed: src/app/shared/nav-menu/nav-menu.scss -->
+
 ```scss
 // Material 3 navigation, in two shapes that share one list:
 //   .is-rail   — 56x32 active pill with the label beneath (medium windows up)
@@ -1686,11 +1760,13 @@ export class NavMenu {
   outline: none;
 }
 ```
+
 <!-- /embed -->
 
 **`src/app/shared/nav-bar/nav-bar.ts`**
 
 <!-- embed: src/app/shared/nav-bar/nav-bar.ts -->
+
 ```ts
 import { Component, inject, input, output, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
@@ -1732,42 +1808,46 @@ export class NavBar {
   }
 }
 ```
+
 <!-- /embed -->
 
 **`src/app/shared/nav-bar/nav-bar.html`**
 
 <!-- embed: src/app/shared/nav-bar/nav-bar.html -->
+
 ```html
 <header class="NavBar" [class.is-scrolled]="scrolled()">
   <div class="NavBar-inner">
     @if (showMenuButton()) {
-      <button
-        matIconButton
-        type="button"
-        class="NavBar-menu"
-        aria-label="Open navigation menu"
-        (click)="menuRequested.emit()"
-      >
-        <mat-icon>menu</mat-icon>
-      </button>
+    <button
+      matIconButton
+      type="button"
+      class="NavBar-menu"
+      aria-label="Open navigation menu"
+      (click)="menuRequested.emit()"
+    >
+      <mat-icon>menu</mat-icon>
+    </button>
     }
 
     <a class="NavBar-brand" routerLink="/">AppName</a>
     <span class="App-spacer"></span>
 
     @if (auth.isSignedIn()) {
-      <app-profile-menu />
+    <app-profile-menu />
     } @else {
-      <button matButton="tonal" type="button" (click)="signIn()">Sign in</button>
+    <button matButton="tonal" type="button" (click)="signIn()">Sign in</button>
     }
   </div>
 </header>
 ```
+
 <!-- /embed -->
 
 **`src/app/shared/nav-bar/nav-bar.scss`**
 
 <!-- embed: src/app/shared/nav-bar/nav-bar.scss -->
+
 ```scss
 @use 'ui';
 
@@ -1822,11 +1902,13 @@ export class NavBar {
   }
 }
 ```
+
 <!-- /embed -->
 
 **`src/app/shared/profile-menu/profile-menu.ts`**
 
 <!-- embed: src/app/shared/profile-menu/profile-menu.ts -->
+
 ```ts
 import { Component, computed, inject } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
@@ -1858,11 +1940,13 @@ export class ProfileMenu {
   }
 }
 ```
+
 <!-- /embed -->
 
 **`src/app/shared/profile-menu/profile-menu.html`**
 
 <!-- embed: src/app/shared/profile-menu/profile-menu.html -->
+
 ```html
 <button
   class="ProfileMenu-trigger"
@@ -1873,20 +1957,20 @@ export class ProfileMenu {
   title="Account menu"
 >
   @if (initial(); as letter) {
-    <span class="ProfileMenu-avatar" aria-hidden="true">{{ letter }}</span>
+  <span class="ProfileMenu-avatar" aria-hidden="true">{{ letter }}</span>
   } @else {
-    <mat-icon class="ProfileMenu-avatar-icon">account_circle</mat-icon>
+  <mat-icon class="ProfileMenu-avatar-icon">account_circle</mat-icon>
   }
 </button>
 
 <mat-menu #menu="matMenu" xPosition="before">
   @if (currentUser.me(); as me) {
-    <div class="ProfileMenu-header">
-      <span class="ProfileMenu-name">{{ me.name }}</span>
-      @if (me.email) {
-        <span class="ProfileMenu-email">{{ me.email }}</span>
-      }
-    </div>
+  <div class="ProfileMenu-header">
+    <span class="ProfileMenu-name">{{ me.name }}</span>
+    @if (me.email) {
+    <span class="ProfileMenu-email">{{ me.email }}</span>
+    }
+  </div>
   }
   <a mat-menu-item routerLink="/profile">
     <mat-icon>person</mat-icon>
@@ -1898,11 +1982,13 @@ export class ProfileMenu {
   </button>
 </mat-menu>
 ```
+
 <!-- /embed -->
 
 **`src/app/shared/profile-menu/profile-menu.scss`**
 
 <!-- embed: src/app/shared/profile-menu/profile-menu.scss -->
+
 ```scss
 @use 'ui';
 
@@ -1969,11 +2055,13 @@ export class ProfileMenu {
   }
 }
 ```
+
 <!-- /embed -->
 
 **`src/app/app.ts`**
 
 <!-- embed: src/app/app.ts -->
+
 ```ts
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { A11yModule } from '@angular/cdk/a11y';
@@ -2024,20 +2112,22 @@ export class App {
   }
 }
 ```
+
 <!-- /embed -->
 
 **`src/app/app.html`**
 
 <!-- embed: src/app/app.html -->
+
 ```html
 <div class="AppShell">
   <app-nav-bar [showMenuButton]="showMenuButton()" (menuRequested)="openMenu()" />
 
   <div class="AppShell-body">
     @if (showRail()) {
-      <aside class="AppShell-rail">
-        <app-nav-menu variant="rail" />
-      </aside>
+    <aside class="AppShell-rail">
+      <app-nav-menu variant="rail" />
+    </aside>
     }
 
     <div class="AppShell-main">
@@ -2047,35 +2137,37 @@ export class App {
   </div>
 
   @if (showMenuButton() && menuOpen()) {
-    <div
-      class="AppShell-scrim"
-      aria-hidden="true"
-      animate.enter="AppShell-scrim-enter"
-      animate.leave="AppShell-scrim-leave"
-      (click)="closeMenu()"
-    ></div>
-    <aside
-      class="AppShell-drawer"
-      role="dialog"
-      aria-modal="true"
-      aria-label="Navigation"
-      cdkTrapFocus
-      [cdkTrapFocusAutoCapture]="true"
-      animate.enter="AppShell-drawer-enter"
-      animate.leave="AppShell-drawer-leave"
-      (keydown.escape)="closeMenu()"
-    >
-      <p class="AppShell-drawer-title">AppName</p>
-      <app-nav-menu variant="drawer" (navigated)="closeMenu()" />
-    </aside>
+  <div
+    class="AppShell-scrim"
+    aria-hidden="true"
+    animate.enter="AppShell-scrim-enter"
+    animate.leave="AppShell-scrim-leave"
+    (click)="closeMenu()"
+  ></div>
+  <aside
+    class="AppShell-drawer"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Navigation"
+    cdkTrapFocus
+    [cdkTrapFocusAutoCapture]="true"
+    animate.enter="AppShell-drawer-enter"
+    animate.leave="AppShell-drawer-leave"
+    (keydown.escape)="closeMenu()"
+  >
+    <p class="AppShell-drawer-title">AppName</p>
+    <app-nav-menu variant="drawer" (navigated)="closeMenu()" />
+  </aside>
   }
 </div>
 ```
+
 <!-- /embed -->
 
 **`src/app/app.scss`**
 
 <!-- embed: src/app/app.scss -->
+
 ```scss
 // Bar on top; below it the navigation rail (medium windows up) beside the
 // routed page. The page column stretches so a page's own empty space sits
@@ -2199,10 +2291,11 @@ export class App {
   }
 }
 ```
+
 <!-- /embed -->
 
-
 Shell notes:
+
 - `NavMenu` reads `CurrentUserStore.link('admin')` for `adminOnly` destinations and
   `App` reads `AuthStore.isSignedIn()`. Swap those two reads for your app's
   role/auth check; nothing else in the shell knows about them.
@@ -2213,11 +2306,13 @@ Shell notes:
   blocks with the full class name.
 
 ### 5. Screen recipes
+
 Each recipe is the M3 answer to a recurring need. Class names are examples — use
 your component's own namespace.
 
 **Page skeleton.** A route's top-level element carries `.App-page` beside its own
 class; the title is the page's only `h1`.
+
 ```html
 <div class="TodosList App-page">
   <header class="TodosList-header">
@@ -2230,33 +2325,52 @@ class; the title is the page's only `h1`.
   </a>
 </div>
 ```
+
 ```scss
 @use 'ui';
 .TodosList {
-  display: flex; flex-direction: column; align-items: flex-start; gap: 16px;
-  &-title { @include ui.page-title; }
-  &-fab { @include ui.fab-position; }
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  &-title {
+    @include ui.page-title;
+  }
+  &-fab {
+    @include ui.fab-position;
+  }
 }
 ```
 
 **Grouped list** (todos, groups, members, admin tools, tags). One surface, hairlines
 between rows, a 72px two-line row, leading control/avatar, trailing actions.
 Leave clearance for the FAB (`margin-bottom: 72px`) on FAB pages.
+
 ```scss
 &-items {
-  align-self: stretch; margin: 0 0 72px; padding: 0; list-style: none;
+  align-self: stretch;
+  margin: 0 0 72px;
+  padding: 0;
+  list-style: none;
   border-radius: var(--mat-sys-corner-large);
   background: var(--mat-sys-surface-container-low);
   overflow: hidden;
 }
 &-item {
-  display: flex; align-items: center; gap: 4px; min-height: 72px; padding: 8px 8px 8px 4px;
-  & + & { border-top: 1px solid var(--mat-sys-outline-variant); }
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 72px;
+  padding: 8px 8px 8px 4px;
+  & + & {
+    border-top: 1px solid var(--mat-sys-outline-variant);
+  }
 }
 ```
+
 A row that is itself a link uses `@include ui.state-layer(var(--mat-sys-on-surface));`
 plus a focus outline with a negative offset (`outline-offset: -3px`) so it isn't
-clipped by the list's `overflow: hidden`. A list of *actionable state* (todos)
+clipped by the list's `overflow: hidden`. A list of _actionable state_ (todos)
 uses a leading toggle icon button (`radio_button_unchecked` → `check_circle` with
 `is-filled`), strikes the title through and dims the row when done, and shows an
 overdue due-date in `error`.
@@ -2269,6 +2383,7 @@ font: var(--mat-sys-title-medium); text-transform: uppercase;`. Use
 
 **Tonal panel for a short form** (create group, add tag, post composer). Not a
 card, not a dialog — an inline panel that opens above the list.
+
 ```scss
 &-form {
   padding: 16px;
@@ -2276,6 +2391,7 @@ card, not a dialog — an inline panel that opens above the list.
   background: var(--mat-sys-surface-container-low);
 }
 ```
+
 Fields are `ngx-forms` field components, or a whole `DynamicForm` (see "Shared
 libraries"). They already render `mat-form-field appearance="outline"
 subscriptSizing="dynamic"`. Actions right-aligned: text **Cancel**, filled
@@ -2291,35 +2407,56 @@ The region being filled carries `aria-busy="true"`. Never bare "Loading…" text
 and no spinner for content.
 
 **Error / notice banner.**
+
 ```scss
-&-error { @include ui.banner(error); }   // <p class="X-error" role="alert">…</p>
+&-error {
+  @include ui.banner(error);
+} // <p class="X-error" role="alert">…</p>
 ```
 
 **Filter → segmented button; sections → tabs.** A handful of exclusive filters
 (`All / New / Active / Closed`) is a `mat-button-toggle-group` (M3 segmented
-button; shows a check on the selected one). Switching *sections of one page*
+button; shows a check on the selected one). Switching _sections of one page_
 (Posts / Members / Followers) is M3 primary tabs:
+
 ```html
 <nav mat-tab-nav-bar aria-label="Sections" [tabPanel]="panel">
   <a mat-tab-link [active]="section() === 'posts'" (click)="section.set('posts')">Posts</a>
-  <a mat-tab-link [active]="section() === 'members'" (click)="section.set('members')">Members (24)</a>
+  <a mat-tab-link [active]="section() === 'members'" (click)="section.set('members')"
+    >Members (24)</a
+  >
 </nav>
 <mat-tab-nav-panel #panel> <!-- the section's content --> </mat-tab-nav-panel>
 ```
 
 **Overflow menu** for rarely-used and destructive actions, beside at most one
 primary and one secondary visible button:
+
 ```html
-<button matIconButton type="button" aria-label="More group actions" title="More" [matMenuTriggerFor]="more">
+<button
+  matIconButton
+  type="button"
+  aria-label="More group actions"
+  title="More"
+  [matMenuTriggerFor]="more"
+>
   <mat-icon>more_vert</mat-icon>
 </button>
 <mat-menu #more="matMenu" xPosition="before">
-  <button mat-menu-item type="button" (click)="edit()"><mat-icon>edit</mat-icon><span>Edit group</span></button>
-  <button mat-menu-item type="button" class="X-danger" (click)="remove()"><mat-icon>delete</mat-icon><span>Delete group</span></button>
+  <button mat-menu-item type="button" (click)="edit()">
+    <mat-icon>edit</mat-icon><span>Edit group</span>
+  </button>
+  <button mat-menu-item type="button" class="X-danger" (click)="remove()">
+    <mat-icon>delete</mat-icon><span>Delete group</span>
+  </button>
 </mat-menu>
 ```
+
 ```scss
-&-danger { --mat-menu-item-label-text-color: var(--mat-sys-error); --mat-menu-item-icon-color: var(--mat-sys-error); }
+&-danger {
+  --mat-menu-item-label-text-color: var(--mat-sys-error);
+  --mat-menu-item-icon-color: var(--mat-sys-error);
+}
 ```
 
 **Confirmation dialog.** `MatDialog` + a shared `ConfirmDialog`. A destructive
@@ -2396,6 +2533,7 @@ max ~20ch, one supporting line at `max-width: 52ch`, one filled button. Nothing
 else competes with it.
 
 ### 6. Gotchas (each one cost time)
+
 - **`matIconButton` has no filled appearance** — use `ui.filled-icon-button`.
   `matButton` does: `"filled" | "tonal" | "outlined" | "elevated"` (text is the
   default).
@@ -2454,6 +2592,7 @@ else competes with it.
   works because `me` is a class field.
 
 ### 7. Verifying and reviewing a screen
+
 Before merging a screen, check it at **390px and 1280px, light and dark**.
 Because most screens sit behind sign-in, verify visually with a throwaway harness
 rather than by hand: a scratch copy of the app (outside the repo) whose `AuthStore`
@@ -2466,6 +2605,7 @@ restore, rail active state and `aria-current`, resize across 600px, no console
 errors with view transitions on.
 
 Review checklist:
+
 - [ ] Only `--mat-sys-*` tokens and `--app-*` variables; no hex, no raw radii, no shadows.
 - [ ] Every container has its `on-` pair; reads in dark.
 - [ ] One filled button; create action is a FAB; rare actions in an overflow menu.
@@ -2487,6 +2627,7 @@ Review checklist:
 - [ ] `npm run docs:check` passes.
 
 ## Component SCSS class naming
+
 Every class in a component stylesheet is namespaced with the component's
 class name (PascalCase, exactly as it appears in the `.ts`), then a
 single **flat, kebab-case suffix**. No BEM `__` / `--`, no SMACSS-style
@@ -2497,13 +2638,13 @@ nesting past one level. Example — component class `UserDashboard`, in
 - **One** root `.ComponentName { }` block. Inside it, `&-…` selectors go
   two levels deep at most:
   1. the flat, kebab-case suffix (`&-container`, `&-rows`);
-  2. one nested selector on *that* element for its own state or
+  2. one nested selector on _that_ element for its own state or
      pseudo-class/element — `&:hover`, `&.is-active`,
      `&.is-active::after`, `&:hover, &.is-open`.
-  A trailing pseudo-class or child/descendant combinator written
-  directly on the level-1 selector (`&-edit:hover`, `&-rows > div`,
-  `&-rows dd`) still counts as level 1, not a nested rule.
-  **Never nest a third level of `&`.**
+     A trailing pseudo-class or child/descendant combinator written
+     directly on the level-1 selector (`&-edit:hover`, `&-rows > div`,
+     `&-rows dd`) still counts as level 1, not a nested rule.
+     **Never nest a third level of `&`.**
 - Prefer giving an element **its own** `is-*` state class over reaching
   across to a relative's — bind it in the template alongside whatever
   else already drives the state (e.g. a chevron that flips with its
@@ -2554,6 +2695,7 @@ nesting past one level. Example — component class `UserDashboard`, in
   rule: its host element, not its root `div`, is the layout item.)
 
 ## Layout: mobile-first, max width, centered
+
 This app is used from a phone as much as from a
 desktop — layout is mobile-first (base styles target the smallest
 viewport, wider-viewport rules layer on top via `bp.up()`, never the
@@ -2569,7 +2711,7 @@ reverse), and content never stretches edge-to-edge on a wide monitor.
   `--app-gutter` (`16px` on compact windows, `24px` from `sm` up — M3's
   margins) as the one shared source of truth, plus an
   `.App-page` utility class (`max-width: var(--app-page-max-width);
-  margin: 0 auto; padding: var(--app-gutter);`) and an `.App-spacer`
+margin: 0 auto; padding: var(--app-gutter);`) and an `.App-spacer`
   utility (`flex: 1 1 auto`, for pushing a flex sibling to the far end —
   the app bar uses it to park the account button at the end).
 - Apply `.App-page` to a route's top-level container **alongside** its
@@ -2596,6 +2738,7 @@ reverse), and content never stretches edge-to-edge on a wide monitor.
   list can scroll inside it.
 
 ## Shared SCSS mixins
+
 Keep shared SCSS mixins in `src/styles/`, wired onto the Sass include
 path via `stylePreprocessorOptions.includePaths: ["src/styles"]` in
 `angular.json`'s `build.options` (needed once per app — without it,

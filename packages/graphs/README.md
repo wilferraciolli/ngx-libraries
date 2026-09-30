@@ -22,8 +22,8 @@ import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 export const appConfig: ApplicationConfig = {
   providers: [
     // ...
-    provideCharts(withDefaultRegisterables())
-  ]
+    provideCharts(withDefaultRegisterables()),
+  ],
 };
 ```
 
@@ -39,7 +39,7 @@ import { BarGraph, graphConfig } from '@wiltech-labs/ngx-graphs';
 @Component({
   selector: 'app-sales-chart',
   imports: [BarGraph],
-  template: `<ngx-bar-graph [graphDef]="salesByQuarter" />`
+  template: `<ngx-bar-graph [graphDef]="salesByQuarter" />`,
 })
 export class SalesChartComponent {
   protected readonly salesByQuarter = graphConfig()
@@ -107,16 +107,16 @@ protected readonly clusterSizes = pointGraphConfig()
 
 ## Graph types
 
-| Component | Chart.js type | Data shape |
-|---|---|---|
-| `BarGraph` | `bar` | `GraphDef` |
-| `LineGraph` | `line` | `GraphDef` |
-| `PieGraph` | `pie` | `GraphDef` |
-| `DoughnutGraph` | `doughnut` | `GraphDef` |
-| `PolarAreaGraph` | `polarArea` | `GraphDef` |
-| `RadarGraph` | `radar` | `GraphDef` |
-| `BubbleGraph` | `bubble` | `PointGraphDef` |
-| `ScatterGraph` | `scatter` | `PointGraphDef` |
+| Component        | Chart.js type | Data shape      |
+| ---------------- | ------------- | --------------- |
+| `BarGraph`       | `bar`         | `GraphDef`      |
+| `LineGraph`      | `line`        | `GraphDef`      |
+| `PieGraph`       | `pie`         | `GraphDef`      |
+| `DoughnutGraph`  | `doughnut`    | `GraphDef`      |
+| `PolarAreaGraph` | `polarArea`   | `GraphDef`      |
+| `RadarGraph`     | `radar`       | `GraphDef`      |
+| `BubbleGraph`    | `bubble`      | `PointGraphDef` |
+| `ScatterGraph`   | `scatter`     | `PointGraphDef` |
 
 ## `GraphDef`
 
@@ -127,7 +127,7 @@ interface GraphSeries {
 }
 
 interface GraphDef {
-  labels: string[];  // categories (bar/line/radar axes) or slice labels (pie/doughnut/polarArea)
+  labels: string[]; // categories (bar/line/radar axes) or slice labels (pie/doughnut/polarArea)
   series: GraphSeries[];
   title?: string;
 }
@@ -139,7 +139,7 @@ interface GraphDef {
 interface PointDatum {
   x: number;
   y: number;
-  r?: number;         // bubble radius — ignored by ScatterGraph
+  r?: number; // bubble radius — ignored by ScatterGraph
 }
 
 interface PointSeries {

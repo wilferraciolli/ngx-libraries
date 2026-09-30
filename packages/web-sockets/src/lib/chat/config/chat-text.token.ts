@@ -26,7 +26,7 @@ export const DEFAULT_CHAT_TEXT: ChatText = {
   clientDisconnected: 'A client disconnected',
   clientTyping: (clientName) => `${clientName} is typing…`,
   error: (message) => `Error: ${message}`,
-  connectionError: (message) => `Connection error: ${message}`
+  connectionError: (message) => `Connection error: ${message}`,
 };
 
 /** A plain function the app supplies, read fresh on every read — see `NGX_CHAT_TEXT`. */
@@ -54,5 +54,5 @@ export type ChatTextResolver = () => ChatText;
  * switch despite being "just a function" from this package's point of view.
  */
 export const NGX_CHAT_TEXT = new InjectionToken<ChatTextResolver>('NGX_CHAT_TEXT', {
-  factory: () => () => DEFAULT_CHAT_TEXT
+  factory: () => () => DEFAULT_CHAT_TEXT,
 });

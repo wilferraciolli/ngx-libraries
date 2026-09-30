@@ -1,13 +1,18 @@
 <div class="demo-container">
   <h2>Dynamic Forms Demo</h2>
-  <p class="subtitle">Configuration-driven forms built with the DynamicForm component from @wiltech-labs/ngx-forms</p>
+  <p class="subtitle">
+    Configuration-driven forms built with the DynamicForm component from @wiltech-labs/ngx-forms
+  </p>
 
   <mat-tab-group>
     <!-- ============ FLIGHTS TAB ============ -->
     <mat-tab label="Flight Form">
       <div class="tab-content">
         <h3>Flight Booking</h3>
-        <p>Demonstrates: text, instant date-time, checkbox fields with required/minLength/maxLength validation.</p>
+        <p>
+          Demonstrates: text, instant date-time, checkbox fields with required/minLength/maxLength
+          validation.
+        </p>
 
         <ngx-dynamic-form
           [metaInfo]="flightFormConfig.fields"
@@ -30,7 +35,7 @@
         </div>
 
         @if (flightSubmitted(); as data) {
-          <mat-divider/>
+          <mat-divider />
           <div class="response-section">
             <strong>Submitted Data:</strong>
             <pre>{{ data | json }}</pre>
@@ -43,7 +48,9 @@
     <mat-tab label="Appointment Form">
       <div class="tab-content">
         <h3>Book an Appointment</h3>
-        <p>Demonstrates: text, a horizontal radio, business date, business time, and number fields.</p>
+        <p>
+          Demonstrates: text, a horizontal radio, business date, business time, and number fields.
+        </p>
 
         <ngx-dynamic-form
           [metaInfo]="appointmentFormConfig.fields"
@@ -66,7 +73,7 @@
         </div>
 
         @if (appointmentSubmitted(); as data) {
-          <mat-divider/>
+          <mat-divider />
           <div class="response-section">
             <strong>Submitted Data:</strong>
             <pre>{{ data | json }}</pre>
@@ -79,7 +86,10 @@
     <mat-tab label="All Field Types">
       <div class="tab-content">
         <h3>Every Field Type</h3>
-        <p>Demonstrates: text (with a pattern), email, password, search, business date, business time, instant date-time, radio, select, checkbox, number, range, textarea, and code.</p>
+        <p>
+          Demonstrates: text (with a pattern), email, password, search, business date, business
+          time, instant date-time, radio, select, checkbox, number, range, textarea, and code.
+        </p>
 
         <ngx-dynamic-form
           [metaInfo]="allFieldsFormConfig.fields"
@@ -102,7 +112,7 @@
         </div>
 
         @if (allFieldsSubmitted(); as data) {
-          <mat-divider/>
+          <mat-divider />
           <div class="response-section">
             <strong>Submitted Data:</strong>
             <pre>{{ data | json }}</pre>
@@ -118,7 +128,8 @@
         <p>
           <strong>Instant date-time</strong> stores an exact moment as a UTC instant
           (<code>YYYY-MM-DDThh:mm:ssZ</code>) and edits it in a timezone.
-          <strong>Business date</strong> (<code>YYYY-MM-DD</code>) and <strong>business time</strong>
+          <strong>Business date</strong> (<code>YYYY-MM-DD</code>) and
+          <strong>business time</strong>
           (<code>HH:mm</code>) ignore timezones entirely. All three display in the chosen locale,
           not the browser's.
         </p>
@@ -128,7 +139,8 @@
             <mat-label>Timezone (instant only)</mat-label>
             <mat-select
               [value]="selectedTimezone()"
-              (selectionChange)="selectedTimezone.set($event.value)">
+              (selectionChange)="selectedTimezone.set($event.value)"
+            >
               @for (tz of timezones; track tz.id) {
                 <mat-option [value]="tz.id">{{ tz.value }}</mat-option>
               }
@@ -139,7 +151,8 @@
             <mat-label>Locale (all fields)</mat-label>
             <mat-select
               [value]="selectedLocale()"
-              (selectionChange)="selectedLocale.set($event.value)">
+              (selectionChange)="selectedLocale.set($event.value)"
+            >
               @for (locale of locales; track locale.id) {
                 <mat-option [value]="locale.id">{{ locale.value }}</mat-option>
               }
@@ -168,14 +181,14 @@
         </div>
 
         @if (dateTimeSubmitted(); as data) {
-          <mat-divider/>
+          <mat-divider />
           <div class="response-section">
             <strong>Submitted Data:</strong>
             <pre>{{ data | json }}</pre>
           </div>
         }
 
-        <mat-divider/>
+        <mat-divider />
         <div class="utc-info-section">
           <h4>The appointment instant in each timezone:</h4>
           <ul>
@@ -184,8 +197,8 @@
             }
           </ul>
           <p class="utc-tip">
-            Try Europe/London with 31/03/2024 01:30 (does not exist, clocks go forward)
-            or 27/10/2024 01:30 (happens twice, clocks go back).
+            Try Europe/London with 31/03/2024 01:30 (does not exist, clocks go forward) or
+            27/10/2024 01:30 (happens twice, clocks go back).
           </p>
         </div>
       </div>
@@ -196,14 +209,21 @@
       <div class="tab-content">
         <h3>Field Components Without DynamicForm</h3>
         <p>
-          Every field component takes a <code>[fieldDef]</code> and a <code>[field]</code>, so you can place
-          them one by one in your own layout — no Save/Clear buttons, and the model can be any plain object.
+          Every field component takes a <code>[fieldDef]</code> and a <code>[field]</code>, so you
+          can place them one by one in your own layout — no Save/Clear buttons, and the model can be
+          any plain object.
         </p>
 
         <div class="standalone-fields">
           <ngx-text-field [fieldDef]="newsletterFields.email" [field]="newsletterForm.email" />
-          <ngx-business-date-field [fieldDef]="newsletterFields.startDate" [field]="newsletterForm.startDate" />
-          <ngx-select-field [fieldDef]="newsletterFields.frequency" [field]="newsletterForm.frequency" />
+          <ngx-business-date-field
+            [fieldDef]="newsletterFields.startDate"
+            [field]="newsletterForm.startDate"
+          />
+          <ngx-select-field
+            [fieldDef]="newsletterFields.frequency"
+            [field]="newsletterForm.frequency"
+          />
           <ngx-checkbox-field [fieldDef]="newsletterFields.agree" [field]="newsletterForm.agree" />
         </div>
 
@@ -225,15 +245,26 @@
 
   <div class="info-section">
     <h3>About Dynamic Forms</h3>
-    <p>
-      The DynamicForm component provides a configuration-driven approach to building forms:
-    </p>
+    <p>The DynamicForm component provides a configuration-driven approach to building forms:</p>
     <ul>
-      <li><strong>Schema-based:</strong> Define form structure with an array of field definitions</li>
-      <li><strong>Type-safe:</strong> Full TypeScript support with generics extending BaseSchema</li>
-      <li><strong>Flexible:</strong> Supports text, email, password, search, radio, select, checkbox, number, range, textarea, code, business date, business time, and instant date-time fields</li>
-      <li><strong>Validation:</strong> Built-in required, minLength/maxLength, min/max, email, pattern and date/time range rules with inline error display</li>
-      <li><strong>Signals-based:</strong> Built on Angular's experimental Signals Forms API (<code>@angular/forms/signals</code>)</li>
+      <li>
+        <strong>Schema-based:</strong> Define form structure with an array of field definitions
+      </li>
+      <li>
+        <strong>Type-safe:</strong> Full TypeScript support with generics extending BaseSchema
+      </li>
+      <li>
+        <strong>Flexible:</strong> Supports text, email, password, search, radio, select, checkbox,
+        number, range, textarea, code, business date, business time, and instant date-time fields
+      </li>
+      <li>
+        <strong>Validation:</strong> Built-in required, minLength/maxLength, min/max, email, pattern
+        and date/time range rules with inline error display
+      </li>
+      <li>
+        <strong>Signals-based:</strong> Built on Angular's experimental Signals Forms API
+        (<code>@angular/forms/signals</code>)
+      </li>
     </ul>
     <p>This approach reduces boilerplate and makes forms more maintainable and testable.</p>
   </div>

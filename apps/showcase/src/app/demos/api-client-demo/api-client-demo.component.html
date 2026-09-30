@@ -68,14 +68,30 @@
   <div class="info-section">
     <h3>About ApiClientService</h3>
     <p>
-      The ApiClientService provides a Promise-based wrapper around Angular's HttpClient, built around
-      the Wiltech API's HAL-ish envelope shape: <code>{{ '{ _data: { [rootKey]: resource } }' }}</code>.
+      The ApiClientService provides a Promise-based wrapper around Angular's HttpClient, built
+      around the Wiltech API's HAL-ish envelope shape:
+      <code>{{ '{ _data: { [rootKey]: resource } }' }}</code
+      >.
     </p>
     <ul>
-      <li><strong>Envelope unwrapping:</strong> <code>get</code>/<code>post</code>/<code>put</code> take a <code>rootKey</code> and return the unwrapped resource directly (not the raw envelope)</li>
-      <li><strong>Promise-based:</strong> methods are <code>async</code> — no manual <code>.subscribe()</code> needed</li>
-      <li><strong>HATEOAS-style links:</strong> <code>resolve()</code> / <code>requireLink()</code> turn a resource's action link into a callable URL</li>
-      <li><strong>Signals resources:</strong> <code>resource()</code> / <code>collectionResource()</code> wrap <code>httpResource</code> for reactive, reloadable reads</li>
+      <li>
+        <strong>Envelope unwrapping:</strong> <code>get</code>/<code>post</code>/<code>put</code>
+        take a <code>rootKey</code> and return the unwrapped resource directly (not the raw
+        envelope)
+      </li>
+      <li>
+        <strong>Promise-based:</strong> methods are <code>async</code> — no manual
+        <code>.subscribe()</code> needed
+      </li>
+      <li>
+        <strong>HATEOAS-style links:</strong> <code>resolve()</code> /
+        <code>requireLink()</code> turn a resource's action link into a callable URL
+      </li>
+      <li>
+        <strong>Signals resources:</strong> <code>resource()</code> /
+        <code>collectionResource()</code> wrap <code>httpResource</code> for reactive, reloadable
+        reads
+      </li>
     </ul>
   </div>
 </div>

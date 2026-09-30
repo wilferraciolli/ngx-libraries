@@ -12,8 +12,9 @@ so it links into a consuming Angular app the same way `@angular/*` packages
 do. Requires `@angular/core`/`@angular/common`/`rxjs` as peer dependencies.
 
 ### Sample payload
+
 ```json
-    
+
 {
 	"_data": {
 		"userProfile": {
@@ -34,7 +35,7 @@ do. Requires `@angular/core`/`@angular/common`/`rxjs` as peer dependencies.
 					"href": "/api/users/uuidsIds"
 				}
 			}
-		}		
+		}
 	},
 	"_metadata" :{
 	  "id": {
@@ -159,15 +160,19 @@ canDelete(provider: Provider): boolean {
 ```
 
 ```ts
-import { ApiErrorResponse, fieldErrorsByField, summarizeApiError } from '@wiltech-labs/ngx-api-client';
+import {
+  ApiErrorResponse,
+  fieldErrorsByField,
+  summarizeApiError,
+} from '@wiltech-labs/ngx-api-client';
 
 // in an HttpClient error handler:
 catchError((err: HttpErrorResponse) => {
   const apiError = err.error as ApiErrorResponse;
-  form.setErrors(fieldErrorsByField(apiError));   // { email: 'must be a valid email', ... }
+  form.setErrors(fieldErrorsByField(apiError)); // { email: 'must be a valid email', ... }
   toast.show(summarizeApiError(apiError));
   return throwError(() => apiError);
-})
+});
 ```
 
 ```ts

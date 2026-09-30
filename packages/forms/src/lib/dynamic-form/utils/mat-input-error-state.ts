@@ -8,7 +8,10 @@ import type { MatInput } from '@angular/material/input';
  * control bound to it. Picker inputs driven by hand have none, so this pushes the field's
  * touched && invalid state into them instead. Call from a constructor (needs an injection context).
  */
-export function syncMatInputErrorState(inputs: Signal<readonly MatInput[]>, state: Signal<FieldState<unknown>>): void {
+export function syncMatInputErrorState(
+  inputs: Signal<readonly MatInput[]>,
+  state: Signal<FieldState<unknown>>,
+): void {
   effect(() => {
     const hasError = state().touched() && state().invalid();
 

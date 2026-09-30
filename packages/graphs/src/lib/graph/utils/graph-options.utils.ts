@@ -18,7 +18,7 @@ export function graphOptions<TType extends ChartType>(
   theme: GraphTheme,
   layout: GraphLayout,
   legendEntries: number,
-  extra: ChartOptions<TType> = {} as ChartOptions<TType>
+  extra: ChartOptions<TType> = {} as ChartOptions<TType>,
 ): ChartOptions<TType> {
   const font = { family: theme.fontFamily, size: theme.fontSize };
   const ticks = { color: theme.mutedText, font };
@@ -28,24 +28,24 @@ export function graphOptions<TType extends ChartType>(
     layout === 'category'
       ? {
           x: { grid: { display: false }, border: { display: false }, ticks },
-          y: { beginAtZero: true, grid, border: { display: false }, ticks }
+          y: { beginAtZero: true, grid, border: { display: false }, ticks },
         }
       : layout === 'point'
         ? {
             x: { grid, border: { display: false }, ticks },
-            y: { grid, border: { display: false }, ticks }
+            y: { grid, border: { display: false }, ticks },
           }
-      : layout === 'radial'
-        ? {
-            r: {
-              grid: { color: theme.grid },
-              angleLines: { color: theme.grid },
-              pointLabels: { color: theme.text, font },
-              // Ring values collide with the marks; the tooltip and table view carry them.
-              ticks: { display: false }
+        : layout === 'radial'
+          ? {
+              r: {
+                grid: { color: theme.grid },
+                angleLines: { color: theme.grid },
+                pointLabels: { color: theme.text, font },
+                // Ring values collide with the marks; the tooltip and table view carry them.
+                ticks: { display: false },
+              },
             }
-          }
-        : undefined;
+          : undefined;
 
   return {
     responsive: true,
@@ -60,7 +60,7 @@ export function graphOptions<TType extends ChartType>(
       legend: {
         display: legendEntries > 1,
         position: 'bottom',
-        labels: { color: theme.text, font, usePointStyle: true, boxWidth: 8, boxHeight: 8 }
+        labels: { color: theme.text, font, usePointStyle: true, boxWidth: 8, boxHeight: 8 },
       },
       tooltip: {
         backgroundColor: theme.tooltipBackground,
@@ -70,8 +70,8 @@ export function graphOptions<TType extends ChartType>(
         bodyFont: font,
         cornerRadius: 4,
         padding: 8,
-        displayColors: legendEntries > 1
-      }
-    }
+        displayColors: legendEntries > 1,
+      },
+    },
   } as ChartOptions<TType>;
 }

@@ -4,8 +4,8 @@ import type { DateTimeDisambiguation } from '../constants/date-time.constants';
 import { parseInstant } from '../utils/date-time.utils';
 
 export interface ZonedInstantResult {
-  instant: string;          // UTC instant, Eg '2024-03-31T01:30:00Z'
-  notice: string | null;    // Set when the wall-clock time fell in a DST gap or overlap
+  instant: string; // UTC instant, Eg '2024-03-31T01:30:00Z'
+  notice: string | null; // Set when the wall-clock time fell in a DST gap or overlap
 }
 
 /**
@@ -32,7 +32,7 @@ export class ZonedDateTimeService {
     date: Date,
     time: Date,
     timeZone: string,
-    disambiguation: DateTimeDisambiguation = 'earlier'
+    disambiguation: DateTimeDisambiguation = 'earlier',
   ): ZonedInstantResult | null {
     try {
       const plainDateTime = Temporal.PlainDateTime.from({
@@ -40,7 +40,7 @@ export class ZonedDateTimeService {
         month: date.getMonth() + 1,
         day: date.getDate(),
         hour: time.getHours(),
-        minute: time.getMinutes()
+        minute: time.getMinutes(),
       });
       const earlier = plainDateTime.toZonedDateTime(timeZone, { disambiguation: 'earlier' });
       const later = plainDateTime.toZonedDateTime(timeZone, { disambiguation: 'later' });
@@ -53,16 +53,18 @@ export class ZonedDateTimeService {
       if (isGap) {
         return {
           instant: later.toInstant().toString(),
-          notice: `${formatWallClock(plainDateTime)} does not exist in ${timeZone} (clocks go forward). `
-            + `Using ${formatWallClock(later.toPlainDateTime())} (UTC${later.offset}) instead.`
+          notice:
+            `${formatWallClock(plainDateTime)} does not exist in ${timeZone} (clocks go forward). ` +
+            `Using ${formatWallClock(later.toPlainDateTime())} (UTC${later.offset}) instead.`,
         };
       }
 
       const chosen = disambiguation === 'later' ? later : earlier;
       return {
         instant: chosen.toInstant().toString(),
-        notice: `${formatWallClock(plainDateTime)} happens twice in ${timeZone} (clocks go back). `
-          + `Using the ${chosen === earlier ? 'first' : 'second'} occurrence (UTC${chosen.offset}).`
+        notice:
+          `${formatWallClock(plainDateTime)} happens twice in ${timeZone} (clocks go back). ` +
+          `Using the ${chosen === earlier ? 'first' : 'second'} occurrence (UTC${chosen.offset}).`,
       };
     } catch {
       return null;
@@ -74,7 +76,10 @@ export class ZonedDateTimeService {
     return this.toZoned(instant, timeZone)?.offset ?? null;
   }
 
-  private toZoned(instant: string | null | undefined, timeZone: string): Temporal.ZonedDateTime | null {
+  private toZoned(
+    instant: string | null | undefined,
+    timeZone: string,
+  ): Temporal.ZonedDateTime | null {
     try {
       return parseInstant(instant)?.toZonedDateTimeISO(timeZone) ?? null;
     } catch {

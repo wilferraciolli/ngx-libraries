@@ -1,21 +1,21 @@
-<p>Approving holiday request for <strong>{{ data()?.employeeName }}</strong>.</p>
+<p>
+  Approving holiday request for <strong>{{ data()?.employeeName }}</strong
+  >.
+</p>
 
-<mat-form-field appearance="outline" style="width: 100%;">
+<mat-form-field appearance="outline" style="width: 100%">
   <mat-label>Note to employee (optional)</mat-label>
-  <textarea
-    matInput
-    [ngModel]="note()"
-    (ngModelChange)="onNoteChange($event)"
-    rows="3"
-  ></textarea>
+  <textarea matInput [ngModel]="note()" (ngModelChange)="onNoteChange($event)" rows="3"></textarea>
 </mat-form-field>
 
 <p>
-  <em>Type anything above, then click the shell's X button — you'll get the unsaved-changes prompt.
-  Leave it empty and X closes immediately.</em>
+  <em
+    >Type anything above, then click the shell's X button — you'll get the unsaved-changes prompt.
+    Leave it empty and X closes immediately.</em
+  >
 </p>
 
-<div style="display: flex; gap: 8px; justify-content: flex-end;">
+<div style="display: flex; gap: 8px; justify-content: flex-end">
   <button mat-button type="button" (click)="cancel()">Cancel</button>
   <button mat-flat-button type="button" (click)="save()">Approve</button>
 </div>

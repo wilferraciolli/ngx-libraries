@@ -9,7 +9,7 @@ let nextGradientId = 0;
   imports: [],
   templateUrl: './ai-sparkle-icon.html',
   styleUrl: './ai-sparkle-icon.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AiSparkleIcon {
   public readonly size = input('24px');

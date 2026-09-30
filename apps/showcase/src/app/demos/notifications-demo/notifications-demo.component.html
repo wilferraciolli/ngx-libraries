@@ -1,23 +1,30 @@
 <div class="demo-container">
   <h2>Notifications Demo</h2>
-  <p class="subtitle">A polling bell + badge + dropdown panel from ngx-notifications (in-memory fake data, no backend)</p>
+  <p class="subtitle">
+    A polling bell + badge + dropdown panel from ngx-notifications (in-memory fake data, no backend)
+  </p>
 
   <div class="form-section">
-    <p>Click the bell below. It starts with 2 unread notifications. Opening one marks it read
-    (the badge count drops); dismissing one removes it from the list entirely.</p>
+    <p>
+      Click the bell below. It starts with 2 unread notifications. Opening one marks it read (the
+      badge count drops); dismissing one removes it from the list entirely.
+    </p>
     <ngx-notifications>
       <ng-template let-notification>
         <strong>{{ notification.title }}</strong>
-        <p style="margin: 4px 0 0;">{{ notification.body }}</p>
+        <p style="margin: 4px 0 0">{{ notification.body }}</p>
       </ng-template>
     </ngx-notifications>
   </div>
 
   <div class="info-section">
     <h3>What's happening</h3>
-    <p>The provider in <code>main.ts</code> supplies an in-memory array instead of a real API — the
-    widget itself has no idea, since <code>fetchNotifications</code>/<code>dismissNotification</code>/
-    <code>openNotification</code> are just callbacks. It polls every 5 minutes in a real app; nothing
-    to see from that here in a short demo session.</p>
+    <p>
+      The provider in <code>main.ts</code> supplies an in-memory array instead of a real API — the
+      widget itself has no idea, since
+      <code>fetchNotifications</code>/<code>dismissNotification</code>/
+      <code>openNotification</code> are just callbacks. It polls every 5 minutes in a real app;
+      nothing to see from that here in a short demo session.
+    </p>
   </div>
 </div>

@@ -21,5 +21,5 @@ export type FormsLocaleResolver = () => string;
  * (see root `CLAUDE.md`'s "Inter-package deps").
  */
 export const NGX_FORMS_LOCALE = new InjectionToken<FormsLocaleResolver>('NGX_FORMS_LOCALE', {
-  factory: () => () => DEFAULT_DATE_TIME_LOCALE
+  factory: () => () => DEFAULT_DATE_TIME_LOCALE,
 });

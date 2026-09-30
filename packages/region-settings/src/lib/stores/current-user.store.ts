@@ -14,7 +14,10 @@ import type { Me, UserProfile } from '../models/current-user.model.js';
  * the defaults (`Me`/`UserProfile`) — most apps need neither type argument.
  */
 @Injectable({ providedIn: 'root' })
-export class CurrentUserStore<TMe extends Identifiable = Me, TProfile extends Identifiable = UserProfile> {
+export class CurrentUserStore<
+  TMe extends Identifiable = Me,
+  TProfile extends Identifiable = UserProfile,
+> {
   private readonly api = inject(ApiClientService);
   private readonly auth = inject(AuthStore);
   private readonly apiOrigin = inject(API_ORIGIN);
@@ -31,7 +34,9 @@ export class CurrentUserStore<TMe extends Identifiable = Me, TProfile extends Id
   );
 
   readonly profile: Signal<TProfile | undefined> = this.profileResource.value;
-  readonly loading = computed(() => this.meResource.isLoading() || this.profileResource.isLoading());
+  readonly loading = computed(
+    () => this.meResource.isLoading() || this.profileResource.isLoading(),
+  );
   readonly error = computed(() => this.meResource.error() ?? this.profileResource.error());
 
   /** Any link the user profile hands out, by name (`userSettings`, `notifications`, ...). Never

@@ -1,6 +1,14 @@
-import { EnvironmentProviders, inject, makeEnvironmentProviders, provideAppInitializer } from '@angular/core';
+import {
+  EnvironmentProviders,
+  inject,
+  makeEnvironmentProviders,
+  provideAppInitializer,
+} from '@angular/core';
 
-import { NGX_NOTIFICATIONS_CONFIG, NotificationsConfig } from '../config/notifications-config.model.js';
+import {
+  NGX_NOTIFICATIONS_CONFIG,
+  NotificationsConfig,
+} from '../config/notifications-config.model.js';
 import { NotificationsService } from '../services/notifications.service.js';
 
 /**

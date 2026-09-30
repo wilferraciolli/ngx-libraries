@@ -23,7 +23,7 @@ Peer dependencies: `@angular/core`, `@angular/common`, `rxjs`. This package also
 import { Component, inject } from '@angular/core';
 import { CurrentUserStore } from '@wiltech-labs/ngx-region-settings';
 
-@Component({ selector: 'app-nav-bar', /* ... */ })
+@Component({ selector: 'app-nav-bar' /* ... */ })
 export class NavBar {
   protected readonly currentUser = inject(CurrentUserStore);
 }
@@ -31,9 +31,9 @@ export class NavBar {
 
 ```html
 @if (currentUser.loading()) {
-  <span>Loading…</span>
+<span>Loading…</span>
 } @else if (currentUser.me(); as me) {
-  <span>{{ me.name }}</span>
+<span>{{ me.name }}</span>
 }
 ```
 
@@ -69,11 +69,11 @@ export class MySettingsPage {
 
 ```html
 @if (store.notAvailable()) {
-  <p>You don't have access to this screen.</p>
+<p>You don't have access to this screen.</p>
 } @else if (store.settings(); as settings) {
-  <!-- store.options() gives you {value, viewValue}[] per field, straight from the API's own
+<!-- store.options() gives you {value, viewValue}[] per field, straight from the API's own
        metadata — never a hardcoded <select> list -->
-  <p>Timezone: {{ settings.timezone }}</p>
+<p>Timezone: {{ settings.timezone }}</p>
 }
 ```
 
@@ -98,7 +98,10 @@ interface MyOrgSettings {
 }
 
 @Injectable()
-export class OrgSettingsStore extends RegionSettingsStore<MyOrgSettings, { reportingCurrency: string }> {
+export class OrgSettingsStore extends RegionSettingsStore<
+  MyOrgSettings,
+  { reportingCurrency: string }
+> {
   protected readonly root = 'orgSettings';
   protected profileLink(): ILink | undefined {
     return this.currentUser.link('orgSettings');

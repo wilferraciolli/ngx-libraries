@@ -12,7 +12,7 @@ import { FieldSubscript } from '../../shared/field-subscript/field-subscript';
   imports: [FormField, MatCheckbox, FieldSubscript],
   templateUrl: './checkbox-field.html',
   styleUrl: './checkbox-field.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CheckboxField {
   public readonly fieldDef = input.required<FieldDef>();

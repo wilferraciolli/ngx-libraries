@@ -6,7 +6,7 @@ export interface GraphsText {
 }
 
 export const DEFAULT_GRAPHS_TEXT: GraphsText = {
-  showData: 'Show data'
+  showData: 'Show data',
 };
 
 /** A plain function the app supplies, read fresh on every read — see `NGX_GRAPHS_TEXT`. */
@@ -28,5 +28,5 @@ export type GraphsTextResolver = () => GraphsText;
  * switch despite being "just a function" from this package's point of view.
  */
 export const NGX_GRAPHS_TEXT = new InjectionToken<GraphsTextResolver>('NGX_GRAPHS_TEXT', {
-  factory: () => () => DEFAULT_GRAPHS_TEXT
+  factory: () => () => DEFAULT_GRAPHS_TEXT,
 });

@@ -6,5 +6,5 @@ export enum SocketEventType {
   ERROR = 'error',
   ERROR_CONNECTION = 'connect_error',
   RECONNECT_ATTEMPT = 'reconnect_attempt',
-  RECONNECT_FAILED = 'reconnect_failed'
+  RECONNECT_FAILED = 'reconnect_failed',
 }

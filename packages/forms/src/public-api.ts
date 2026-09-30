@@ -21,11 +21,18 @@ export type { FieldDef, FieldOption } from './lib/dynamic-form/interfaces/field-
 
 // Dynamic Form Builder
 export { FormConfigBuilder, formConfig } from './lib/dynamic-form/builders/form-config.builder';
-export type { DateTimeFieldOptions, FieldName, FieldOptions } from './lib/dynamic-form/builders/form-config.builder';
+export type {
+  DateTimeFieldOptions,
+  FieldName,
+  FieldOptions,
+} from './lib/dynamic-form/builders/form-config.builder';
 
 // Dynamic Form Constants
 export { FormFieldType } from './lib/dynamic-form/constants/form-field.constant';
-export type { DateTimeConfig, DateTimeDisambiguation } from './lib/dynamic-form/constants/date-time.constants';
+export type {
+  DateTimeConfig,
+  DateTimeDisambiguation,
+} from './lib/dynamic-form/constants/date-time.constants';
 
 // Dynamic Form Config
 export { NGX_FORMS_LOCALE } from './lib/dynamic-form/config/forms-locale.token';
@@ -36,4 +43,8 @@ export { ZonedDateTimeService } from './lib/dynamic-form/services/zoned-date-tim
 export type { ZonedInstantResult } from './lib/dynamic-form/services/zoned-date-time.service';
 
 // Dynamic Form Utils
-export { createEmptyEntity, defineSchema, toSchema } from './lib/dynamic-form/utils/dynamic-form.utils';
+export {
+  createEmptyEntity,
+  defineSchema,
+  toSchema,
+} from './lib/dynamic-form/utils/dynamic-form.utils';

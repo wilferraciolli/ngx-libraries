@@ -28,41 +28,51 @@ bootstrapApplication(AppComponent, {
     provideCharts(withDefaultRegisterables()),
     {
       provide: API_ORIGIN,
-      useValue: 'http://localhost:8080'
+      useValue: 'http://localhost:8080',
     },
     provideTranslations({
       locales: ['en-GB', 'el-GR'],
       defaultLocale: 'en-GB',
-      dictionaries: { 'en-GB': en, 'el-GR': el }
+      dictionaries: { 'en-GB': en, 'el-GR': el },
     }),
     {
       provide: NGX_DATES_LOCALE,
       useFactory: () => {
         const translations = inject(TranslationsService);
         return () => translations.locale();
-      }
+      },
     },
     provideNotifications<DemoNotification>(() => {
       // Fake in-memory backend, not a real API — ngx-notifications has no idea, since it only ever
       // calls the three callbacks below.
       let items: DemoNotification[] = [
-        { id: '1', title: 'Holiday approved', body: 'Your holiday request for next week was approved.', read: false },
-        { id: '2', title: 'New comment', body: 'Someone commented on your pull request.', read: false },
-        { id: '3', title: 'Weekly digest', body: 'Your weekly summary is ready.', read: true }
+        {
+          id: '1',
+          title: 'Holiday approved',
+          body: 'Your holiday request for next week was approved.',
+          read: false,
+        },
+        {
+          id: '2',
+          title: 'New comment',
+          body: 'Someone commented on your pull request.',
+          read: false,
+        },
+        { id: '3', title: 'Weekly digest', body: 'Your weekly summary is ready.', read: true },
       ];
 
       return {
         fetchNotifications: async () => ({
           items: [...items],
-          unreadCount: items.filter((n) => !n.read).length
+          unreadCount: items.filter((n) => !n.read).length,
         }),
         dismissNotification: async (notification) => {
           items = items.filter((n) => n.id !== notification.id);
         },
         openNotification: (notification) => {
           items = items.map((n) => (n.id === notification.id ? { ...n, read: true } : n));
-        }
+        },
       };
-    })
-  ]
-}).catch(err => console.error(err));
+    }),
+  ],
+}).catch((err) => console.error(err));

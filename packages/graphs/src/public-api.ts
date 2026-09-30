@@ -15,11 +15,18 @@ export { ScatterGraph } from './lib/graph/components/scatter-graph/scatter-graph
 
 // Graph interfaces
 export type { GraphDef, GraphSeries } from './lib/graph/interfaces/graph-definition';
-export type { PointDatum, PointGraphDef, PointSeries } from './lib/graph/interfaces/point-graph-definition';
+export type {
+  PointDatum,
+  PointGraphDef,
+  PointSeries,
+} from './lib/graph/interfaces/point-graph-definition';
 
 // Graph builders
 export { GraphConfigBuilder, graphConfig } from './lib/graph/builders/graph-config.builder';
-export { PointGraphConfigBuilder, pointGraphConfig } from './lib/graph/builders/point-graph-config.builder';
+export {
+  PointGraphConfigBuilder,
+  pointGraphConfig,
+} from './lib/graph/builders/point-graph-config.builder';
 
 // Graph utils
 export { toChartData } from './lib/graph/utils/graph.utils';

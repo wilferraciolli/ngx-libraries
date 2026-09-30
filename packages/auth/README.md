@@ -28,9 +28,9 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor])),
     provideAuth({
       clerkPublishableKey: environment.clerkPublishableKey,
-      apiOrigin: environment.apiUrl
-    })
-  ]
+      apiOrigin: environment.apiUrl,
+    }),
+  ],
 };
 ```
 
@@ -44,16 +44,16 @@ one `provideHttpClient()` call per app.
 ```ts
 interface NgxAuthConfig {
   clerkPublishableKey: string; // Clerk Dashboard -> API Keys
-  apiOrigin: string;           // required — see "Why apiOrigin is required" below
-  jwtTemplate?: string;        // Clerk Dashboard -> Configure -> JWT Templates
-  redirectTo?: string;         // where authGuard sends a signed-out visitor; defaults to '/'
+  apiOrigin: string; // required — see "Why apiOrigin is required" below
+  jwtTemplate?: string; // Clerk Dashboard -> Configure -> JWT Templates
+  redirectTo?: string; // where authGuard sends a signed-out visitor; defaults to '/'
 }
 ```
 
 #### Why `apiOrigin` is required
 
 `authInterceptor` only attaches `Authorization: Bearer <token>` to a request whose URL starts with
-`apiOrigin`. There's no default — an empty/omitted value would match *every* request
+`apiOrigin`. There's no default — an empty/omitted value would match _every_ request
 (`'anything'.startsWith('')` is always `true`), which would leak your Clerk session token to any
 third-party call an app makes (an image host, an unrelated API, a CDN, ...). Stating your own API's
 origin explicitly is the whole point of the check.
@@ -72,7 +72,7 @@ it unset to use Clerk's default session token.
 import { Component, inject } from '@angular/core';
 import { AuthStore } from '@wiltech-labs/ngx-auth';
 
-@Component({ selector: 'app-nav-bar', /* ... */ })
+@Component({ selector: 'app-nav-bar' /* ... */ })
 export class NavBar {
   protected readonly auth = inject(AuthStore);
 
@@ -88,10 +88,10 @@ export class NavBar {
 
 ```html
 @if (auth.isSignedIn()) {
-  <span>{{ auth.user()?.firstName }}</span>
-  <button type="button" (click)="signOut()">Sign out</button>
+<span>{{ auth.user()?.firstName }}</span>
+<button type="button" (click)="signOut()">Sign out</button>
 } @else {
-  <button type="button" (click)="signIn()">Sign in</button>
+<button type="button" (click)="signIn()">Sign in</button>
 }
 ```
 
@@ -111,7 +111,7 @@ import { authGuard } from '@wiltech-labs/ngx-auth';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent }, // keep at least one route public
-  { path: 'settings', component: SettingsComponent, canActivate: [authGuard] }
+  { path: 'settings', component: SettingsComponent, canActivate: [authGuard] },
 ];
 ```
 

@@ -6,8 +6,22 @@
  * slots sit below 3:1 on the surface, which the table view every graph carries relieves.
  * Re-validate if you change a value or the order.
  */
-export const CATEGORICAL_LIGHT: readonly string[] = ['#00897b', '#eb6834', '#4a3aa7', '#eda100', '#e87ba4', '#2a78d6'];
-export const CATEGORICAL_DARK: readonly string[] = ['#12a3a8', '#d95926', '#9085e9', '#c98500', '#d55181', '#3987e5'];
+export const CATEGORICAL_LIGHT: readonly string[] = [
+  '#00897b',
+  '#eb6834',
+  '#4a3aa7',
+  '#eda100',
+  '#e87ba4',
+  '#2a78d6',
+];
+export const CATEGORICAL_DARK: readonly string[] = [
+  '#12a3a8',
+  '#d95926',
+  '#9085e9',
+  '#c98500',
+  '#d55181',
+  '#3987e5',
+];
 
 /** Point graphs put every series next to every other, so only the first three slots are safe. */
 export const MAX_POINT_SERIES = 3;

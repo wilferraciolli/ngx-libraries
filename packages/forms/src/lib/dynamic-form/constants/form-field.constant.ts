@@ -12,5 +12,5 @@ export enum FormFieldType {
   CODE = 'code',
   BUSINESS_DATE = 'business-date',
   BUSINESS_TIME = 'business-time',
-  INSTANT_DATE_TIME = 'instant-date-time'
+  INSTANT_DATE_TIME = 'instant-date-time',
 }

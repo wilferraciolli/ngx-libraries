@@ -4,6 +4,7 @@ Shared Angular data-visualization components — wraps `ng2-charts`/`chart.js` r
 charting from scratch. See root `../../CLAUDE.md` for repo-wide conventions.
 
 ## Layout
+
 ```
 src/
 ├── public-api.ts        # barrel — the entire public surface; nothing outside this is exported
@@ -26,6 +27,7 @@ src/
 ```
 
 ## Conventions
+
 - Real Angular constructs (`@Component`) — not framework-agnostic functions. Every known consumer
   is Angular, so idiomatic DI beats a generic-TS compromise.
 - One folder per concern under `src/lib/graph/` — don't let it go flat. A new concern (e.g. an
@@ -60,7 +62,7 @@ src/
   (scales by layout, legend only for > 1 entry, tooltip, fonts). `GraphFrame` (internal) renders the
   caption and the "Show data" table around every canvas — add shared markup there.
 - **`GraphFrame`'s "Show data" text comes from `NGX_GRAPHS_TEXT`** (`InjectionToken<() =>
-  GraphsText>`, added 2026-09-30), not a hardcoded string — the one piece of this package's own UI
+GraphsText>`, added 2026-09-30), not a hardcoded string — the one piece of this package's own UI
   text, everything else being app-supplied data. Same resolver-token pattern as `ngx-dates`'
   `NGX_DATES_LOCALE`/`ngx-forms`' `NGX_FORMS_LOCALE`: a plain function, so this package has no
   build-time dependency on `ngx-translations` (see root `CLAUDE.md`'s "Inter-package deps"). Read inside a
@@ -79,6 +81,7 @@ src/
   documented in this package's README, same spirit as `api-client`'s `API_ORIGIN` token.
 
 ## Status
+
 - All 8 non-mixed chart.js chart types covered: `BarGraph`, `LineGraph`, `PieGraph`,
   `DoughnutGraph`, `PolarAreaGraph`, `RadarGraph`, `BubbleGraph`, `ScatterGraph`.
 - Not yet published to npm — under development.

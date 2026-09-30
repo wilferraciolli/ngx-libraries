@@ -14,6 +14,7 @@ plural/ICU support, lazy-loading per scope, missing-key tooling, and an actively
 for the team not to have to own itself. See `NEXT_STEPS.md` (root) for the full decision history.
 
 ## Layout
+
 ```
 src/
 ├── public-api.ts        # barrel — the entire public surface; nothing outside this is exported
@@ -26,6 +27,7 @@ src/
 ```
 
 ## Conventions
+
 - Real Angular constructs (`@Injectable`, `@Pipe`) — not framework-agnostic functions. Every known
   consumer is Angular, so idiomatic DI beats a generic-TS compromise.
 - `@jsverse/transloco` is a regular `dependency` of this package (not a peer) — same reasoning as
@@ -55,7 +57,7 @@ src/
   every app that uses this package. `TPipe` reimplements the same small, documented mechanism under
   our own `t` name instead.
 - Missing key falls back to rendering the key itself (`missingHandler: { logMissingKey: true,
-  useFallbackTranslation: true, allowEmpty: false }` in `provideTranslations()`) — visible and debuggable,
+useFallbackTranslation: true, allowEmpty: false }` in `provideTranslations()`) — visible and debuggable,
   never a blank string.
 - Bundled dictionaries (`NgxTranslationsConfig.dictionaries`) are the default path, for a small, finite
   locale set — matches `resource-management-ui`'s own reasoning (no network round trip, no
@@ -67,6 +69,7 @@ src/
   take the current locale the same reactive way (i.e. from `TranslationsService.locale()`), not `LOCALE_ID`.
 
 ## Status
+
 - New package: `provideTranslations()`, `TranslationsService`, `TPipe`.
 - Not yet published to npm — under development.
 - No consumers yet. `resource-management-ui`'s `I18nStore`/`labels.ts` are candidates to migrate

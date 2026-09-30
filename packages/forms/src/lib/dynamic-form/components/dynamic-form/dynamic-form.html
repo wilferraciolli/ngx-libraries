@@ -54,7 +54,12 @@
 
   <div class="DynamicForm-actions">
     <button matButton type="button" (click)="clearForm()">{{ clearLabel() }}</button>
-    <button matButton="filled" type="button" [disabled]="dynamicForm()().invalid()" (click)="handleSubmit()">
+    <button
+      matButton="filled"
+      type="button"
+      [disabled]="dynamicForm()().invalid()"
+      (click)="handleSubmit()"
+    >
       {{ submitLabel() }}
     </button>
   </div>

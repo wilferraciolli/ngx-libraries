@@ -40,7 +40,9 @@ export class ApiClientService {
     url: string,
     payload: TPayload,
   ): Promise<TResource> {
-    const res = await firstValueFrom(this.http.post<SingleEnvelope<TRoot, TResource>>(url, payload));
+    const res = await firstValueFrom(
+      this.http.post<SingleEnvelope<TRoot, TResource>>(url, payload),
+    );
     return res._data[root];
   }
 

@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, type Signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+  type Signal,
+} from '@angular/core';
 import { BaseChartDirective } from 'ng2-charts';
 import type { ChartConfiguration } from 'chart.js';
 import type { GraphDef } from '../../interfaces/graph-definition';
@@ -15,7 +22,7 @@ import { GraphFrame } from '../graph-frame/graph-frame';
   imports: [BaseChartDirective, GraphFrame],
   templateUrl: './doughnut-graph.html',
   styleUrl: './doughnut-graph.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DoughnutGraph {
   private readonly theme = inject(GraphThemeService).theme;
@@ -23,11 +30,11 @@ export class DoughnutGraph {
   public readonly graphDef = input.required<GraphDef>();
 
   protected readonly chartData = computed<ChartConfiguration<'doughnut'>['data']>(() =>
-    toChartData<'doughnut'>(this.graphDef(), this.theme(), true)
+    toChartData<'doughnut'>(this.graphDef(), this.theme(), true),
   );
 
   protected readonly options: Signal<ChartConfiguration<'doughnut'>['options']> = computed(() =>
-    graphOptions<'doughnut'>(this.theme(), 'circular', this.graphDef().labels.length)
+    graphOptions<'doughnut'>(this.theme(), 'circular', this.graphDef().labels.length),
   );
 
   protected readonly table = computed(() => toGraphTable(this.graphDef()));

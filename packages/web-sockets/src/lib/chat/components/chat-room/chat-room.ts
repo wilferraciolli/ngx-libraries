@@ -7,7 +7,7 @@ import {
   computed,
   inject,
   input,
-  signal
+  signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Temporal } from 'temporal-polyfill';
@@ -32,7 +32,7 @@ const STATUS_MESSAGE_DURATION_MS = 2000;
   imports: [ChatMessageBubble],
   templateUrl: './chat-room.html',
   styleUrl: './chat-room.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChatRoom implements OnInit, OnDestroy {
   private readonly webSocket = inject(WebSocketService);
@@ -116,7 +116,7 @@ export class ChatRoom implements OnInit, OnDestroy {
 
     this.webSocket.send<ChatMessage>(
       SocketMessageType.MESSAGE,
-      this.buildMessage(text, ChatMessageType.COMMENT_ADDED)
+      this.buildMessage(text, ChatMessageType.COMMENT_ADDED),
     );
     this.draft.set('');
   }
@@ -124,11 +124,15 @@ export class ChatRoom implements OnInit, OnDestroy {
   private sendTyping(): void {
     this.webSocket.send<ChatMessage>(
       SocketMessageType.MESSAGE,
-      this.buildMessage('', ChatMessageType.USER_TYPING, false)
+      this.buildMessage('', ChatMessageType.USER_TYPING, false),
     );
   }
 
-  private buildMessage(text: string, messageType: ChatMessageType, replyToSender = true): ChatMessage {
+  private buildMessage(
+    text: string,
+    messageType: ChatMessageType,
+    replyToSender = true,
+  ): ChatMessage {
     return {
       id: crypto.randomUUID(),
       clientId: this.clientId(),
@@ -137,7 +141,7 @@ export class ChatRoom implements OnInit, OnDestroy {
       messageType,
       message: text,
       replyToSender,
-      timestamp: Temporal.Now.instant().toString({ smallestUnit: 'second' })
+      timestamp: Temporal.Now.instant().toString({ smallestUnit: 'second' }),
     };
   }
 

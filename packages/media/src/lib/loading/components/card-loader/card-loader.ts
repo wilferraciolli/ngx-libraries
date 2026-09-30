@@ -10,7 +10,7 @@ import { ContentLoader } from '../content-loader/content-loader';
   imports: [ContentLoader],
   templateUrl: './card-loader.html',
   styleUrl: './card-loader.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CardLoader {
   public readonly lines = input(2);

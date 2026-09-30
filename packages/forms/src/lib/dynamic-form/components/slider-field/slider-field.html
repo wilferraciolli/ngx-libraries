@@ -1,6 +1,9 @@
 <div class="SliderField-label">
   <span [id]="labelId">
-    {{ fieldDef().label }}@if (field()().required()) {<span aria-hidden="true"> *</span>}
+    {{ fieldDef().label }}
+    @if (field()().required()) {
+      <span aria-hidden="true"> *</span>
+    }
   </span>
   <span class="SliderField-value">{{ field()().value() }}</span>
 </div>
@@ -9,7 +12,8 @@
   discrete
   [min]="fieldDef().min ?? 0"
   [max]="fieldDef().max ?? 100"
-  [step]="fieldDef().step ?? 1">
+  [step]="fieldDef().step ?? 1"
+>
   <input matSliderThumb [formField]="field()" [attr.aria-labelledby]="labelId" />
 </mat-slider>
 <ngx-field-subscript [field]="field()" [hint]="fieldDef().hint" />

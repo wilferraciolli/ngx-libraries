@@ -29,8 +29,13 @@ const TIERS: RelativeTimeTier[] = [
   { unit: 'hour', secondsPerUnit: 3_600, thresholdSeconds: 86_400, refreshMs: 60_000 },
   { unit: 'day', secondsPerUnit: 86_400, thresholdSeconds: 86_400 * 7, refreshMs: 3_600_000 },
   { unit: 'week', secondsPerUnit: 86_400 * 7, thresholdSeconds: 86_400 * 30, refreshMs: 3_600_000 },
-  { unit: 'month', secondsPerUnit: 86_400 * 30, thresholdSeconds: 86_400 * 365, refreshMs: 3_600_000 },
-  { unit: 'year', secondsPerUnit: 86_400 * 365, thresholdSeconds: Infinity, refreshMs: 3_600_000 }
+  {
+    unit: 'month',
+    secondsPerUnit: 86_400 * 30,
+    thresholdSeconds: 86_400 * 365,
+    refreshMs: 3_600_000,
+  },
+  { unit: 'year', secondsPerUnit: 86_400 * 365, thresholdSeconds: Infinity, refreshMs: 3_600_000 },
 ];
 
 export interface RelativeTimeResult {
@@ -47,6 +52,6 @@ export function pickTier(diffSeconds: number): RelativeTimeResult {
   return {
     value: Math.round(diffSeconds / tier.secondsPerUnit),
     unit: tier.unit,
-    refreshMs: tier.refreshMs
+    refreshMs: tier.refreshMs,
   };
 }

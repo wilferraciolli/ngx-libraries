@@ -1,12 +1,16 @@
 <div class="RadioField-label" [id]="labelId">
-  {{ fieldDef().label }}@if (field()().required()) {<span aria-hidden="true"> *</span>}
+  {{ fieldDef().label }}
+  @if (field()().required()) {
+    <span aria-hidden="true"> *</span>
+  }
 </div>
 <mat-radio-group
   class="RadioField-group"
   [class.is-vertical]="fieldDef().orientation === 'vertical'"
   [attr.aria-orientation]="fieldDef().orientation ?? 'horizontal'"
   [formField]="field()"
-  [attr.aria-labelledby]="labelId">
+  [attr.aria-labelledby]="labelId"
+>
   @for (option of fieldDef().options ?? []; track option.value) {
     <mat-radio-button [value]="option.value">{{ option.label }}</mat-radio-button>
   }

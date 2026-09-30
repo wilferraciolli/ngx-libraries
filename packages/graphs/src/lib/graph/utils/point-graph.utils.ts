@@ -10,13 +10,13 @@ let warned = false;
  *  theme's categorical palette in order, each mark ringed in the surface colour so overlaps read. */
 export function toPointChartData<TType extends ChartType>(
   graphDef: PointGraphDef,
-  theme: GraphTheme = FALLBACK_GRAPH_THEME
+  theme: GraphTheme = FALLBACK_GRAPH_THEME,
 ): ChartData<TType> {
   if (graphDef.series.length > MAX_POINT_SERIES && !warned) {
     warned = true;
     console.warn(
       `[ngx-graphs] ${graphDef.series.length} point series: past ${MAX_POINT_SERIES}, overlapping ` +
-        'series stop being distinguishable. Split them into small multiples.'
+        'series stop being distinguishable. Split them into small multiples.',
     );
   }
 
@@ -26,7 +26,7 @@ export function toPointChartData<TType extends ChartType>(
       data: series.data,
       backgroundColor: seriesColor(theme, seriesIndex),
       borderColor: theme.surface,
-      borderWidth: 2
-    }))
+      borderWidth: 2,
+    })),
   } as unknown as ChartData<TType>;
 }

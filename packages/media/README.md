@@ -31,7 +31,7 @@ import { CardLoader } from '@wiltech-labs/ngx-media';
     } @else {
       <!-- real content -->
     }
-  `
+  `,
 })
 export class VideoListComponent {
   // ...
@@ -47,9 +47,9 @@ like paragraph text — drop it into any component in place of its real content 
 
 ```html
 @if (loading()) {
-  <ngx-content-loader [lines]="4" />
+<ngx-content-loader [lines]="4" />
 } @else {
-  <p>{{ article().body }}</p>
+<p>{{ article().body }}</p>
 }
 ```
 
@@ -77,7 +77,9 @@ announce the outcome there:
 
 ```html
 <section [attr.aria-busy]="loading()">
-  @if (loading()) { <ngx-card-loader /> } @else { <!-- content --> }
+  @if (loading()) { <ngx-card-loader /> } @else {
+  <!-- content -->
+  }
 </section>
 ```
 
@@ -92,7 +94,7 @@ import { YoutubePlayer } from '@wiltech-labs/ngx-media';
 @Component({
   selector: 'app-video',
   imports: [YoutubePlayer],
-  template: `<ngx-youtube-player videoId="dQw4w9WgXcQ" />`
+  template: `<ngx-youtube-player videoId="dQw4w9WgXcQ" />`,
 })
 export class VideoComponent {}
 ```

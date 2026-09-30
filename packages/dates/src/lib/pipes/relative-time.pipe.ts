@@ -33,7 +33,10 @@ export class RelativeTimePipe implements PipeTransform, OnDestroy {
     });
   }
 
-  public transform(value: InstantLike | null | undefined, options?: Intl.RelativeTimeFormatOptions): string {
+  public transform(
+    value: InstantLike | null | undefined,
+    options?: Intl.RelativeTimeFormatOptions,
+  ): string {
     if (value === null || value === undefined) {
       return '';
     }

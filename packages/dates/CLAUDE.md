@@ -7,6 +7,7 @@ Shared Angular date/time display helpers — a `relativeTime` pipe and `Relative
 package's place in the app conventions.
 
 ## Layout
+
 ```
 src/
 ├── public-api.ts        # barrel — the entire public surface; nothing outside this is exported
@@ -24,18 +25,18 @@ src/
 - **No dependency on `@wiltech-labs/ngx-translations`, or on any other package here — deliberately.** The
   original design (`NEXT_STEPS.md`'s 2026-09-29 planning note) had this package import
   `TranslationsService` directly. Building it surfaced a real constraint: `ng-packagr` builds every package
-  as a fully independent, standalone publishable unit, and a workspace sibling's *source* package.json
+  as a fully independent, standalone publishable unit, and a workspace sibling's _source_ package.json
   has no `main`/`types` fields (only the built `dist/` one does, written by `ng-packagr` itself) — so
   there is currently no working way for one package here to import another at build time, only for
-  an *app* to depend on several of them. Given that, `NGX_DATES_LOCALE` (an `InjectionToken<() =>
-  string>`, defaulting to the browser's own `navigator.language`) replaced the direct import — the
+  an _app_ to depend on several of them. Given that, `NGX_DATES_LOCALE` (an `InjectionToken<() =>
+string>`, defaulting to the browser's own `navigator.language`) replaced the direct import — the
   exact same pattern `ngx-translations`' own `NgxTranslationsConfig.resolveLocale` already uses for its own
   app-pluggable resolution, applied one level further out. An app using `ngx-translations` wires the two
   together itself:
   ```ts
   { provide: NGX_DATES_LOCALE, useFactory: () => { const translations = inject(TranslationsService); return () => translations.locale(); } }
   ```
-  If a real need for actual shared code between two of these packages ever comes up, solving *that*
+  If a real need for actual shared code between two of these packages ever comes up, solving _that_
   (e.g. publishing intermediate builds before the dependents build) is a separate decision — don't
   reach for another inter-package import without revisiting this constraint first.
 - `temporal-polyfill` is a regular `dependency` (same precedent as `ngx-forms`), listed in

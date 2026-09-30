@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, viewChildren } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  viewChildren,
+} from '@angular/core';
 import type { FieldTree } from '@angular/forms/signals';
 import { DateAdapter } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -22,7 +30,7 @@ import { parsePlainTime } from '../../utils/date-time.utils';
   providers: [provideLocaleDateAdapter()],
   templateUrl: './business-time-field.html',
   styleUrl: './business-time-field.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BusinessTimeField {
   public readonly fieldDef = input.required<FieldDef>();
@@ -40,7 +48,9 @@ export class BusinessTimeField {
 
   constructor() {
     syncMatInputErrorState(this.inputs, this.state);
-    effect(() => this.dateAdapter.setLocale(this.fieldDef().dateTimeConfig?.locale || this.resolveLocale()));
+    effect(() =>
+      this.dateAdapter.setLocale(this.fieldDef().dateTimeConfig?.locale || this.resolveLocale()),
+    );
   }
 
   protected onTimeChange(time: Date | null): void {
@@ -50,7 +60,9 @@ export class BusinessTimeField {
     }
 
     this.state().value.set(
-      Temporal.PlainTime.from({ hour: time.getHours(), minute: time.getMinutes() }).toString({ smallestUnit: 'minute' })
+      Temporal.PlainTime.from({ hour: time.getHours(), minute: time.getMinutes() }).toString({
+        smallestUnit: 'minute',
+      }),
     );
   }
 }

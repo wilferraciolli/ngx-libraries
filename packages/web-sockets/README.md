@@ -27,9 +27,9 @@ export const appConfig: ApplicationConfig = {
         // any socket.io-client ManagerOptions/SocketOptions, e.g.:
         // withCredentials: true,
         // auth: { token: '...' }
-      }
-    })
-  ]
+      },
+    }),
+  ],
 };
 ```
 
@@ -65,7 +65,7 @@ interface PresenceUpdate {
   online: boolean;
 }
 
-@Component({ /* ... */ })
+@Component({/* ... */})
 export class PresenceComponent implements OnInit {
   private readonly webSocket = inject(WebSocketService);
   protected readonly connected = this.webSocket.connected; // Signal<boolean>
@@ -87,9 +87,11 @@ in an RxJS pipeline instead (e.g. combined with `onError()`), use the `connected
 ```ts
 import { combineLatest } from 'rxjs';
 
-combineLatest([this.webSocket.connected$, this.webSocket.onError()]).subscribe(([connected, error]) => {
-  // ...
-});
+combineLatest([this.webSocket.connected$, this.webSocket.onError()]).subscribe(
+  ([connected, error]) => {
+    // ...
+  },
+);
 ```
 
 ## `ChatRoom`
@@ -104,7 +106,7 @@ import { ChatRoom } from '@wiltech-labs/ngx-web-sockets';
 @Component({
   selector: 'app-support-chat',
   imports: [ChatRoom],
-  template: `<ngx-chat-room roomName="support" [clientName]="currentUserName" />`
+  template: `<ngx-chat-room roomName="support" [clientName]="currentUserName" />`,
 })
 export class SupportChatComponent {
   currentUserName = 'Jordan';
@@ -116,7 +118,7 @@ instance rather than changing `roomName` on a live one:
 
 ```html
 @if (activeRoom(); as room) {
-  <ngx-chat-room [roomName]="room" [clientName]="clientName" />
+<ngx-chat-room [roomName]="room" [clientName]="clientName" />
 }
 ```
 
@@ -143,7 +145,7 @@ For a genuine one-off, override with tokens (never hex values): `--ngx-chat-surf
 
 Connection status, the composer placeholder, and transient status messages ("A client connected",
 "X is typing…") come from `NGX_CHAT_TEXT` (defaults to English), not hardcoded strings — message
-*bodies* are still app/server data, untouched by this. Override it once in `app.config.ts`, e.g.
+_bodies_ are still app/server data, untouched by this. Override it once in `app.config.ts`, e.g.
 wired to [`@wiltech-labs/ngx-translations`](../translations):
 
 ```ts

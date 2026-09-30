@@ -19,7 +19,7 @@ export class PointGraphConfigBuilder {
   public build(): PointGraphDef {
     return {
       series: this.seriesList,
-      title: this.titleValue
+      title: this.titleValue,
     };
   }
 }

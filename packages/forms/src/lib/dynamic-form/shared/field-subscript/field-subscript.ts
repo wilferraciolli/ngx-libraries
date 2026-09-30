@@ -12,7 +12,7 @@ import { MatError } from '@angular/material/form-field';
   imports: [MatError],
   templateUrl: './field-subscript.html',
   styleUrl: './field-subscript.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FieldSubscript {
   public readonly field = input.required<FieldTree<unknown>>();

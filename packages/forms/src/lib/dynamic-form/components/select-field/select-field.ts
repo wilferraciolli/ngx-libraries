@@ -12,7 +12,7 @@ import type { FieldDef } from '../../interfaces/field-definition';
   imports: [FormField, MatFormFieldModule, MatSelect, MatOption],
   templateUrl: './select-field.html',
   styleUrl: './select-field.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SelectField {
   public readonly fieldDef = input.required<FieldDef>();

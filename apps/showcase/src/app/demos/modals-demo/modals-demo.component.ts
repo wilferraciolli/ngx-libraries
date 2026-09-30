@@ -2,7 +2,11 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { ModalCloseAction, ModalCloseResult, ModalService } from '@wiltech-labs/ngx-modals';
 
-import { ModalsDemoContentComponent, ModalsDemoData, ModalsDemoResult } from './modals-demo-content.component';
+import {
+  ModalsDemoContentComponent,
+  ModalsDemoData,
+  ModalsDemoResult,
+} from './modals-demo-content.component';
 
 type DemoResult = ModalCloseResult<ModalCloseAction, ModalsDemoResult | undefined>;
 
@@ -11,7 +15,7 @@ type DemoResult = ModalCloseResult<ModalCloseAction, ModalsDemoResult | undefine
   standalone: true,
   imports: [CommonModule],
   templateUrl: './modals-demo.component.html',
-  styleUrls: ['./modals-demo.component.css']
+  styleUrls: ['./modals-demo.component.css'],
 })
 export class ModalsDemoComponent {
   private readonly modals = inject(ModalService);
@@ -22,7 +26,7 @@ export class ModalsDemoComponent {
     this.modals
       .open<DemoResult, ModalsDemoData>(ModalsDemoContentComponent, {
         title: 'Approve holiday request',
-        data: { employeeName: 'Priya Patel' }
+        data: { employeeName: 'Priya Patel' },
       })
       .afterClosed()
       .subscribe((result) => {

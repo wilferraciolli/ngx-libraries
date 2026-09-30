@@ -13,7 +13,7 @@ import type { GraphTable } from '../../utils/graph-table.utils';
   imports: [],
   templateUrl: './graph-frame.html',
   styleUrl: './graph-frame.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GraphFrame {
   public readonly caption = input<string>();

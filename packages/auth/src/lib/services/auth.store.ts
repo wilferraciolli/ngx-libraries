@@ -50,7 +50,10 @@ export class AuthStore {
    */
   public async getToken(): Promise<string | null> {
     const { jwtTemplate } = this.config;
-    return (await this.clerk?.session?.getToken(jwtTemplate ? { template: jwtTemplate } : undefined)) ?? null;
+    return (
+      (await this.clerk?.session?.getToken(jwtTemplate ? { template: jwtTemplate } : undefined)) ??
+      null
+    );
   }
 
   /**

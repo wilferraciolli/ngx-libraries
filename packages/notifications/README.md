@@ -96,9 +96,10 @@ almost always worth providing — without one, the panel falls back to a raw JSO
 import { Component, inject } from '@angular/core';
 import { NotificationsService } from '@wiltech-labs/ngx-notifications';
 
-@Component({ selector: 'app-something', /* ... */ })
+@Component({ selector: 'app-something' /* ... */ })
 export class Something {
-  protected readonly notifications = inject<NotificationsService<Notification>>(NotificationsService);
+  protected readonly notifications =
+    inject<NotificationsService<Notification>>(NotificationsService);
   // notifications.notifications(), notifications.unreadCount(), notifications.loading(), notifications.error()
 }
 ```

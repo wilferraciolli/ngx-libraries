@@ -14,7 +14,9 @@
     />
   </svg>
   @if (notifications.unreadCount() > 0) {
-    <span class="NotificationsWidget-badge">{{ notifications.unreadCount() > 99 ? '99+' : notifications.unreadCount() }}</span>
+    <span class="NotificationsWidget-badge">{{
+      notifications.unreadCount() > 99 ? '99+' : notifications.unreadCount()
+    }}</span>
   }
 </button>
 
@@ -27,12 +29,26 @@
   (backdropClick)="close()"
   (detach)="close()"
 >
-  <div class="NotificationsWidget-panel" role="dialog" [attr.aria-label]="text().panelTitle" cdkTrapFocus cdkTrapFocusAutoCapture>
+  <div
+    class="NotificationsWidget-panel"
+    role="dialog"
+    [attr.aria-label]="text().panelTitle"
+    cdkTrapFocus
+    cdkTrapFocusAutoCapture
+  >
     <div class="NotificationsWidget-header">
       <h2 class="NotificationsWidget-title">{{ text().panelTitle }}</h2>
-      <button type="button" class="NotificationsWidget-close" [attr.aria-label]="text().close" (click)="close()">
+      <button
+        type="button"
+        class="NotificationsWidget-close"
+        [attr.aria-label]="text().close"
+        (click)="close()"
+      >
         <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path fill="currentColor" d="M18.3 5.71 12 12.01l-6.3-6.3-1.4 1.42 6.29 6.29-6.3 6.3 1.42 1.4 6.29-6.29 6.29 6.3 1.42-1.42-6.3-6.29 6.3-6.29z" />
+          <path
+            fill="currentColor"
+            d="M18.3 5.71 12 12.01l-6.3-6.3-1.4 1.42 6.29 6.29-6.3 6.3 1.42 1.4 6.29-6.29 6.29 6.3 1.42-1.42-6.3-6.29 6.3-6.29z"
+          />
         </svg>
       </button>
     </div>
@@ -47,9 +63,15 @@
       <ul class="NotificationsWidget-list" role="list">
         @for (notification of notifications.notifications(); track $index) {
           <li class="NotificationsWidget-item">
-            <button type="button" class="NotificationsWidget-itemContent" (click)="select(notification)">
+            <button
+              type="button"
+              class="NotificationsWidget-itemContent"
+              (click)="select(notification)"
+            >
               @if (itemTemplate) {
-                <ng-container *ngTemplateOutlet="itemTemplate; context: { $implicit: notification }" />
+                <ng-container
+                  *ngTemplateOutlet="itemTemplate; context: { $implicit: notification }"
+                />
               } @else {
                 <pre class="NotificationsWidget-itemFallback">{{ notification | json }}</pre>
               }
@@ -61,7 +83,10 @@
               (click)="dismiss(notification, $event)"
             >
               <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path fill="currentColor" d="M18.3 5.71 12 12.01l-6.3-6.3-1.4 1.42 6.29 6.29-6.3 6.3 1.42 1.4 6.29-6.29 6.29 6.3 1.42-1.42-6.3-6.29 6.3-6.29z" />
+                <path
+                  fill="currentColor"
+                  d="M18.3 5.71 12 12.01l-6.3-6.3-1.4 1.42 6.29 6.29-6.3 6.3 1.42 1.4 6.29-6.29 6.29 6.3 1.42-1.42-6.3-6.29 6.3-6.29z"
+                />
               </svg>
             </button>
           </li>

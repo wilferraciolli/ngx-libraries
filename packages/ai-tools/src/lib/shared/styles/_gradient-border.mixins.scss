@@ -19,7 +19,13 @@
   position: relative;
   border-radius: $radius;
   padding: $thickness;
-  background: conic-gradient(from var(--ngx-ai-border-angle), ai.$start, ai.$mid, ai.$end, ai.$start);
+  background: conic-gradient(
+    from var(--ngx-ai-border-angle),
+    ai.$start,
+    ai.$mid,
+    ai.$end,
+    ai.$start
+  );
   animation: ngx-ai-border-rotate 4s linear infinite;
 
   @media (prefers-reduced-motion: reduce) {

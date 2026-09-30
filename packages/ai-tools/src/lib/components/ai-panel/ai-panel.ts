@@ -8,7 +8,7 @@ import { AiSparkleIcon } from '../ai-sparkle-icon/ai-sparkle-icon';
   imports: [AiSparkleIcon],
   templateUrl: './ai-panel.html',
   styleUrl: './ai-panel.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AiPanel {
   public readonly title = input<string>();

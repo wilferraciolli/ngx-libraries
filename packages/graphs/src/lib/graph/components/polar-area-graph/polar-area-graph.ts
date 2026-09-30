@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, type Signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+  type Signal,
+} from '@angular/core';
 import { BaseChartDirective } from 'ng2-charts';
 import type { ChartConfiguration } from 'chart.js';
 import type { GraphDef } from '../../interfaces/graph-definition';
@@ -15,7 +22,7 @@ import { GraphFrame } from '../graph-frame/graph-frame';
   imports: [BaseChartDirective, GraphFrame],
   templateUrl: './polar-area-graph.html',
   styleUrl: './polar-area-graph.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PolarAreaGraph {
   private readonly theme = inject(GraphThemeService).theme;
@@ -23,11 +30,11 @@ export class PolarAreaGraph {
   public readonly graphDef = input.required<GraphDef>();
 
   protected readonly chartData = computed<ChartConfiguration<'polarArea'>['data']>(() =>
-    toChartData<'polarArea'>(this.graphDef(), this.theme(), true)
+    toChartData<'polarArea'>(this.graphDef(), this.theme(), true),
   );
 
   protected readonly options: Signal<ChartConfiguration<'polarArea'>['options']> = computed(() =>
-    graphOptions<'polarArea'>(this.theme(), 'radial', this.graphDef().labels.length)
+    graphOptions<'polarArea'>(this.theme(), 'radial', this.graphDef().labels.length),
   );
 
   protected readonly table = computed(() => toGraphTable(this.graphDef()));

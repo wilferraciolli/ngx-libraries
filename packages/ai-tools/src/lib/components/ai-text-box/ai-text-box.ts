@@ -8,7 +8,7 @@ import { AiSparkleIcon } from '../ai-sparkle-icon/ai-sparkle-icon';
   imports: [AiSparkleIcon],
   templateUrl: './ai-text-box.html',
   styleUrl: './ai-text-box.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AiTextBox {
   public readonly value = model('');

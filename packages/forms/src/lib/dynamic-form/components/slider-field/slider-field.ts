@@ -14,7 +14,7 @@ let nextId: number = 0;
   imports: [FormField, MatSlider, MatSliderThumb, FieldSubscript],
   templateUrl: './slider-field.html',
   styleUrl: './slider-field.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SliderField {
   public readonly fieldDef = input.required<FieldDef>();

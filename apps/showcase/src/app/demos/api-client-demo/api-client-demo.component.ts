@@ -8,7 +8,7 @@ import { ApiClientService, ApiEnvelope } from '@wiltech-labs/ngx-api-client';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './api-client-demo.component.html',
-  styleUrls: ['./api-client-demo.component.css']
+  styleUrls: ['./api-client-demo.component.css'],
 })
 export class ApiClientDemoComponent implements OnInit {
   apiUrl = '';

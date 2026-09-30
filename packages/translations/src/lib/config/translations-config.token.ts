@@ -34,4 +34,6 @@ export interface NgxTranslationsConfig {
   persistLocale?: (locale: string) => void;
 }
 
-export const NGX_TRANSLATIONS_CONFIG = new InjectionToken<NgxTranslationsConfig>('NGX_TRANSLATIONS_CONFIG');
+export const NGX_TRANSLATIONS_CONFIG = new InjectionToken<NgxTranslationsConfig>(
+  'NGX_TRANSLATIONS_CONFIG',
+);

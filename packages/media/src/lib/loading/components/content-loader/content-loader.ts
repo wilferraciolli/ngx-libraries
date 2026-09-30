@@ -9,10 +9,12 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
   imports: [],
   templateUrl: './content-loader.html',
   styleUrl: './content-loader.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContentLoader {
   public readonly lines = input(3);
 
-  protected readonly lineIndexes = computed(() => Array.from({ length: this.lines() }, (_, i) => i));
+  protected readonly lineIndexes = computed(() =>
+    Array.from({ length: this.lines() }, (_, i) => i),
+  );
 }

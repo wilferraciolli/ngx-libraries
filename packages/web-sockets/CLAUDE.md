@@ -8,6 +8,7 @@ that project's shape (config token, provider, service, room join/leave, a chat l
 component) carried over, but the implementation didn't; see **Modernized from the source** below.
 
 ## Layout
+
 ```
 src/
 ├── public-api.ts        # barrel — the entire public surface; nothing outside this is exported
@@ -29,6 +30,7 @@ src/
 ```
 
 ## Conventions
+
 - Real Angular constructs (`@Injectable`/`@Component`) — not framework-agnostic functions. Every
   known consumer is Angular, so idiomatic DI beats a generic-TS compromise.
 - One folder per concern under `src/lib/` — `connection/` (protocol-level, reusable beyond chat)
@@ -62,7 +64,7 @@ src/
   `.pipe()` sees `unknown`.
 - **`ChatRoom`'s own UI text (connection status, composer placeholder, transient status messages)
   comes from `NGX_CHAT_TEXT`** (`InjectionToken<() => ChatText>`, added 2026-09-30), not hardcoded
-  strings — message *bodies* stay app/server data, untouched by this. Same resolver-token pattern
+  strings — message _bodies_ stay app/server data, untouched by this. Same resolver-token pattern
   as `ngx-dates`' `NGX_DATES_LOCALE`/`ngx-forms`' `NGX_FORMS_LOCALE`/`ngx-graphs`'
   `NGX_GRAPHS_TEXT`: a plain function, so this package has no build-time dependency on `ngx-translations`
   (see root `CLAUDE.md`'s "Inter-package deps"). The two parameterized messages (`clientTyping`,
@@ -70,8 +72,10 @@ src/
   building a template-parsing mini-engine for two call sites.
 
 ## Modernized from the source
+
 The original prototype worked, but had accumulated rough edges this rewrite deliberately fixes
 rather than carries forward:
+
 - **Dropped the `ngx-socket-io` dependency.** It's a thin wrapper around `socket.io-client` that
   forced awkward escapes like `socket.ioSocket.connected`/`socket.ioSocket.on(...)` to reach the
   real client. This package calls `io()` from `socket.io-client` directly — one fewer dependency,
@@ -108,6 +112,7 @@ rather than carries forward:
   original's hardcoded placeholder `'id'` and `'2025-01-01T09:00:00Z'`.
 
 ## Status
+
 - New package: `WebSocketService`/`provideWebSocket()` plus `ChatRoom`/`ChatMessageBubble`.
 - Not yet published to npm — under development.
 - No consumers yet. No server exists to exercise this against yet either — this is client-side

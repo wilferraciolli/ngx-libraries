@@ -19,6 +19,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   const auth = inject(AuthStore);
   return from(auth.getToken()).pipe(
-    switchMap((token) => next(token ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : req))
+    switchMap((token) =>
+      next(token ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : req),
+    ),
   );
 };

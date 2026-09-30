@@ -8,7 +8,7 @@ import { RelativeTimePipe } from '@wiltech-labs/ngx-dates';
   standalone: true,
   imports: [CommonModule, TPipe, RelativeTimePipe],
   templateUrl: './translations-demo.component.html',
-  styleUrls: ['./translations-demo.component.css']
+  styleUrls: ['./translations-demo.component.css'],
 })
 export class TranslationsDemoComponent {
   protected readonly translations = inject(TranslationsService);
@@ -23,9 +23,11 @@ export class TranslationsDemoComponent {
   // the string itself rather than a template binding.
   protected readonly statusLabel = computed(() => this.translations.t('metadata.status.active'));
 
-  protected readonly formattedDate = computed(() => this.translations.formatDate(this.now, { dateStyle: 'long' }));
+  protected readonly formattedDate = computed(() =>
+    this.translations.formatDate(this.now, { dateStyle: 'long' }),
+  );
   protected readonly formattedPrice = computed(() =>
-    this.translations.formatNumber(this.price, { style: 'currency', currency: 'GBP' })
+    this.translations.formatNumber(this.price, { style: 'currency', currency: 'GBP' }),
   );
 
   protected switchTo(locale: string): void {

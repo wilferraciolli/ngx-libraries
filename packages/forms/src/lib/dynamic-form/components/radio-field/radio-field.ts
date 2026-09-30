@@ -14,7 +14,7 @@ let nextId: number = 0;
   imports: [FormField, MatRadioGroup, MatRadioButton, FieldSubscript],
   templateUrl: './radio-field.html',
   styleUrl: './radio-field.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RadioField {
   public readonly fieldDef = input.required<FieldDef>();

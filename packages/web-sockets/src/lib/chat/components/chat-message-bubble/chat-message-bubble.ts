@@ -8,7 +8,7 @@ import type { ChatMessage } from '../../interfaces/chat-message.interface';
   imports: [],
   templateUrl: './chat-message-bubble.html',
   styleUrl: './chat-message-bubble.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChatMessageBubble {
   public readonly clientId = input.required<string>();

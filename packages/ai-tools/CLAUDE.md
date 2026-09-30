@@ -4,6 +4,7 @@ Shared Angular AI-flavoured components — gradient panels, text boxes and butto
 look and feel. See root `../../CLAUDE.md` for repo-wide conventions.
 
 ## Layout
+
 ```
 src/
 ├── public-api.ts        # barrel — the entire public surface; nothing outside this is exported
@@ -17,6 +18,7 @@ src/
 ```
 
 ## Conventions
+
 - Real Angular constructs (`@Component`) — not framework-agnostic functions. Every known consumer
   is Angular, so idiomatic DI beats a generic-TS compromise.
 - One folder per concern under `src/lib/` — don't let it go flat. A new concern (e.g. a chat
@@ -39,7 +41,9 @@ src/
 - `AiSparkleIcon` fills with the gradient by default; pass `[monochrome]="true"` when placing it on
   a background that's already gradient-colored (e.g. inside `AiButton`) so it uses `currentColor`
   instead of fighting the background for contrast.
+
 ## Status
+
 - New package, initial component set only (`AiSparkleIcon`, `AiPanel`, `AiTextBox`, `AiButton`).
   Services (e.g. an actual AI request layer) are intentionally not started yet.
 - Not yet published to npm — under development.

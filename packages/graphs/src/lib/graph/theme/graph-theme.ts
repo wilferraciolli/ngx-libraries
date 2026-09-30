@@ -30,17 +30,18 @@ export const FALLBACK_GRAPH_THEME: GraphTheme = {
   tooltipBackground: '#2e3132',
   tooltipText: '#eff1f2',
   fontFamily: 'Roboto, sans-serif',
-  fontSize: 12
+  fontSize: 12,
 };
 
 /** Each role: the app's `--ngx-graph-*` override, then the M3 token, then a light/dark fallback. */
 const ROLES = {
   text: 'var(--ngx-graph-text, var(--mat-sys-on-surface, light-dark(#191c1d, #e1e3e3)))',
-  mutedText: 'var(--ngx-graph-muted-text, var(--mat-sys-on-surface-variant, light-dark(#3f484a, #bfc8ca)))',
+  mutedText:
+    'var(--ngx-graph-muted-text, var(--mat-sys-on-surface-variant, light-dark(#3f484a, #bfc8ca)))',
   grid: 'var(--ngx-graph-grid, var(--mat-sys-outline-variant, light-dark(#bfc8ca, #3f484a)))',
   surface: 'var(--ngx-graph-surface, var(--mat-sys-surface, light-dark(#f6fafb, #101415)))',
   tooltipBackground: 'var(--mat-sys-inverse-surface, light-dark(#2e3132, #e1e3e3))',
-  tooltipText: 'var(--mat-sys-inverse-on-surface, light-dark(#eff1f2, #2e3132))'
+  tooltipText: 'var(--mat-sys-inverse-on-surface, light-dark(#eff1f2, #2e3132))',
 } as const;
 
 /**
@@ -65,7 +66,9 @@ export class GraphThemeService {
     // Re-resolve on an OS scheme change and on the app's own theme toggle (class/attribute/style on
     // <html> or <body>). Root-provided, so these live as long as the app.
     const view = this.document.defaultView;
-    view?.matchMedia?.('(prefers-color-scheme: dark)').addEventListener?.('change', () => this.resolve());
+    view
+      ?.matchMedia?.('(prefers-color-scheme: dark)')
+      .addEventListener?.('change', () => this.resolve());
     if (typeof MutationObserver === 'function') {
       const observer = new MutationObserver(() => this.resolve());
       const options = { attributes: true, attributeFilter: ['class', 'style', 'data-theme'] };
@@ -96,7 +99,9 @@ export class GraphThemeService {
     const isDark = this.isDark(colorOf(ROLES.surface));
     const fallbackSeries = isDark ? CATEGORICAL_DARK : CATEGORICAL_LIGHT;
     const series = fallbackSeries.map((hex, index) =>
-      colorOf(`var(--ngx-graph-color-${index + 1}${index === 0 ? ', var(--app-chart-1' : ''}, ${hex})${index === 0 ? ')' : ''}`)
+      colorOf(
+        `var(--ngx-graph-color-${index + 1}${index === 0 ? ', var(--app-chart-1' : ''}, ${hex})${index === 0 ? ')' : ''}`,
+      ),
     );
 
     probe.style.color = '';
@@ -114,7 +119,7 @@ export class GraphThemeService {
       tooltipBackground: colorOf(ROLES.tooltipBackground),
       tooltipText: colorOf(ROLES.tooltipText),
       fontFamily,
-      fontSize
+      fontSize,
     });
 
     probe.remove();

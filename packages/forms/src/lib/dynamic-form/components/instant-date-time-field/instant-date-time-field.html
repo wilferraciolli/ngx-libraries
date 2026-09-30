@@ -1,5 +1,8 @@
 <div class="InstantDateTimeField-label">
-  {{ fieldDef().label }}@if (state().required()) {<span aria-hidden="true"> *</span>}
+  {{ fieldDef().label }}
+  @if (state().required()) {
+    <span aria-hidden="true"> *</span>
+  }
 </div>
 
 <div class="InstantDateTimeField-row">
@@ -35,7 +38,10 @@
 </div>
 
 <div class="InstantDateTimeField-zone">
-  {{ timeZone() }}@if (offset()) { (UTC{{ offset() }})}
+  {{ timeZone() }}
+  @if (offset()) {
+    (UTC{{ offset() }})
+  }
   @if (state().value()) {
     · stored as {{ state().value() }}
   }

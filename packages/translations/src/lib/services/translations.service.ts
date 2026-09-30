@@ -22,7 +22,7 @@ export class TranslationsService {
    * loads after sign-in) flows through automatically, not just at startup.
    */
   public readonly locale: Signal<string> = computed(
-    () => this.sessionOverride() ?? this.config.resolveLocale?.() ?? this.config.defaultLocale
+    () => this.sessionOverride() ?? this.config.resolveLocale?.() ?? this.config.defaultLocale,
   );
 
   constructor() {

@@ -17,6 +17,7 @@ around, unless the change originates here deliberately (e.g. the
 `ApiClientService` addition, which doesn't exist in `insurly-ui` yet).
 
 ## Layout
+
 ```
 src/
 ├── public-api.ts        # barrel — the entire public surface; nothing outside this is exported
@@ -35,6 +36,7 @@ src/
 ```
 
 ## Conventions
+
 - Real Angular constructs (`@Injectable`, `@Pipe`) — not framework-agnostic
   functions. Every known consumer is Angular, so idiomatic DI beats a
   generic-TS compromise (see root `CLAUDE.md`'s "Consumers" decision).
@@ -58,11 +60,12 @@ src/
   provide it — same-origin consumers need zero config.
 - `ApiErrorResponse` / `ApiFieldViolation` mirror `insurly-api`'s
   `ApiError` / `ApiError.FieldViolation` records field-for-field — the
-  original `insurly-ui` `ErrorResponse` class did *not* match the backend
+  original `insurly-ui` `ErrorResponse` class did _not_ match the backend
   (different field names, never actually wired up anywhere); this package
   fixes that instead of carrying the mismatch forward.
 
 ## Status
+
 - Published to npm as `@wiltech-labs/ngx-api-client` — see the note in the
   root `CLAUDE.md` on why the scope is `@wiltech-labs`, not `@wiltech`.
 - Wired into `insurly-ui`: every `*ApiService`

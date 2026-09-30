@@ -32,12 +32,14 @@ interface ApprovalResult {
   approved: boolean;
 }
 
-@Component({ selector: 'app-holiday-approval', /* ... */ })
+@Component({ selector: 'app-holiday-approval' /* ... */ })
 export class HolidayApprovalModal implements ModalContent {
   data = input<ApprovalData>();
 
   private readonly note = signal('');
-  private readonly dialogRef = inject(MatDialogRef<HolidayApprovalModal, ModalCloseResult<ModalCloseAction, ApprovalResult>>);
+  private readonly dialogRef = inject(
+    MatDialogRef<HolidayApprovalModal, ModalCloseResult<ModalCloseAction, ApprovalResult>>,
+  );
 
   // Reported to the shell's close button — return true while there's something to lose.
   hasUnsavedChanges(): boolean {
@@ -66,16 +68,19 @@ you'd opened it with `MatDialog` directly — this package doesn't change that p
 import { Component, inject } from '@angular/core';
 import { ModalCloseAction, ModalCloseResult, ModalService } from '@wiltech-labs/ngx-modals';
 
-@Component({ selector: 'app-team-calendar', /* ... */ })
+@Component({ selector: 'app-team-calendar' /* ... */ })
 export class TeamCalendar {
   private readonly modals = inject(ModalService);
 
   protected approveRequest(employeeName: string): void {
     this.modals
-      .open<ModalCloseResult<ModalCloseAction, { approved: boolean }>, ApprovalData>(HolidayApprovalModal, {
-        title: 'Approve holiday request',
-        data: { employeeName },
-      })
+      .open<ModalCloseResult<ModalCloseAction, { approved: boolean }>, ApprovalData>(
+        HolidayApprovalModal,
+        {
+          title: 'Approve holiday request',
+          data: { employeeName },
+        },
+      )
       .afterClosed()
       .subscribe((result) => {
         if (result?.action === ModalCloseAction.Updated && result.data.approved) {
@@ -99,7 +104,10 @@ point, not a closed list. Both `ModalCloseResult` and `open()` are generic — d
 enum when a modal's outcomes don't fit:
 
 ```ts
-enum ApprovalAction { Approved = 'APPROVED', Rejected = 'REJECTED' }
+enum ApprovalAction {
+  Approved = 'APPROVED',
+  Rejected = 'REJECTED',
+}
 
 this.modals.open<ModalCloseResult<ApprovalAction, ApprovalResult>>(HolidayApprovalModal, { data });
 ```
@@ -110,8 +118,11 @@ The same Yes/No prompt the unsaved-changes guard uses is available directly, for
 wants it (a delete confirmation, say):
 
 ```ts
-this.modals.confirm('Delete this provider? This can\'t be undone.', { confirmLabel: 'Delete' })
-  .subscribe((confirmed) => { if (confirmed) this.delete(); });
+this.modals
+  .confirm("Delete this provider? This can't be undone.", { confirmLabel: 'Delete' })
+  .subscribe((confirmed) => {
+    if (confirmed) this.delete();
+  });
 ```
 
 ## Layout

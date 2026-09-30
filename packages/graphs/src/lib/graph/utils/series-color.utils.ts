@@ -15,7 +15,7 @@ export function seriesColor(theme: GraphTheme, index: number): string {
     warned = true;
     console.warn(
       `[ngx-graphs] ${index + 1} series/slices, but only ${theme.series.length} categorical colours ` +
-        'are distinguishable. Fold the rest into "Other" or use small multiples.'
+        'are distinguishable. Fold the rest into "Other" or use small multiples.',
     );
   }
   return theme.mutedText;

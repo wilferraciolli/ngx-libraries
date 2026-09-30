@@ -11,7 +11,7 @@ import { seriesColor } from './series-color.utils';
 export function toChartData<TType extends ChartType>(
   graphDef: GraphDef,
   theme: GraphTheme = FALLBACK_GRAPH_THEME,
-  perCategory = false
+  perCategory = false,
 ): ChartData<TType> {
   return {
     labels: graphDef.labels,
@@ -22,14 +22,14 @@ export function toChartData<TType extends ChartType>(
             data: series.data,
             backgroundColor: graphDef.labels.map((_, labelIndex) => seriesColor(theme, labelIndex)),
             borderColor: theme.surface,
-            borderWidth: 2
+            borderWidth: 2,
           }
         : {
             label: series.label,
             data: series.data,
             backgroundColor: seriesColor(theme, seriesIndex),
-            borderColor: seriesColor(theme, seriesIndex)
-          }
-    )
+            borderColor: seriesColor(theme, seriesIndex),
+          },
+    ),
   } as unknown as ChartData<TType>;
 }

@@ -35,9 +35,9 @@ export const appConfig: ApplicationConfig = {
       useFactory: () => {
         const translations = inject(TranslationsService);
         return () => translations.locale();
-      }
-    }
-  ]
+      },
+    },
+  ],
 };
 ```
 
@@ -53,7 +53,7 @@ import { RelativeTimePipe } from '@wiltech-labs/ngx-dates';
 @Component({
   selector: 'app-comment',
   imports: [RelativeTimePipe],
-  template: `<time>{{ comment.postedAt | relativeTime }}</time>`
+  template: `<time>{{ comment.postedAt | relativeTime }}</time>`,
 })
 export class CommentComponent {
   protected readonly comment = { postedAt: '2026-09-30T08:15:00Z' };
@@ -74,7 +74,7 @@ from that field needs no conversion first.
 import { Component, inject } from '@angular/core';
 import { RelativeTimeService } from '@wiltech-labs/ngx-dates';
 
-@Component({ /* ... */ })
+@Component({/* ... */})
 export class NotificationComponent {
   private readonly relativeTime = inject(RelativeTimeService);
 
@@ -92,7 +92,8 @@ a template, which stays live as time passes without the component re-deriving it
 `Intl.RelativeTimeFormatOptions` pass straight through, e.g. to force a unit or numeric style:
 
 ```html
-{{ comment.postedAt | relativeTime: { numeric: 'always' } }}  <!-- "1 day ago" instead of "yesterday" -->
+{{ comment.postedAt | relativeTime: { numeric: 'always' } }}
+<!-- "1 day ago" instead of "yesterday" -->
 ```
 
 ## Layout

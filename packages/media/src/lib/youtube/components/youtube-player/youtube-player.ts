@@ -9,7 +9,7 @@ import type { SafeResourceUrl } from '@angular/platform-browser';
   imports: [],
   templateUrl: './youtube-player.html',
   styleUrl: './youtube-player.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class YoutubePlayer {
   private readonly sanitizer = inject(DomSanitizer);
@@ -22,7 +22,7 @@ export class YoutubePlayer {
   protected readonly url = computed<SafeResourceUrl>(() => {
     const params = new URLSearchParams({ autoplay: this.autoplay() ? '1' : '0' });
     return this.sanitizer.bypassSecurityTrustResourceUrl(
-      `https://www.youtube-nocookie.com/embed/${this.videoId()}?${params.toString()}`
+      `https://www.youtube-nocookie.com/embed/${this.videoId()}?${params.toString()}`,
     );
   });
 }

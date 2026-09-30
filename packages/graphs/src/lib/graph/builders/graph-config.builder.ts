@@ -25,7 +25,7 @@ export class GraphConfigBuilder {
     return {
       labels: this.labelsValue,
       series: this.seriesList,
-      title: this.titleValue
+      title: this.titleValue,
     };
   }
 }

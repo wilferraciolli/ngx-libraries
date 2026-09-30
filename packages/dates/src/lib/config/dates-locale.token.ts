@@ -18,5 +18,5 @@ export type DatesLocaleResolver = () => string;
  * still notifies the pipe reactively despite being "just a function" here.
  */
 export const NGX_DATES_LOCALE = new InjectionToken<DatesLocaleResolver>('NGX_DATES_LOCALE', {
-  factory: () => () => (typeof navigator !== 'undefined' ? navigator.language : 'en-GB')
+  factory: () => () => (typeof navigator !== 'undefined' ? navigator.language : 'en-GB'),
 });

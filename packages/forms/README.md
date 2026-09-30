@@ -33,7 +33,10 @@ the Roboto font, e.g.:
 ```html
 <!-- index.html -->
 <link rel="preconnect" href="https://fonts.gstatic.com" />
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet" />
+<link
+  href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
+  rel="stylesheet"
+/>
 ```
 
 ## Usage with DynamicForm
@@ -44,7 +47,8 @@ the Roboto font, e.g.:
 import { formConfig } from '@wiltech-labs/ngx-forms';
 import type { BaseSchema, SchemaConfig } from '@wiltech-labs/ngx-forms';
 
-export interface FlightSchema extends BaseSchema {   // BaseSchema adds `id` and `schemaType`
+export interface FlightSchema extends BaseSchema {
+  // BaseSchema adds `id` and `schemaType`
   schemaType: 'flight';
   from: string;
   to: string;
@@ -59,12 +63,17 @@ export const flightFormConfig: SchemaConfig<FlightSchema> = formConfig<FlightSch
   .instantDateTime('departure', 'Departure', {
     required: true,
     hint: 'Local time at the departure airport',
-    dateTimeConfig: { timeZone: 'Europe/London', min: '2026-01-01T00:00:00Z' }
+    dateTimeConfig: { timeZone: 'Europe/London', min: '2026-01-01T00:00:00Z' },
   })
-  .select('cabin', 'Cabin', [
-    { label: 'Economy', value: 'economy' },
-    { label: 'Business', value: 'business' }
-  ], { required: true })
+  .select(
+    'cabin',
+    'Cabin',
+    [
+      { label: 'Economy', value: 'economy' },
+      { label: 'Business', value: 'business' },
+    ],
+    { required: true },
+  )
   .checkbox('delayed', 'Delayed')
   .build({ from: '', to: '', departure: '', cabin: 'economy', delayed: false });
 ```
@@ -91,12 +100,15 @@ import type { FlightSchema } from './flight-form.config';
       (onFormSubmit)="save()"
       (onFormClear)="clear()"
     />
-  `
+  `,
 })
 export class FlightFormComponent {
   protected readonly config = flightFormConfig;
   protected readonly flight = signal(flightFormConfig.initialValue);
-  protected readonly flightForm = form(this.flight, toSchema<FlightSchema>(flightFormConfig.fields));
+  protected readonly flightForm = form(
+    this.flight,
+    toSchema<FlightSchema>(flightFormConfig.fields),
+  );
 
   protected save(): void {
     console.log('Saved', this.flight());
@@ -126,7 +138,11 @@ object; it doesn't need `id` or `schemaType`.
 import { Component, signal } from '@angular/core';
 import { form } from '@angular/forms/signals';
 import {
-  BusinessDateField, CheckboxField, FormFieldType, TextField, toSchema
+  BusinessDateField,
+  CheckboxField,
+  FormFieldType,
+  TextField,
+  toSchema,
 } from '@wiltech-labs/ngx-forms';
 import type { FieldDef } from '@wiltech-labs/ngx-forms';
 
@@ -144,7 +160,7 @@ interface Newsletter {
     <ngx-business-date-field [fieldDef]="fields.startDate" [field]="newsletterForm.startDate" />
     <ngx-checkbox-field [fieldDef]="fields.agree" [field]="newsletterForm.agree" />
     <button [disabled]="newsletterForm().invalid()" (click)="subscribe()">Subscribe</button>
-  `
+  `,
 })
 export class NewsletterComponent {
   protected readonly fields = {
@@ -154,13 +170,21 @@ export class NewsletterComponent {
       type: FormFieldType.BUSINESS_DATE,
       label: 'Start from',
       required: true,
-      dateTimeConfig: { min: '2026-01-01', locale: 'en-GB' }
+      dateTimeConfig: { min: '2026-01-01', locale: 'en-GB' },
     },
-    agree: { name: 'agree', type: FormFieldType.CHECKBOX, label: 'I agree to receive emails', required: true }
+    agree: {
+      name: 'agree',
+      type: FormFieldType.CHECKBOX,
+      label: 'I agree to receive emails',
+      required: true,
+    },
   } satisfies Record<keyof Newsletter, FieldDef>;
 
   protected readonly newsletter = signal<Newsletter>({ email: '', startDate: '', agree: false });
-  protected readonly newsletterForm = form(this.newsletter, toSchema<Newsletter>(Object.values(this.fields)));
+  protected readonly newsletterForm = form(
+    this.newsletter,
+    toSchema<Newsletter>(Object.values(this.fields)),
+  );
 
   protected subscribe(): void {
     console.log(this.newsletter());
@@ -174,22 +198,22 @@ container. `DynamicForm` adds no padding or background of its own — put it in 
 
 ## Field types
 
-| `FormFieldType` | Builder method | Component | Value | Material control |
-|---|---|---|---|---|
-| `TEXT` | `text()` | `TextField` | `string` | `matInput` |
-| `EMAIL` | `email()` | `TextField` | `string` | `matInput` (`type="email"`), plus a valid-address check |
-| `PASSWORD` | `password()` | `TextField` | `string` | `matInput` (masked) |
-| `SEARCH` | `search()` | `TextField` | `string` | `matInput` |
-| `NUMBER` | `number()` | `TextField` | `number` | `matInput` |
-| `TEXTAREA` | `textarea()` | `TextareaField` | `string` | `matInput` textarea, auto-growing |
-| `CODE` | `code()` | `TextareaField` | `string` | Monospaced textarea, Tab indents |
-| `CHECKBOX` | `checkbox()` | `CheckboxField` | `boolean` | `mat-checkbox` |
-| `RADIO` | `radio(name, label, choices)` | `RadioField` | option value | `mat-radio-group` |
-| `SELECT` | `select(name, label, choices)` | `SelectField` | option value | `mat-select` |
-| `RANGE` | `range()` | `SliderField` | `number` | `mat-slider` (`min`/`max`/`step`, default 0–100) |
-| `BUSINESS_DATE` | `businessDate()` | `BusinessDateField` | `'YYYY-MM-DD'` | Datepicker |
-| `BUSINESS_TIME` | `businessTime()` | `BusinessTimeField` | `'HH:mm'` | Timepicker |
-| `INSTANT_DATE_TIME` | `instantDateTime()` | `InstantDateTimeField` | UTC `'YYYY-MM-DDThh:mm:ssZ'` | Datepicker + timepicker |
+| `FormFieldType`     | Builder method                 | Component              | Value                        | Material control                                        |
+| ------------------- | ------------------------------ | ---------------------- | ---------------------------- | ------------------------------------------------------- |
+| `TEXT`              | `text()`                       | `TextField`            | `string`                     | `matInput`                                              |
+| `EMAIL`             | `email()`                      | `TextField`            | `string`                     | `matInput` (`type="email"`), plus a valid-address check |
+| `PASSWORD`          | `password()`                   | `TextField`            | `string`                     | `matInput` (masked)                                     |
+| `SEARCH`            | `search()`                     | `TextField`            | `string`                     | `matInput`                                              |
+| `NUMBER`            | `number()`                     | `TextField`            | `number`                     | `matInput`                                              |
+| `TEXTAREA`          | `textarea()`                   | `TextareaField`        | `string`                     | `matInput` textarea, auto-growing                       |
+| `CODE`              | `code()`                       | `TextareaField`        | `string`                     | Monospaced textarea, Tab indents                        |
+| `CHECKBOX`          | `checkbox()`                   | `CheckboxField`        | `boolean`                    | `mat-checkbox`                                          |
+| `RADIO`             | `radio(name, label, choices)`  | `RadioField`           | option value                 | `mat-radio-group`                                       |
+| `SELECT`            | `select(name, label, choices)` | `SelectField`          | option value                 | `mat-select`                                            |
+| `RANGE`             | `range()`                      | `SliderField`          | `number`                     | `mat-slider` (`min`/`max`/`step`, default 0–100)        |
+| `BUSINESS_DATE`     | `businessDate()`               | `BusinessDateField`    | `'YYYY-MM-DD'`               | Datepicker                                              |
+| `BUSINESS_TIME`     | `businessTime()`               | `BusinessTimeField`    | `'HH:mm'`                    | Timepicker                                              |
+| `INSTANT_DATE_TIME` | `instantDateTime()`            | `InstantDateTimeField` | UTC `'YYYY-MM-DDThh:mm:ssZ'` | Datepicker + timepicker                                 |
 
 Use `hidden(name)` on the builder for a field that belongs to the model and its validation but is never shown.
 
@@ -221,7 +245,7 @@ import { TranslationsService } from '@wiltech-labs/ngx-translations';
 ```
 
 Unlike `ngx-dates`' `NGX_DATES_LOCALE` (read-only display text), this locale also decides which
-*typed* day/month order the picker's input accepts — changing it changes user input behaviour, not
+_typed_ day/month order the picker's input accepts — changing it changes user input behaviour, not
 just wording, so it isn't defaulted to the browser's own language the way `ngx-dates` is. Leave it
 unset and every field keeps today's default (`'en-GB'`).
 
@@ -229,32 +253,32 @@ unset and every field keeps today's default (`'en-GB'`).
 
 ```typescript
 interface FieldDef {
-  name: string;                     // Property name in the model
+  name: string; // Property name in the model
   type: FormFieldType;
   label: string;
   required?: boolean;
-  minLength?: number;               // Text fields
-  maxLength?: number;               // Text fields
-  pattern?: RegExp | string;        // Text fields: a RegExp is used as-is; a string must match the whole value
-  patternMessage?: string;          // Error when `pattern` doesn't match. Default: "<label> is not in the expected format"
-  min?: number;                     // Number and range fields
-  max?: number;                     // Number and range fields
-  step?: number;                    // Range fields
-  options?: FieldOption[];          // Radio and select: [{ label, value }]
+  minLength?: number; // Text fields
+  maxLength?: number; // Text fields
+  pattern?: RegExp | string; // Text fields: a RegExp is used as-is; a string must match the whole value
+  patternMessage?: string; // Error when `pattern` doesn't match. Default: "<label> is not in the expected format"
+  min?: number; // Number and range fields
+  max?: number; // Number and range fields
+  step?: number; // Range fields
+  options?: FieldOption[]; // Radio and select: [{ label, value }]
   orientation?: 'horizontal' | 'vertical'; // Radio: a wrapping row (default) or one option per line
-  dateTimeConfig?: DateTimeConfig;  // Business date/time and instant date-time
-  hidden?: boolean;                 // Part of the model, never rendered
-  disabled?: boolean;               // Rendered but not editable
-  hint?: string;                    // Help text under the field
-  maxWidth?: string;                // DynamicForm only: caps this field's width, Eg '400px'
+  dateTimeConfig?: DateTimeConfig; // Business date/time and instant date-time
+  hidden?: boolean; // Part of the model, never rendered
+  disabled?: boolean; // Rendered but not editable
+  hint?: string; // Help text under the field
+  maxWidth?: string; // DynamicForm only: caps this field's width, Eg '400px'
 }
 
 interface DateTimeConfig {
-  locale?: string;                  // Display/typing format, Eg 'en-GB', 'en-US', 'el-CY'. Default 'en-GB'.
-  min?: string;                     // In the field's own value format: '2026-12-25', '09:00' or '2026-01-01T00:00:00Z'
+  locale?: string; // Display/typing format, Eg 'en-GB', 'en-US', 'el-CY'. Default 'en-GB'.
+  min?: string; // In the field's own value format: '2026-12-25', '09:00' or '2026-01-01T00:00:00Z'
   max?: string;
-  timeZone?: string;                // Instant only: IANA zone, Eg 'Europe/London'. Default: the user's timezone.
-  disambiguation?: 'earlier' | 'later';  // Instant only: which occurrence when a time happens twice
+  timeZone?: string; // Instant only: IANA zone, Eg 'Europe/London'. Default: the user's timezone.
+  disambiguation?: 'earlier' | 'later'; // Instant only: which occurrence when a time happens twice
 }
 ```
 
@@ -262,15 +286,15 @@ interface DateTimeConfig {
 
 `toSchema()` turns each `FieldDef` into Signals Forms rules, with messages built from the label:
 
-| Config | Rule | Message |
-|---|---|---|
-| `required: true` | `required()` | "Email is required" |
-| `minLength` / `maxLength` | `minLength()` / `maxLength()` | "Username must be at least 3 characters" |
-| `min` / `max` | `min()` / `max()` | "Age must be at least 18" |
-| type `EMAIL` | `email()` | "Email must be a valid email address" |
-| `pattern` (+ `patternMessage`) | `pattern()` | your `patternMessage`, or "Username is not in the expected format" |
-| `dateTimeConfig.min` / `max` | custom | "Closed on cannot be after 2026-12-31" |
-| `disabled: true` | `disabled()` | — (field shown but not editable) |
+| Config                         | Rule                          | Message                                                            |
+| ------------------------------ | ----------------------------- | ------------------------------------------------------------------ |
+| `required: true`               | `required()`                  | "Email is required"                                                |
+| `minLength` / `maxLength`      | `minLength()` / `maxLength()` | "Username must be at least 3 characters"                           |
+| `min` / `max`                  | `min()` / `max()`             | "Age must be at least 18"                                          |
+| type `EMAIL`                   | `email()`                     | "Email must be a valid email address"                              |
+| `pattern` (+ `patternMessage`) | `pattern()`                   | your `patternMessage`, or "Username is not in the expected format" |
+| `dateTimeConfig.min` / `max`   | custom                        | "Closed on cannot be after 2026-12-31"                             |
+| `disabled: true`               | `disabled()`                  | — (field shown but not editable)                                   |
 
 There's no separate `requiredTrue`: `required` treats `false` as empty, so `required: true` on a
 checkbox means it must be ticked (Eg "Accept terms").
@@ -279,8 +303,8 @@ checkbox means it must be ticked (Eg "Accept terms").
 formConfig<SignUp>('signUp')
   .text('username', 'Username', {
     required: true,
-    pattern: '[a-z0-9.]+',                 // whole value must match
-    patternMessage: 'Use lowercase letters, digits and dots only'
+    pattern: '[a-z0-9.]+', // whole value must match
+    patternMessage: 'Use lowercase letters, digits and dots only',
   })
   .email('email', 'Email', { required: true })
   .checkbox('terms', 'I accept the terms', { required: true })

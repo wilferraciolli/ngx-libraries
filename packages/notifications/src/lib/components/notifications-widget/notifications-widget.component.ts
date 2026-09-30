@@ -41,11 +41,14 @@ export class NotificationsWidget<TNotification = unknown> {
   @ContentChild(TemplateRef)
   protected itemTemplate?: TemplateRef<{ $implicit: TNotification }>;
 
-  protected readonly notifications = inject<NotificationsService<TNotification>>(NotificationsService);
+  protected readonly notifications =
+    inject<NotificationsService<TNotification>>(NotificationsService);
   protected readonly text = inject(NGX_NOTIFICATIONS_TEXT);
 
   protected readonly isOpen = signal(false);
-  protected readonly triggerLabel = computed(() => this.text().triggerLabel(this.notifications.unreadCount()));
+  protected readonly triggerLabel = computed(() =>
+    this.text().triggerLabel(this.notifications.unreadCount()),
+  );
 
   protected toggle(): void {
     this.isOpen.update((open) => !open);

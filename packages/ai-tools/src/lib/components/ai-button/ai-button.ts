@@ -8,7 +8,7 @@ import { AiSparkleIcon } from '../ai-sparkle-icon/ai-sparkle-icon';
   imports: [AiSparkleIcon],
   templateUrl: './ai-button.html',
   styleUrl: './ai-button.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AiButton {
   public readonly label = input.required<string>();

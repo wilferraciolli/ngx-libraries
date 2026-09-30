@@ -1,4 +1,7 @@
 <mat-checkbox [formField]="field()">
-  {{ fieldDef().label }}@if (field()().required()) {<span aria-hidden="true"> *</span>}
+  {{ fieldDef().label }}
+  @if (field()().required()) {
+    <span aria-hidden="true"> *</span>
+  }
 </mat-checkbox>
 <ngx-field-subscript class="CheckboxField-subscript" [field]="field()" [hint]="fieldDef().hint" />

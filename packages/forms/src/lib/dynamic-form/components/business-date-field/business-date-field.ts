@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, viewChildren } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  viewChildren,
+} from '@angular/core';
 import type { FieldTree } from '@angular/forms/signals';
 import { DateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -22,7 +30,7 @@ import { parsePlainDate } from '../../utils/date-time.utils';
   providers: [provideLocaleDateAdapter()],
   templateUrl: './business-date-field.html',
   styleUrl: './business-date-field.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BusinessDateField {
   public readonly fieldDef = input.required<FieldDef>();
@@ -40,7 +48,9 @@ export class BusinessDateField {
 
   constructor() {
     syncMatInputErrorState(this.inputs, this.state);
-    effect(() => this.dateAdapter.setLocale(this.fieldDef().dateTimeConfig?.locale || this.resolveLocale()));
+    effect(() =>
+      this.dateAdapter.setLocale(this.fieldDef().dateTimeConfig?.locale || this.resolveLocale()),
+    );
   }
 
   protected onDateChange(date: Date | null): void {
@@ -50,7 +60,11 @@ export class BusinessDateField {
     }
 
     this.state().value.set(
-      Temporal.PlainDate.from({ year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate() }).toString()
+      Temporal.PlainDate.from({
+        year: date.getFullYear(),
+        month: date.getMonth() + 1,
+        day: date.getDate(),
+      }).toString(),
     );
   }
 }

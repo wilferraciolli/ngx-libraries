@@ -11,6 +11,7 @@ worth generalizing, not worth copying verbatim (it predates Signals, and the rig
 new requirement that prior art never had). See root `NEXT_STEPS.md` for the fuller decision history.
 
 ## Layout
+
 ```
 src/
 ├── public-api.ts        # barrel — the entire public surface; nothing outside this is exported
@@ -25,6 +26,7 @@ src/
 ```
 
 ## Conventions
+
 - **`ModalService.open()` is the only entry point** — it wraps the caller's content component in
   `ModalShellComponent` (positioning, the close button, the unsaved-changes guard) and opens that
   through `MatDialog`. `ModalShellComponent` is deliberately **not exported** from `public-api.ts`
@@ -35,7 +37,7 @@ src/
   calls `.setInput('data', config.data)` — the content component declares a matching `data` input
   (`data = input<TData>()`). Because that dynamic creation happens inside a view whose own element
   injector chains up through the dialog's injector (the one `MatDialogRef`/`MAT_DIALOG_DATA` are
-  provided in — this is how `MatDialog`/CDK Dialog wires up the component *it* creates), the content
+  provided in — this is how `MatDialog`/CDK Dialog wires up the component _it_ creates), the content
   component can `inject(MatDialogRef<ItsOwnType, ItsOwnResultType>)` directly and call
   `.close(result)` itself, exactly as if `MatDialog.open()` had opened it directly. Generic type
   parameters on `MatDialogRef` are compile-time only — every component in the tree resolves the
@@ -51,7 +53,7 @@ src/
   (e.g. after a successful save) are the only ways out. This is deliberate, not an oversight: it's
   what makes the dirty-check guarantee actually hold — a bypassable Escape/backdrop would defeat it.
 - **Positioning and responsiveness are pure `MatDialogConfig`, no shipped global CSS.** `position:
-  {top:'0', right:'0'}`, `height: '100vh'`, `width: config.width ?? 'var(--ngx-modal-width, 33vw)'`
+{top:'0', right:'0'}`, `height: '100vh'`, `width: config.width ?? 'var(--ngx-modal-width, 33vw)'`
   are all inline styles CDK applies directly to the overlay pane — no stylesheet needed. Below the
   CDK's `Breakpoints.XSmall`, `ModalService.open()` calls `dialogRef.updateSize('100vw', '100vh')`
   via a `BreakpointObserver.observe()` subscription (unsubscribed on `afterClosed()`), same pattern
@@ -59,7 +61,7 @@ src/
 - **Known v1 gap, deliberately deferred**: no slide-in-from-right transition or square-left-corner
   surface shape — Material's default fade/scale transition and rounded corners apply as-is. Fixing
   this means styling `.cdk-overlay-pane`/`.mat-mdc-dialog-container` via `panelClass`, which needs a
-  *global* (non-component-encapsulated) stylesheet — `::ng-deep` from `ModalShellComponent` can't
+  _global_ (non-component-encapsulated) stylesheet — `::ng-deep` from `ModalShellComponent` can't
   reach those elements, they're CDK-created ancestors of its own root element, not descendants. No
   established mechanism in this repo yet for a package to ship loose global CSS an app imports
   (every other package's styling is either component-encapsulated or a `--ngx-*`/`--mat-sys-*`
@@ -70,7 +72,7 @@ src/
 - **`ModalCloseAction`'s six members are a starting vocabulary, not a fixed contract** — both
   `ModalCloseResult` and `ModalService.open<TResult>()` are generic, so a modal whose actions don't
   fit (`Approved`/`Rejected`, say) defines its own `TAction` and passes a `ModalCloseResult<TAction,
-  TData>` as `open()`'s `TResult`.
+TData>` as `open()`'s `TResult`.
 - No dependency on `@wiltech-labs/ngx-styles` (doesn't exist yet) for the width token —
   `--ngx-modal-width` is this package's own custom property, following the same "token default, no
   hex fallback needed here since it's a length not a colour" pattern.
@@ -79,6 +81,7 @@ src/
   `docs/ANGULAR_APP_CONVENTIONS.md`'s "Material-based packages inherit the app theme directly").
 
 ## Status
+
 - New package: `ModalService` (`open()`/`confirm()`), `ModalCloseAction`/`ModalCloseResult`,
   `ModalContent`/`hasUnsavedChanges()`, `ModalConfig`, `ConfirmDialogComponent`/`ConfirmDialogData`.
 - `tsc --noEmit` and `ng-packagr build` both clean. Wired into `apps/showcase` at `/modals` (a

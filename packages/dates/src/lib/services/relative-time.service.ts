@@ -15,7 +15,7 @@ export class RelativeTimeService {
   /** `now` defaults to the real current instant — pass one explicitly only for tests. */
   public relativeTime(
     value: InstantLike,
-    options?: Intl.RelativeTimeFormatOptions & { now?: InstantLike }
+    options?: Intl.RelativeTimeFormatOptions & { now?: InstantLike },
   ): string {
     const { now, ...formatOptions } = options ?? {};
     const target = toInstant(value);
@@ -25,7 +25,7 @@ export class RelativeTimeService {
 
     return new Intl.RelativeTimeFormat(this.resolveLocale(), {
       numeric: 'auto',
-      ...formatOptions
+      ...formatOptions,
     }).format(amount, unit);
   }
 

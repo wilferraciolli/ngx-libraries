@@ -1,4 +1,14 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, linkedSignal, signal, viewChildren } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  linkedSignal,
+  signal,
+  viewChildren,
+} from '@angular/core';
 import type { WritableSignal } from '@angular/core';
 import type { FieldTree } from '@angular/forms/signals';
 import { DateAdapter } from '@angular/material/core';
@@ -22,11 +32,17 @@ import { FieldSubscript } from '../../shared/field-subscript/field-subscript';
 @Component({
   selector: 'ngx-instant-date-time-field',
   standalone: true,
-  imports: [MatFormFieldModule, MatInputModule, MatDatepickerModule, MatTimepickerModule, FieldSubscript],
+  imports: [
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatTimepickerModule,
+    FieldSubscript,
+  ],
   providers: [provideLocaleDateAdapter()],
   templateUrl: './instant-date-time-field.html',
   styleUrl: './instant-date-time-field.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InstantDateTimeField {
   public readonly fieldDef = input.required<FieldDef>();
@@ -41,15 +57,23 @@ export class InstantDateTimeField {
 
   protected readonly state = computed(() => this.field()());
   protected readonly config = computed(() => this.fieldDef().dateTimeConfig);
-  protected readonly timeZone = computed(() => this.config()?.timeZone || Temporal.Now.timeZoneId());
-  protected readonly offset = computed(() => this.zonedDateTime.offset(this.state().value(), this.timeZone()));
-  protected readonly minDate = computed(() => this.zonedDateTime.toDate(this.config()?.min, this.timeZone()));
-  protected readonly maxDate = computed(() => this.zonedDateTime.toDate(this.config()?.max, this.timeZone()));
+  protected readonly timeZone = computed(
+    () => this.config()?.timeZone || Temporal.Now.timeZoneId(),
+  );
+  protected readonly offset = computed(() =>
+    this.zonedDateTime.offset(this.state().value(), this.timeZone()),
+  );
+  protected readonly minDate = computed(() =>
+    this.zonedDateTime.toDate(this.config()?.min, this.timeZone()),
+  );
+  protected readonly maxDate = computed(() =>
+    this.zonedDateTime.toDate(this.config()?.max, this.timeZone()),
+  );
 
   // Only a change of the actual wall-clock time counts, so '' -> null (still empty) keeps a half-filled pick.
   private readonly wallClock = computed(
     () => this.zonedDateTime.toDate(this.state().value(), this.timeZone()),
-    { equal: (a, b) => a?.getTime() === b?.getTime() }
+    { equal: (a, b) => a?.getTime() === b?.getTime() },
   );
 
   // Both pickers follow the bound value, but can hold a half-filled pick until both parts are set.
@@ -64,7 +88,7 @@ export class InstantDateTimeField {
   }
 
   protected onDateChange(date: Date | null): void {
-    if (sameParts(date, this.date(), d => [d.getFullYear(), d.getMonth(), d.getDate()])) {
+    if (sameParts(date, this.date(), (d) => [d.getFullYear(), d.getMonth(), d.getDate()])) {
       return;
     }
 
@@ -74,7 +98,7 @@ export class InstantDateTimeField {
 
   // The timepicker re-emits values we set on it (Eg on blur); ignoring those keeps a DST notice visible.
   protected onTimeChange(time: Date | null): void {
-    if (sameParts(time, this.time(), t => [t.getHours(), t.getMinutes()])) {
+    if (sameParts(time, this.time(), (t) => [t.getHours(), t.getMinutes()])) {
       return;
     }
 
@@ -96,7 +120,12 @@ export class InstantDateTimeField {
       return;
     }
 
-    const result = this.zonedDateTime.toInstant(date, time, this.timeZone(), this.config()?.disambiguation);
+    const result = this.zonedDateTime.toInstant(
+      date,
+      time,
+      this.timeZone(),
+      this.config()?.disambiguation,
+    );
     value.set(result?.instant ?? null);
     this.notice.set(result?.notice ?? null);
   }

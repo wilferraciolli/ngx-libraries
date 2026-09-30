@@ -12,38 +12,38 @@ import { NotificationsDemoComponent } from './demos/notifications-demo/notificat
 export const routes: Routes = [
   {
     path: '',
-    component: HomeComponent
+    component: HomeComponent,
   },
   {
     path: 'api-client',
-    component: ApiClientDemoComponent
+    component: ApiClientDemoComponent,
   },
   {
     path: 'forms',
-    component: FormsDemoComponent
+    component: FormsDemoComponent,
   },
   {
     path: 'media',
-    component: MediaDemoComponent
+    component: MediaDemoComponent,
   },
   {
     path: 'ai-tools',
-    component: AiToolsDemoComponent
+    component: AiToolsDemoComponent,
   },
   {
     path: 'graphs',
-    component: GraphsDemoComponent
+    component: GraphsDemoComponent,
   },
   {
     path: 'translations',
-    component: TranslationsDemoComponent
+    component: TranslationsDemoComponent,
   },
   {
     path: 'modals',
-    component: ModalsDemoComponent
+    component: ModalsDemoComponent,
   },
   {
     path: 'notifications',
-    component: NotificationsDemoComponent
-  }
+    component: NotificationsDemoComponent,
+  },
 ];

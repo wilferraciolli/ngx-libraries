@@ -67,11 +67,21 @@ export class FormConfigBuilder<T extends BaseSchema> {
     return this.add(FormFieldType.RANGE, name, label, options);
   }
 
-  public radio(name: FieldName<T>, label: string, choices: FieldOption[], options?: FieldOptions): this {
+  public radio(
+    name: FieldName<T>,
+    label: string,
+    choices: FieldOption[],
+    options?: FieldOptions,
+  ): this {
     return this.add(FormFieldType.RADIO, name, label, { ...options, options: choices });
   }
 
-  public select(name: FieldName<T>, label: string, choices: FieldOption[], options?: FieldOptions): this {
+  public select(
+    name: FieldName<T>,
+    label: string,
+    choices: FieldOption[],
+    options?: FieldOptions,
+  ): this {
     return this.add(FormFieldType.SELECT, name, label, { ...options, options: choices });
   }
 
@@ -105,7 +115,7 @@ export class FormConfigBuilder<T extends BaseSchema> {
     return {
       schemaType: this.schemaType,
       fields: this.fields(),
-      initialValue: createEmptyEntity<T>(this.schemaType, initialValue)
+      initialValue: createEmptyEntity<T>(this.schemaType, initialValue),
     };
   }
 
@@ -116,6 +126,8 @@ export class FormConfigBuilder<T extends BaseSchema> {
 }
 
 /** Starts a FormConfigBuilder for schema `T`. */
-export function formConfig<T extends BaseSchema>(schemaType: T['schemaType']): FormConfigBuilder<T> {
+export function formConfig<T extends BaseSchema>(
+  schemaType: T['schemaType'],
+): FormConfigBuilder<T> {
   return new FormConfigBuilder<T>(schemaType);
 }

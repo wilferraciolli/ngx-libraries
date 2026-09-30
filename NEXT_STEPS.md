@@ -11,7 +11,7 @@ scratchpad so we don't lose track between sessions. Update as items land or prio
       `"file:../x/dist"` (see root `CLAUDE.md`'s "Inter-package deps") — on a fresh clone neither
       `dist/` exists yet. `npm install` never errors on this (it symlinks to the not-yet-existing
       path, and the symlink self-heals once that path's target appears later — no re-install
-      needed), so the failure only ever shows up at *build* time, cascading `TS2571`/module-not-found
+      needed), so the failure only ever shows up at _build_ time, cascading `TS2571`/module-not-found
       errors from the still-empty dependency. The root `build:packages` script used to get the
       ordering right only by accident (alphabetical directory order happened to put `api-client`/
       `auth` before `region-settings`). Fixed 2026-09-30: added `scripts/build-packages.sh`, which
@@ -19,7 +19,7 @@ scratchpad so we don't lose track between sessions. Update as items land or prio
       `build`/`build:packages` scripts now call it instead of a plain `for d in packages/*/` loop.
       Reproduced the original failure directly (wiped every package's `dist/`, fresh `npm install`,
       built `region-settings` alone — failed) and confirmed the fix on the same reproduction (`npm
-      install && npm run build` now succeeds end to end, including the showcase app). See
+install && npm run build` now succeeds end to end, including the showcase app). See
       `packages/region-settings/CLAUDE.md`'s "Build-order requirement" note for the full detail —
       building a single package on its own (`cd packages/region-settings && npm run build`) still
       needs `../api-client`/`../auth` built manually first, the script only orders the repo-wide
@@ -39,7 +39,7 @@ scratchpad so we don't lose track between sessions. Update as items land or prio
       the api-client and forms demo components). `npm install` regenerated `package-lock.json`,
       and both packages were rebuilt so `dist/` picked up the correct fesm/typings filenames.
 - [x] `apps/showcase`'s own `npm run typecheck` (`tsc -p tsconfig.json --noEmit`) failed with `TS6059
-      ... is not under 'rootDir'` for every library consumed via the `paths` mapping. Root cause: no
+... is not under 'rootDir'` for every library consumed via the `paths` mapping. Root cause: no
       explicit `rootDir` was set alongside the explicit `outDir`, so `tsc` inferred `rootDir` from
       `apps/showcase/src` alone — any `paths`-mapped file outside that (i.e. every `packages/*/src`
       import) then failed the "must be under rootDir" check. Fixed 2026-09-30 by adding
@@ -77,6 +77,7 @@ light and with a dark M3 token set (no console errors):
 - [x] `.prettierrc` / `.editorconfig` added (Prettier not yet run over the packages).
 
 Still open:
+
 - [ ] graphs: peak-value label plugin and arrow-key tooltips (the doc says they're not in yet).
 - [ ] ai-tools: with a theme whose primary/tertiary/secondary are all one hue (e.g. Material's
       `azure-blue` prebuilt), the AI gradient comes out near-monochrome. Decide whether that's fine or
@@ -108,18 +109,16 @@ switches instantly — no reload — via a signal every
 - [x] The app never imports `@jsverse/transloco` directly — `TranslocoLoader`/`Translation` types
       (for a custom `loader`) are re-exported from this package's own barrel.
 - [x] Two bugs found and fixed while wiring the showcase demo (`apps/showcase`'s `/translations` route),
-      caught by screenshotting both locales rather than just building/typechecking:
-      1. `t()`/`TPipe` called `TranslocoService.translate()` directly, but nothing ever called
-         `.load()` for a language — that's ordinarily the built-in pipe/directive's job. Every key
-         rendered as itself (the missing-key fallback) in *both* locales, not just an untranslated
-         one. Fixed: `TranslationsService` now calls `.load(locale)` before `setActiveLang()`, both in the
-         constructor's reactive subscription and in `setLocale()`.
-      2. `TranslationsService.t()` wasn't reactive inside a `computed()` — `TranslocoService.translate()`
-         reads its own plain internal state, not a signal, so a `computed()` wrapping `t()` never
-         reran on a language switch (translated fine via the `t` pipe, not via logic). Fixed: `t()`
-         now passes `this.locale()` explicitly as `translate()`'s `lang` argument, so reading it
-         inside a `computed()` sees the dependency. `TPipe` was changed to call `TranslationsService.t()`
-         rather than `TranslocoService.translate()` directly, so both paths agree.
+      caught by screenshotting both locales rather than just building/typechecking: 1. `t()`/`TPipe` called `TranslocoService.translate()` directly, but nothing ever called
+      `.load()` for a language — that's ordinarily the built-in pipe/directive's job. Every key
+      rendered as itself (the missing-key fallback) in _both_ locales, not just an untranslated
+      one. Fixed: `TranslationsService` now calls `.load(locale)` before `setActiveLang()`, both in the
+      constructor's reactive subscription and in `setLocale()`. 2. `TranslationsService.t()` wasn't reactive inside a `computed()` — `TranslocoService.translate()`
+      reads its own plain internal state, not a signal, so a `computed()` wrapping `t()` never
+      reran on a language switch (translated fine via the `t` pipe, not via logic). Fixed: `t()`
+      now passes `this.locale()` explicitly as `translate()`'s `lang` argument, so reading it
+      inside a `computed()` sees the dependency. `TPipe` was changed to call `TranslationsService.t()`
+      rather than `TranslocoService.translate()` directly, so both paths agree.
 - [x] Wired into `apps/showcase` at `/translations` (two demo dictionaries, `en-GB`/`el-GR`): a language
       switcher, `t` pipe usage with params, `TranslationsService.t()` from a `computed()`, and
       `formatDate()`/`formatNumber()`. Verified in a browser in both locales, and that switching
@@ -127,15 +126,10 @@ switches instantly — no reload — via a signal every
 - [x] `docs/ANGULAR_APP_CONVENTIONS.md`'s "Shared libraries" section, table, setup snippet, and
       "Dates and times" updated; root `CLAUDE.md` repo layout updated.
 - [ ] Not yet published to npm — under development, no consumers yet.
-- [ ] Still open, not done as part of this:
-      - Per-library text tokens — see "Per-library text tokens" below, done 2026-09-30.
-      - `ngx-api-client` sending `Accept-Language` from the active locale.
-      - Migrating an existing consuming app's own `I18nStore`/`labels.ts` onto this package —
-        flagged for later, on request, not started.
-      - Peak/ICU-heavy features (plurals, gendered forms) aren't exercised by the demo yet, only the
-        plain-dictionary/interpolation path.
-      - `ngx-forms`' `dateTimeConfig.locale` fallback — see "`ngx-forms`: `NGX_FORMS_LOCALE`" below,
-        done 2026-09-30, after `ngx-dates`.
+- [ ] Still open, not done as part of this: - Per-library text tokens — see "Per-library text tokens" below, done 2026-09-30. - `ngx-api-client` sending `Accept-Language` from the active locale. - Migrating an existing consuming app's own `I18nStore`/`labels.ts` onto this package —
+      flagged for later, on request, not started. - Peak/ICU-heavy features (plurals, gendered forms) aren't exercised by the demo yet, only the
+      plain-dictionary/interpolation path. - `ngx-forms`' `dateTimeConfig.locale` fallback — see "`ngx-forms`: `NGX_FORMS_LOCALE`" below,
+      done 2026-09-30, after `ngx-dates`.
 
 ## New package `ngx-dates` — built 2026-09-30
 
@@ -144,10 +138,10 @@ Built right after `ngx-translations`, per this file's own note above ("reading t
 out not to build:
 
 - [x] Tried the direct import first. `ng-packagr` failed with `TS2307: Cannot find module
-      '@wiltech-labs/ngx-translations'`, even with a `tsconfig` `paths` mapping (which fixes this for `tsc`
+'@wiltech-labs/ngx-translations'`, even with a `tsconfig` `paths` mapping (which fixes this for `tsc`
       directly, and is how `apps/showcase` resolves every package — but `ng-packagr` builds each
       package as a fully standalone publishable unit and doesn't honour it the same way). Root
-      cause: a workspace sibling's *source* `package.json` has no `main`/`types` field — only the
+      cause: a workspace sibling's _source_ `package.json` has no `main`/`types` field — only the
       `dist/` one `ng-packagr` itself writes does — so there's currently no working way for one
       package here to depend on another's source at build time, only for an app to depend on
       several of them side by side. Documented as a new row in root `CLAUDE.md`'s "Locked-in
@@ -156,7 +150,7 @@ out not to build:
       `navigator.language`) — the exact pattern `ngx-translations`'s own `NgxTranslationsConfig.resolveLocale`
       already uses for app-pluggable resolution, applied one level further out. The app wires the
       two together itself: `{ provide: NGX_DATES_LOCALE, useFactory: () => { const translations =
-      inject(TranslationsService); return () => translations.locale(); } }`. `ngx-dates` ends up with zero
+inject(TranslationsService); return () => translations.locale(); } }`. `ngx-dates` ends up with zero
       dependency on `ngx-translations`, or on any i18n setup at all.
 - [x] `RelativeTimeService.relativeTime(value, options?)` — `Temporal` + `Intl.RelativeTimeFormat`,
       a shared unit ladder (`pickTier()` in `relative-time.utils.ts`) picking the right unit
@@ -170,7 +164,7 @@ out not to build:
       minute old, hourly once day-or-older — rather than depending on an unrelated binding to
       trigger change detection. Locale changes are picked up via an `effect()` that only calls
       `markForCheck()` (never writes a signal); confirmed that `effect()` still tracks a signal read
-      performed *inside* the injected `resolveLocale()` function call, not just ones read directly
+      performed _inside_ the injected `resolveLocale()` function call, not just ones read directly
       in the effect body.
 - [x] Wired into the showcase's existing `/translations` demo (not a separate route — the point is showing
       both packages react to the same switch together): `main.ts` wires `NGX_DATES_LOCALE` to
@@ -223,17 +217,17 @@ needed the same treatment:
 - [x] `ngx-graphs`' `GraphFrame` had exactly one genuinely hardcoded, non-overridable string:
       the "Show data" table-toggle text. Added `NGX_GRAPHS_TEXT`
       (`config/graphs-text.token.ts`, `InjectionToken<() => GraphsText>`, `GraphsText { showData:
-      string }`), same resolver-token pattern as `NGX_DATES_LOCALE`/`NGX_FORMS_LOCALE`. `GraphFrame`
+string }`), same resolver-token pattern as `NGX_DATES_LOCALE`/`NGX_FORMS_LOCALE`. `GraphFrame`
       reads it via `computed(() => this.resolveText())`, so a resolver wired to `ngx-translations` stays
       reactive to a language switch. Exported from `public-api.ts`.
 - [x] `ngx-web-sockets`' `ChatRoom` had six: connection status ("Connected"/"Connecting…"), the
       messages-region and composer `aria-label`s, the composer placeholder, and the send button's
-      `aria-label`/`title` — plus five more in *transient status messages* that were easy to miss on
+      `aria-label`/`title` — plus five more in _transient status messages_ that were easy to miss on
       a first pass (`showStatus()` calls for "A client connected"/"A client disconnected", the
       per-client "X is typing…", and the two error messages). Added `NGX_CHAT_TEXT`
       (`config/chat-text.token.ts`, `ChatText` — the two parameterized ones, `clientTyping` and
       `error`/`connectionError`, are functions rather than interpolation-placeholder strings, to
-      avoid building a template-parsing mini-engine for two call sites). Message *bodies* are
+      avoid building a template-parsing mini-engine for two call sites). Message _bodies_ are
       untouched — still plain app/server data.
 - [x] Both packages rebuild/typecheck clean; full workspace build (8 packages + showcase `ng build`)
       still clean. `ngx-graphs`' "Show data" toggle checked live in the showcase's `/graphs` demo
@@ -249,9 +243,15 @@ needed the same treatment:
       path is ever wanted; not done here to keep this change to the packages themselves.
 
 ## More housekeeping
+
 - [ ] Showcase: give it the house M3 theme (it uses light-only `azure-blue` + hardcoded greys), so dark
       mode can be checked for real.
-- [ ] Run Prettier over the repo once and commit that separately.
+- [x] Run Prettier over the repo once and commit that separately. Done 2026-09-30: added `prettier`
+      as a root devDependency (no config existed for it as a package script before — `.prettierrc`
+      was already checked in), plus `.prettierignore` (`dist`, `node_modules`, `coverage`,
+      `package-lock.json`) and root `format`/`format:check` scripts. Ran `prettier --write .` once,
+      144 files reformatted — trailing commas and a few wrapped lines, no semantic changes (spot-checked
+      several diffs). Full `npm run build` and `npm run typecheck` both pass clean afterward.
 - [ ] api-client: `resource()`/`collectionResource()` now guard with `hasValue()` — bump + publish
       0.1.6, then update consumers. Other packages: first publish once reviewed.
 - [x] `ngx-auth` and `ngx-region-settings` were both built without the doc-sync step every earlier
@@ -273,7 +273,7 @@ built the same day too.
 
 ### Prior art: an existing app's dialog service
 
-A few years old, in a sibling repo, not part of this monorepo. Worth porting the *shape* of, not
+A few years old, in a sibling repo, not part of this monorepo. Worth porting the _shape_ of, not
 the code verbatim (it predates Signals, standalone components are inconsistent there, and the
 layout requirement below is new):
 
@@ -284,13 +284,13 @@ layout requirement below is new):
   `MatDialog` already wraps CDK Dialog and adds the Material surface/animation/theming this needs
   anyway.
 - Per-dialog `<X>DialogCloseData` interfaces (e.g. `SurveyInstanceDialogCloseData { actionType: 
-  DialogClosedActionType; id; surveyInstance }`) — the enum *and* the payload travel together in one
+DialogClosedActionType; id; surveyInstance }`) — the enum _and_ the payload travel together in one
   object. Exactly the "access to the data as well" shape asked for — `ngx-modals` should generalize
   this into one typed shape (something like `ModalCloseResult<TAction, TData> = { action: TAction;
-  data: TData }`) instead of every app hand-writing its own close-data interface per dialog.
+data: TData }`) instead of every app hand-writing its own close-data interface per dialog.
 - Caller pattern: `dialog.open(Component, config).afterClosed().subscribe(data => { if
-  (data.actionType === DialogClosedActionType.DELETED) { ... } })` — confirms the enum is read by the
-  *caller*, after close, not by the modal content itself.
+(data.actionType === DialogClosedActionType.DELETED) { ... } })` — confirms the enum is read by the
+  _caller_, after close, not by the modal content itself.
 - `MatConfirmDialogComponent` + `DialogService.openConfirmDialog(msg)` — a small reusable Yes/No
   dialog (`disableClose: true`, so the user must pick a button) used today only for delete
   confirmations. `ngx-modals`' own unsaved-changes prompt (see below) is the same idea, generalized.
@@ -312,14 +312,14 @@ request in the panel while their team's availability stays visible on the left).
       `MatDialogConfig` inline styles, no stylesheet needed for correct positioning/sizing.
       **Descoped for v1**: the `panelClass` override for a slide-in-from-right transition with
       square left-hand corners (Material's default centered fade/scale + rounded corners apply
-      as-is instead) — styling `.cdk-overlay-pane`/`.mat-mdc-dialog-container` needs a *global*,
+      as-is instead) — styling `.cdk-overlay-pane`/`.mat-mdc-dialog-container` needs a _global_,
       non-component-encapsulated stylesheet (`::ng-deep` from the shell can't reach them — they're
       CDK-created ancestors of the shell's own root element, not descendants), and this repo has no
       established mechanism yet for a package to ship loose global CSS an app imports. See
       `ngx-modals`' own `CLAUDE.md` for the full reasoning; revisit if/when that packaging question
       gets solved (maybe by `ngx-styles`, maybe some other way).
 - [x] Width is an overridable `--ngx-modal-width` custom property, defaulting to `var(--ngx-modal-width,
-      33vw)` — settable app-wide via the CSS variable, or per-open via `ModalConfig.width`.
+33vw)` — settable app-wide via the CSS variable, or per-open via `ModalConfig.width`.
 - [x] **Correction to the "breakpoints are already in a library" assumption**: confirmed still true
       — no `ngx-styles` yet (see that section below). `ngx-modals` reacts to the CDK's
       `BreakpointObserver.observe(Breakpoints.XSmall)` directly at runtime, subscribed per `open()`
@@ -333,24 +333,21 @@ request in the panel while their team's availability stays visible on the left).
 - [x] **Resolved**: `ModalCloseAction` enum — `Dismissed`/`Cancelled`/`Done`/`Created`/`Updated`/
       `Deleted` — six members, a starting vocabulary rather than a closed list (see below), paired
       with whatever data the modal wants to hand back via `ModalCloseResult<TAction, TData> = {
-      action: TAction; data: TData }`.
+action: TAction; data: TData }`.
 - [x] **New requirement, not in the prior-art app above — built**: the shell's X button closes
       immediately if the content has no unsaved changes; if it does, `ModalService`'s own
       `ConfirmDialogComponent` prompts first ("You have unsaved changes. Are you sure you want to
-      close? It will lose data."), and only closes the panel if confirmed.
-      - Content reports dirty state via the optional `ModalContent.hasUnsavedChanges(): boolean` —
-        a component that doesn't implement it is treated as always safe to close (a `hasUnsavedChanges()`
-        helper checks `typeof instance?.hasUnsavedChanges === 'function'` before calling it, never throws).
-      - The outer `MatDialog` is opened with `disableClose: true` — Escape and a backdrop click do
-        nothing, so they can't bypass the same check the X button goes through.
-      - `ConfirmDialogComponent` is the generalized, reusable version of the prior-art app's
-        `MatConfirmDialogComponent`/`openConfirmDialog()` — also exposed directly as
-        `ModalService.confirm(message, options?)` for anything else that wants the same prompt (e.g.
-        a delete confirmation), not just this package's own internal use of it.
+      close? It will lose data."), and only closes the panel if confirmed. - Content reports dirty state via the optional `ModalContent.hasUnsavedChanges(): boolean` —
+      a component that doesn't implement it is treated as always safe to close (a `hasUnsavedChanges()`
+      helper checks `typeof instance?.hasUnsavedChanges === 'function'` before calling it, never throws). - The outer `MatDialog` is opened with `disableClose: true` — Escape and a backdrop click do
+      nothing, so they can't bypass the same check the X button goes through. - `ConfirmDialogComponent` is the generalized, reusable version of the prior-art app's
+      `MatConfirmDialogComponent`/`openConfirmDialog()` — also exposed directly as
+      `ModalService.confirm(message, options?)` for anything else that wants the same prompt (e.g.
+      a delete confirmation), not just this package's own internal use of it.
 - [x] **The exact typed-wrapper API shape, resolved**: `ModalService.open<TResult, TData>(component,
-      config)` — root-provided service, not a factory function or a directive. It wraps `component`
+config)` — root-provided service, not a factory function or a directive. It wraps `component`
       in an internal `ModalShellComponent` (chrome: positioning, the close button, the dirty-check
-      guard) and opens *that* through `MatDialog`, returning `MatDialogRef<unknown, TResult>` (the
+      guard) and opens _that_ through `MatDialog`, returning `MatDialogRef<unknown, TResult>` (the
       shell's own type is erased from the public signature — nothing outside this package needs it).
       `ModalShellComponent` creates the caller's `component` dynamically
       (`ViewContainerRef.createComponent()`) inside its own view and feeds it `config.data` via
@@ -384,19 +381,21 @@ request in the panel while their team's availability stays visible on the left).
 
 ## New package `ngx-region-settings` — built 2026-09-30
 
-Idea captured 2026-09-30, built the same day. Prior art reviewed in a *different* reference app than
+Idea captured 2026-09-30, built the same day. Prior art reviewed in a _different_ reference app than
 the one behind `ngx-modals` above (`current-user.store.ts`, `region-settings.store.ts`). That app
 isn't a `@wiltech-labs/*` consumer itself (its own personal-scope API-client fork, a hand-rolled
 `AuthStore`/`TranslationService`), so — same caveat as every other prior-art reference here — port
-the *shape*, not the code.
+the _shape_, not the code.
 
 ### What's copy-pasted per app today
+
 Every app repeats the same flow: sign in → call `/me` → follow its `userProfile` link → follow
 `userSettings`/`systemSettings` links off the profile, into two screens ("my settings" and an
 admin-only "system settings") that are the same shape with different links and different `_data`
 roots.
 
 ### What the reference already got right (port this shape)
+
 - `RegionSettingsStore` is an **abstract base class** parameterized by only two things: the `_data`
   root key (`'userSettings'`/`'systemSettings'`) and which profile link to follow. Two 5-line
   subclasses (`UserSettingsStore`/`SystemSettingsStore`) supply those. The base owns loading state,
@@ -410,7 +409,8 @@ roots.
   `ngx-notifications` discussion above — a notifications link too) reads off of.
 
 ### Design decisions
-- [x] **Resolved 2026-09-30**: this package *does* own `CurrentUserStore`/`UserSettingsStore`/
+
+- [x] **Resolved 2026-09-30**: this package _does_ own `CurrentUserStore`/`UserSettingsStore`/
       `SystemSettingsStore` as ready-to-use signal stores, built directly on `ApiClientService` from
       `@wiltech-labs/ngx-api-client` — a real npm dependency, not an app-supplied `fetch`/`save`/
       `reset` function. Consuming apps inject the library's own stores and use them as-is, the same
@@ -419,7 +419,7 @@ roots.
       `@wiltech-labs/ngx-*` package depending on another — see root `CLAUDE.md`'s "Inter-package
       deps" row for the sanctioned-exception rule and why it doesn't reopen the `ngx-dates`/
       `ngx-translations` case (`ngx-api-client` is kept a strict foundation leaf; this package
-      depends *downward* on it, and no cycle is possible as long as `ngx-api-client` never depends on
+      depends _downward_ on it, and no cycle is possible as long as `ngx-api-client` never depends on
       anything built on top of it).
 - [x] **Not circular**: confirmed with the user — the dependency is one-directional
       (`ngx-region-settings → ngx-api-client`), same shape as `ngx-translations → @jsverse/transloco`.
@@ -439,7 +439,7 @@ roots.
       invented or left abstract — the common case (now effectively every app) needs zero type
       arguments; the generics exist for the rare app whose payload genuinely still differs.
 - [x] Naming follows the reference project's own name for this exact pattern: `packages/
-      region-settings` / `@wiltech-labs/ngx-region-settings`.
+region-settings` / `@wiltech-labs/ngx-region-settings`.
 - [x] **Resolved 2026-09-30**: `ngx-region-settings` also takes a real dependency on `ngx-auth`,
       gating `CurrentUserStore`'s `/me` fetch on `AuthStore.isSignedIn()` directly, the same way the
       reference code does. This is the second sanctioned exception to root `CLAUDE.md`'s
@@ -450,17 +450,17 @@ roots.
 - [x] **Solved the real `ng-packagr`/npm-workspaces resolution problem this section's design
       decisions above assumed was solvable**: a bare semver range in `ngx-region-settings`'
       `dependencies` resolves to npm workspaces' own auto-link-by-name behaviour, pointing at the
-      sibling's *unpublished source* folder — the exact `TS2307` dead end hit and documented under
+      sibling's _unpublished source_ folder — the exact `TS2307` dead end hit and documented under
       `ngx-dates` above. Fix: an explicit `"file:../api-client/dist"` / `"file:../auth/dist"`
       reference in `dependencies` instead — npm then nests a local `node_modules/@wiltech-labs/ngx-x`
-      inside `packages/region-settings` pointing at the literal path given (the sibling's *built*
+      inside `packages/region-settings` pointing at the literal path given (the sibling's _built_
       output, which has real `main`/`types`), rather than the root-hoisted source symlink. Confirmed
       working end to end: `npm install`, `tsc --noEmit`, and `ng-packagr build` all succeeded.
       A root-level npm `overrides` entry was tried first (to avoid a `file:` path in `dependencies`
       at all) — npm refused it (`EOVERRIDE ... conflicts with direct dependency`) because
       `ngx-api-client`/`ngx-auth` are workspace members, treated as a direct dependency of the
       workspace root. Two consequences, documented in `ngx-region-settings`'s own `CLAUDE.md`: (1)
-      `ngx-api-client`/`ngx-auth` must be *built* (their `dist/` must exist) before
+      `ngx-api-client`/`ngx-auth` must be _built_ (their `dist/` must exist) before
       `ngx-region-settings` builds — root `CLAUDE.md`'s "Inter-package deps" row now documents this;
       (2) `ng-packagr` copies `dependencies` verbatim into `dist/package.json`, `file:` paths
       included, so publishing needs a manual fixup first (replace the `file:` entries with real
@@ -491,13 +491,13 @@ mutation), and deep-linking (router integration) — state plus UI, closer in sh
       Built as `provideNotifications(configFactory)` + `NotificationsConfig<TNotification>`
       (`fetchNotifications`/`dismissNotification`/`openNotification`), same "app supplies an opaque
       function" pattern as `ngx-translations`' `loader` / `ngx-dates`' `NGX_DATES_LOCALE`. Deliberately
-      *not* extending the `ngx-api-client`/`ngx-region-settings` sanctioned exception — an app can
+      _not_ extending the `ngx-api-client`/`ngx-region-settings` sanctioned exception — an app can
       still source `fetchNotifications` from `ngx-region-settings`' own
       `CurrentUserStore.link('notifications')` at the call site, which is an app-level composition
       choice, not a package dependency.
 - [x] **Real bug caught during build, not in the design sketch above**: the sketch's
-      `provideNotifications({ fetchNotifications: () => inject(ApiClientService)... })` — a *plain
-      config object* whose callbacks call `inject()` directly inside themselves — doesn't actually
+      `provideNotifications({ fetchNotifications: () => inject(ApiClientService)... })` — a _plain
+      config object_ whose callbacks call `inject()` directly inside themselves — doesn't actually
       work. `NotificationsService.refresh()` calls those callbacks later, on a poll tick or a dismiss
       click, with no Angular injection context at all; a raw `inject()` call in there throws
       `NG0203` the first time a poll tick fires. Fixed: `provideNotifications()` takes a **factory**
@@ -563,7 +563,7 @@ Material seed palette, as a copy-and-own template, not a shared partial).
       implies interaction/usability design; this package is Sass tokens and mixins, a styling
       concern, not a UX one, and `styles` matches the plain, single-concern naming every other
       package already uses (`forms`, `graphs`, `dates`, `translations`).
-- [x] **Open shape question, resolved**: this is a genuinely different *kind* of package than
+- [x] **Open shape question, resolved**: this is a genuinely different _kind_ of package than
       everything else here — pure Sass partials/mixins, no `@Injectable`/`@Component`/TypeScript at
       all, so `ng-packagr` (Angular Package Format, fundamentally about compiling Angular sources)
       isn't the right build. Went with a plain npm package: no `ng-package.json`, no `tsconfig.json`,
@@ -573,7 +573,7 @@ Material seed palette, as a copy-and-own template, not a shared partial).
       package's own `CLAUDE.md` for what's different.
 - [x] `_breakpoints.scss`/`_spacing.scss`/`_ui.scss` ship as `@use`-able partials — consumers add
       `node_modules/@wiltech-labs/ngx-styles/src` to `angular.json`'s `stylePreprocessorOptions.
-      includePaths`, then `@use 'breakpoints'`/`'spacing'`/`'ui'` exactly like the local-copy
+includePaths`, then `@use 'breakpoints'`/`'spacing'`/`'ui'` exactly like the local-copy
       convention they replace. `theme-colors.template.scss` ships as a template to copy into the
       app's own `src/styles/_theme-colors.scss` and regenerate via
       `ng generate @angular/material:theme-color` — deliberately **not** underscore-prefixed, so it
@@ -634,7 +634,7 @@ Two different things were bundled under "auth" in the doc, and only one belongs 
       a new third-party dependency (`@ngrx/signals`) nothing else here needs, for state this simple.
 - [x] **`NgxAuthConfig.apiOrigin` made required, not defaulted** — the existing apps' interceptors
       hardcoded their own `environment.apiUrl` inline; this package generalizes that into a config
-      field, and deliberately does *not* give it a `''` default the way `ngx-api-client`'s
+      field, and deliberately does _not_ give it a `''` default the way `ngx-api-client`'s
       `API_ORIGIN` has, because an empty/omitted origin would match every request
       (`'anything'.startsWith('')` is always `true`) and leak the token to third-party calls (Giphy,
       an image host, ...) — a real scenario flagged during design, not hypothetical.
@@ -719,7 +719,7 @@ in particular, no consumer yet and no showcase demo route.
 
 - [x] Initial component set built on `feature/new-libraries` (2026-09-29): `AiSparkleIcon` (4-pointed
       sparkle/diamond glyph, gradient-filled by default, `[monochrome]` for use on a colored
-      background), `AiPanel` and `AiTextBox` (animated *rotating* `conic-gradient` border, via
+      background), `AiPanel` and `AiTextBox` (animated _rotating_ `conic-gradient` border, via
       `@property`-animated angle — not a static gradient fill), and `AiButton` (gradient-filled).
       All colors themeable via `--ngx-ai-gradient-*`/`--ngx-ai-surface` CSS custom properties, no
       Material dependency. Wired into `apps/showcase` at `/ai-tools` and visually verified in a
@@ -763,7 +763,7 @@ in particular, no consumer yet and no showcase demo route.
       a shared `withTitle()` helper, and the color palette into `DEFAULT_PALETTE`, used by both
       `toChartData()` and `toPointChartData()`. All 8 wired into `apps/showcase`'s `/graphs` demo
       and visually verified in a browser — no console errors, all render with correct data/colors.
-      Deliberately did *not* copy the other repo's per-component hardcoded demo data or its
+      Deliberately did _not_ copy the other repo's per-component hardcoded demo data or its
       doughnut-specific half-doughnut builder — kept everything driven through the one shared
       `GraphDef`/`PointGraphDef` abstraction instead.
 - [x] Upgraded `ng2-charts` from `6.0.1` to latest (`11.0.0`, 2026-09-29) — it was 5 majors behind;

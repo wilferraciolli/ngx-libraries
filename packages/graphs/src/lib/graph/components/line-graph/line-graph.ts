@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, type Signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  input,
+  type Signal,
+} from '@angular/core';
 import { BaseChartDirective } from 'ng2-charts';
 import type { ChartConfiguration } from 'chart.js';
 import type { GraphDef } from '../../interfaces/graph-definition';
@@ -15,7 +22,7 @@ import { GraphFrame } from '../graph-frame/graph-frame';
   imports: [BaseChartDirective, GraphFrame],
   templateUrl: './line-graph.html',
   styleUrl: './line-graph.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LineGraph {
   private readonly theme = inject(GraphThemeService).theme;
@@ -23,12 +30,22 @@ export class LineGraph {
   public readonly graphDef = input.required<GraphDef>();
 
   protected readonly chartData = computed<ChartConfiguration<'line'>['data']>(() =>
-    toChartData<'line'>(this.graphDef(), this.theme())
+    toChartData<'line'>(this.graphDef(), this.theme()),
   );
 
   protected readonly options: Signal<ChartConfiguration<'line'>['options']> = computed(() =>
-    graphOptions<'line'>(this.theme(), 'category', this.graphDef().series.length,
-      { interaction: { mode: 'index', intersect: false }, datasets: { line: { borderWidth: 2, tension: 0, pointRadius: 0, pointHoverRadius: 4, pointHitRadius: 12 } } })
+    graphOptions<'line'>(this.theme(), 'category', this.graphDef().series.length, {
+      interaction: { mode: 'index', intersect: false },
+      datasets: {
+        line: {
+          borderWidth: 2,
+          tension: 0,
+          pointRadius: 0,
+          pointHoverRadius: 4,
+          pointHitRadius: 12,
+        },
+      },
+    }),
   );
 
   protected readonly table = computed(() => toGraphTable(this.graphDef()));

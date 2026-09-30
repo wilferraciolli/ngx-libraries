@@ -1,4 +1,9 @@
-import { EnvironmentProviders, inject, makeEnvironmentProviders, provideAppInitializer } from '@angular/core';
+import {
+  EnvironmentProviders,
+  inject,
+  makeEnvironmentProviders,
+  provideAppInitializer,
+} from '@angular/core';
 import { NGX_AUTH_CONFIG, type NgxAuthConfig } from '../config/auth-config.token';
 import { AuthStore } from '../services/auth.store';
 
@@ -14,6 +19,6 @@ import { AuthStore } from '../services/auth.store';
 export function provideAuth(config: NgxAuthConfig): EnvironmentProviders {
   return makeEnvironmentProviders([
     { provide: NGX_AUTH_CONFIG, useValue: config },
-    provideAppInitializer(() => inject(AuthStore).init())
+    provideAppInitializer(() => inject(AuthStore).init()),
   ]);
 }

@@ -18,7 +18,7 @@ export class WebSocketService {
   private readonly config = inject(WEBSOCKET_CONFIG);
   private readonly socket: Socket = io(this.config.url, {
     autoConnect: false,
-    ...this.config.options
+    ...this.config.options,
   });
 
   private readonly _connected = signal(false);

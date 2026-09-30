@@ -29,9 +29,9 @@ export const appConfig: ApplicationConfig = {
     provideTranslations({
       locales: ['en-GB', 'el-GR'],
       defaultLocale: 'en-GB',
-      dictionaries: { 'en-GB': en, 'el-GR': el }
-    })
-  ]
+      dictionaries: { 'en-GB': en, 'el-GR': el },
+    }),
+  ],
 };
 ```
 
@@ -66,7 +66,11 @@ export class ApiTranslationsLoader implements TranslocoLoader {
   }
 }
 
-provideTranslations({ locales: ['en-GB', 'el-GR'], defaultLocale: 'en-GB', loader: ApiTranslationsLoader });
+provideTranslations({
+  locales: ['en-GB', 'el-GR'],
+  defaultLocale: 'en-GB',
+  loader: ApiTranslationsLoader,
+});
 ```
 
 ### Resolving the signed-in user's language
@@ -83,7 +87,7 @@ provideTranslations({
   // Session override (see setLocale()) always wins over this.
   resolveLocale: () => inject(CurrentUserStore).profile()?.language,
   // Fire-and-forget — persist however the app likes. Never blocks or reverts the switch.
-  persistLocale: (locale) => void inject(CurrentUserStore).updateProfile({ language: locale })
+  persistLocale: (locale) => void inject(CurrentUserStore).updateProfile({ language: locale }),
 });
 ```
 
@@ -100,7 +104,7 @@ import { TranslationsService, TPipe } from '@wiltech-labs/ngx-translations';
     <h1>{{ 'flight.departure' | t }}</h1>
     <p>{{ 'flight.seatsLeft' | t: { count: seatsLeft } }}</p>
     <button (click)="save()">{{ 'common.buttons.save' | t }}</button>
-  `
+  `,
 })
 export class FlightFormComponent {
   private readonly translations = inject(TranslationsService);
@@ -135,8 +139,8 @@ locale, for a language switcher.
 ### Formatting
 
 ```ts
-this.translations.formatDate(flight.departure);                                    // "31/12/2026, 09:00"
-this.translations.formatDate(flight.departure, { dateStyle: 'medium' });           // "31 Dec 2026"
+this.translations.formatDate(flight.departure); // "31/12/2026, 09:00"
+this.translations.formatDate(flight.departure, { dateStyle: 'medium' }); // "31 Dec 2026"
 this.translations.formatNumber(flight.price, { style: 'currency', currency: 'GBP' }); // "£249.00"
 ```
 

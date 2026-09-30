@@ -4,8 +4,5 @@
   "lib": {
     "entryFile": "src/public-api.ts"
   },
-  "allowedNonPeerDependencies": [
-    "socket.io-client",
-    "temporal-polyfill"
-  ]
+  "allowedNonPeerDependencies": ["socket.io-client", "temporal-polyfill"]
 }

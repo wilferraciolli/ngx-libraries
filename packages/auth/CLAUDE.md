@@ -11,6 +11,7 @@ shape into a reusable, configurable library rather than continuing to hand-roll 
 `NEXT_STEPS.md` for the fuller decision history.
 
 ## Layout
+
 ```
 src/
 ├── public-api.ts        # barrel — the entire public surface; nothing outside this is exported
@@ -23,6 +24,7 @@ src/
 ```
 
 ## Conventions
+
 - Real Angular constructs (`@Injectable`) — not framework-agnostic functions. Every known consumer
   is Angular, so idiomatic DI beats a generic-TS compromise.
 - `@clerk/clerk-js` is a regular `dependency` of this package (not a peer) — same reasoning as
@@ -35,7 +37,7 @@ src/
   `ngx-translations`' `TranslationsService` already uses — does the job without adding a new
   third-party dependency this package doesn't otherwise need.
 - **Never call `clerk.mountSignIn()`/`mountUserButton()`/any other `mount*` method.** The npm build
-  of `@clerk/clerk-js` ships *without* the embedded UI components bundle (only available through
+  of `@clerk/clerk-js` ships _without_ the embedded UI components bundle (only available through
   Clerk's React SDK) — a `mount*` call throws `Error: Clerk was not loaded with Ui components` at
   runtime, not at build time, so it slips past a typecheck and a first glance. `AuthStore.signIn()`
   uses `clerk.redirectToSignIn()` instead — a full-page redirect to Clerk's hosted Account Portal,
@@ -57,7 +59,7 @@ src/
   its own origin explicitly closes that footgun rather than defaulting to something that happens to
   be safe only for a single-backend app.
 - **`authInterceptor` doesn't gate access, and doesn't block a signed-out request.** It only decides
-  whether to *attach* a token; a request with no token still goes through unauthenticated. Access
+  whether to _attach_ a token; a request with no token still goes through unauthenticated. Access
   control is `authGuard`'s job, applied per-route — this split means an app with guest-accessible
   routes/API calls isn't forced through sign-in just by wiring this interceptor in.
 - **`authInterceptor` isn't registered by `provideAuth()`.** Angular only wants one
@@ -70,6 +72,7 @@ src/
   omit it to use Clerk's default session token.
 
 ## Status
+
 - New package: `provideAuth()`, `AuthStore`, `authGuard`, `authInterceptor`.
 - Not yet published to npm — under development.
 - No consumers yet within this monorepo. Every consuming app that already had its own hand-rolled

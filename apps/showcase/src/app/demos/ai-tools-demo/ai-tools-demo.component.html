@@ -4,7 +4,7 @@
 
   <div class="info-section">
     <h3>AiSparkleIcon</h3>
-    <div style="display: flex; align-items: center; gap: 16px;">
+    <div style="display: flex; align-items: center; gap: 16px">
       <ngx-ai-sparkle-icon size="32px" />
       <ngx-ai-sparkle-icon size="20px" />
       <ngx-ai-sparkle-icon size="16px" />
@@ -13,14 +13,14 @@
 
   <div class="info-section">
     <h3>AiPanel</h3>
-    <ngx-ai-panel title="AI Summary" style="max-width: 480px; display: block;">
+    <ngx-ai-panel title="AI Summary" style="max-width: 480px; display: block">
       <p>This quarter's revenue grew 12%, driven mainly by new enterprise accounts.</p>
     </ngx-ai-panel>
   </div>
 
   <div class="info-section">
     <h3>AiTextBox + AiButton</h3>
-    <div style="max-width: 480px; display: flex; flex-direction: column; gap: 12px;">
+    <div style="max-width: 480px; display: flex; flex-direction: column; gap: 12px">
       <ngx-ai-text-box [(value)]="prompt" placeholder="Ask AI anything…" />
       <ngx-ai-button label="Generate" [disabled]="generating()" (clicked)="generate()" />
       @if (generating()) {

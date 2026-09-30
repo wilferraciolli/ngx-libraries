@@ -4,7 +4,7 @@
 
   <div class="info-section">
     <h3>{{ 'demo.switchLanguage' | t }}</h3>
-    <div style="display: flex; gap: 8px;">
+    <div style="display: flex; gap: 8px">
       @for (locale of translations.supportedLocales(); track locale) {
         <button
           type="button"
@@ -15,7 +15,9 @@
         </button>
       }
     </div>
-    <p>{{ 'demo.currentLocale' | t }}: <strong>{{ translations.locale() }}</strong></p>
+    <p>
+      {{ 'demo.currentLocale' | t }}: <strong>{{ translations.locale() }}</strong>
+    </p>
   </div>
 
   <div class="info-section">
@@ -27,18 +29,28 @@
 
   <div class="info-section">
     <h3>TranslationsService.t() (logic)</h3>
-    <p>metadata.status.active → <strong>{{ statusLabel() }}</strong></p>
+    <p>
+      metadata.status.active → <strong>{{ statusLabel() }}</strong>
+    </p>
   </div>
 
   <div class="info-section">
     <h3>formatDate() / formatNumber()</h3>
-    <p>{{ 'demo.formattedDate' | t }}: <strong>{{ formattedDate() }}</strong></p>
-    <p>{{ 'demo.formattedNumber' | t }}: <strong>{{ formattedPrice() }}</strong></p>
+    <p>
+      {{ 'demo.formattedDate' | t }}: <strong>{{ formattedDate() }}</strong>
+    </p>
+    <p>
+      {{ 'demo.formattedNumber' | t }}: <strong>{{ formattedPrice() }}</strong>
+    </p>
   </div>
 
   <div class="info-section">
     <h3>ngx-dates: relativeTime pipe</h3>
-    <p>Comment posted: <strong>{{ fiveMinutesAgo | relativeTime }}</strong></p>
-    <p>Order placed: <strong>{{ threeDaysAgo | relativeTime }}</strong></p>
+    <p>
+      Comment posted: <strong>{{ fiveMinutesAgo | relativeTime }}</strong>
+    </p>
+    <p>
+      Order placed: <strong>{{ threeDaysAgo | relativeTime }}</strong>
+    </p>
   </div>
 </div>

@@ -32,7 +32,7 @@ import type { BaseSchema } from '../../interfaces/base.schema';
     SliderField,
     BusinessDateField,
     BusinessTimeField,
-    InstantDateTimeField
+    InstantDateTimeField,
   ],
   templateUrl: './dynamic-form.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

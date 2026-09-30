@@ -10,7 +10,7 @@ import {
   BubbleGraph,
   ScatterGraph,
   graphConfig,
-  pointGraphConfig
+  pointGraphConfig,
 } from '@wiltech-labs/ngx-graphs';
 
 @Component({
@@ -25,10 +25,10 @@ import {
     PolarAreaGraph,
     RadarGraph,
     BubbleGraph,
-    ScatterGraph
+    ScatterGraph,
   ],
   templateUrl: './graphs-demo.component.html',
-  styleUrls: ['./graphs-demo.component.css']
+  styleUrls: ['./graphs-demo.component.css'],
 })
 export class GraphsDemoComponent {
   protected readonly salesByQuarter = graphConfig()
@@ -74,7 +74,7 @@ export class GraphsDemoComponent {
       { x: 10, y: 10, r: 10 },
       { x: 15, y: 5, r: 15 },
       { x: 26, y: 12, r: 23 },
-      { x: 7, y: 8, r: 8 }
+      { x: 7, y: 8, r: 8 },
     ])
     .title('Cluster sizes')
     .build();
@@ -85,7 +85,7 @@ export class GraphsDemoComponent {
       { x: 2, y: 3 },
       { x: 3, y: -2 },
       { x: 4, y: 4 },
-      { x: 5, y: -3 }
+      { x: 5, y: -3 },
     ])
     .title('Measurements')
     .build();

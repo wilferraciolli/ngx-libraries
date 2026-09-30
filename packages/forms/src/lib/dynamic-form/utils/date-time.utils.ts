@@ -4,23 +4,23 @@ import { FormFieldType } from '../constants/form-field.constant';
 import {
   BUSINESS_DATE_INVALID_ERROR_LABEL,
   BUSINESS_TIME_INVALID_ERROR_LABEL,
-  INSTANT_DATE_TIME_INVALID_ERROR_LABEL
+  INSTANT_DATE_TIME_INVALID_ERROR_LABEL,
 } from '../constants/date-time.constants';
 import type { FieldDef } from '../interfaces/field-definition';
 
 /** Parses a UTC instant, Eg '2024-03-31T01:30:00Z'. Null instead of throwing for empty/invalid input. */
 export function parseInstant(value: string | null | undefined): Temporal.Instant | null {
-  return tryParse(value, v => Temporal.Instant.from(v));
+  return tryParse(value, (v) => Temporal.Instant.from(v));
 }
 
 /** Parses a calendar date, Eg '2024-12-25'. Null instead of throwing for empty/invalid input. */
 export function parsePlainDate(value: string | null | undefined): Temporal.PlainDate | null {
-  return tryParse(value, v => Temporal.PlainDate.from(v));
+  return tryParse(value, (v) => Temporal.PlainDate.from(v));
 }
 
 /** Parses a time of day, Eg '09:00'. Null instead of throwing for empty/invalid input. */
 export function parsePlainTime(value: string | null | undefined): Temporal.PlainTime | null {
-  return tryParse(value, v => Temporal.PlainTime.from(v));
+  return tryParse(value, (v) => Temporal.PlainTime.from(v));
 }
 
 interface DateTimeRule<T> {
@@ -33,18 +33,18 @@ const DATE_TIME_RULES: Partial<Record<FormFieldType, DateTimeRule<any>>> = {
   [FormFieldType.INSTANT_DATE_TIME]: {
     parse: parseInstant,
     compare: Temporal.Instant.compare,
-    invalidMessage: INSTANT_DATE_TIME_INVALID_ERROR_LABEL
+    invalidMessage: INSTANT_DATE_TIME_INVALID_ERROR_LABEL,
   },
   [FormFieldType.BUSINESS_DATE]: {
     parse: parsePlainDate,
     compare: Temporal.PlainDate.compare,
-    invalidMessage: BUSINESS_DATE_INVALID_ERROR_LABEL
+    invalidMessage: BUSINESS_DATE_INVALID_ERROR_LABEL,
   },
   [FormFieldType.BUSINESS_TIME]: {
     parse: parsePlainTime,
     compare: Temporal.PlainTime.compare,
-    invalidMessage: BUSINESS_TIME_INVALID_ERROR_LABEL
-  }
+    invalidMessage: BUSINESS_TIME_INVALID_ERROR_LABEL,
+  },
 };
 
 export function isDateTimeField(type: FormFieldType): boolean {

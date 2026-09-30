@@ -7,10 +7,11 @@ conventions.
 Decided 2026-09-30: deliberately **not** folded into `ngx-media` (presentational/stateless, no
 service layer) and deliberately **not** extending the `ngx-api-client`/`ngx-auth` sanctioned
 dependency exception `ngx-region-settings` uses — see root `NEXT_STEPS.md` for the fuller decision
-history and why this package stays a leaf in the *other* direction (depends on nothing sibling,
+history and why this package stays a leaf in the _other_ direction (depends on nothing sibling,
 rather than being depended on by anything).
 
 ## Layout
+
 ```
 src/
 ├── public-api.ts        # barrel — the entire public surface; nothing outside this is exported
@@ -25,6 +26,7 @@ src/
 ```
 
 ## Conventions
+
 - **Stays fully app-pluggable — no dependency on `ngx-api-client`, unlike `ngx-region-settings`.**
   The app resolves its own person-profile `notifications` HATEOAS link and hands this package three
   plain callbacks (`fetchNotifications`/`dismissNotification`/`openNotification`) via
@@ -76,7 +78,7 @@ src/
   `CLAUDE.md` for `MatDialogRef`.
 - **Item rendering is content-projected** (`@ContentChild(TemplateRef)`), since the package can't
   know a notification's field names. No projected template falls back to a raw `{{ notification |
-  json }}` dump inside the panel — clearly a debug view, not a real empty state; almost every real
+json }}` dump inside the panel — clearly a debug view, not a real empty state; almost every real
   usage should project its own `<ng-template let-notification>`.
 - Text (`panelTitle`/`loading`/`empty`/`error`/`dismiss`/`close`/`triggerLabel`) comes from
   `NGX_NOTIFICATIONS_TEXT`, the same resolver-function pattern as `NGX_GRAPHS_TEXT`/`NGX_CHAT_TEXT`
@@ -84,6 +86,7 @@ src/
   English.
 
 ## Status
+
 - New package: `provideNotifications()`, `NotificationsService`, `NotificationsWidget`,
   `NotificationsConfig`/`NotificationsPage`, `NGX_NOTIFICATIONS_TEXT`.
 - `tsc --noEmit` and `ng-packagr build` both clean.
