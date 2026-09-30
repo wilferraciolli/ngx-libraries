@@ -19,12 +19,16 @@ scratchpad so we don't lose track between sessions. Update as items land or prio
       `tsconfig.json` path mapping, `README.md`, and the imports in `main.ts`/`home.component.ts`/
       the api-client and forms demo components). `npm install` regenerated `package-lock.json`,
       and both packages were rebuilt so `dist/` picked up the correct fesm/typings filenames.
-- [ ] `apps/showcase`'s own `npm run typecheck` (`tsc -p tsconfig.json --noEmit`) fails with `TS6059
-      ... is not under 'rootDir'` for every library consumed via the `paths` mapping (hit this for
-      `forms` already on `main`, and now `media` too). `ng build`/`ng serve` are unaffected — only
-      the standalone `tsc --noEmit` script trips on it — but worth fixing the showcase `tsconfig.json`
-      (likely needs an explicit `rootDir` or a project-references setup) before it's mistaken for a
-      broken build.
+- [x] `apps/showcase`'s own `npm run typecheck` (`tsc -p tsconfig.json --noEmit`) failed with `TS6059
+      ... is not under 'rootDir'` for every library consumed via the `paths` mapping. Root cause: no
+      explicit `rootDir` was set alongside the explicit `outDir`, so `tsc` inferred `rootDir` from
+      `apps/showcase/src` alone — any `paths`-mapped file outside that (i.e. every `packages/*/src`
+      import) then failed the "must be under rootDir" check. Fixed 2026-09-30 by adding
+      `"rootDir": "../.."` (the monorepo root) to `apps/showcase/tsconfig.json`, so the whole
+      workspace is a legitimate common root. `ng build`/`ng serve` were never affected (they use
+      `tsconfig.app.json`'s own build path, not this file's raw `tsc` invocation) and still work
+      unchanged after the fix. Verified: root `npm run typecheck` now passes clean across every
+      package and the showcase app in one run, and `ng build` still succeeds.
 - Note for next session: killing the showcase's `ng serve` by `lsof -ti:4200 | xargs kill` only
   killed the npm/shell wrapper, not the actual `ng serve (ngx-showcase)` child — it kept running
   and serving a stale build on a later browser check. `kill -9 <pid>` on the actual listening PID
