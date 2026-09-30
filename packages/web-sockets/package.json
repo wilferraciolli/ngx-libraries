@@ -1,6 +1,6 @@
 {
   "name": "@wiltech-labs/ngx-web-sockets",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Shared Angular websocket client \u2014 connect, join/leave a server-managed room, and a chat UI built on top.",
   "license": "Apache-2.0",
   "sideEffects": false,
