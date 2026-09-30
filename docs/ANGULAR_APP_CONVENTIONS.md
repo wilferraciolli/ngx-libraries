@@ -134,6 +134,7 @@ to use which package and the rules for using it in an app.
 | Translations | `ngx-translations` | `provideTranslations()`, `TranslationsService`, the `t` pipe | An app-local translation store (see `ngx-translations` below), raw Transloco use |
 | A side panel / modal | `ngx-modals` | `ModalService.open()`, `ModalCloseAction`/`ModalCloseResult`, `ModalContent` | Hand-rolled `MatDialog.open()` calls, an app-local close-reason enum per feature |
 | Notification bell | `ngx-notifications` | `provideNotifications()`, `NotificationsService`, `<ngx-notifications>` | An app-local bell/badge/panel, a hand-rolled polling interval |
+| Shared Sass (breakpoints, spacing, M3 mixins) | `ngx-styles` | `@use 'breakpoints'`/`'spacing'`/`'ui'` from `stylePreprocessorOptions.includePaths` | A `src/styles/_breakpoints.scss`/`_spacing.scss`/`_ui.scss` copy-pasted per app |
 
 ### Setup
 Install only the packages the app uses (`npm i @wiltech-labs/ngx-forms …`).
@@ -367,6 +368,19 @@ provideTranslations({ locales: [...], defaultLocale: '...', dictionaries: {...} 
 - Text (`panelTitle`/`loading`/`empty`/`error`/`dismiss`/`close`/`triggerLabel`) comes from
   `NGX_NOTIFICATIONS_TEXT` — override it (e.g. wired to `ngx-translations`) to translate it; leave it
   unset and it stays English.
+
+**`ngx-styles`**
+- Not a component/service package — pure Sass, no `ng-packagr` build, no `app.config.ts` provider.
+  Add `node_modules/@wiltech-labs/ngx-styles/src` to `angular.json`'s
+  `stylePreprocessorOptions.includePaths`, then `@use 'breakpoints'`/`'spacing'`/`'ui'` from any
+  stylesheet — same partials this doc's own Foundations section embeds, just resolved from
+  `node_modules` instead of a local `src/styles` copy.
+- `theme-colors.template.scss` is a starting seed to copy into your own
+  `src/styles/_theme-colors.scss` and regenerate (`ng generate @angular/material:theme-color`), not
+  a shared partial — a brand palette is per-app, unlike the breakpoint/spacing/mixin logic.
+- `ui.state-layer` reads `--app-duration-short`/`--app-ease-standard` — set these yourself in your
+  own `styles.scss` `:root` (see the Foundations `styles.scss` embed above); the package doesn't
+  define them since they're app-owned motion constants, not `--mat-sys-*` tokens.
 
 ### Migrating an existing app
 Work through what the app actually has:

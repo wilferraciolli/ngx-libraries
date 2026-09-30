@@ -1,0 +1,38 @@
+// Shared breakpoint scale — Material 3's window size classes: compact is
+// everything below `sm` (phones; navigation is a modal drawer), medium
+// starts at `sm` (tablets; a navigation rail), expanded at `md`, large at
+// `lg`. Ported from insurly-ui's src/styles/_breakpoints.scss — see
+// docs/ANGULAR_APP_CONVENTIONS.md.
+@use 'sass:map';
+@use 'sass:meta';
+
+$breakpoints: (
+  sm: 600px,
+  md: 840px,
+  lg: 1200px,
+);
+
+// Accepts a key of $breakpoints or a raw length.
+@function -width($bp) {
+  @if meta.type-of($bp) == 'number' {
+    @return $bp;
+  }
+  @if not map.has-key($breakpoints, $bp) {
+    @error 'Unknown breakpoint `#{$bp}`. Expected one of #{map.keys($breakpoints)} or a length.';
+  }
+  @return map.get($breakpoints, $bp);
+}
+
+// Viewports at least as wide as $bp.
+@mixin up($bp) {
+  @media (min-width: -width($bp)) {
+    @content;
+  }
+}
+
+// Viewports narrower than $bp.
+@mixin down($bp) {
+  @media (max-width: -width($bp) - 1px) {
+    @content;
+  }
+}

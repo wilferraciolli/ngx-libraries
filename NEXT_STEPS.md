@@ -518,41 +518,63 @@ mutation), and deep-linking (router integration) — state plus UI, closer in sh
 - [ ] No consumer yet. Design before building, same as every other package here.
 - [ ] Not yet published to npm.
 
-## Planned package `ngx-styles` (not started)
+## New package `ngx-styles` — built 2026-09-30
 
 Long-standing idea, first flagged in this file's "Align libraries..." section above ("Possibly
-`ngx-styles`... see discussion"), fleshed out 2026-09-30. **Reference for this one is
+`ngx-styles`... see discussion"). **Reference for this one is
 `docs/ANGULAR_APP_CONVENTIONS.md`'s own SCSS setup (ported from `insurly-ui`'s `src/styles/*`) —
 explicitly not the dialog-service reference app behind `ngx-modals`, which is scoped to that design
 only.**
 
-Today every app copy-pastes the same four partials fresh: `_breakpoints.scss` (the `sm: 600px`/
+Ships the four partials every app was copy-pasting fresh: `_breakpoints.scss` (the `sm: 600px`/
 `md: 840px`/`lg: 1200px` scale + `bp.up()`/`bp.down()` mixins), `_spacing.scss` (4px-unit `space()`
 scale + responsive padding steps), `_ui.scss` (mixins like `page-title`, `banner`, `state-layer`,
-`focus-ring`, all reading `--mat-sys-*` tokens), and `_theme-colors.scss` (the house Material seed
-palette).
+`focus-ring`, all reading `--mat-sys-*` tokens), and `theme-colors.template.scss` (the house
+Material seed palette, as a copy-and-own template, not a shared partial).
 
-- [ ] **Naming decided**: `packages/styles` / `@wiltech-labs/ngx-styles` — not `ux-styles`. "UX"
+- [x] **Naming decided**: `packages/styles` / `@wiltech-labs/ngx-styles` — not `ux-styles`. "UX"
       implies interaction/usability design; this package is Sass tokens and mixins, a styling
       concern, not a UX one, and `styles` matches the plain, single-concern naming every other
       package already uses (`forms`, `graphs`, `dates`, `translations`).
-- [ ] **Open shape question, unresolved**: this would be a different *kind* of package than
+- [x] **Open shape question, resolved**: this is a genuinely different *kind* of package than
       everything else here — pure Sass partials/mixins, no `@Injectable`/`@Component`/TypeScript at
-      all. `ng-packagr`'s Angular Package Format build is fundamentally about compiling Angular
-      sources, so it may not be the right build for this — could be a plain npm package that ships
-      `.scss` files as static assets with no compile step, rather than going through `ng-packagr` at
-      all. Needs deciding before a "New package checklist" (root `CLAUDE.md`) even applies here — this
-      package may not follow that checklist as written.
-- [ ] `_breakpoints.scss`/`_spacing.scss`/`_ui.scss` are genuinely shared *logic* (mixins/functions) —
-      straightforward to ship as `@use`-able partials. `_theme-colors.scss` is different: it's a
-      per-app *brand seed* apps are meant to copy and then own (docs: "keep the house seeds... change
-      them only for a genuinely different brand"), so it likely wants to ship as a template file to
-      copy-init from (closer to a schematic), not a partial apps `@use` directly. Still open.
-- [ ] Once this exists, `ngx-modals`' `--ngx-modal-width` responsive behaviour and any other
-      package's breakpoint-dependent CSS should read from it instead of assuming
+      all, so `ng-packagr` (Angular Package Format, fundamentally about compiling Angular sources)
+      isn't the right build. Went with a plain npm package: no `ng-package.json`, no `tsconfig.json`,
+      no `src/public-api.ts`, no `build`/`typecheck` script (root's `--if-present` scripts skip it
+      cleanly). `package.json` just lists `"files": ["src"]` and publishes raw `.scss` straight from
+      source. Root `CLAUDE.md`'s "New package checklist" doesn't apply here as written — see this
+      package's own `CLAUDE.md` for what's different.
+- [x] `_breakpoints.scss`/`_spacing.scss`/`_ui.scss` ship as `@use`-able partials — consumers add
+      `node_modules/@wiltech-labs/ngx-styles/src` to `angular.json`'s `stylePreprocessorOptions.
+      includePaths`, then `@use 'breakpoints'`/`'spacing'`/`'ui'` exactly like the local-copy
+      convention they replace. `theme-colors.template.scss` ships as a template to copy into the
+      app's own `src/styles/_theme-colors.scss` and regenerate via
+      `ng generate @angular/material:theme-color` — deliberately **not** underscore-prefixed, so it
+      can't accidentally be `@use`d as a shared partial. A brand palette is per-app; the other three
+      files are genuinely shared logic. Resolved per the doc's own framing ("keep the house seeds...
+      change them only for a genuinely different brand").
+- [x] `_ui.scss`'s `state-layer` mixin reads `--app-duration-short`/`--app-ease-standard` — two plain
+      CSS custom properties this package doesn't define itself. Decided these stay app-owned (set in
+      the consumer's own `styles.scss` `:root`, same as `--app-page-max-width`/`--app-gutter`) rather
+      than having `ngx-styles` emit a second copy of them — see this package's `CLAUDE.md` for why
+      that would be a worse source-of-truth problem than the coupling itself.
+- [x] Verified the partials actually compile: ran the Sass CLI directly against `packages/styles/src`
+      with a throwaway stylesheet exercising `bp.up()`, `spacing.space()`, `ui.page-title`,
+      `ui.state-layer`, and `ui.danger-button(filled)` — output matched the reference doc's CSS
+      exactly. `theme-colors.template.scss` also compiles standalone (against the repo's own
+      `@angular/material`, via `--load-path=node_modules`).
+- [ ] No showcase demo route — `apps/showcase` uses plain `.css` with no M3 theme foundation
+      (`_theme-colors.scss`/`mat.theme()`) set up, so there's nothing for these mixins to plug into
+      without first building that foundation into the demo app, which is out of scope for this
+      package. Not browser-verified beyond the Sass-compiles-cleanly check above.
+- [ ] Once consumed somewhere, `ngx-modals`' `--ngx-modal-width` responsive behaviour and any other
+      package's breakpoint-dependent CSS should read from this instead of assuming
       `BreakpointObserver`/`Breakpoints.XSmall` alone — see the `ngx-modals` section above, which
-      flagged this exact gap.
-- [ ] No consumer yet. Design before building, same as every other package here.
+      flagged this exact gap. Not done yet — `ngx-modals` doesn't take a dependency on this package
+      (styles partials aren't importable by a TS file the way `ngx-api-client`/`ngx-auth` are).
+- [ ] No consumer yet.
+- [x] Doc-sync done: `docs/ANGULAR_APP_CONVENTIONS.md` got a "What to use for what" table row and a
+      "Using each package" subsection. No showcase home tile — see the no-demo-route note above.
 
 ## New package `ngx-auth` — built 2026-09-30
 
@@ -648,6 +670,11 @@ in particular, the not-yet-browser-verified flag.
 
 See "New package `ngx-notifications` — built 2026-09-30" above for what's built and what's still
 open — in particular, the not-yet-browser-verified flag.
+
+## packages/styles
+
+See "New package `ngx-styles` — built 2026-09-30" above for what's built and what's still open —
+in particular, no consumer yet and no showcase demo route.
 
 ## packages/media
 
