@@ -5,6 +5,25 @@ scratchpad so we don't lose track between sessions. Update as items land or prio
 
 ## Housekeeping (found while looking, not yet fixed)
 
+- [x] Fresh clone on another machine: `npm install` succeeded, but building failed for
+      `ngx-region-settings` (looked like it "needed another npm install"). Root cause: `dist/` is
+      gitignored everywhere, and `ngx-region-settings` depends on `ngx-api-client`/`ngx-auth` via
+      `"file:../x/dist"` (see root `CLAUDE.md`'s "Inter-package deps") — on a fresh clone neither
+      `dist/` exists yet. `npm install` never errors on this (it symlinks to the not-yet-existing
+      path, and the symlink self-heals once that path's target appears later — no re-install
+      needed), so the failure only ever shows up at *build* time, cascading `TS2571`/module-not-found
+      errors from the still-empty dependency. The root `build:packages` script used to get the
+      ordering right only by accident (alphabetical directory order happened to put `api-client`/
+      `auth` before `region-settings`). Fixed 2026-09-30: added `scripts/build-packages.sh`, which
+      builds `api-client`/`auth` first explicitly, then every other package — root `package.json`'s
+      `build`/`build:packages` scripts now call it instead of a plain `for d in packages/*/` loop.
+      Reproduced the original failure directly (wiped every package's `dist/`, fresh `npm install`,
+      built `region-settings` alone — failed) and confirmed the fix on the same reproduction (`npm
+      install && npm run build` now succeeds end to end, including the showcase app). See
+      `packages/region-settings/CLAUDE.md`'s "Build-order requirement" note for the full detail —
+      building a single package on its own (`cd packages/region-settings && npm run build`) still
+      needs `../api-client`/`../auth` built manually first, the script only orders the repo-wide
+      build.
 - [x] `CLAUDE.md` repo layout now lists every package (`api-client`, `forms`, `media`, `ai-tools`,
       `graphs`, `web-sockets`, `translations`, `dates`) — kept up to date as each new package landed.
 - [x] `apps/showcase/README.md` and its home page tile list had gone stale as demos were added —
@@ -235,13 +254,17 @@ needed the same treatment:
 - [ ] Run Prettier over the repo once and commit that separately.
 - [ ] api-client: `resource()`/`collectionResource()` now guard with `hasValue()` — bump + publish
       0.1.6, then update consumers. Other packages: first publish once reviewed.
-- [ ] `ngx-auth` and `ngx-region-settings` were both built without the doc-sync step every earlier
-      package got: neither has a "What to use for what" table row, a "Using each package" subsection,
-      or a showcase home-page tile (`ngx-modals` got all three — see above). Noticed while adding
-      `ngx-modals`' own entries; not fixed here to stay scoped to the package actually being built
-      today. Also neither is wired into `apps/showcase` with a real demo route yet (both need a
-      signed-in state to demo meaningfully, unlike the other packages — `ngx-auth`'s own "not yet
-      wired into apps/showcase" note above already flags this for itself).
+- [x] `ngx-auth` and `ngx-region-settings` were both built without the doc-sync step every earlier
+      package got. Fixed 2026-09-30: both now have a "What to use for what" table row and a "Using
+      each package" subsection in `docs/ANGULAR_APP_CONVENTIONS.md`, plus a "Setup" entry for
+      `provideAuth()`/`authInterceptor` (`ngx-region-settings` needs no app-level provider —
+      `CurrentUserStore` is already `providedIn: 'root'`, documented as such rather than added as a
+      no-op setup line). `ngx-auth`'s "Using each package" entry points back at this doc's existing
+      "Authentication (Clerk)"/"`AuthStore` shape"/"Routing" sections rather than duplicating them,
+      since those already describe the exact pattern this package packages up. Still no showcase
+      home-page tile for either — both need a signed-in state to demo meaningfully, which
+      `apps/showcase` doesn't have wired up yet; that part of the gap stays open (see each package's
+      own "not yet wired into apps/showcase" note).
 
 ## New package `ngx-modals` — built 2026-09-30
 

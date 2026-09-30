@@ -132,23 +132,26 @@ to use which package and the rules for using it in an app.
 | AI interaction surfaces | `ngx-ai-tools` | `AiTextBox`, `AiButton`, `AiPanel`, `AiSparkleIcon` | Ad hoc gradient styling |
 | Realtime / websockets | `ngx-web-sockets` | `provideWebSocket()`, `WebSocketService`, `ChatRoom`, `ChatMessageBubble` | `ngx-socket-io`, hand-rolled socket services |
 | Translations | `ngx-translations` | `provideTranslations()`, `TranslationsService`, the `t` pipe | An app-local translation store (see `ngx-translations` below), raw Transloco use |
+| Clerk sign-in state, guard, HTTP token | `ngx-auth` | `provideAuth()`, `AuthStore`, `authGuard`, `authInterceptor` | The hand-rolled `AuthStore`/`signalStore` this doc's own "Authentication (Clerk)" section describes |
+| Current user / region settings | `ngx-region-settings` | `CurrentUserStore`, `RegionSettingsStore` (`UserSettingsStore`/`SystemSettingsStore`) | An app-local `/me` → `userProfile` → `userSettings`/`systemSettings` link-following chain |
 | A side panel / modal | `ngx-modals` | `ModalService.open()`, `ModalCloseAction`/`ModalCloseResult`, `ModalContent` | Hand-rolled `MatDialog.open()` calls, an app-local close-reason enum per feature |
 | Notification bell | `ngx-notifications` | `provideNotifications()`, `NotificationsService`, `<ngx-notifications>` | An app-local bell/badge/panel, a hand-rolled polling interval |
 | Shared Sass (breakpoints, spacing, M3 mixins) | `ngx-styles` | `@use 'breakpoints'`/`'spacing'`/`'ui'` from `stylePreprocessorOptions.includePaths` | A `src/styles/_breakpoints.scss`/`_spacing.scss`/`_ui.scss` copy-pasted per app |
 
 ### Setup
 Install only the packages the app uses (`npm i @wiltech-labs/ngx-forms …`).
-Five of them need an app-level provider in `app.config.ts`:
+Six of them need an app-level provider in `app.config.ts`:
 ```ts
 import { inject } from '@angular/core';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { API_ORIGIN } from '@wiltech-labs/ngx-api-client';
 import { provideWebSocket } from '@wiltech-labs/ngx-web-sockets';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { TranslationsService, provideTranslations } from '@wiltech-labs/ngx-translations';
 import { NGX_DATES_LOCALE } from '@wiltech-labs/ngx-dates';
+import { provideAuth, authInterceptor } from '@wiltech-labs/ngx-auth';
 
-provideHttpClient(),                                         // ngx-api-client
+provideHttpClient(withInterceptors([authInterceptor])),     // ngx-api-client; authInterceptor — ngx-auth, only if using it
 { provide: API_ORIGIN, useValue: environment.apiOrigin },    // ngx-api-client — only when the API is on another origin
 provideCharts(withDefaultRegisterables()),                   // ngx-graphs — chart.js registration, once per app
 provideWebSocket({ url: environment.socketUrl }),            // ngx-web-sockets
@@ -157,6 +160,10 @@ provideTranslations({ locales: [...], defaultLocale: '...', dictionaries: {...} 
   provide: NGX_DATES_LOCALE,
   useFactory: () => { const translations = inject(TranslationsService); return () => translations.locale(); }
 },
+provideAuth({                                                // ngx-auth
+  clerkPublishableKey: environment.clerkPublishableKey,
+  apiOrigin: environment.apiOrigin,
+}),
 ```
 - `API_ORIGIN` is the API's **bare origin** (`https://api.example.com`), not the
   `/api`-prefixed `apiUrl`. It defaults to `''` (same origin).
@@ -177,6 +184,15 @@ provideTranslations({ locales: [...], defaultLocale: '...', dictionaries: {...} 
   above — wiring it to `ngx-translations` the same way means a language switch changes
   which typed day/month order a date/time field's input accepts, not just
   wording, so it's an app's deliberate choice, not a default. See "`ngx-forms`"
+  below.
+- `ngx-auth`'s `authInterceptor` is added to the app's own `provideHttpClient(withInterceptors([...]))`
+  call, not registered by `provideAuth()` itself — Angular only wants one `provideHttpClient()` call
+  per app. `clerkPublishableKey`/`apiOrigin` live in the environment files, same as `apiOrigin`/
+  `socketUrl` above.
+- `ngx-region-settings` needs no `app.config.ts` provider at all — `CurrentUserStore` is
+  `providedIn: 'root'` already, and `UserSettingsStore`/`SystemSettingsStore` are feature-local
+  (each settings page adds one to its own component `providers: []`, not app-wide). See
+  "`ngx-region-settings`"
   below.
 
 ### How the libraries fit the design system
@@ -335,6 +351,39 @@ provideTranslations({ locales: [...], defaultLocale: '...', dictionaries: {...} 
 - `ngx-dates` has no dependency on `ngx-translations`, or on any other package here —
   see "Inter-package deps" in root `CLAUDE.md` for why, if a package here ever
   seems like it wants to import another directly.
+
+**`ngx-auth`**
+- Packages up the shape this doc's own "Authentication (Clerk)" section above describes — an app
+  using `ngx-auth` doesn't hand-roll that `AuthStore`/guard/interceptor itself, it imports them.
+  `provideAuth({ clerkPublishableKey, apiOrigin })` runs `AuthStore.init()` via
+  `provideAppInitializer` (never from a component constructor — see "Setup" above).
+- `AuthStore.user`/`.session`/`.isSignedIn`/`.getToken()`/`.signIn()`/`.signOut()` — the same shape
+  the "`AuthStore` shape" section above describes, just imported instead of hand-rolled. `signIn()`
+  still redirects to Clerk's hosted Account Portal; never a `mount*` call — see the section above
+  for why.
+- `authGuard` is a `CanActivateFn` for the "gate everything but a public landing route" pattern the
+  "Routing" section above describes. `authInterceptor` only attaches a token to a request whose URL
+  starts with `NgxAuthConfig.apiOrigin` — it doesn't gate access, `authGuard` does that.
+- `jwtTemplate`/`redirectTo` on `NgxAuthConfig` are both optional — see the package's own README for
+  when a named JWT template is actually needed.
+
+**`ngx-region-settings`**
+- `CurrentUserStore` (root-provided): `/me` → its `userProfile` link → the profile, gated on
+  `AuthStore.isSignedIn()` from `ngx-auth` — a sign-out clears the chain, a sign-in refetches it, no
+  manual `ensureLoaded()`/`reset()` calls. `inject(CurrentUserStore)` anywhere; `.me()`/`.profile()`/
+  `.loading()`/`.error()` signals, `.link(name)` for any other link the profile hands out.
+- `UserSettingsStore`/`SystemSettingsStore` (feature-local — add one to the settings page's own
+  component `providers: []`, not app-wide): follow `userSettings`/`systemSettings` off the current
+  user's profile. `.settings()`/`.isLoading()`/`.error()`/`.notAvailable()` (profile loaded, no link
+  handed out — this caller isn't allowed this screen) signals, `.options()` for `_metadata`-driven
+  allowed values, `.save(payload)`/`.reset()`.
+- Takes a real npm dependency on `ngx-api-client` and `ngx-auth` — the one sanctioned exception to
+  "Inter-package deps" in root `CLAUDE.md` (both are kept strict foundation leaves, so it's safe from
+  cycles). Don't read this as license to add a direct dependency between any other two packages here.
+- Generic over the settings/profile payload shape (`CurrentUserStore<TMe, TProfile>`,
+  `RegionSettingsStore<TSettings, TPayload>`) but defaults to a real, already-exercised API shape —
+  most apps need zero type arguments. No label-translation or `isAdmin`-style helper: this package
+  fetches and exposes state, an app maps/translates/authorizes at the call site.
 
 **`ngx-modals`**
 - `ModalService.open(component, config)` is the only way to open one — never call `MatDialog.open()`

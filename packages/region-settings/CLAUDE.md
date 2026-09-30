@@ -53,12 +53,21 @@ src/
   package.
 - **Build-order requirement this creates**: `ngx-api-client` and `ngx-auth` must be built (their
   `dist/` must exist) *before* this package builds — `file:../api-client/dist` is a dangling
-  reference otherwise. Root `package.json`'s `build:packages` script happens to satisfy this today
-  purely because its `for d in packages/*/` loop runs in alphabetical directory order
-  (`api-client`, `auth`, ... , `region-settings`, ...) — if package directory names ever change in a
-  way that breaks that ordering, this becomes a real build failure, not just a slow one. Building
-  this package on its own (`cd packages/region-settings && npm run build`) after a fresh clone
-  requires manually building `../api-client` and `../auth` first for the same reason.
+  reference otherwise. `npm install` itself never fails on this (it happily symlinks to a
+  not-yet-existing path, and the symlink self-heals once that path's target appears — no re-install
+  needed), so this only ever surfaces as a *build* failure, not an install one, and it's easy to
+  mistake for "needs another `npm install`." `dist/` is gitignored, so this bites on every fresh
+  clone. Root `package.json`'s `build:packages` script used to get this right only by accident
+  (alphabetical directory order happened to put `api-client`/`auth` before `region-settings`) — hit
+  for real 2026-09-30 on a fresh clone elsewhere; exact trigger command not confirmed, but the
+  failure mode was reproduced directly (wipe every package's gitignored `dist/`, fresh `npm install`,
+  then build `region-settings` alone — fails with cascading `TS2571`/module-not-found errors from the
+  still-empty `ngx-api-client`/`ngx-auth` symlink targets). Fixed by
+  `scripts/build-packages.sh`, which builds `api-client`/`auth` explicitly first, then everything
+  else — see root `NEXT_STEPS.md` Housekeeping and root `README.md`. Building this package on its own
+  (`cd packages/region-settings && npm run build`) after a fresh clone still requires manually
+  building `../api-client` and `../auth` first — the script only orders the repo-wide build, not a
+  single-package one.
 - Both dependencies are regular `dependencies` (not peer) — same precedent as
   `ngx-translations`/`@jsverse/transloco` and `ngx-auth`/`@clerk/clerk-js`: this package controls the
   exact version it's built against. Listed in `ng-package.json`'s `allowedNonPeerDependencies`.
