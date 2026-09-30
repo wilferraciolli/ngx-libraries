@@ -35,6 +35,9 @@
           @case ('select') {
             <ngx-select-field [fieldDef]="fieldDef" [field]="field" />
           }
+          @case ('chips') {
+            <ngx-chips-field [fieldDef]="fieldDef" [field]="field" />
+          }
           @case ('range') {
             <ngx-slider-field [fieldDef]="fieldDef" [field]="field" />
           }

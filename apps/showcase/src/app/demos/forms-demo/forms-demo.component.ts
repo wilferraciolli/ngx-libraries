@@ -99,6 +99,7 @@ interface AllFieldsSchema extends BaseSchema {
   satisfaction: number;
   bio: string;
   snippet: string;
+  keywords: string[];
 }
 
 @Component({
@@ -300,6 +301,10 @@ export class FormsDemoComponent {
         required: true,
         hint: 'A single yes/no toggle. On a checkbox, required means it must be ticked.',
       })
+      .chips('keywords', 'Keywords', {
+        maxWidth: '900px',
+        hint: 'Type a word and press Enter (or comma) to add it as a chip; click the x to remove one.',
+      })
       .build({
         username: 'jane.doe',
         email: 'jane.doe@example.com',
@@ -315,6 +320,7 @@ export class FormsDemoComponent {
         satisfaction: 7,
         bio: 'Full-stack engineer who likes strongly-typed forms and hates YAML.\n\nBased in Cyprus, previously London. Always up for a good debugging story.',
         snippet: 'function greet(name: string): string {\n  return `Hello, ${name}!`;\n}',
+        keywords: ['angular', 'signals', 'typescript'],
       });
 
   protected readonly allFieldsEntity: WritableSignal<AllFieldsSchema> = signal(

@@ -85,6 +85,11 @@ export class FormConfigBuilder<T extends BaseSchema> {
     return this.add(FormFieldType.SELECT, name, label, { ...options, options: choices });
   }
 
+  /** Freeform list of tokens (Eg keywords), typed one at a time. */
+  public chips(name: FieldName<T>, label: string, options?: FieldOptions): this {
+    return this.add(FormFieldType.CHIPS, name, label, options);
+  }
+
   /** Calendar date with no timezone, stored as 'YYYY-MM-DD'. */
   public businessDate(name: FieldName<T>, label: string, options?: DateTimeFieldOptions): this {
     return this.add(FormFieldType.BUSINESS_DATE, name, label, options);

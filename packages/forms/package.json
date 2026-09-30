@@ -1,6 +1,6 @@
 {
   "name": "@wiltech-labs/ngx-forms",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Shared Angular forms library — form builders, validators, and utility services for common form patterns.",
   "license": "Apache-2.0",
   "sideEffects": false,
@@ -12,6 +12,7 @@
     "@angular/common": "^22.0.0",
     "@angular/forms": "^22.0.0",
     "@angular/material": "^22.0.0",
+    "@angular/cdk": "^22.0.0",
     "rxjs": "^7.4.0"
   },
   "publishConfig": {
@@ -22,6 +23,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
+    "@angular/cdk": "^22.0.0",
     "@angular/common": "^22.0.0",
     "@angular/compiler-cli": "^22.0.0",
     "@angular/core": "^22.0.0",

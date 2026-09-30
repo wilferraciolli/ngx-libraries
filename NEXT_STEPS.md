@@ -766,6 +766,31 @@ it.
       yet (only on `ngx-api-client` so far).
 - [ ] Two more Angular projects are planned to eventually consume these libraries — not started.
 
+## `ngx-forms` gains a `CHIPS` field type — 2026-09-30
+
+- [x] Added `ChipsField` (`ngx-chips-field`): a Material `mat-chip-grid` for a freeform list of
+      tokens (`FieldTree<string[]>`) — type a word, press Enter/comma to add it as a chip, click the
+      `x` to remove one. Same public contract as every other field, `[fieldDef]` + `[field]`, so it
+      works inside `DynamicForm` or standalone.
+- [x] Driven by hand (`state().value.update(...)`), same pattern as the date/time fields — `[formField]`
+      targets one control's value, not a token added/removed one at a time, so there's no scalar
+      Signals Forms binding for a chip grid the way there is for `matInput`/`mat-select`.
+- [x] Needed `LiveAnnouncer` from `@angular/cdk/a11y` (screen-reader announcements on add/remove,
+      same as Material's own chips example) — `@angular/cdk` wasn't a declared dependency of this
+      package before (only pulled in transitively via `@angular/material`), added as a peer/dev
+      dependency alongside it.
+- [x] Wired into `FormFieldType.CHIPS`, `DynamicForm`'s `@switch`, `FormConfigBuilder.chips()`, and
+      `public-api.ts`.
+- [x] Exercised in `apps/showcase`'s "All Fields" forms demo (`keywords` field) to keep that demo's
+      "every field type" claim true — pushed the showcase's initial bundle from 1.46MB to 1.54MB,
+      over the previous 1.5MB `maximumError` budget (already past the 1.1MB warning threshold before
+      this change); bumped `apps/showcase/angular.json`'s `maximumError` to 1.6MB rather than trim
+      unrelated bundle weight to make room for one legitimate new Material module.
+- [x] `tsc --noEmit`, `ng-packagr build` (catches template-binding errors `tsc` alone misses — same
+      lesson as `RegionSettingsFormComponent` above), full-repo `npm run typecheck`, and the showcase
+      app's production build all clean.
+- [ ] Not covered by the "No tests yet" gap noted below — same boundary, no unit tests added.
+
 ## packages/api-client
 
 - [ ] Already published and consumed by `insurly-ui`. No known outstanding work beyond routine

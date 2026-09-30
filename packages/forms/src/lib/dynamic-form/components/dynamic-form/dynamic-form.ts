@@ -7,6 +7,7 @@ import { TextareaField } from '../textarea-field/textarea-field';
 import { CheckboxField } from '../checkbox-field/checkbox-field';
 import { RadioField } from '../radio-field/radio-field';
 import { SelectField } from '../select-field/select-field';
+import { ChipsField } from '../chips-field/chips-field';
 import { SliderField } from '../slider-field/slider-field';
 import { BusinessDateField } from '../business-date-field/business-date-field';
 import { BusinessTimeField } from '../business-time-field/business-time-field';
@@ -29,6 +30,7 @@ import type { BaseSchema } from '../../interfaces/base.schema';
     CheckboxField,
     RadioField,
     SelectField,
+    ChipsField,
     SliderField,
     BusinessDateField,
     BusinessTimeField,

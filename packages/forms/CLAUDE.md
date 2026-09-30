@@ -12,7 +12,7 @@ src/
         ├── components/
         │   ├── dynamic-form/      # @switch on FieldDef.type -> one field component per type, plus Save/Clear
         │   └── *-field/           # One Material component per field type (text, textarea, checkbox, radio,
-        │                          #   select, slider, business-date, business-time, instant-date-time)
+        │                          #   select, chips, slider, business-date, business-time, instant-date-time)
         ├── builders/              # formConfig<T>() / FormConfigBuilder
         ├── adapters/              # LocaleDateAdapter + provideLocaleDateAdapter() for the pickers
         ├── config/                # NGX_FORMS_LOCALE — app-wide date/time field locale fallback
@@ -35,6 +35,9 @@ src/
 - Where possible put `[formField]` on the Material control itself — Material 22 reads required,
   disabled and error state from Signals Forms directly. The date/time pickers can't (they convert
   values), so they write `field().value` by hand and use `syncMatInputErrorState()` for errors.
+  `ChipsField` is the same case for a different reason: `[formField]` binds one control to one
+  value, but a chip grid adds/removes one token at a time, so it also writes `state().value.update()`
+  by hand.
 - Validation lives in `toSchema()`, driven by `FieldDef`, never in the components.
 - The showcase dev server doesn't watch `packages/forms` (it's only reached through a TS path
   mapping) — restart `ng serve` after library changes.

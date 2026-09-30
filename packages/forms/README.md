@@ -210,6 +210,7 @@ container. `DynamicForm` adds no padding or background of its own — put it in 
 | `CHECKBOX`          | `checkbox()`                   | `CheckboxField`        | `boolean`                    | `mat-checkbox`                                          |
 | `RADIO`             | `radio(name, label, choices)`  | `RadioField`           | option value                 | `mat-radio-group`                                       |
 | `SELECT`            | `select(name, label, choices)` | `SelectField`          | option value                 | `mat-select`                                            |
+| `CHIPS`             | `chips()`                      | `ChipsField`           | `string[]`                   | `mat-chip-grid`, one token typed at a time              |
 | `RANGE`             | `range()`                      | `SliderField`          | `number`                     | `mat-slider` (`min`/`max`/`step`, default 0–100)        |
 | `BUSINESS_DATE`     | `businessDate()`               | `BusinessDateField`    | `'YYYY-MM-DD'`               | Datepicker                                              |
 | `BUSINESS_TIME`     | `businessTime()`               | `BusinessTimeField`    | `'HH:mm'`                    | Timepicker                                              |
