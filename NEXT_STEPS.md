@@ -62,17 +62,17 @@ Still open:
 
 ## New package `ngx-translations` — built 2026-09-30
 
-Decided 2026-09-29, revised twice the same day after finding `resource-management-ui`'s existing
-`core/i18n/I18nStore` — its product doc (`docs/features/internationalization-i18n.md`) requires
-"responsive to language changes without reload." First revision dropped reload for a hand-rolled
-instant-switch engine generalizing `I18nStore`; second revision replaced the hand-rolled engine
-with Transloco, after confirming it already switches instantly — no reload — via a signal every
+Decided 2026-09-29, revised twice the same day after finding an existing consuming app's own
+`I18nStore` — its product requirements needed "responsive to language changes without reload."
+First revision dropped reload for a hand-rolled instant-switch engine generalizing that store;
+second revision replaced the hand-rolled engine with Transloco, after confirming it already
+switches instantly — no reload — via a signal every
 `translate()`/`translateObject()` call tracks inside `computed()` (its `activeLang` signal), so
 "instant switch" and "own engine" were never actually linked. Built to that final design:
 
 - [x] `provideTranslations({ locales, defaultLocale, dictionaries | loader, resolveLocale?, persistLocale? })`
       wraps `provideTransloco()`. `BundledTranslationsLoader` is the default (reads `dictionaries`, bundled
-      at build time — matches `resource-management-ui`'s reasoning for a small, finite locale set);
+      at build time — matches an existing consuming app's reasoning for a small, finite locale set);
       pass `loader` instead for many locales or backend-served translations.
 - [x] `TranslationsService` (root-provided): `locale` (`Signal<string>`, resolution order session override →
       `resolveLocale()` → `defaultLocale`), `setLocale()` (instant, no reload; persists via
@@ -107,8 +107,8 @@ with Transloco, after confirming it already switches instantly — no reload —
 - [ ] Still open, not done as part of this:
       - Per-library text tokens — see "Per-library text tokens" below, done 2026-09-30.
       - `ngx-api-client` sending `Accept-Language` from the active locale.
-      - Migrating `resource-management-ui`'s `I18nStore`/`labels.ts` onto this package — flagged for
-        later, on request, not started.
+      - Migrating an existing consuming app's own `I18nStore`/`labels.ts` onto this package —
+        flagged for later, on request, not started.
       - Peak/ICU-heavy features (plurals, gendered forms) aren't exercised by the demo yet, only the
         plain-dictionary/interpolation path.
       - `ngx-forms`' `dateTimeConfig.locale` fallback — see "`ngx-forms`: `NGX_FORMS_LOCALE`" below,
@@ -237,11 +237,10 @@ needed the same treatment:
 Idea captured 2026-09-30, refined the same day with a layout spec and a real prior-art reference.
 Nothing built yet.
 
-### Prior art: `surveysUI`'s dialog service
+### Prior art: an existing app's dialog service
 
-A few years old, in a sibling repo, not part of this monorepo:
-`/home/wilferraciolli/GIT/WILTECH/surveys/surveysUI/src/app/shared/`. Worth porting the *shape* of,
-not the code verbatim (it predates Signals, standalone components are inconsistent there, and the
+A few years old, in a sibling repo, not part of this monorepo. Worth porting the *shape* of, not
+the code verbatim (it predates Signals, standalone components are inconsistent there, and the
 layout requirement below is new):
 
 - `dialog.service.ts` — a thin `DialogService` wrapping `MatDialog`, plus a `DialogClosedActionType`
@@ -286,7 +285,7 @@ request in the panel while their team's availability stays visible on the left).
       `docs/ANGULAR_APP_CONVENTIONS.md` documents a *per-app* `src/styles/_breakpoints.scss` SCSS
       partial (`sm`/`md`/`lg`, M3's window size classes) that every consuming app sets up itself, and
       the CDK's `BreakpointObserver`/`Breakpoints.XSmall` for the JS-side reactive case (exactly what
-      the `surveysUI` prior art already uses) — see this file's still-open "Possibly `ngx-styles`"
+      the prior-art app above already uses) — see this file's still-open "Possibly `ngx-styles`"
       item above. There's no shared `ngx-*` breakpoints package to depend on today. Until that lands,
       `ngx-modals` follows the same convention every other package here already follows for anything
       app-owned: react to the CDK's `Breakpoints.XSmall` at runtime (full-screen below that, the
@@ -304,7 +303,7 @@ request in the panel while their team's availability stays visible on the left).
       vs a generic `Done`, exact set still open) paired with whatever data the modal wants to hand
       back, as one typed close-result object (see `ModalCloseResult<TAction, TData>` above) — so a
       caller can switch on the reason and only read the data when it matters.
-- [ ] **New requirement, not in the `surveysUI` prior art**: an X button that closes immediately if
+- [ ] **New requirement, not in the prior-art app above**: an X button that closes immediately if
       the modal's content has no unsaved changes, but — if it does — first shows a confirm prompt
       ("You have unsaved changes, are you sure you want to close? It will lose data") before actually
       closing. Needs:
@@ -315,26 +314,24 @@ request in the panel while their team's availability stays visible on the left).
       - The outer `MatDialog` opened with `disableClose: true` (or backdrop/Escape intercepted
         manually), so a backdrop click or Escape can't bypass the same check the X button goes
         through.
-      - The confirm prompt itself is the generalized, reusable version of `surveysUI`'s
+      - The confirm prompt itself is the generalized, reusable version of the prior-art app's
         `MatConfirmDialogComponent`/`openConfirmDialog()` — one shared component this package ships,
         not something every consuming app re-implements.
 - [ ] Not designed yet — enum member names, the exact typed-wrapper API shape (a
       `ModalService.open<T, R>()`-style method, presumably), and the precise shell/content contract
       for the dirty check are all still open. Design before building, same as every other package
       here.
-- [ ] No consumer yet. Not a straight port of `insurly-ui`/`resource-management-ui` code the way most
-      packages here started — closer to a redesign of the `surveysUI` prior art above, adapted to a
+- [ ] No consumer yet. Not a straight port of already-exercised consumer-app code the way most
+      packages here started — closer to a redesign of the prior-art app above, adapted to a
       layout that prior art never had.
 
 ## Planned package `ngx-region-settings` (not started)
 
-Idea captured 2026-09-30. Prior art reviewed in a *different* sibling repo than the modals one —
-`/home/wilferraciolli/GIT/WILTECH/PythonTutorials/showcase`
-(`src/app/core/user/current-user.store.ts`, `src/app/features/settings/region-settings.store.ts`) —
-**not** `surveysUI`, which is scoped to `ngx-modals` only. That showcase app isn't a `@wiltech-labs/*`
-consumer itself (its own `@wiliamferraciolli/ngx-api-client` fork, a hand-rolled `AuthStore`/
-`TranslationService`), so — same caveat as every other prior-art reference here — port the *shape*,
-not the code.
+Idea captured 2026-09-30. Prior art reviewed in a *different* reference app than the one behind
+`ngx-modals` above (`current-user.store.ts`, `region-settings.store.ts`). That app isn't a
+`@wiltech-labs/*` consumer itself (its own personal-scope API-client fork, a hand-rolled
+`AuthStore`/`TranslationService`), so — same caveat as every other prior-art reference here — port
+the *shape*, not the code.
 
 ### What's copy-pasted per app today
 Every app repeats the same flow: sign in → call `/me` → follow its `userProfile` link → follow
@@ -380,13 +377,13 @@ roots.
 - [ ] `Me`/`UserProfile` field shapes (`roleIds`, `email`, `externalId`, etc.) are app-specific in the
       reference — decide whether `CurrentUserStore` is generic over those (`CurrentUserStore<TMe,
       TProfile>`) or ships a minimal fixed shape (`{ id, links }`) with apps extending it. Still open.
-- [ ] **New open question this decision raises**: the reference's `CurrentUserStore` gates its `/me`
-      fetch on `auth.isSignedIn()` (an `AuthStore`-shaped thing — see the planned `ngx-auth` package
-      below). Does `ngx-region-settings` extend the same sanctioned-exception dependency to
-      `ngx-auth` too, or does `CurrentUserStore` take an app-supplied `isSignedIn: Signal<boolean>`
-      instead, so the exception stays limited to `ngx-api-client` alone? Per root `CLAUDE.md`'s
-      updated rule, extending it to a second package needs revisiting explicitly, not assuming.
-      Not decided — see the `ngx-auth` section below too.
+- [x] **Resolved 2026-09-30**: `ngx-region-settings` also takes a real dependency on `ngx-auth`,
+      gating `CurrentUserStore`'s `/me` fetch on `AuthStore.isSignedIn()` directly, the same way the
+      reference code does. This is the second sanctioned exception to root `CLAUDE.md`'s
+      "Inter-package deps" rule — see that row for why it's safe (both `ngx-api-client` and
+      `ngx-auth` are kept strict foundation leaves).
+- [ ] Build order: `ngx-auth` first (no dependencies of its own, fully exercised spec already),
+      `ngx-region-settings` after — it depends on both `ngx-auth` and `ngx-api-client`.
 - [ ] No consumer yet. Design before building, same as every other package here.
 
 ## Planned package `ngx-notifications` (not started)
@@ -431,7 +428,8 @@ top of it) than to `ngx-media`.
 Long-standing idea, first flagged in this file's "Align libraries..." section above ("Possibly
 `ngx-styles`... see discussion"), fleshed out 2026-09-30. **Reference for this one is
 `docs/ANGULAR_APP_CONVENTIONS.md`'s own SCSS setup (ported from `insurly-ui`'s `src/styles/*`) —
-explicitly not `surveysUI`, which is scoped to the `ngx-modals` design only.**
+explicitly not the dialog-service reference app behind `ngx-modals`, which is scoped to that design
+only.**
 
 Today every app copy-pastes the same four partials fresh: `_breakpoints.scss` (the `sm: 600px`/
 `md: 840px`/`lg: 1200px` scale + `bp.up()`/`bp.down()` mixins), `_spacing.scss` (4px-unit `space()`
@@ -461,38 +459,58 @@ palette).
       flagged this exact gap.
 - [ ] No consumer yet. Design before building, same as every other package here.
 
-## Planned package `ngx-auth` (not started)
+## New package `ngx-auth` — built 2026-09-30
 
-Idea captured 2026-09-30. Unlike the others, this one already has a fully exercised spec to port
-from — `docs/ANGULAR_APP_CONVENTIONS.md`'s existing "Authentication (Clerk)" section — because the
-user confirmed this is genuinely copy-pasted per app today, not speculative.
+Unlike the other four planned packages, this one had a fully exercised spec to port from —
+`docs/ANGULAR_APP_CONVENTIONS.md`'s existing "Authentication (Clerk)" section, plus an already-built
+Clerk integration (state shape, the `mountSignIn()` gotcha, guard, interceptor) in existing
+consuming apps — genuinely copy-pasted per app before this package existed, not a from-scratch
+design. Chosen as the starting point of the five planned packages: no dependencies of its own, and
+it unblocks `ngx-region-settings`.
 
-Two different things are bundled under "auth" in that doc, and only one of them belongs in this
-package:
+Two different things were bundled under "auth" in the doc, and only one belongs in this package:
 
-- [ ] **In scope — the Clerk wrapper**: `AuthStore` (a root-provided `signalStore`: raw `user`/
-      `session` from Clerk, `isSignedIn = computed(() => session() != null)`, `init()`'s exact
-      sequencing via `provideAppInitializer` — never a root component constructor, so route guards
-      and the HTTP interceptor never race a not-yet-loaded Clerk instance — `getToken()` for the HTTP
-      interceptor, `signIn()`/`signOut()`), the `mountSignIn()`/`mountUserButton()` gotcha (never call
-      them; use `clerk.redirectToSignIn()` instead — the npm build ships without the embedded UI
-      bundle), the `authGuard` (`CanActivateFn` checking `isSignedIn()`), and the `@clerk/testing`
-      Playwright setup (`clerkSetup()` in its own project, `clerk.signIn({ page, emailAddress })`).
-      This has zero app-specific knowledge — pure "wrap the vendor SDK correctly," same pattern as
-      `ngx-translations` wrapping Transloco. `@clerk/clerk-js` would be a regular `dependency` of this
-      package (not a peer), same precedent as `ngx-translations`/`@jsverse/transloco`.
-- [ ] **Explicitly out of scope — `CurrentUserStore`**: the app's own backend profile, fetched via a
-      HATEOAS link, shape differs per app. That's `ngx-region-settings`' job (see above), not this
-      package's — this package only answers "is someone signed in, and what's their token," never
-      "who are they in our system."
-- [ ] **Open question, shared with `ngx-region-settings` above**: `ngx-region-settings`'
-      `CurrentUserStore` needs to gate its `/me` fetch on sign-in state. Does that mean
-      `ngx-region-settings` takes a real dependency on `ngx-auth` too (a second sanctioned exception
-      to root `CLAUDE.md`'s "Inter-package deps" rule, needing `ngx-auth` to also commit to being a
-      foundation leaf), or does `ngx-region-settings` stay decoupled via an app-supplied
-      `isSignedIn: Signal<boolean>`? Not decided.
-- [ ] No consumer yet, though — unlike every other planned package here — this is a straight port of
-      already-exercised app code (the doc's spec came from real apps), not a from-scratch design.
+- [x] **In scope, built — the Clerk wrapper**: `AuthStore` (root-provided: `user`/`session` Signals
+      holding Clerk's own objects directly, `isSignedIn = computed(() => session() != null)`,
+      `init()`'s exact sequencing via `provideAppInitializer` — never a component constructor, so
+      `authGuard`/`authInterceptor` never race a not-yet-loaded Clerk instance — `getToken()`,
+      `signIn()`/`signOut()`), the `mountSignIn()`/`mountUserButton()` gotcha (never call them;
+      `AuthStore.signIn()` uses `clerk.redirectToSignIn()` instead), `authGuard` (`CanActivateFn`
+      checking `isSignedIn()`, redirecting to `NgxAuthConfig.redirectTo`), and `authInterceptor`
+      (`HttpInterceptorFn` attaching the bearer token). `@clerk/clerk-js` (`^6.35.0`, newer than what
+      existing apps pinned) is a regular `dependency` of this package, not a peer — same precedent as
+      `ngx-translations`/`@jsverse/transloco`.
+- [x] **Explicitly out of scope — `CurrentUserStore`**: the app's own backend profile, fetched via a
+      HATEOAS link, shape differs per app. That's `ngx-region-settings`' job, not this package's —
+      this package only answers "is someone signed in, and what's their token," never "who are they
+      in our system."
+- [x] **Design deviation from the apps this was generalized from**: those used `@ngrx/signals`'
+      `signalStore()`; this package uses plain `@Injectable` + `signal()`/`computed()` instead — the
+      same shape `ngx-translations`' `TranslationsService` already uses, so this package doesn't add
+      a new third-party dependency (`@ngrx/signals`) nothing else here needs, for state this simple.
+- [x] **`NgxAuthConfig.apiOrigin` made required, not defaulted** — the existing apps' interceptors
+      hardcoded their own `environment.apiUrl` inline; this package generalizes that into a config
+      field, and deliberately does *not* give it a `''` default the way `ngx-api-client`'s
+      `API_ORIGIN` has, because an empty/omitted origin would match every request
+      (`'anything'.startsWith('')` is always `true`) and leak the token to third-party calls (Giphy,
+      an image host, ...) — a real scenario flagged during design, not hypothetical.
+- [x] **`authInterceptor` attaches a token only if one exists; it never blocks a request** — confirmed
+      necessary during design: some apps allow guest/anonymous users, so the interceptor can't assume
+      every request needs (or will get) a token. Access control stays `authGuard`'s job, applied
+      per-route.
+- [x] **Resolved 2026-09-30**: `ngx-region-settings` takes a real dependency on `ngx-auth`, gating
+      `CurrentUserStore`'s `/me` fetch directly on `AuthStore.isSignedIn()`. This package therefore
+      commits to being a foundation leaf itself, same as `ngx-api-client` — see root `CLAUDE.md`'s
+      "Inter-package deps" row.
+- [x] Package scaffolded (`package.json`, `ng-package.json`, `tsconfig.json`, `README.md`,
+      `CLAUDE.md`), builds and typechecks clean. Root `CLAUDE.md` repo layout updated.
+- [ ] Playwright/`@clerk/testing` setup (`clerkSetup()`, `clerk.signIn({ page, emailAddress })`)
+      stayed out of this package — that's app-level e2e test config, not something a library ships.
+      Worth a short recipe in the README if this turns out to trip people up in practice; not added
+      yet since it isn't code this package needs to own.
+- [ ] Not yet wired into `apps/showcase` — no route in that app actually needs sign-in yet. Add a
+      demo once one does, same as every other package's showcase wiring.
+- [ ] Not yet published to npm — under development, no consumers yet.
 
 ## packages/forms
 
@@ -517,6 +535,10 @@ See "New package `ngx-translations` — built 2026-09-30" above for what's built
 ## packages/dates
 
 See "New package `ngx-dates` — built 2026-09-30" above for what's built and what's still open.
+
+## packages/auth
+
+See "New package `ngx-auth` — built 2026-09-30" above for what's built and what's still open.
 
 ## packages/media
 
