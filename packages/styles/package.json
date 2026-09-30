@@ -1,0 +1,13 @@
+{
+  "name": "@wiltech-labs/ngx-styles",
+  "version": "1.0.0",
+  "description": "Shared Material 3 Sass partials — breakpoints, spacing scale, and design-system mixins (page-title, banner, state-layer, focus-ring, ...) that read --mat-sys-* tokens. Raw .scss, no compile step.",
+  "license": "Apache-2.0",
+  "sideEffects": false,
+  "files": [
+    "src"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
