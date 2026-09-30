@@ -67,12 +67,16 @@ src/
   (`EOVERRIDE ... conflicts with direct dependency`), because `ngx-api-client`/`ngx-auth` are already
   workspace members, which npm treats as a direct dependency of the workspace root itself. The
   `file:` reference in this package's own `dependencies` was the only mechanism that actually worked.
-- **This means `dist/package.json` needs a manual fixup before publishing** — `ng-packagr` copies
-  `dependencies` verbatim, `file:` paths included, so a published tarball would otherwise ship a
-  dependency on a path that doesn't exist outside this monorepo. See this package's README's
-  "Publishing" section for the exact step. Not automated (no CI/publish-script exists yet — see root
-  `NEXT_STEPS.md`'s "Repo-wide" section); worth a small script if this pattern gets reused by a third
-  package.
+- **This means `dist/package.json` needs its `file:` deps rewritten before publishing** — `ng-packagr`
+  copies `dependencies` verbatim, `file:` paths included, so a published tarball would otherwise ship
+  a dependency on a path that doesn't exist outside this monorepo. Automated 2026-09-30 by
+  `scripts/fix-dist-file-deps.js` (`npm run fix-dist-file-deps` from the repo root) — this was a
+  manual hand-edit until this package became the third one to reuse the `file:../x/dist` pattern
+  (after `ngx-api-client`/`ngx-auth`), at which point a real user (not just a hypothetical future
+  package) hit the raw `file:` reference still sitting in `dist/package.json` after `npm run build`
+  and asked why. The script rewrites every `file:../x/dist` entry it finds in any package's
+  `dist/package.json` to `^<x's current source version>`, read straight from `packages/x/package.json`
+  — see this package's README's "Publishing" section for usage.
 - **Build-order requirement this creates**: `ngx-api-client`, `ngx-auth`, and `ngx-forms` must be
   built (their `dist/` must exist) _before_ this package builds — `file:../api-client/dist` is a
   dangling reference otherwise. `npm install` itself never fails on this (it happily symlinks to a

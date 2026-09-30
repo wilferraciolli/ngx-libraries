@@ -10,6 +10,7 @@
     "build": "npm run build:packages && for d in apps/*/; do npm run build --workspace=\"${d%/}\" --if-present || exit 1; done",
     "build:packages": "bash scripts/build-packages.sh",
     "typecheck": "npm run typecheck --workspaces --if-present",
+    "fix-dist-file-deps": "node scripts/fix-dist-file-deps.js",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

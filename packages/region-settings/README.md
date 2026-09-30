@@ -157,16 +157,17 @@ npm run build
 Then, **before** `npm publish`: `ng-packagr` copies `dependencies` verbatim into
 `dist/package.json`, including this package's own `file:../api-client/dist` /
 `file:../auth/dist` / `file:../forms/dist` entries (see this package's `CLAUDE.md` for why they're
-`file:` references at all) — those are meaningless outside this monorepo, so hand-edit
-`dist/package.json` to point them at the real published version ranges first, e.g.:
+`file:` references at all) — those are meaningless outside this monorepo, so rewrite them to the real
+published version ranges first, from the repo root:
 
-```json
-"dependencies": {
-  "@wiltech-labs/ngx-api-client": "^1.0.0",
-  "@wiltech-labs/ngx-auth": "^1.0.0",
-  "@wiltech-labs/ngx-forms": "^1.0.0"
-}
+```bash
+npm run fix-dist-file-deps
 ```
+
+This rewrites every `file:../x/dist` dependency in every package's `dist/package.json` (not just this
+one) to `^<x's own current source version>`, reading that version straight from `packages/x/package.json`
+— pass a specific package path (`npm run fix-dist-file-deps -- packages/region-settings`) to limit it
+to one. See `scripts/fix-dist-file-deps.js`.
 
 Then publish the fixed-up output:
 

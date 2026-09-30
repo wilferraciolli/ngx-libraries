@@ -52,6 +52,17 @@ install && npm run build` now succeeds end to end, including the showcase app). 
   killed the npm/shell wrapper, not the actual `ng serve (ngx-showcase)` child — it kept running
   and serving a stale build on a later browser check. `kill -9 <pid>` on the actual listening PID
   (from `ss -ltnp | grep 4200`) is what actually frees the port.
+- [x] `dist/package.json`'s `file:../x/dist` entries (the `ngx-api-client`/`ngx-auth`/`ngx-forms`
+      sanctioned-exception mechanism — see root `CLAUDE.md`'s "Inter-package deps") needed a manual
+      hand-edit before every publish, documented but not automated — flagged as "worth a small script
+      if this pattern gets reused by a third package" when `ngx-region-settings` became that third
+      package. Hit for real 2026-09-30: ran `npm run build` on `ngx-region-settings`, found the raw
+      `file:` references still sitting in `dist/package.json` (expected — that step was always manual),
+      asked why. Automated with `scripts/fix-dist-file-deps.js` (`npm run fix-dist-file-deps`, optional
+      package-path args to limit it): scans every `packages/*/dist/package.json`, rewrites any
+      `file:../x/dist` dependency to `^<x's current source version>` read from `packages/x/package.json`.
+      Verified against `ngx-region-settings`'s actual `dist/package.json` (all three entries rewritten
+      correctly) and a no-args scan-all run.
 
 ## Align libraries with `docs/ANGULAR_APP_CONVENTIONS.md` (2026-09-29)
 
