@@ -1,17 +1,17 @@
 import { EnvironmentProviders, makeEnvironmentProviders } from '@angular/core';
 import { provideTransloco } from '@jsverse/transloco';
-import { NGX_I18N_CONFIG, type NgxI18nConfig } from '../config/i18n-config.token';
-import { BundledI18nLoader } from './bundled-i18n.loader';
+import { NGX_TRANSLATIONS_CONFIG, type NgxTranslationsConfig } from '../config/translations-config.token';
+import { BundledTranslationsLoader } from './bundled-translations.loader';
 
 /**
  * Sets up translations for the app: register once in `app.config.ts`. Wraps Transloco so the app
- * depends on `@wiltech-labs/ngx-i18n` alone — inject `I18nService` and use the `t` pipe, never
+ * depends on `@wiltech-labs/ngx-translations` alone — inject `TranslationsService` and use the `t` pipe, never
  * Transloco's own service/pipe directly, so the engine underneath can change without touching
  * every call site.
  */
-export function provideI18n(config: NgxI18nConfig): EnvironmentProviders[] {
+export function provideTranslations(config: NgxTranslationsConfig): EnvironmentProviders[] {
   return [
-    makeEnvironmentProviders([{ provide: NGX_I18N_CONFIG, useValue: config }]),
+    makeEnvironmentProviders([{ provide: NGX_TRANSLATIONS_CONFIG, useValue: config }]),
     ...provideTransloco({
       config: {
         defaultLang: config.defaultLocale,
@@ -22,7 +22,7 @@ export function provideI18n(config: NgxI18nConfig): EnvironmentProviders[] {
         reRenderOnLangChange: true,
         missingHandler: { logMissingKey: true, useFallbackTranslation: true, allowEmpty: false }
       },
-      loader: config.loader ?? BundledI18nLoader
+      loader: config.loader ?? BundledTranslationsLoader
     })
   ];
 }

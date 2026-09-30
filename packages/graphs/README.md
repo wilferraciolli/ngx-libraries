@@ -178,23 +178,23 @@ Overrides, for a genuine one-off only and always to a token, never a hex value:
 ### Translating "Show data"
 
 That toggle text comes from `NGX_GRAPHS_TEXT` (defaults to English), not a hardcoded string.
-Override it once in `app.config.ts`, e.g. wired to [`@wiltech-labs/ngx-i18n`](../i18n):
+Override it once in `app.config.ts`, e.g. wired to [`@wiltech-labs/ngx-translations`](../translations):
 
 ```ts
 import { inject } from '@angular/core';
 import { NGX_GRAPHS_TEXT } from '@wiltech-labs/ngx-graphs';
-import { I18nService } from '@wiltech-labs/ngx-i18n';
+import { TranslationsService } from '@wiltech-labs/ngx-translations';
 
 {
   provide: NGX_GRAPHS_TEXT,
   useFactory: () => {
-    const i18n = inject(I18nService);
-    return () => ({ showData: i18n.t('graphs.showData') });
+    const translations = inject(TranslationsService);
+    return () => ({ showData: translations.t('graphs.showData') });
   }
 }
 ```
 
-No dependency on `ngx-i18n` from this package — the resolver is a plain function, same as
+No dependency on `ngx-translations` from this package — the resolver is a plain function, same as
 `ngx-dates`' `NGX_DATES_LOCALE`.
 
 ## Other exports

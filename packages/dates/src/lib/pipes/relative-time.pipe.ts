@@ -7,8 +7,8 @@ import { InstantLike } from '../utils/relative-time.utils';
  * `{{ comment.postedAt | relativeTime }}` — the template counterpart of `RelativeTimeService`.
  * Impure by design, for two independent reasons an ordinary pure pipe can't cover: the same input
  * reads differently as real time passes ("moments ago" -> "5 minutes ago"), and it re-renders on a
- * locale switch when `NGX_DATES_LOCALE` is wired to a reactive resolver (e.g. `ngx-i18n`'s
- * `I18nService.locale()`). Self-schedules its own re-check (cheaper the further away the value is
+ * locale switch when `NGX_DATES_LOCALE` is wired to a reactive resolver (e.g. `ngx-translations`'
+ * `TranslationsService.locale()`). Self-schedules its own re-check (cheaper the further away the value is
  * — a value from last year re-checks hourly, not every second) rather than relying on some other
  * binding to happen to trigger change detection.
  */
@@ -23,7 +23,7 @@ export class RelativeTimePipe implements PipeTransform, OnDestroy {
   private lastText = '';
 
   constructor() {
-    // If `resolveLocale` reads a signal internally (e.g. wired to `I18nService.locale()`), `effect()`
+    // If `resolveLocale` reads a signal internally (e.g. wired to `TranslationsService.locale()`), `effect()`
     // still tracks it here despite being "just a function call" — Angular tracks any signal read
     // during the effect's synchronous execution, however many calls deep. Locale switches then
     // don't wait for the timer below.

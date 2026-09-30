@@ -1,4 +1,4 @@
-# @wiltech-labs/ngx-i18n
+# @wiltech-labs/ngx-translations
 
 Shared Angular translations: instant (no-reload) language switching on
 [Transloco](https://jsverse.gitbook.io/transloco), a `t()` service method and a `t` pipe, and
@@ -8,7 +8,7 @@ locale-aware date/number formatting. The app depends on this package alone — i
 ## Installation
 
 ```bash
-npm install @wiltech-labs/ngx-i18n
+npm install @wiltech-labs/ngx-translations
 ```
 
 Peer dependencies: `@angular/core`, `@angular/common` (both `^22`). `@jsverse/transloco` is
@@ -19,14 +19,14 @@ installed automatically as a regular dependency of this package.
 ```ts
 // app.config.ts
 import { ApplicationConfig } from '@angular/core';
-import { provideI18n } from '@wiltech-labs/ngx-i18n';
-import en from './i18n/en-GB.json';
-import el from './i18n/el-GR.json';
+import { provideTranslations } from '@wiltech-labs/ngx-translations';
+import en from './translations/en-GB.json';
+import el from './translations/el-GR.json';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     // ...
-    provideI18n({
+    provideTranslations({
       locales: ['en-GB', 'el-GR'],
       defaultLocale: 'en-GB',
       dictionaries: { 'en-GB': en, 'el-GR': el }
@@ -56,17 +56,17 @@ Provide a `loader` instead of `dictionaries` — a class implementing Transloco'
 ```ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import type { Translation, TranslocoLoader } from '@wiltech-labs/ngx-i18n';
+import type { Translation, TranslocoLoader } from '@wiltech-labs/ngx-translations';
 
 @Injectable()
-export class ApiI18nLoader implements TranslocoLoader {
+export class ApiTranslationsLoader implements TranslocoLoader {
   constructor(private http: HttpClient) {}
   getTranslation(lang: string) {
     return this.http.get<Translation>(`/api/translations/${lang}`);
   }
 }
 
-provideI18n({ locales: ['en-GB', 'el-GR'], defaultLocale: 'en-GB', loader: ApiI18nLoader });
+provideTranslations({ locales: ['en-GB', 'el-GR'], defaultLocale: 'en-GB', loader: ApiTranslationsLoader });
 ```
 
 ### Resolving the signed-in user's language
@@ -76,7 +76,7 @@ async source (a profile that loads after sign-in) takes effect the moment it res
 an explicit language switch:
 
 ```ts
-provideI18n({
+provideTranslations({
   locales: ['en-GB', 'el-GR'],
   defaultLocale: 'en-GB',
   dictionaries: { 'en-GB': en, 'el-GR': el },
@@ -91,7 +91,7 @@ provideI18n({
 
 ```ts
 import { Component, inject } from '@angular/core';
-import { I18nService, TPipe } from '@wiltech-labs/ngx-i18n';
+import { TranslationsService, TPipe } from '@wiltech-labs/ngx-translations';
 
 @Component({
   selector: 'app-flight-form',
@@ -103,41 +103,41 @@ import { I18nService, TPipe } from '@wiltech-labs/ngx-i18n';
   `
 })
 export class FlightFormComponent {
-  private readonly i18n = inject(I18nService);
+  private readonly translations = inject(TranslationsService);
   protected readonly seatsLeft = 3;
 
   protected save(): void {
     // A value, not a template — for logic that needs the string itself.
-    toast.show(this.i18n.t('flight.saved'));
+    toast.show(this.translations.t('flight.saved'));
   }
 }
 ```
 
 - **`| t`** in a template — stays live across a language switch under `OnPush`, without the
   template needing to read a signal or an `Observable` itself.
-- **`I18nService.t(key, params?)`** — the instant translated value, for logic: a `computed()`, a
+- **`TranslationsService.t(key, params?)`** — the instant translated value, for logic: a `computed()`, a
   toast message, an id worked out to a key at runtime.
 
 ### Switching language
 
 ```ts
-protected readonly i18n = inject(I18nService);
+protected readonly translations = inject(TranslationsService);
 
 protected onLanguageChange(locale: string): void {
-  this.i18n.setLocale(locale); // instant — no reload; persists in the background
+  this.translations.setLocale(locale); // instant — no reload; persists in the background
 }
 ```
 
-`I18nService.locale` is a `Signal<string>` — the resolution order is this session's `setLocale()`
+`TranslationsService.locale` is a `Signal<string>` — the resolution order is this session's `setLocale()`
 choice, then `resolveLocale()`, then `defaultLocale`. `supportedLocales()` lists every configured
 locale, for a language switcher.
 
 ### Formatting
 
 ```ts
-this.i18n.formatDate(flight.departure);                                    // "31/12/2026, 09:00"
-this.i18n.formatDate(flight.departure, { dateStyle: 'medium' });           // "31 Dec 2026"
-this.i18n.formatNumber(flight.price, { style: 'currency', currency: 'GBP' }); // "£249.00"
+this.translations.formatDate(flight.departure);                                    // "31/12/2026, 09:00"
+this.translations.formatDate(flight.departure, { dateStyle: 'medium' });           // "31 Dec 2026"
+this.translations.formatNumber(flight.price, { style: 'currency', currency: 'GBP' }); // "£249.00"
 ```
 
 Both read `Intl` directly against the current locale — not `LOCALE_ID` or Material's
@@ -146,13 +146,13 @@ Both read `Intl` directly against the current locale — not `LOCALE_ID` or Mate
 ## Translating an id from the API
 
 The API sends stable ids, never pre-formatted display text. Key convention:
-`'metadata.<field>.<id>'`, e.g. `i18n.t('metadata.status.active')` for a `status` field's `active`
+`'metadata.<field>.<id>'`, e.g. `translations.t('metadata.status.active')` for a `status` field's `active`
 id — pairs with `@wiltech-labs/ngx-api-client`'s `MetadataService`/`convertIdToValues` pipe.
 
 ## Missing translations
 
 A missing key falls back to rendering the key itself (visible, debuggable, never a blank string) —
-Transloco's own `missingHandler`, configured by `provideI18n()`.
+Transloco's own `missingHandler`, configured by `provideTranslations()`.
 
 ## Layout
 
@@ -160,9 +160,9 @@ Transloco's own `missingHandler`, configured by `provideI18n()`.
 src/
 ├── public-api.ts        # barrel — the entire public surface; nothing outside this is exported
 └── lib/
-    ├── config/            # NgxI18nConfig, LocaleResolver, NGX_I18N_CONFIG token
-    ├── providers/         # provideI18n(), BundledI18nLoader (the default loader)
-    ├── services/          # I18nService — locale, setLocale(), t(), formatDate()/formatNumber()
+    ├── config/            # NgxTranslationsConfig, LocaleResolver, NGX_TRANSLATIONS_CONFIG token
+    ├── providers/         # provideTranslations(), BundledTranslationsLoader (the default loader)
+    ├── services/          # TranslationsService — locale, setLocale(), t(), formatDate()/formatNumber()
     └── pipes/             # TPipe ('t')
 ```
 
@@ -175,7 +175,7 @@ Not yet published to npm — under development.
 To publish this package to npm:
 
 ```bash
-cd packages/i18n
+cd packages/translations
 npm run build
 cd dist
 npm publish

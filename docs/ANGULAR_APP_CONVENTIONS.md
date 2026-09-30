@@ -131,7 +131,7 @@ to use which package and the rules for using it in an app.
 | Charts | `ngx-graphs` | `graphConfig()` + `BarGraph`/`LineGraph`/`PieGraph`/`DoughnutGraph`/`PolarAreaGraph`/`RadarGraph`; `pointGraphConfig()` + `BubbleGraph`/`ScatterGraph` | App-local chart wrappers, direct `ng2-charts` use, hand-drawn charts |
 | AI interaction surfaces | `ngx-ai-tools` | `AiTextBox`, `AiButton`, `AiPanel`, `AiSparkleIcon` | Ad hoc gradient styling |
 | Realtime / websockets | `ngx-web-sockets` | `provideWebSocket()`, `WebSocketService`, `ChatRoom`, `ChatMessageBubble` | `ngx-socket-io`, hand-rolled socket services |
-| Translations | `ngx-i18n` | `provideI18n()`, `I18nService`, the `t` pipe | An app-local translation store (see `ngx-i18n` below), raw Transloco use |
+| Translations | `ngx-translations` | `provideTranslations()`, `TranslationsService`, the `t` pipe | An app-local translation store (see `ngx-translations` below), raw Transloco use |
 
 ### Setup
 Install only the packages the app uses (`npm i @wiltech-labs/ngx-forms …`).
@@ -142,17 +142,17 @@ import { provideHttpClient } from '@angular/common/http';
 import { API_ORIGIN } from '@wiltech-labs/ngx-api-client';
 import { provideWebSocket } from '@wiltech-labs/ngx-web-sockets';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
-import { I18nService, provideI18n } from '@wiltech-labs/ngx-i18n';
+import { TranslationsService, provideTranslations } from '@wiltech-labs/ngx-translations';
 import { NGX_DATES_LOCALE } from '@wiltech-labs/ngx-dates';
 
 provideHttpClient(),                                         // ngx-api-client
 { provide: API_ORIGIN, useValue: environment.apiOrigin },    // ngx-api-client — only when the API is on another origin
 provideCharts(withDefaultRegisterables()),                   // ngx-graphs — chart.js registration, once per app
 provideWebSocket({ url: environment.socketUrl }),            // ngx-web-sockets
-provideI18n({ locales: [...], defaultLocale: '...', dictionaries: {...} }), // ngx-i18n
-{                                                             // ngx-dates — wire its locale to ngx-i18n's
+provideTranslations({ locales: [...], defaultLocale: '...', dictionaries: {...} }), // ngx-translations
+{                                                             // ngx-dates — wire its locale to ngx-translations'
   provide: NGX_DATES_LOCALE,
-  useFactory: () => { const i18n = inject(I18nService); return () => i18n.locale(); }
+  useFactory: () => { const translations = inject(TranslationsService); return () => translations.locale(); }
 },
 ```
 - `API_ORIGIN` is the API's **bare origin** (`https://api.example.com`), not the
@@ -164,14 +164,14 @@ provideI18n({ locales: [...], defaultLocale: '...', dictionaries: {...} }), // n
 - `ngx-forms` fields are Angular Material components and take the house M3 theme
   from "Design system: Material 3". Skip the prebuilt-theme import in the
   package README; that's for apps without their own theme.
-- `ngx-i18n` needs at least `locales`/`defaultLocale` plus `dictionaries` or a
-  `loader` — see "`ngx-i18n`" below.
-- `ngx-dates` has no dependency on `ngx-i18n` (or any other package here) —
+- `ngx-translations` needs at least `locales`/`defaultLocale` plus `dictionaries` or a
+  `loader` — see "`ngx-translations`" below.
+- `ngx-dates` has no dependency on `ngx-translations` (or any other package here) —
   `NGX_DATES_LOCALE` defaults to the browser's own language if left unset. The
   `useFactory` above is what makes a language switch update relative-time text
-  too; skip it in an app with no `ngx-i18n` setup.
+  too; skip it in an app with no `ngx-translations` setup.
 - `ngx-forms` has the same `NGX_FORMS_LOCALE` token, deliberately **not** shown
-  above — wiring it to `ngx-i18n` the same way means a language switch changes
+  above — wiring it to `ngx-translations` the same way means a language switch changes
   which typed day/month order a date/time field's input accepts, not just
   wording, so it's an app's deliberate choice, not a default. See "`ngx-forms`"
   below.
@@ -229,7 +229,7 @@ provideI18n({ locales: [...], defaultLocale: '...', dictionaries: {...} }), // n
   app's; the fields are the library's.
 - Date/time fields display and parse in `dateTimeConfig.locale`, falling back to
   `NGX_FORMS_LOCALE` when a field doesn't set one — provide it in `app.config.ts`
-  to change every field's default locale together (wire it to `ngx-i18n` the
+  to change every field's default locale together (wire it to `ngx-translations` the
   same way as `NGX_DATES_LOCALE`, see "Setup" above). Leave it unset and every
   field keeps the package's own default (`'en-GB'`).
 
@@ -248,7 +248,7 @@ provideI18n({ locales: [...], defaultLocale: '...', dictionaries: {...} }), // n
   to change the height. Keep to six series (three on bubble/scatter). Past that
   the library warns: fold the rest into "Other" or use small multiples.
 - The "Show data" toggle text comes from `NGX_GRAPHS_TEXT` — override it (e.g.
-  wired to `ngx-i18n`) to translate it; leave it unset and it stays English.
+  wired to `ngx-translations`) to translate it; leave it unset and it stays English.
 
 **`ngx-media`**
 - A content loading state is a skeleton shaped like the content:
@@ -287,31 +287,31 @@ provideI18n({ locales: [...], defaultLocale: '...', dictionaries: {...} }), // n
 - The server contract (event names and payloads) is in the package README. A
   backend has to match it.
 - Connection status, the composer placeholder and transient status messages
-  come from `NGX_CHAT_TEXT` — override it (e.g. wired to `ngx-i18n`) to
+  come from `NGX_CHAT_TEXT` — override it (e.g. wired to `ngx-translations`) to
   translate it; message *bodies* are always app/server data either way.
 
-**`ngx-i18n`**
-- Depend on `@wiltech-labs/ngx-i18n` alone — never import `@jsverse/transloco`
+**`ngx-translations`**
+- Depend on `@wiltech-labs/ngx-translations` alone — never import `@jsverse/transloco`
   directly (the app's own `package.json` shouldn't list it). The engine
   underneath can change without any template or service call changing with it.
-- Inject `I18nService` for logic (`i18n.t(key, params)`, a `computed()`, a
+- Inject `TranslationsService` for logic (`translations.t(key, params)`, a `computed()`, a
   toast message); use the `t` pipe in templates (`{{ 'common.buttons.save' | t }}`).
   Both read live — a language switch shows up on the next read, nothing is
   cached stale.
-- **Switching language never reloads the app.** `I18nService.setLocale(locale)`
+- **Switching language never reloads the app.** `TranslationsService.setLocale(locale)`
   updates every `t()`/`t` pipe call and `formatDate()`/`formatNumber()`
   immediately; persisting the choice happens in the background afterward and
   never blocks or reverts the switch.
 - Resolution order: this session's `setLocale()` choice, then the app's own
   `resolveLocale` (read reactively — a signed-in user's saved language,
   say), then `defaultLocale`. Provide `resolveLocale`/`persistLocale` in
-  `provideI18n()`, not as separate ad hoc code elsewhere.
+  `provideTranslations()`, not as separate ad hoc code elsewhere.
 - Translating an id from the API: key convention `'metadata.<field>.<id>'`
-  (e.g. `i18n.t('metadata.status.active')`), which pairs with `ngx-api-client`'s
+  (e.g. `translations.t('metadata.status.active')`), which pairs with `ngx-api-client`'s
   `MetadataService`/`convertIdToValues`.
 - `formatDate()`/`formatNumber()` read `Intl` against the current locale
   directly — use them (or the `date`/`number` pipes with a locale that follows
-  `I18nService.locale()`) rather than `LOCALE_ID`, which is fixed at bootstrap
+  `TranslationsService.locale()`) rather than `LOCALE_ID`, which is fixed at bootstrap
   and can't react to a runtime switch.
 - A missing translation key renders as the key itself, not a blank string —
   don't add a second fallback layer on top.
@@ -323,13 +323,13 @@ provideI18n({ locales: [...], defaultLocale: '...', dictionaries: {...} }), // n
   wire format `ngx-forms`' instant-date-time field uses, so a value read from
   that field needs no conversion first.
 - Locale comes from `NGX_DATES_LOCALE`, not `LOCALE_ID` (fixed at bootstrap,
-  can't react to a runtime switch). Wire it to `ngx-i18n` in `provideI18n`'s
+  can't react to a runtime switch). Wire it to `ngx-translations` in `provideTranslations()`'s
   setup above; without that wiring it defaults to the browser's own language
   and won't move when the app's language does.
 - The pipe is impure and self-updates as real time passes (every second while
   under a minute old, hourly once it's day-or-older) — nothing else needs to
   trigger change detection for the displayed text to stay current.
-- `ngx-dates` has no dependency on `ngx-i18n`, or on any other package here —
+- `ngx-dates` has no dependency on `ngx-translations`, or on any other package here —
   see "Inter-package deps" in root `CLAUDE.md` for why, if a package here ever
   seems like it wants to import another directly.
 
@@ -348,10 +348,10 @@ Work through what the app actually has:
 - [ ] Ad hoc AI styling → `ngx-ai-tools` surfaces. Static AI markers stay
       `tertiary-container`.
 - [ ] Socket services or `ngx-socket-io` → `ngx-web-sockets`.
-- [ ] An app-local translation store, or raw Transloco use → `ngx-i18n`. Remove
+- [ ] An app-local translation store, or raw Transloco use → `ngx-translations`. Remove
       `@jsverse/transloco` from the app's own `package.json` if it's there.
 - [ ] An app-local "time ago" pipe → `ngx-dates`' `relativeTime` pipe. Wire
-      `NGX_DATES_LOCALE` to `ngx-i18n` if the app has it set up.
+      `NGX_DATES_LOCALE` to `ngx-translations` if the app has it set up.
 - [ ] Remove any `--ngx-*` override set to a hex value.
 - [ ] Run the review checklist (section 7) on every screen touched, light and
       dark.
@@ -388,7 +388,7 @@ means, not by what the picker looks like:
   - Business times: `Temporal.PlainTime.from(t).toLocaleString(locale, { hour: 'numeric', minute: '2-digit' })`.
   - Relative times: `ngx-dates`' `relativeTime` pipe, inside
     `<time [attr.datetime]="iso">` with the full timestamp in `title`.
-  - All of the above take the locale from `ngx-i18n`'s `I18nService.locale()`
+  - All of the above take the locale from `ngx-translations`' `TranslationsService.locale()`
     in an app that has it (for `ngx-dates`, via `NGX_DATES_LOCALE` — see
     "Setup" above), not a hardcoded locale string.
 - **Time zones**: show instants in the user's zone by default. A feature tied to

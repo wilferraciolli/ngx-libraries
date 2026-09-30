@@ -6,10 +6,10 @@ scratchpad so we don't lose track between sessions. Update as items land or prio
 ## Housekeeping (found while looking, not yet fixed)
 
 - [x] `CLAUDE.md` repo layout now lists every package (`api-client`, `forms`, `media`, `ai-tools`,
-      `graphs`, `web-sockets`, `i18n`, `dates`) — kept up to date as each new package landed.
+      `graphs`, `web-sockets`, `translations`, `dates`) — kept up to date as each new package landed.
 - [x] `apps/showcase/README.md` and its home page tile list had gone stale as demos were added —
       still said "Bar and pie graphs" (now 8 chart types) and listed only 3 of the 6 wired-in demos
-      (missing media/ai-tools/graphs/i18n from "Testing the Libraries" and "Project Structure").
+      (missing media/ai-tools/graphs/translations from "Testing the Libraries" and "Project Structure").
       Found while double-checking for anything not yet tracked here, not from a specific task.
       Fixed 2026-09-30; nothing else found stale on the same pass (root `README.md`, every package's
       own README/CLAUDE.md, `docs/ANGULAR_APP_CONVENTIONS.md`).
@@ -60,7 +60,7 @@ Still open:
       whether the gradient should keep fixed AI hues.
 - [ ] Possibly `ngx-styles` (shared SCSS: breakpoints, spacing, ui mixins, theme) — see discussion.
 
-## New package `ngx-i18n` — built 2026-09-30
+## New package `ngx-translations` — built 2026-09-30
 
 Decided 2026-09-29, revised twice the same day after finding `resource-management-ui`'s existing
 `core/i18n/I18nStore` — its product doc (`docs/features/internationalization-i18n.md`) requires
@@ -70,11 +70,11 @@ with Transloco, after confirming it already switches instantly — no reload —
 `translate()`/`translateObject()` call tracks inside `computed()` (its `activeLang` signal), so
 "instant switch" and "own engine" were never actually linked. Built to that final design:
 
-- [x] `provideI18n({ locales, defaultLocale, dictionaries | loader, resolveLocale?, persistLocale? })`
-      wraps `provideTransloco()`. `BundledI18nLoader` is the default (reads `dictionaries`, bundled
+- [x] `provideTranslations({ locales, defaultLocale, dictionaries | loader, resolveLocale?, persistLocale? })`
+      wraps `provideTransloco()`. `BundledTranslationsLoader` is the default (reads `dictionaries`, bundled
       at build time — matches `resource-management-ui`'s reasoning for a small, finite locale set);
       pass `loader` instead for many locales or backend-served translations.
-- [x] `I18nService` (root-provided): `locale` (`Signal<string>`, resolution order session override →
+- [x] `TranslationsService` (root-provided): `locale` (`Signal<string>`, resolution order session override →
       `resolveLocale()` → `defaultLocale`), `setLocale()` (instant, no reload; persists via
       `persistLocale()` without awaiting it), `t(key, params)`, `formatDate()`/`formatNumber()` (own
       `Intl` use, not `LOCALE_ID`/`DateAdapter`, which can't react to a runtime switch),
@@ -84,21 +84,21 @@ with Transloco, after confirming it already switches instantly — no reload —
       verbatim, so app templates never write Transloco's own pipe name.
 - [x] The app never imports `@jsverse/transloco` directly — `TranslocoLoader`/`Translation` types
       (for a custom `loader`) are re-exported from this package's own barrel.
-- [x] Two bugs found and fixed while wiring the showcase demo (`apps/showcase`'s `/i18n` route),
+- [x] Two bugs found and fixed while wiring the showcase demo (`apps/showcase`'s `/translations` route),
       caught by screenshotting both locales rather than just building/typechecking:
       1. `t()`/`TPipe` called `TranslocoService.translate()` directly, but nothing ever called
          `.load()` for a language — that's ordinarily the built-in pipe/directive's job. Every key
          rendered as itself (the missing-key fallback) in *both* locales, not just an untranslated
-         one. Fixed: `I18nService` now calls `.load(locale)` before `setActiveLang()`, both in the
+         one. Fixed: `TranslationsService` now calls `.load(locale)` before `setActiveLang()`, both in the
          constructor's reactive subscription and in `setLocale()`.
-      2. `I18nService.t()` wasn't reactive inside a `computed()` — `TranslocoService.translate()`
+      2. `TranslationsService.t()` wasn't reactive inside a `computed()` — `TranslocoService.translate()`
          reads its own plain internal state, not a signal, so a `computed()` wrapping `t()` never
          reran on a language switch (translated fine via the `t` pipe, not via logic). Fixed: `t()`
          now passes `this.locale()` explicitly as `translate()`'s `lang` argument, so reading it
-         inside a `computed()` sees the dependency. `TPipe` was changed to call `I18nService.t()`
+         inside a `computed()` sees the dependency. `TPipe` was changed to call `TranslationsService.t()`
          rather than `TranslocoService.translate()` directly, so both paths agree.
-- [x] Wired into `apps/showcase` at `/i18n` (two demo dictionaries, `en-GB`/`el-GR`): a language
-      switcher, `t` pipe usage with params, `I18nService.t()` from a `computed()`, and
+- [x] Wired into `apps/showcase` at `/translations` (two demo dictionaries, `en-GB`/`el-GR`): a language
+      switcher, `t` pipe usage with params, `TranslationsService.t()` from a `computed()`, and
       `formatDate()`/`formatNumber()`. Verified in a browser in both locales, and that switching
       doesn't reload (a `window` marker set before the switch survives it) — no console errors.
 - [x] `docs/ANGULAR_APP_CONVENTIONS.md`'s "Shared libraries" section, table, setup snippet, and
@@ -116,12 +116,12 @@ with Transloco, after confirming it already switches instantly — no reload —
 
 ## New package `ngx-dates` — built 2026-09-30
 
-Built right after `ngx-i18n`, per this file's own note above ("reading the locale from `ngx-i18n`'s
-`I18nService.locale()`"). That note's plan — `ngx-dates` importing `I18nService` directly — turned
+Built right after `ngx-translations`, per this file's own note above ("reading the locale from `ngx-translations`'s
+`TranslationsService.locale()`"). That note's plan — `ngx-dates` importing `TranslationsService` directly — turned
 out not to build:
 
 - [x] Tried the direct import first. `ng-packagr` failed with `TS2307: Cannot find module
-      '@wiltech-labs/ngx-i18n'`, even with a `tsconfig` `paths` mapping (which fixes this for `tsc`
+      '@wiltech-labs/ngx-translations'`, even with a `tsconfig` `paths` mapping (which fixes this for `tsc`
       directly, and is how `apps/showcase` resolves every package — but `ng-packagr` builds each
       package as a fully standalone publishable unit and doesn't honour it the same way). Root
       cause: a workspace sibling's *source* `package.json` has no `main`/`types` field — only the
@@ -130,11 +130,11 @@ out not to build:
       several of them side by side. Documented as a new row in root `CLAUDE.md`'s "Locked-in
       decisions" table ("Inter-package deps: none") so this isn't rediscovered the hard way again.
 - [x] Redesigned around `NGX_DATES_LOCALE` (`InjectionToken<() => string>`, defaults to
-      `navigator.language`) — the exact pattern `ngx-i18n`'s own `NgxI18nConfig.resolveLocale`
+      `navigator.language`) — the exact pattern `ngx-translations`'s own `NgxTranslationsConfig.resolveLocale`
       already uses for app-pluggable resolution, applied one level further out. The app wires the
-      two together itself: `{ provide: NGX_DATES_LOCALE, useFactory: () => { const i18n =
-      inject(I18nService); return () => i18n.locale(); } }`. `ngx-dates` ends up with zero
-      dependency on `ngx-i18n`, or on any i18n setup at all.
+      two together itself: `{ provide: NGX_DATES_LOCALE, useFactory: () => { const translations =
+      inject(TranslationsService); return () => translations.locale(); } }`. `ngx-dates` ends up with zero
+      dependency on `ngx-translations`, or on any i18n setup at all.
 - [x] `RelativeTimeService.relativeTime(value, options?)` — `Temporal` + `Intl.RelativeTimeFormat`,
       a shared unit ladder (`pickTier()` in `relative-time.utils.ts`) picking the right unit
       (second/minute/hour/day/week/month/year) from the diff. Accepts a UTC instant string, `Date`,
@@ -149,9 +149,9 @@ out not to build:
       `markForCheck()` (never writes a signal); confirmed that `effect()` still tracks a signal read
       performed *inside* the injected `resolveLocale()` function call, not just ones read directly
       in the effect body.
-- [x] Wired into the showcase's existing `/i18n` demo (not a separate route — the point is showing
+- [x] Wired into the showcase's existing `/translations` demo (not a separate route — the point is showing
       both packages react to the same switch together): `main.ts` wires `NGX_DATES_LOCALE` to
-      `I18nService.locale()`; the demo adds a "5 minutes ago" / "3 days ago" pair. Verified with
+      `TranslationsService.locale()`; the demo adds a "5 minutes ago" / "3 days ago" pair. Verified with
       Playwright in both `en-GB` and `el-GR` — text switches instantly, no console errors.
 - [x] `docs/ANGULAR_APP_CONVENTIONS.md` updated: table row, `Setup` snippet, a real `ngx-dates`
       subsection (replacing the old "planned" placeholder), migration checklist bullet, "Dates and
@@ -164,12 +164,12 @@ The one loose end `ngx-dates` left (see above): `ngx-forms`' three date/time fie
 (`BusinessDateField`/`BusinessTimeField`/`InstantDateTimeField`) each fell back to the hardcoded
 `DEFAULT_DATE_TIME_LOCALE` constant when a `FieldDef` didn't set `dateTimeConfig.locale`. Replaced
 that fallback with `NGX_FORMS_LOCALE` (`InjectionToken<() => string>`), the same resolver-token
-pattern as `NGX_DATES_LOCALE` — an app can wire it to `ngx-i18n`'s `I18nService.locale()` the same
+pattern as `NGX_DATES_LOCALE` — an app can wire it to `ngx-translations`'s `TranslationsService.locale()` the same
 way, with zero import-time dependency between the two packages.
 
 - [x] `NGX_FORMS_LOCALE` added (`config/forms-locale.token.ts`), defaulting to
       `DEFAULT_DATE_TIME_LOCALE` (`'en-GB'`) — **not** the browser's own language the way
-      `NGX_DATES_LOCALE` defaults, and deliberately not wired to `ngx-i18n` in the showcase either:
+      `NGX_DATES_LOCALE` defaults, and deliberately not wired to `ngx-translations` in the showcase either:
       this locale also decides which typed day/month order `LocaleDateAdapter.parse()` accepts, so
       changing it changes user input behaviour, not just wording. An app opts in on purpose; it
       isn't a default recommendation the way the `ngx-dates` wiring is.
@@ -187,7 +187,7 @@ way, with zero import-time dependency between the two packages.
 
 ## Per-library text tokens — built 2026-09-30
 
-Surveyed all 5 non-i18n packages (`ngx-forms`, `ngx-graphs`, `ngx-media`, `ngx-web-sockets`,
+Surveyed all 5 non-translations packages (`ngx-forms`, `ngx-graphs`, `ngx-media`, `ngx-web-sockets`,
 `ngx-ai-tools`) for hardcoded UI strings before designing anything, rather than assuming all five
 needed the same treatment:
 
@@ -201,7 +201,7 @@ needed the same treatment:
       the "Show data" table-toggle text. Added `NGX_GRAPHS_TEXT`
       (`config/graphs-text.token.ts`, `InjectionToken<() => GraphsText>`, `GraphsText { showData:
       string }`), same resolver-token pattern as `NGX_DATES_LOCALE`/`NGX_FORMS_LOCALE`. `GraphFrame`
-      reads it via `computed(() => this.resolveText())`, so a resolver wired to `ngx-i18n` stays
+      reads it via `computed(() => this.resolveText())`, so a resolver wired to `ngx-translations` stays
       reactive to a language switch. Exported from `public-api.ts`.
 - [x] `ngx-web-sockets`' `ChatRoom` had six: connection status ("Connected"/"Connecting…"), the
       messages-region and composer `aria-label`s, the composer placeholder, and the send button's
@@ -220,7 +220,7 @@ needed the same treatment:
       typecheck/build are the only verification it got.
 - [x] `packages/graphs/README.md`+`CLAUDE.md`, `packages/web-sockets/README.md`+`CLAUDE.md`, and
       `docs/ANGULAR_APP_CONVENTIONS.md` (`ngx-graphs`/`ngx-web-sockets` subsections) updated with the
-      new tokens and an `ngx-i18n`-wiring recipe for each.
+      new tokens and an `ngx-translations`-wiring recipe for each.
 - [ ] Neither token is wired into the showcase's own `main.ts` (unlike `NGX_DATES_LOCALE`) — left at
       their English defaults there. Wiring one in is a small follow-up if a demo of the translated
       path is ever wanted; not done here to keep this change to the packages themselves.
@@ -248,9 +248,9 @@ needed the same treatment:
 - [ ] Already published and consumed by `insurly-ui`. No known outstanding work beyond routine
       version bumps as needed.
 
-## packages/i18n
+## packages/translations
 
-See "New package `ngx-i18n` — built 2026-09-30" above for what's built and what's still open.
+See "New package `ngx-translations` — built 2026-09-30" above for what's built and what's still open.
 
 ## packages/dates
 

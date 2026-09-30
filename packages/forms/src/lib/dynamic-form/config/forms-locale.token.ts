@@ -13,10 +13,10 @@ export type FormsLocaleResolver = () => string;
  * switching it changes user input behaviour, not just wording — an app opts in deliberately:
  *
  * ```ts
- * { provide: NGX_FORMS_LOCALE, useFactory: () => { const i18n = inject(I18nService); return () => i18n.locale(); } }
+ * { provide: NGX_FORMS_LOCALE, useFactory: () => { const translations = inject(TranslationsService); return () => translations.locale(); } }
  * ```
  *
- * A plain function rather than a direct import of `ngx-i18n`'s `I18nService`, so this package
+ * A plain function rather than a direct import of `ngx-translations`' `TranslationsService`, so this package
  * stays buildable and publishable on its own — same reasoning as `ngx-dates`' `NGX_DATES_LOCALE`
  * (see root `CLAUDE.md`'s "Inter-package deps").
  */

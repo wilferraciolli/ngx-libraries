@@ -64,7 +64,7 @@ src/
   comes from `NGX_CHAT_TEXT`** (`InjectionToken<() => ChatText>`, added 2026-09-30), not hardcoded
   strings — message *bodies* stay app/server data, untouched by this. Same resolver-token pattern
   as `ngx-dates`' `NGX_DATES_LOCALE`/`ngx-forms`' `NGX_FORMS_LOCALE`/`ngx-graphs`'
-  `NGX_GRAPHS_TEXT`: a plain function, so this package has no build-time dependency on `ngx-i18n`
+  `NGX_GRAPHS_TEXT`: a plain function, so this package has no build-time dependency on `ngx-translations`
   (see root `CLAUDE.md`'s "Inter-package deps"). The two parameterized messages (`clientTyping`,
   `error`/`connectionError`) are functions rather than interpolation-placeholder strings, to avoid
   building a template-parsing mini-engine for two call sites.

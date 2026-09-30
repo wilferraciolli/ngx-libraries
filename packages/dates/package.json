@@ -1,7 +1,7 @@
 {
   "name": "@wiltech-labs/ngx-dates",
   "version": "1.0.0",
-  "description": "Shared Angular date/time helpers — a relativeTime pipe/service on Temporal + Intl.RelativeTimeFormat, locale-aware via ngx-i18n.",
+  "description": "Shared Angular date/time helpers — a relativeTime pipe/service on Temporal + Intl.RelativeTimeFormat, locale-aware via ngx-translations.",
   "license": "Apache-2.0",
   "sideEffects": false,
   "dependencies": {

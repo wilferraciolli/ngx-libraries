@@ -63,8 +63,8 @@ src/
   GraphsText>`, added 2026-09-30), not a hardcoded string — the one piece of this package's own UI
   text, everything else being app-supplied data. Same resolver-token pattern as `ngx-dates`'
   `NGX_DATES_LOCALE`/`ngx-forms`' `NGX_FORMS_LOCALE`: a plain function, so this package has no
-  build-time dependency on `ngx-i18n` (see root `CLAUDE.md`'s "Inter-package deps"). Read inside a
-  `computed()` in `GraphFrame`, so a resolver wired to `ngx-i18n` stays reactive to a language
+  build-time dependency on `ngx-translations` (see root `CLAUDE.md`'s "Inter-package deps"). Read inside a
+  `computed()` in `GraphFrame`, so a resolver wired to `ngx-translations` stays reactive to a language
   switch.
 - One component per graph type (`BarGraph`, `LineGraph`, `PieGraph`, `DoughnutGraph`,
   `PolarAreaGraph`, `RadarGraph`, `BubbleGraph`, `ScatterGraph`), same one-component-per-type layout

@@ -3,7 +3,7 @@
 Shared Angular date/time display helpers: a `relativeTime` pipe and `RelativeTimeService`, built on
 [Temporal](https://tc39.es/proposal-temporal/) and `Intl.RelativeTimeFormat`. Locale-pluggable: by
 default it reads the browser's own language, and wiring it to
-[`@wiltech-labs/ngx-i18n`](../i18n) (one line, below) makes text update instantly on a language
+[`@wiltech-labs/ngx-translations`](../translations) (one line, below) makes text update instantly on a language
 switch too, the same as everything else translated through that package.
 
 ## Installation
@@ -19,13 +19,13 @@ installed automatically as a regular dependency of this package.
 
 `NGX_DATES_LOCALE` (an `InjectionToken<() => string>`) decides which locale is formatted against —
 it defaults to `navigator.language` and never changes on its own. Override it to wire in
-`@wiltech-labs/ngx-i18n`'s active locale, so a language switch there updates relative-time text too:
+`@wiltech-labs/ngx-translations`' active locale, so a language switch there updates relative-time text too:
 
 ```ts
 // app.config.ts
 import { inject } from '@angular/core';
 import { NGX_DATES_LOCALE } from '@wiltech-labs/ngx-dates';
-import { I18nService } from '@wiltech-labs/ngx-i18n';
+import { TranslationsService } from '@wiltech-labs/ngx-translations';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -33,15 +33,15 @@ export const appConfig: ApplicationConfig = {
     {
       provide: NGX_DATES_LOCALE,
       useFactory: () => {
-        const i18n = inject(I18nService);
-        return () => i18n.locale();
+        const translations = inject(TranslationsService);
+        return () => translations.locale();
       }
     }
   ]
 };
 ```
 
-This package has no dependency on `ngx-i18n` (or on any particular i18n setup) — the resolver is a
+This package has no dependency on `ngx-translations` (or on any particular i18n setup) — the resolver is a
 plain function so the two compose without either package needing to know the other exists.
 
 ## Usage

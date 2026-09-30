@@ -1,7 +1,7 @@
 import { Injectable, Signal, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { TranslocoService } from '@jsverse/transloco';
-import { NGX_I18N_CONFIG } from '../config/i18n-config.token';
+import { NGX_TRANSLATIONS_CONFIG } from '../config/translations-config.token';
 
 /**
  * App-wide translation and locale state (like `AuthStore`/`CurrentUserStore` — inject it anywhere).
@@ -9,9 +9,9 @@ import { NGX_I18N_CONFIG } from '../config/i18n-config.token';
  * the current locale fresh, so a switch shows up the moment `locale()` changes.
  */
 @Injectable({ providedIn: 'root' })
-export class I18nService {
+export class TranslationsService {
   private readonly transloco = inject(TranslocoService);
-  private readonly config = inject(NGX_I18N_CONFIG);
+  private readonly config = inject(NGX_TRANSLATIONS_CONFIG);
 
   /** This session's explicit choice, if `setLocale()` has been called; `null` until then. */
   private readonly sessionOverride = signal<string | null>(null);

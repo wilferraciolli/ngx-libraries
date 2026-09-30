@@ -4,7 +4,7 @@
   },
   "demo": {
     "title": "Translations Demo",
-    "subtitle": "Instant, no-reload language switching, a t() service method and a t pipe, from ngx-i18n",
+    "subtitle": "Instant, no-reload language switching, a t() service method and a t pipe, from ngx-translations",
     "greeting": "Hello, {{name}}!",
     "itemCount": "You have {{count}} items in your cart",
     "switchLanguage": "Switch language",

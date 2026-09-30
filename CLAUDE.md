@@ -18,7 +18,7 @@ ngx-libraries/
 │   ├── ai-tools/           # @wiltech-labs/ngx-ai-tools — see its own CLAUDE.md
 │   ├── graphs/             # @wiltech-labs/ngx-graphs — see its own CLAUDE.md
 │   ├── web-sockets/        # @wiltech-labs/ngx-web-sockets — see its own CLAUDE.md
-│   ├── i18n/               # @wiltech-labs/ngx-i18n — see its own CLAUDE.md
+│   ├── translations/       # @wiltech-labs/ngx-translations — see its own CLAUDE.md
 │   └── dates/              # @wiltech-labs/ngx-dates — see its own CLAUDE.md
 ├── docs/
 │   └── ANGULAR_APP_CONVENTIONS.md  # conventions every consuming Angular app follows — its
@@ -38,7 +38,7 @@ ngx-libraries/
 | Publishing | Public npm packages (not a private registry) — `publishConfig.access: public` is set per package. Publish from that package's `dist/` (the `ng-packagr` output), never the source folder — the source `package.json` has no entry-point fields. |
 | Components | Standalone only, no NgModules — matches every known consumer's convention. |
 | License | Apache-2.0 (repo `LICENSE`, inherited by each package's `package.json`). |
-| Inter-package deps | None — every package builds and publishes standalone. `ng-packagr` needs a real, resolvable module for each import, and a workspace sibling's *source* `package.json` has no `main`/`types` (only its built `dist/` one does — see Publishing above), so one package here can't import another's source the way an app can via a `tsconfig` path mapping. Where a package would otherwise want another (`ngx-dates` wanting `ngx-i18n`'s locale, e.g.), use an app-pluggable resolver token instead (see `ngx-i18n`'s `NgxI18nConfig.resolveLocale` / `ngx-dates`' `NGX_DATES_LOCALE`) and let the *consuming app* wire the two together. |
+| Inter-package deps | None — every package builds and publishes standalone. `ng-packagr` needs a real, resolvable module for each import, and a workspace sibling's *source* `package.json` has no `main`/`types` (only its built `dist/` one does — see Publishing above), so one package here can't import another's source the way an app can via a `tsconfig` path mapping. Where a package would otherwise want another (`ngx-dates` wanting `ngx-translations`' locale, e.g.), use an app-pluggable resolver token instead (see `ngx-translations`' `NgxTranslationsConfig.resolveLocale` / `ngx-dates`' `NGX_DATES_LOCALE`) and let the *consuming app* wire the two together. |
 
 ## Working in this repo
 - One package = one npm-publishable unit. Organize each package's `src/lib/`
