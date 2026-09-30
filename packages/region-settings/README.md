@@ -154,26 +154,25 @@ cd packages/region-settings
 npm run build
 ```
 
-Then, **before** `npm publish`: `ng-packagr` copies `dependencies` verbatim into
-`dist/package.json`, including this package's own `file:../api-client/dist` /
-`file:../auth/dist` / `file:../forms/dist` entries (see this package's `CLAUDE.md` for why they're
-`file:` references at all) — those are meaningless outside this monorepo, so rewrite them to the real
-published version ranges first, from the repo root:
+`ng-packagr` copies `dependencies` verbatim into `dist/package.json`, including this package's own
+`file:../api-client/dist` / `file:../auth/dist` / `file:../forms/dist` entries (see this package's
+`CLAUDE.md` for why they're `file:` references at all) — those are meaningless outside this monorepo.
+`npm run build`'s `postbuild` script (`scripts/fix-dist-file-deps.js`) rewrites them to real published
+version ranges automatically, right after `ng-packagr` finishes — **not a separate step to remember**.
+This was a manual, easy-to-forget hand-edit through `1.0.1`–`1.0.3` (all three published with the raw,
+meaningless `file:` paths still in `dependencies` as a result); wiring it into `postbuild` instead of a
+README instruction is the actual fix, since a step nobody's forced to run eventually gets skipped. If
+you ever need to fix up an already-built `dist/` without rebuilding, `npm run fix-dist-file-deps`
+from the repo root does the same rewrite on demand (optionally scoped to one package:
+`npm run fix-dist-file-deps -- packages/region-settings`).
 
-```bash
-npm run fix-dist-file-deps
-```
-
-This rewrites every `file:../x/dist` dependency in every package's `dist/package.json` (not just this
-one) to `^<x's own current source version>`, reading that version straight from `packages/x/package.json`
-— pass a specific package path (`npm run fix-dist-file-deps -- packages/region-settings`) to limit it
-to one. See `scripts/fix-dist-file-deps.js`.
-
-Then publish the fixed-up output:
+Then publish the output:
 
 ```bash
 cd dist
 npm publish
 ```
 
-Ensure `version` in the source `package.json` is updated before building, per semver conventions.
+Ensure `version` in the source `package.json` is updated before building, per semver conventions —
+`1.0.1`–`1.0.3` are unusable (published with `file:` deps that don't resolve outside this monorepo);
+don't depend on them.

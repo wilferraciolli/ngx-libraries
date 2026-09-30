@@ -16,7 +16,7 @@ const packagesDir = path.join(repoRoot, 'packages');
 
 const targets =
   process.argv.length > 2
-    ? process.argv.slice(2).map((p) => path.resolve(repoRoot, p))
+    ? process.argv.slice(2).map((p) => path.resolve(process.cwd(), p))
     : fs
         .readdirSync(packagesDir)
         .map((name) => path.join(packagesDir, name))
