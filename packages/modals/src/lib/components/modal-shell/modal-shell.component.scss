@@ -1,0 +1,31 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--mat-sys-surface-container-high);
+  color: var(--mat-sys-on-surface);
+}
+
+.ModalShell-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 8px 8px 24px;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+}
+
+.ModalShell-title {
+  font: var(--mat-sys-title-large);
+  letter-spacing: var(--mat-sys-title-large-tracking);
+  margin: 0;
+}
+
+.ModalShell-close {
+  margin-inline-start: auto;
+}
+
+.ModalShell-content {
+  flex: 1;
+  overflow: auto;
+  padding: 24px;
+}

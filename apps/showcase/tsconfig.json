@@ -23,6 +23,12 @@
       ],
       "@wiltech-labs/ngx-translations": [
         "../../packages/translations/src/public-api.ts"
+      ],
+      "@wiltech-labs/ngx-modals": [
+        "../../packages/modals/src/public-api.ts"
+      ],
+      "@wiltech-labs/ngx-notifications": [
+        "../../packages/notifications/src/public-api.ts"
       ]
     },
     "experimentalDecorators": true,

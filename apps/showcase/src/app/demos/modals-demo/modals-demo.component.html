@@ -1,0 +1,17 @@
+<div class="demo-container">
+  <h2>Modals Demo</h2>
+  <p class="subtitle">A right-docked panel from ngx-modals — 33% width, full height, full screen below the XSmall breakpoint</p>
+
+  <div class="form-section">
+    <button (click)="openModal()" class="btn btn-primary">Approve holiday request</button>
+  </div>
+
+  <div class="info-section">
+    <h3>Last close result</h3>
+    @if (lastResult(); as result) {
+      <pre>{{ result | json }}</pre>
+    } @else {
+      <p>Open the modal and close it (via Approve, Cancel, or the X button) to see its result here.</p>
+    }
+  </div>
+</div>

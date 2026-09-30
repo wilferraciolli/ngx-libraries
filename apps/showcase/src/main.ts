@@ -9,8 +9,16 @@ import { API_ORIGIN } from '@wiltech-labs/ngx-api-client';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { TranslationsService, provideTranslations } from '@wiltech-labs/ngx-translations';
 import { NGX_DATES_LOCALE } from '@wiltech-labs/ngx-dates';
+import { provideNotifications } from '@wiltech-labs/ngx-notifications';
 import en from './translations/en-GB.json';
 import el from './translations/el-GR.json';
+
+interface DemoNotification {
+  id: string;
+  title: string;
+  body: string;
+  read: boolean;
+}
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -33,6 +41,28 @@ bootstrapApplication(AppComponent, {
         const translations = inject(TranslationsService);
         return () => translations.locale();
       }
-    }
+    },
+    provideNotifications<DemoNotification>(() => {
+      // Fake in-memory backend, not a real API — ngx-notifications has no idea, since it only ever
+      // calls the three callbacks below.
+      let items: DemoNotification[] = [
+        { id: '1', title: 'Holiday approved', body: 'Your holiday request for next week was approved.', read: false },
+        { id: '2', title: 'New comment', body: 'Someone commented on your pull request.', read: false },
+        { id: '3', title: 'Weekly digest', body: 'Your weekly summary is ready.', read: true }
+      ];
+
+      return {
+        fetchNotifications: async () => ({
+          items: [...items],
+          unreadCount: items.filter((n) => !n.read).length
+        }),
+        dismissNotification: async (notification) => {
+          items = items.filter((n) => n.id !== notification.id);
+        },
+        openNotification: (notification) => {
+          items = items.map((n) => (n.id === notification.id ? { ...n, read: true } : n));
+        }
+      };
+    })
   ]
 }).catch(err => console.error(err));
