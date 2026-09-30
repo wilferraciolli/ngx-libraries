@@ -62,17 +62,17 @@ Still open:
 
 ## New package `ngx-translations` — built 2026-09-30
 
-Decided 2026-09-29, revised twice the same day after finding `resource-management-ui`'s existing
-`core/i18n/I18nStore` — its product doc (`docs/features/internationalization-i18n.md`) requires
-"responsive to language changes without reload." First revision dropped reload for a hand-rolled
-instant-switch engine generalizing `I18nStore`; second revision replaced the hand-rolled engine
-with Transloco, after confirming it already switches instantly — no reload — via a signal every
+Decided 2026-09-29, revised twice the same day after finding an existing consuming app's own
+`I18nStore` — its product requirements needed "responsive to language changes without reload."
+First revision dropped reload for a hand-rolled instant-switch engine generalizing that store;
+second revision replaced the hand-rolled engine with Transloco, after confirming it already
+switches instantly — no reload — via a signal every
 `translate()`/`translateObject()` call tracks inside `computed()` (its `activeLang` signal), so
 "instant switch" and "own engine" were never actually linked. Built to that final design:
 
 - [x] `provideTranslations({ locales, defaultLocale, dictionaries | loader, resolveLocale?, persistLocale? })`
       wraps `provideTransloco()`. `BundledTranslationsLoader` is the default (reads `dictionaries`, bundled
-      at build time — matches `resource-management-ui`'s reasoning for a small, finite locale set);
+      at build time — matches an existing consuming app's reasoning for a small, finite locale set);
       pass `loader` instead for many locales or backend-served translations.
 - [x] `TranslationsService` (root-provided): `locale` (`Signal<string>`, resolution order session override →
       `resolveLocale()` → `defaultLocale`), `setLocale()` (instant, no reload; persists via
@@ -107,8 +107,8 @@ with Transloco, after confirming it already switches instantly — no reload —
 - [ ] Still open, not done as part of this:
       - Per-library text tokens — see "Per-library text tokens" below, done 2026-09-30.
       - `ngx-api-client` sending `Accept-Language` from the active locale.
-      - Migrating `resource-management-ui`'s `I18nStore`/`labels.ts` onto this package — flagged for
-        later, on request, not started.
+      - Migrating an existing consuming app's own `I18nStore`/`labels.ts` onto this package —
+        flagged for later, on request, not started.
       - Peak/ICU-heavy features (plurals, gendered forms) aren't exercised by the demo yet, only the
         plain-dictionary/interpolation path.
       - `ngx-forms`' `dateTimeConfig.locale` fallback — see "`ngx-forms`: `NGX_FORMS_LOCALE`" below,
@@ -232,6 +232,286 @@ needed the same treatment:
 - [ ] api-client: `resource()`/`collectionResource()` now guard with `hasValue()` — bump + publish
       0.1.6, then update consumers. Other packages: first publish once reviewed.
 
+## Planned package `ngx-modals` (not started)
+
+Idea captured 2026-09-30, refined the same day with a layout spec and a real prior-art reference.
+Nothing built yet.
+
+### Prior art: an existing app's dialog service
+
+A few years old, in a sibling repo, not part of this monorepo. Worth porting the *shape* of, not
+the code verbatim (it predates Signals, standalone components are inconsistent there, and the
+layout requirement below is new):
+
+- `dialog.service.ts` — a thin `DialogService` wrapping `MatDialog`, plus a `DialogClosedActionType`
+  enum (`CREATED`/`UPDATED`/`DELETED`/`DISMISSED`) right in the same file. Settles the
+  CDK-vs-Material question below: given `ngx-forms` already depends on Angular Material, and this
+  prior art already builds on `MatDialog` (not raw `@angular/cdk/dialog`), `ngx-modals` should too —
+  `MatDialog` already wraps CDK Dialog and adds the Material surface/animation/theming this needs
+  anyway.
+- Per-dialog `<X>DialogCloseData` interfaces (e.g. `SurveyInstanceDialogCloseData { actionType: 
+  DialogClosedActionType; id; surveyInstance }`) — the enum *and* the payload travel together in one
+  object. Exactly the "access to the data as well" shape asked for — `ngx-modals` should generalize
+  this into one typed shape (something like `ModalCloseResult<TAction, TData> = { action: TAction;
+  data: TData }`) instead of every app hand-writing its own close-data interface per dialog.
+- Caller pattern: `dialog.open(Component, config).afterClosed().subscribe(data => { if
+  (data.actionType === DialogClosedActionType.DELETED) { ... } })` — confirms the enum is read by the
+  *caller*, after close, not by the modal content itself.
+- `MatConfirmDialogComponent` + `DialogService.openConfirmDialog(msg)` — a small reusable Yes/No
+  dialog (`disableClose: true`, so the user must pick a button) used today only for delete
+  confirmations. `ngx-modals`' own unsaved-changes prompt (see below) is the same idea, generalized.
+- Responsive resize already exists there too: `BreakpointObserver.observe(Breakpoints.XSmall)`
+  (`@angular/cdk/layout`) subscribed per open dialog, calling `dialogRef.updateSize('100%', '100%')`
+  on the small breakpoint and back to a fixed size otherwise. `ngx-modals` should do the same kind of
+  reactive resize, just to the layout in the next section instead of a centered dialog.
+
+### Layout: a right-hand panel, not a centered dialog
+
+The actual ask is closer to a **side sheet** than a classic centered `MatDialog`: docked to the
+right edge, full viewport height (top to bottom), one third of the screen width — so on a wide
+screen the user can still see and act on what's behind it (e.g. approving a colleague's holiday
+request in the panel while their team's availability stays visible on the left).
+
+- [ ] Angular Material has no ready-made "side sheet" component to lean on (`MatSidenav`/`mat-drawer`
+      is a persistent layout element, not an on-demand modal). Build this as `MatDialog.open()` with
+      a custom `position: { top: '0', right: '0' }`, `height: '100vh'`, a width token (see below),
+      and a `panelClass` that overrides Material's default surface shape/animation for a slide-in
+      from the right with square left-hand corners, rather than the default centered fade/scale.
+- [ ] Width should be an overridable `--ngx-modal-width` custom property (house pattern: token
+      default, hex last), defaulting to something like `33vw` — not a hardcoded `33%`, so an app can
+      widen it for a modal whose content genuinely needs more room without this package hardcoding
+      "always exactly a third."
+- [ ] **Correction to the "breakpoints are already in a library" assumption**: they're not, yet.
+      `docs/ANGULAR_APP_CONVENTIONS.md` documents a *per-app* `src/styles/_breakpoints.scss` SCSS
+      partial (`sm`/`md`/`lg`, M3's window size classes) that every consuming app sets up itself, and
+      the CDK's `BreakpointObserver`/`Breakpoints.XSmall` for the JS-side reactive case (exactly what
+      the prior-art app above already uses) — see this file's still-open "Possibly `ngx-styles`"
+      item above. There's no shared `ngx-*` breakpoints package to depend on today. Until that lands,
+      `ngx-modals` follows the same convention every other package here already follows for anything
+      app-owned: react to the CDK's `Breakpoints.XSmall` at runtime (full-screen below that, the
+      one-third panel above it) via an injected observable/signal, and let CSS custom properties
+      (not a SCSS `@use` of an app-local partial this package can't see) carry the rest. If
+      `ngx-styles` ever ships breakpoints as tokens, revisit this.
+- [ ] Below the compact/`XSmall` breakpoint: full screen, same `updateSize()`-on-breakpoint-change
+      approach as the prior art, just swapping "centered / full-screen" for "one-third right panel /
+      full-screen."
+
+### Close reason + unsaved-changes guard
+
+- [ ] Standard close-reason enum (name/members TBD, but `DialogClosedActionType` above is the
+      starting point — likely something like `Cancelled`/`Dismissed` vs `Created`/`Updated`/`Deleted`
+      vs a generic `Done`, exact set still open) paired with whatever data the modal wants to hand
+      back, as one typed close-result object (see `ModalCloseResult<TAction, TData>` above) — so a
+      caller can switch on the reason and only read the data when it matters.
+- [ ] **New requirement, not in the prior-art app above**: an X button that closes immediately if
+      the modal's content has no unsaved changes, but — if it does — first shows a confirm prompt
+      ("You have unsaved changes, are you sure you want to close? It will lose data") before actually
+      closing. Needs:
+      - A small contract the modal's *content* component implements to report dirty state to the
+        shell (e.g. a `hasUnsavedChanges(): boolean` method or an injected signal) — the modal
+        package can't know this on its own, the same way `ngx-forms`' validation lives in the field
+        config, not the shell.
+      - The outer `MatDialog` opened with `disableClose: true` (or backdrop/Escape intercepted
+        manually), so a backdrop click or Escape can't bypass the same check the X button goes
+        through.
+      - The confirm prompt itself is the generalized, reusable version of the prior-art app's
+        `MatConfirmDialogComponent`/`openConfirmDialog()` — one shared component this package ships,
+        not something every consuming app re-implements.
+- [ ] Not designed yet — enum member names, the exact typed-wrapper API shape (a
+      `ModalService.open<T, R>()`-style method, presumably), and the precise shell/content contract
+      for the dirty check are all still open. Design before building, same as every other package
+      here.
+- [ ] No consumer yet. Not a straight port of already-exercised consumer-app code the way most
+      packages here started — closer to a redesign of the prior-art app above, adapted to a
+      layout that prior art never had.
+
+## Planned package `ngx-region-settings` (not started)
+
+Idea captured 2026-09-30. Prior art reviewed in a *different* reference app than the one behind
+`ngx-modals` above (`current-user.store.ts`, `region-settings.store.ts`). That app isn't a
+`@wiltech-labs/*` consumer itself (its own personal-scope API-client fork, a hand-rolled
+`AuthStore`/`TranslationService`), so — same caveat as every other prior-art reference here — port
+the *shape*, not the code.
+
+### What's copy-pasted per app today
+Every app repeats the same flow: sign in → call `/me` → follow its `userProfile` link → follow
+`userSettings`/`systemSettings` links off the profile, into two screens ("my settings" and an
+admin-only "system settings") that are the same shape with different links and different `_data`
+roots.
+
+### What the reference already got right (port this shape)
+- `RegionSettingsStore` is an **abstract base class** parameterized by only two things: the `_data`
+  root key (`'userSettings'`/`'systemSettings'`) and which profile link to follow. Two 5-line
+  subclasses (`UserSettingsStore`/`SystemSettingsStore`) supply those. The base owns loading state,
+  metadata-driven `options` (never a hardcoded `<select>` list), a `notAvailable` computed (link
+  absent from the profile = this caller isn't allowed the screen), `save()`/`reset()` through the
+  resource's own `updateSettings`/`resetSettings` links, and an `owner_type: 'SYSTEM' | 'USER'` flag
+  so the UI can show "you're on the system default" before the user ever saves their own — a genuine
+  own-value-with-a-system-default-fallback pattern, not specific to region/locale.
+- `CurrentUserStore` follows `/me` → `userProfile` the same never-hand-built-URL way, gated on
+  `AuthStore.isSignedIn()`, and exposes a `link(name)` helper every feature (settings, and — per the
+  `ngx-notifications` discussion above — a notifications link too) reads off of.
+
+### Design decisions
+- [x] **Resolved 2026-09-30**: this package *does* own `CurrentUserStore`/`UserSettingsStore`/
+      `SystemSettingsStore` as ready-to-use signal stores, built directly on `ApiClientService` from
+      `@wiltech-labs/ngx-api-client` — a real npm dependency, not an app-supplied `fetch`/`save`/
+      `reset` function. Consuming apps inject the library's own stores and use them as-is, the same
+      way `ngx-translations` hands apps a ready-to-use `TranslationsService` built on Transloco,
+      rather than asking every app to wire up its own. This is the first case of one
+      `@wiltech-labs/ngx-*` package depending on another — see root `CLAUDE.md`'s "Inter-package
+      deps" row for the sanctioned-exception rule and why it doesn't reopen the `ngx-dates`/
+      `ngx-translations` case (`ngx-api-client` is kept a strict foundation leaf; this package
+      depends *downward* on it, and no cycle is possible as long as `ngx-api-client` never depends on
+      anything built on top of it).
+- [x] **Not circular**: confirmed with the user — the dependency is one-directional
+      (`ngx-region-settings → ngx-api-client`), same shape as `ngx-translations → @jsverse/transloco`.
+      A cycle would require `ngx-api-client` to depend back on `ngx-region-settings`, which nothing
+      calls for and the foundation-leaf rule above forbids.
+- [ ] **Fixed shape vs. generic payload**: the reference's `RegionSettings` (timezone/language/
+      locale/currency/theme) is one plausible common shape, but the store should probably be generic
+      (`SettingsStore<TSettings, TPayload>`) rather than hardcoding those five fields, so it's usable
+      even where an app's idea of "region settings" differs. Still open.
+- [ ] Naming follows the reference project's own name for this exact pattern: `packages/
+      region-settings` / `@wiltech-labs/ngx-region-settings`.
+- [ ] `Me`/`UserProfile` field shapes (`roleIds`, `email`, `externalId`, etc.) are app-specific in the
+      reference — decide whether `CurrentUserStore` is generic over those (`CurrentUserStore<TMe,
+      TProfile>`) or ships a minimal fixed shape (`{ id, links }`) with apps extending it. Still open.
+- [x] **Resolved 2026-09-30**: `ngx-region-settings` also takes a real dependency on `ngx-auth`,
+      gating `CurrentUserStore`'s `/me` fetch on `AuthStore.isSignedIn()` directly, the same way the
+      reference code does. This is the second sanctioned exception to root `CLAUDE.md`'s
+      "Inter-package deps" rule — see that row for why it's safe (both `ngx-api-client` and
+      `ngx-auth` are kept strict foundation leaves).
+- [ ] Build order: `ngx-auth` first (no dependencies of its own, fully exercised spec already),
+      `ngx-region-settings` after — it depends on both `ngx-auth` and `ngx-api-client`.
+- [ ] No consumer yet. Design before building, same as every other package here.
+
+## Planned package `ngx-notifications` (not started)
+
+Idea captured 2026-09-30. Not folded into `ngx-media` — that package is deliberately presentational
+and stateless (skeleton loaders, a YouTube embed), with no service layer or data-fetching at all.
+This needs a bell+badge icon, a panel/list, an unread count, dismiss (a mutation), and deep-linking
+(router integration) — state plus UI, closer in shape to `ngx-web-sockets` (a service + components on
+top of it) than to `ngx-media`.
+
+- [ ] **Stays fully app-pluggable — no dependency on `ngx-api-client`, unlike `ngx-region-settings`.**
+      The app resolves the person-profile's `links.notifications` HATEOAS link itself (it already
+      knows how) and hands this package a plain fetch function, same "app supplies an opaque
+      function" pattern as `ngx-translations`' `loader` / `ngx-dates`' `NGX_DATES_LOCALE`:
+      ```ts
+      provideNotifications({
+        fetchNotifications: () => inject(ApiClientService).get<NotificationsPage>(currentUser().links.notifications),
+        dismissNotification: (id) => inject(ApiClientService).delete(notification.links.dismiss),
+        pollIntervalMs: 5 * 60 * 1000 // default; app can override
+      })
+      ```
+      Deliberately *not* extending the `ngx-api-client`/`ngx-region-settings` sanctioned exception
+      here — nothing about this package needs it, and an app can just as easily source
+      `fetchNotifications` from `ngx-region-settings`' own `CurrentUserStore.link('notifications')` at
+      the call site above, which is an app-level composition choice, not a package dependency.
+- [ ] **Polling, not websockets** — confirmed explicitly, ruled out. A root-provided
+      `NotificationsService` runs its own interval (default 5 minutes, configurable via
+      `pollIntervalMs`), calls `fetchNotifications()` on tick, and exposes `notifications`/
+      `unreadCount` as signals for the bell/badge/panel to read.
+- [ ] **Deep-link and dismiss are both app-supplied callbacks too** — clicking a notification has to
+      navigate somewhere app-specific (a route this package can't know), so that's a callback in the
+      same config, not a route baked into the library.
+- [ ] **Open design question**: does this need Angular Material at all? Bell + badge + dropdown panel
+      could stay Material-free like `media`/`ai-tools`/`graphs`/`web-sockets` — CDK Overlay for the
+      panel positioning (dismiss-on-outside-click, focus trap), `--ngx-notifications-*` tokens for
+      styling — rather than pulling in `MatBadge`/`MatMenu`. Leaning Material-free to match that
+      family, not decided.
+- [ ] No consumer yet. Design before building, same as every other package here.
+
+## Planned package `ngx-styles` (not started)
+
+Long-standing idea, first flagged in this file's "Align libraries..." section above ("Possibly
+`ngx-styles`... see discussion"), fleshed out 2026-09-30. **Reference for this one is
+`docs/ANGULAR_APP_CONVENTIONS.md`'s own SCSS setup (ported from `insurly-ui`'s `src/styles/*`) —
+explicitly not the dialog-service reference app behind `ngx-modals`, which is scoped to that design
+only.**
+
+Today every app copy-pastes the same four partials fresh: `_breakpoints.scss` (the `sm: 600px`/
+`md: 840px`/`lg: 1200px` scale + `bp.up()`/`bp.down()` mixins), `_spacing.scss` (4px-unit `space()`
+scale + responsive padding steps), `_ui.scss` (mixins like `page-title`, `banner`, `state-layer`,
+`focus-ring`, all reading `--mat-sys-*` tokens), and `_theme-colors.scss` (the house Material seed
+palette).
+
+- [ ] **Naming decided**: `packages/styles` / `@wiltech-labs/ngx-styles` — not `ux-styles`. "UX"
+      implies interaction/usability design; this package is Sass tokens and mixins, a styling
+      concern, not a UX one, and `styles` matches the plain, single-concern naming every other
+      package already uses (`forms`, `graphs`, `dates`, `translations`).
+- [ ] **Open shape question, unresolved**: this would be a different *kind* of package than
+      everything else here — pure Sass partials/mixins, no `@Injectable`/`@Component`/TypeScript at
+      all. `ng-packagr`'s Angular Package Format build is fundamentally about compiling Angular
+      sources, so it may not be the right build for this — could be a plain npm package that ships
+      `.scss` files as static assets with no compile step, rather than going through `ng-packagr` at
+      all. Needs deciding before a "New package checklist" (root `CLAUDE.md`) even applies here — this
+      package may not follow that checklist as written.
+- [ ] `_breakpoints.scss`/`_spacing.scss`/`_ui.scss` are genuinely shared *logic* (mixins/functions) —
+      straightforward to ship as `@use`-able partials. `_theme-colors.scss` is different: it's a
+      per-app *brand seed* apps are meant to copy and then own (docs: "keep the house seeds... change
+      them only for a genuinely different brand"), so it likely wants to ship as a template file to
+      copy-init from (closer to a schematic), not a partial apps `@use` directly. Still open.
+- [ ] Once this exists, `ngx-modals`' `--ngx-modal-width` responsive behaviour and any other
+      package's breakpoint-dependent CSS should read from it instead of assuming
+      `BreakpointObserver`/`Breakpoints.XSmall` alone — see the `ngx-modals` section above, which
+      flagged this exact gap.
+- [ ] No consumer yet. Design before building, same as every other package here.
+
+## New package `ngx-auth` — built 2026-09-30
+
+Unlike the other four planned packages, this one had a fully exercised spec to port from —
+`docs/ANGULAR_APP_CONVENTIONS.md`'s existing "Authentication (Clerk)" section, plus an already-built
+Clerk integration (state shape, the `mountSignIn()` gotcha, guard, interceptor) in existing
+consuming apps — genuinely copy-pasted per app before this package existed, not a from-scratch
+design. Chosen as the starting point of the five planned packages: no dependencies of its own, and
+it unblocks `ngx-region-settings`.
+
+Two different things were bundled under "auth" in the doc, and only one belongs in this package:
+
+- [x] **In scope, built — the Clerk wrapper**: `AuthStore` (root-provided: `user`/`session` Signals
+      holding Clerk's own objects directly, `isSignedIn = computed(() => session() != null)`,
+      `init()`'s exact sequencing via `provideAppInitializer` — never a component constructor, so
+      `authGuard`/`authInterceptor` never race a not-yet-loaded Clerk instance — `getToken()`,
+      `signIn()`/`signOut()`), the `mountSignIn()`/`mountUserButton()` gotcha (never call them;
+      `AuthStore.signIn()` uses `clerk.redirectToSignIn()` instead), `authGuard` (`CanActivateFn`
+      checking `isSignedIn()`, redirecting to `NgxAuthConfig.redirectTo`), and `authInterceptor`
+      (`HttpInterceptorFn` attaching the bearer token). `@clerk/clerk-js` (`^6.35.0`, newer than what
+      existing apps pinned) is a regular `dependency` of this package, not a peer — same precedent as
+      `ngx-translations`/`@jsverse/transloco`.
+- [x] **Explicitly out of scope — `CurrentUserStore`**: the app's own backend profile, fetched via a
+      HATEOAS link, shape differs per app. That's `ngx-region-settings`' job, not this package's —
+      this package only answers "is someone signed in, and what's their token," never "who are they
+      in our system."
+- [x] **Design deviation from the apps this was generalized from**: those used `@ngrx/signals`'
+      `signalStore()`; this package uses plain `@Injectable` + `signal()`/`computed()` instead — the
+      same shape `ngx-translations`' `TranslationsService` already uses, so this package doesn't add
+      a new third-party dependency (`@ngrx/signals`) nothing else here needs, for state this simple.
+- [x] **`NgxAuthConfig.apiOrigin` made required, not defaulted** — the existing apps' interceptors
+      hardcoded their own `environment.apiUrl` inline; this package generalizes that into a config
+      field, and deliberately does *not* give it a `''` default the way `ngx-api-client`'s
+      `API_ORIGIN` has, because an empty/omitted origin would match every request
+      (`'anything'.startsWith('')` is always `true`) and leak the token to third-party calls (Giphy,
+      an image host, ...) — a real scenario flagged during design, not hypothetical.
+- [x] **`authInterceptor` attaches a token only if one exists; it never blocks a request** — confirmed
+      necessary during design: some apps allow guest/anonymous users, so the interceptor can't assume
+      every request needs (or will get) a token. Access control stays `authGuard`'s job, applied
+      per-route.
+- [x] **Resolved 2026-09-30**: `ngx-region-settings` takes a real dependency on `ngx-auth`, gating
+      `CurrentUserStore`'s `/me` fetch directly on `AuthStore.isSignedIn()`. This package therefore
+      commits to being a foundation leaf itself, same as `ngx-api-client` — see root `CLAUDE.md`'s
+      "Inter-package deps" row.
+- [x] Package scaffolded (`package.json`, `ng-package.json`, `tsconfig.json`, `README.md`,
+      `CLAUDE.md`), builds and typechecks clean. Root `CLAUDE.md` repo layout updated.
+- [ ] Playwright/`@clerk/testing` setup (`clerkSetup()`, `clerk.signIn({ page, emailAddress })`)
+      stayed out of this package — that's app-level e2e test config, not something a library ships.
+      Worth a short recipe in the README if this turns out to trip people up in practice; not added
+      yet since it isn't code this package needs to own.
+- [ ] Not yet wired into `apps/showcase` — no route in that app actually needs sign-in yet. Add a
+      demo once one does, same as every other package's showcase wiring.
+- [ ] Not yet published to npm — under development, no consumers yet.
+
 ## packages/forms
 
 - [ ] No tests yet. Unlike `api-client` (a straight port of exercised `insurly-ui` code), forms
@@ -255,6 +535,10 @@ See "New package `ngx-translations` — built 2026-09-30" above for what's built
 ## packages/dates
 
 See "New package `ngx-dates` — built 2026-09-30" above for what's built and what's still open.
+
+## packages/auth
+
+See "New package `ngx-auth` — built 2026-09-30" above for what's built and what's still open.
 
 ## packages/media
 

@@ -19,7 +19,8 @@ ngx-libraries/
 │   ├── graphs/             # @wiltech-labs/ngx-graphs — see its own CLAUDE.md
 │   ├── web-sockets/        # @wiltech-labs/ngx-web-sockets — see its own CLAUDE.md
 │   ├── translations/       # @wiltech-labs/ngx-translations — see its own CLAUDE.md
-│   └── dates/              # @wiltech-labs/ngx-dates — see its own CLAUDE.md
+│   ├── dates/              # @wiltech-labs/ngx-dates — see its own CLAUDE.md
+│   └── auth/               # @wiltech-labs/ngx-auth — see its own CLAUDE.md
 ├── docs/
 │   └── ANGULAR_APP_CONVENTIONS.md  # conventions every consuming Angular app follows — its
 │                                   # "Shared libraries" section is the contract these packages meet
@@ -38,7 +39,7 @@ ngx-libraries/
 | Publishing | Public npm packages (not a private registry) — `publishConfig.access: public` is set per package. Publish from that package's `dist/` (the `ng-packagr` output), never the source folder — the source `package.json` has no entry-point fields. |
 | Components | Standalone only, no NgModules — matches every known consumer's convention. |
 | License | Apache-2.0 (repo `LICENSE`, inherited by each package's `package.json`). |
-| Inter-package deps | None — every package builds and publishes standalone. `ng-packagr` needs a real, resolvable module for each import, and a workspace sibling's *source* `package.json` has no `main`/`types` (only its built `dist/` one does — see Publishing above), so one package here can't import another's source the way an app can via a `tsconfig` path mapping. Where a package would otherwise want another (`ngx-dates` wanting `ngx-translations`' locale, e.g.), use an app-pluggable resolver token instead (see `ngx-translations`' `NgxTranslationsConfig.resolveLocale` / `ngx-dates`' `NGX_DATES_LOCALE`) and let the *consuming app* wire the two together. |
+| Inter-package deps | Default is still none. `ng-packagr` needs a real, resolvable module for each import, and a workspace sibling's *unpublished source* `package.json` has no `main`/`types` (only its built `dist/` one does — see Publishing above), so one package here can't import another's source the way an app can via a `tsconfig` path mapping — use an app-pluggable resolver token instead (see `ngx-translations`' `NgxTranslationsConfig.resolveLocale` / `ngx-dates`' `NGX_DATES_LOCALE`) and let the *consuming app* wire the two together. **Two sanctioned exceptions, decided 2026-09-30**: a package may take a real npm dependency on `@wiltech-labs/ngx-api-client` and/or `@wiltech-labs/ngx-auth` specifically, once each is published, the same way `ngx-translations` depends on `@jsverse/transloco` — `ngx-region-settings` (planned) does this, building `CurrentUserStore`/`RegionSettingsStore` directly on `ApiClientService`, gated on `AuthStore.isSignedIn()` from `ngx-auth`, rather than every consumer wiring app-supplied fetch/save/reset/sign-in functions by hand. This is safe from cycles only because both are kept strict *foundation leaves*: neither may ever depend on another `@wiltech-labs/ngx-*` package, published or not — a package built on top of one (or both) can depend downward on it, but a foundation leaf can never depend upward on anything built on it, or a cycle becomes possible. Don't extend this exception to any other sibling package (e.g. `ngx-translations`, `ngx-dates`) without revisiting this decision first — they aren't guaranteed to stay leaves the way `ngx-api-client`/`ngx-auth` are designed to. |
 
 ## Working in this repo
 - One package = one npm-publishable unit. Organize each package's `src/lib/`
