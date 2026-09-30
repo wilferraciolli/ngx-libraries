@@ -1,4 +1,4 @@
-# @wiltech-labs/ngx-i18n
+# @wiltech-labs/ngx-translations
 
 Shared Angular translations — instant (no-reload) language switching, a `t()` service method and a
 `t` pipe, locale-aware date/number formatting. See root `../../CLAUDE.md` for repo-wide
@@ -18,10 +18,10 @@ for the team not to have to own itself. See `NEXT_STEPS.md` (root) for the full 
 src/
 ├── public-api.ts        # barrel — the entire public surface; nothing outside this is exported
 └── lib/
-    ├── config/            # NgxI18nConfig, LocaleResolver, NGX_I18N_CONFIG token
-    ├── providers/         # provideI18n() — wraps provideTransloco()
-    │                       # BundledI18nLoader — the default loader, reads NgxI18nConfig.dictionaries
-    ├── services/          # I18nService — locale, setLocale(), t(), formatDate()/formatNumber()
+    ├── config/            # NgxTranslationsConfig, LocaleResolver, NGX_TRANSLATIONS_CONFIG token
+    ├── providers/         # provideTranslations() — wraps provideTransloco()
+    │                       # BundledTranslationsLoader — the default loader, reads NgxTranslationsConfig.dictionaries
+    ├── services/          # TranslationsService — locale, setLocale(), t(), formatDate()/formatNumber()
     └── pipes/             # TPipe ('t')
 ```
 
@@ -35,7 +35,7 @@ src/
   the pipe, the `TranslocoLoader`/`Translation` types for a custom `loader` — is re-exported from
   this package's own `public-api.ts`. That's the point of the wrapper: the engine underneath can
   change without every consuming app's imports changing with it.
-- **Instant switch, never a reload.** `I18nService.locale` is a `Signal<string>`; `setLocale()`
+- **Instant switch, never a reload.** `TranslationsService.locale` is a `Signal<string>`; `setLocale()`
   updates it (and Transloco's own active language) synchronously, then fires `persistLocale()`
   without awaiting it. Nothing in this package's own code calls `location.reload()` or anything
   equivalent — don't add any.
@@ -44,7 +44,7 @@ src/
   `CurrentUserStore.profile()`). This package has no built-in concept of "organization" or "user
   profile" — `resource-management-ui`'s three-tier order (session → user → organization → fallback)
   is one instance of that resolver, not something this package bakes in.
-- **`I18nService.locale` is pushed into Transloco via `toObservable(...).pipe(takeUntilDestroyed())`
+- **`TranslationsService.locale` is pushed into Transloco via `toObservable(...).pipe(takeUntilDestroyed())`
   in the constructor, not an `effect()`.** `TranslocoService.setActiveLang()` writes Transloco's own
   internal signal; calling it from inside our `effect()` would be a write-inside-an-effect the way
   Angular's effects are meant to avoid. A plain RxJS subscription side-effects into another
@@ -55,19 +55,19 @@ src/
   every app that uses this package. `TPipe` reimplements the same small, documented mechanism under
   our own `t` name instead.
 - Missing key falls back to rendering the key itself (`missingHandler: { logMissingKey: true,
-  useFallbackTranslation: true, allowEmpty: false }` in `provideI18n()`) — visible and debuggable,
+  useFallbackTranslation: true, allowEmpty: false }` in `provideTranslations()`) — visible and debuggable,
   never a blank string.
-- Bundled dictionaries (`NgxI18nConfig.dictionaries`) are the default path, for a small, finite
+- Bundled dictionaries (`NgxTranslationsConfig.dictionaries`) are the default path, for a small, finite
   locale set — matches `resource-management-ui`'s own reasoning (no network round trip, no
-  asset-path complexity). `BundledI18nLoader` is what wires them into Transloco's loader contract.
+  asset-path complexity). `BundledTranslationsLoader` is what wires them into Transloco's loader contract.
   An app with many locales, or translations served by its backend, passes its own `loader` instead.
 - Date/number formatting is this package's own, via `Intl` read against `locale()` directly — not
   `LOCALE_ID`/Material's `DateAdapter`, which are fixed at bootstrap and can't react to a runtime
   switch. `ngx-forms`' `dateTimeConfig.locale` and a future `ngx-dates`' `relativeTime` pipe should
-  take the current locale the same reactive way (i.e. from `I18nService.locale()`), not `LOCALE_ID`.
+  take the current locale the same reactive way (i.e. from `TranslationsService.locale()`), not `LOCALE_ID`.
 
 ## Status
-- New package: `provideI18n()`, `I18nService`, `TPipe`.
+- New package: `provideTranslations()`, `TranslationsService`, `TPipe`.
 - Not yet published to npm — under development.
 - No consumers yet. `resource-management-ui`'s `I18nStore`/`labels.ts` are candidates to migrate
   onto this package once it's published — not done as part of building it, flagged in root

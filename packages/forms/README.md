@@ -207,16 +207,16 @@ never the browser's locale — typing `31/12/2026` works for any day-first local
 `dateTimeConfig.locale` set on a field always wins. When it's unset, the fallback comes from
 `NGX_FORMS_LOCALE` (an `InjectionToken<() => string>`), not a hardcoded constant — provide it once
 in `app.config.ts` to change every field's default locale together, e.g. wired to
-[`@wiltech-labs/ngx-i18n`](../i18n):
+[`@wiltech-labs/ngx-translations`](../translations):
 
 ```ts
 import { inject } from '@angular/core';
 import { NGX_FORMS_LOCALE } from '@wiltech-labs/ngx-forms';
-import { I18nService } from '@wiltech-labs/ngx-i18n';
+import { TranslationsService } from '@wiltech-labs/ngx-translations';
 
 {
   provide: NGX_FORMS_LOCALE,
-  useFactory: () => { const i18n = inject(I18nService); return () => i18n.locale(); }
+  useFactory: () => { const translations = inject(TranslationsService); return () => translations.locale(); }
 }
 ```
 

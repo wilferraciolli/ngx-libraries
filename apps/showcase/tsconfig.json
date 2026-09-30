@@ -21,8 +21,8 @@
       "@wiltech-labs/ngx-graphs": [
         "../../packages/graphs/src/public-api.ts"
       ],
-      "@wiltech-labs/ngx-i18n": [
-        "../../packages/i18n/src/public-api.ts"
+      "@wiltech-labs/ngx-translations": [
+        "../../packages/translations/src/public-api.ts"
       ]
     },
     "experimentalDecorators": true,

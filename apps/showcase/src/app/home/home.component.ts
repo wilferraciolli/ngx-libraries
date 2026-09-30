@@ -37,9 +37,9 @@ export class HomeComponent {
       route: '/graphs'
     },
     {
-      name: '@wiltech-labs/ngx-i18n',
+      name: '@wiltech-labs/ngx-translations',
       description: 'Instant, no-reload language switching on Transloco, a t() service method and a t pipe',
-      route: '/i18n'
+      route: '/translations'
     }
   ];
 }

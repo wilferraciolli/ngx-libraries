@@ -7,10 +7,10 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { API_ORIGIN } from '@wiltech-labs/ngx-api-client';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
-import { I18nService, provideI18n } from '@wiltech-labs/ngx-i18n';
+import { TranslationsService, provideTranslations } from '@wiltech-labs/ngx-translations';
 import { NGX_DATES_LOCALE } from '@wiltech-labs/ngx-dates';
-import en from './i18n/en-GB.json';
-import el from './i18n/el-GR.json';
+import en from './translations/en-GB.json';
+import el from './translations/el-GR.json';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -22,7 +22,7 @@ bootstrapApplication(AppComponent, {
       provide: API_ORIGIN,
       useValue: 'http://localhost:8080'
     },
-    provideI18n({
+    provideTranslations({
       locales: ['en-GB', 'el-GR'],
       defaultLocale: 'en-GB',
       dictionaries: { 'en-GB': en, 'el-GR': el }
@@ -30,8 +30,8 @@ bootstrapApplication(AppComponent, {
     {
       provide: NGX_DATES_LOCALE,
       useFactory: () => {
-        const i18n = inject(I18nService);
-        return () => i18n.locale();
+        const translations = inject(TranslationsService);
+        return () => translations.locale();
       }
     }
   ]
