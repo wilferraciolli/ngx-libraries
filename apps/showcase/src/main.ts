@@ -5,6 +5,7 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app/app.routes';
 import { provideHttpClient } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { MAT_ICON_DEFAULT_OPTIONS } from '@angular/material/icon';
 import { API_ORIGIN } from '@wiltech-labs/ngx-api-client';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { TranslationsService, provideTranslations } from '@wiltech-labs/ngx-translations';
@@ -25,6 +26,8 @@ bootstrapApplication(AppComponent, {
     provideRouter(routes),
     provideHttpClient(),
     provideAnimationsAsync(),
+    // Every <mat-icon> is a Material Symbols Outlined glyph (font loaded in index.html).
+    { provide: MAT_ICON_DEFAULT_OPTIONS, useValue: { fontSet: 'material-symbols-outlined' } },
     provideCharts(withDefaultRegisterables()),
     {
       provide: API_ORIGIN,

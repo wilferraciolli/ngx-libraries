@@ -6,17 +6,28 @@
   </p>
 
   <div class="form-section">
-    <button (click)="openModal()" class="btn btn-primary">Approve holiday request</button>
-  </div>
-
-  <div class="info-section">
-    <h3>Last close result</h3>
-    @if (lastResult(); as result) {
+    <h3>Scenario 1: approve/reject with data passed in</h3>
+    <button (click)="openApprovalModal()" class="btn btn-primary">
+      Approve holiday request
+    </button>
+    <h4>Last close result</h4>
+    @if (lastApprovalResult(); as result) {
       <pre>{{ result | json }}</pre>
     } @else {
       <p>
         Open the modal and close it (via Approve, Cancel, or the X button) to see its result here.
       </p>
+    }
+  </div>
+
+  <div class="form-section">
+    <h3>Scenario 2: a form, value returned on close</h3>
+    <button (click)="openSignupModal()" class="btn btn-primary">Sign up</button>
+    <h4>Last close result</h4>
+    @if (lastSignupResult(); as result) {
+      <pre>{{ result | json }}</pre>
+    } @else {
+      <p>Open the modal, fill in the form and submit (or Cancel) to see its result here.</p>
     }
   </div>
 </div>

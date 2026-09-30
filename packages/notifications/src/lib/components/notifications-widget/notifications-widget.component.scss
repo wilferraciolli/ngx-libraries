@@ -46,46 +46,82 @@
   text-align: center;
 }
 
+// Sized by NotificationsWidget's OverlayConfig (width: var(--ngx-notifications-width, 33vw),
+// height: 100vh, position: {top:0, right:0}) — this element just fills the pane CDK gives it, same
+// full-height-right-dock contract as ngx-modals' panel, implemented natively here (see root
+// CLAUDE.md's "Inter-package deps" — ngx-modals isn't a sanctioned cross-package dependency).
 .NotificationsWidget-panel {
-  width: 360px;
-  max-height: 480px;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border-radius: var(--ngx-notifications-corner, var(--mat-sys-corner-medium, 12px));
-  background: var(--ngx-notifications-panel-background, var(--mat-sys-surface-container, #fff));
+  background: var(--ngx-notifications-panel-background, var(--mat-sys-surface-container-low, #fff));
   color: var(--ngx-notifications-panel-text, var(--mat-sys-on-surface, #1d1b20));
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.2);
 
   @media (prefers-reduced-motion: no-preference) {
-    animation: NotificationsWidget-panel-in 120ms ease-out;
+    animation: NotificationsWidget-panel-in 160ms
+      var(--ngx-notifications-ease, cubic-bezier(0.05, 0.7, 0.1, 1));
   }
 }
 
 @keyframes NotificationsWidget-panel-in {
   from {
+    transform: translateX(24px);
     opacity: 0;
-    transform: translateY(-4px);
   }
   to {
+    transform: translateX(0);
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
 .NotificationsWidget-header {
+  flex: none;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 8px 12px 16px;
+  gap: 12px;
+  padding: 20px 16px;
+  background: var(--ngx-notifications-header-background, var(--mat-sys-surface-container, #f3edf7));
   border-bottom: 1px solid var(--ngx-notifications-divider, var(--mat-sys-outline-variant, #cac4d0));
 }
 
-.NotificationsWidget-title {
+.NotificationsWidget-headerIcon {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--ngx-notifications-corner, var(--mat-sys-corner-medium, 12px));
+  background: var(
+    --ngx-notifications-header-icon-background,
+    var(--mat-sys-primary-container, #97f0ff)
+  );
+  color: var(--ngx-notifications-header-icon-color, var(--mat-sys-on-primary-container, #002019));
+
+  svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.NotificationsWidget-headerText {
   flex: 1;
+  min-width: 0;
+}
+
+.NotificationsWidget-title {
   margin: 0;
-  font-size: 16px;
-  font-weight: 500;
+  font: var(--mat-sys-title-large, 500 22px/28px sans-serif);
+  letter-spacing: var(--mat-sys-title-large-tracking, normal);
+}
+
+.NotificationsWidget-subtitle {
+  margin: 2px 0 0;
+  font: var(--mat-sys-body-medium, 400 14px/20px sans-serif);
+  color: var(--ngx-notifications-muted-text, var(--mat-sys-on-surface-variant, #49454f));
 }
 
 .NotificationsWidget-close,
@@ -125,40 +161,64 @@
 }
 
 .NotificationsWidget-list {
+  flex: 1;
   margin: 0;
-  padding: 0;
+  padding: 8px;
   list-style: none;
   overflow-y: auto;
 }
 
 .NotificationsWidget-item {
   display: flex;
-  align-items: stretch;
-  border-bottom: 1px solid var(--ngx-notifications-divider, var(--mat-sys-outline-variant, #cac4d0));
-
-  &:last-child {
-    border-bottom: none;
-  }
-}
-
-.NotificationsWidget-itemContent {
-  flex: 1;
-  min-width: 0;
-  border: none;
-  background: transparent;
-  padding: 12px 16px;
-  text-align: left;
-  color: inherit;
-  font: inherit;
-  cursor: pointer;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 12px 8px;
+  border-radius: var(--ngx-notifications-corner, var(--mat-sys-corner-medium, 12px));
 
   &:hover {
     background: var(--ngx-notifications-hover-background, var(--mat-sys-surface-variant, #e7e0ec));
   }
 
+  & + & {
+    margin-top: 4px;
+  }
+}
+
+.NotificationsWidget-itemContent {
+  min-width: 0;
+  color: inherit;
+  font: var(--mat-sys-body-medium, 400 14px/20px sans-serif);
+}
+
+.NotificationsWidget-itemActions {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+// The one thing that actually triggers openNotification() — the item's own content is no longer a
+// click target, so hovering/scanning the list can't accidentally fire the action.
+.NotificationsWidget-action {
+  border: none;
+  border-radius: var(--ngx-notifications-corner, var(--mat-sys-corner-small, 8px));
+  padding: 6px 12px;
+  background: var(
+    --ngx-notifications-action-background,
+    var(--mat-sys-secondary-container, #d3e4e5)
+  );
+  color: var(--ngx-notifications-action-text, var(--mat-sys-on-secondary-container, #0e1d1e));
+  font: var(--mat-sys-label-large, 500 14px/20px sans-serif);
+  cursor: pointer;
+
+  &:hover {
+    filter: brightness(0.96);
+  }
+
   &:focus-visible {
     outline: 3px solid var(--ngx-notifications-focus-ring, var(--mat-sys-secondary, #625b71));
-    outline-offset: -3px;
+    outline-offset: 2px;
   }
 }
 

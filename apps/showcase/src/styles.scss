@@ -1,0 +1,80 @@
+// Material 3 theme (see docs/ANGULAR_APP_CONVENTIONS.md "Design system: Material 3"). `mat.theme()`
+// defines the --mat-sys-* CSS variables (colour roles, type scale, shape scale, elevation, state
+// layers) that Material components — and this app's own CSS — read instead of hardcoded values.
+// The theme type is `color-scheme`, so every role resolves through `light-dark()` and follows the
+// system/browser preference: no separate dark stylesheet needed.
+@use '@angular/material' as mat;
+@use 'styles/theme-colors' as theme;
+
+html {
+  @include mat.theme(
+    (
+      color: (
+        primary: theme.$primary-palette,
+        tertiary: theme.$tertiary-palette,
+      ),
+      typography: (
+          plain-family: (
+            Roboto,
+            system-ui,
+            sans-serif,
+          ),
+          brand-family: (
+            'Roboto Flex',
+            Roboto,
+            system-ui,
+            sans-serif,
+          ),
+        ),
+      density: 0,
+    )
+  );
+  color-scheme: light dark;
+  -webkit-text-size-adjust: 100%;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans',
+    'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--mat-sys-on-surface);
+  background-color: var(--mat-sys-surface);
+  line-height: 1.6;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+}
+
+a {
+  color: var(--mat-sys-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  font-family: inherit;
+}
+
+input,
+select,
+textarea {
+  font-family: inherit;
+}

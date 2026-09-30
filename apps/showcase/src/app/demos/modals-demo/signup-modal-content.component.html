@@ -1,0 +1,28 @@
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <mat-form-field appearance="outline" style="width: 100%">
+    <mat-label>Name</mat-label>
+    <input matInput formControlName="name" required />
+    @if (form.controls.name.invalid && form.controls.name.touched) {
+      <mat-error>Name is required.</mat-error>
+    }
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" style="width: 100%">
+    <mat-label>Email</mat-label>
+    <input matInput type="email" formControlName="email" required />
+    @if (form.controls.email.invalid && form.controls.email.touched) {
+      <mat-error>Enter a valid email address.</mat-error>
+    }
+  </mat-form-field>
+
+  <mat-checkbox formControlName="agreedToTerms">I agree to the terms and conditions</mat-checkbox>
+
+  <p>
+    <em>Close via the shell's X button after typing something to see the unsaved-changes prompt.</em>
+  </p>
+
+  <div style="display: flex; gap: 8px; justify-content: flex-end">
+    <button mat-button type="button" (click)="cancel()">Cancel</button>
+    <button mat-flat-button type="submit">Sign up</button>
+  </div>
+</form>

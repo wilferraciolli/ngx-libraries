@@ -7,8 +7,10 @@ import {
   ModalsDemoData,
   ModalsDemoResult,
 } from './modals-demo-content.component';
+import { SignupModalContentComponent, SignupModalResult } from './signup-modal-content.component';
 
-type DemoResult = ModalCloseResult<ModalCloseAction, ModalsDemoResult | undefined>;
+type ApprovalResult = ModalCloseResult<ModalCloseAction, ModalsDemoResult | undefined>;
+type SignupResult = ModalCloseResult<ModalCloseAction, SignupModalResult | undefined>;
 
 @Component({
   selector: 'app-modals-demo',
@@ -20,17 +22,27 @@ type DemoResult = ModalCloseResult<ModalCloseAction, ModalsDemoResult | undefine
 export class ModalsDemoComponent {
   private readonly modals = inject(ModalService);
 
-  protected readonly lastResult = signal<DemoResult | null>(null);
+  protected readonly lastApprovalResult = signal<ApprovalResult | null>(null);
+  protected readonly lastSignupResult = signal<SignupResult | null>(null);
 
-  protected openModal(): void {
+  protected openApprovalModal(): void {
     this.modals
-      .open<DemoResult, ModalsDemoData>(ModalsDemoContentComponent, {
+      .open<ApprovalResult, ModalsDemoData>(ModalsDemoContentComponent, {
         title: 'Approve holiday request',
         data: { employeeName: 'Priya Patel' },
       })
       .afterClosed()
       .subscribe((result) => {
-        if (result) this.lastResult.set(result);
+        if (result) this.lastApprovalResult.set(result);
+      });
+  }
+
+  protected openSignupModal(): void {
+    this.modals
+      .open<SignupResult>(SignupModalContentComponent, { title: 'Sign up' })
+      .afterClosed()
+      .subscribe((result) => {
+        if (result) this.lastSignupResult.set(result);
       });
   }
 }

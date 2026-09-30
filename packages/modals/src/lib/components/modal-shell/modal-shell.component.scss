@@ -10,13 +10,15 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 8px 8px 24px;
+  padding: 20px 8px 20px 24px;
   border-bottom: 1px solid var(--mat-sys-outline-variant);
 }
 
+// Page-title scale (not the panel-title scale a dropdown/side-panel header uses) — this shell is
+// the whole view while it's open, not a small auxiliary panel.
 .ModalShell-title {
-  font: var(--mat-sys-title-large);
-  letter-spacing: var(--mat-sys-title-large-tracking);
+  font: var(--mat-sys-headline-small);
+  letter-spacing: var(--mat-sys-headline-small-tracking);
   margin: 0;
 }
 

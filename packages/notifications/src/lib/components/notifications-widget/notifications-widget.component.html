@@ -1,6 +1,4 @@
 <button
-  #trigger="cdkOverlayOrigin"
-  cdkOverlayOrigin
   type="button"
   class="NotificationsWidget-trigger"
   [attr.aria-label]="triggerLabel()"
@@ -20,15 +18,7 @@
   }
 </button>
 
-<ng-template
-  cdkConnectedOverlay
-  [cdkConnectedOverlayOrigin]="trigger"
-  [cdkConnectedOverlayOpen]="isOpen()"
-  [cdkConnectedOverlayHasBackdrop]="true"
-  cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
-  (backdropClick)="close()"
-  (detach)="close()"
->
+<ng-template #panel>
   <div
     class="NotificationsWidget-panel"
     role="dialog"
@@ -37,7 +27,20 @@
     cdkTrapFocusAutoCapture
   >
     <div class="NotificationsWidget-header">
-      <h2 class="NotificationsWidget-title">{{ text().panelTitle }}</h2>
+      <div class="NotificationsWidget-headerIcon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path
+            fill="currentColor"
+            d="M12 22a2.2 2.2 0 0 0 2.2-2.2h-4.4A2.2 2.2 0 0 0 12 22Zm7-6.2V11c0-3.3-1.8-6-5-6.7V3.5a2 2 0 1 0-4 0v.8C6.8 5 5 7.7 5 11v4.8L3 17.8V19h18v-1.2Z"
+          />
+        </svg>
+      </div>
+      <div class="NotificationsWidget-headerText">
+        <h2 class="NotificationsWidget-title">{{ text().panelTitle }}</h2>
+        @if (notifications.unreadCount() > 0) {
+          <p class="NotificationsWidget-subtitle">{{ notifications.unreadCount() }} unread</p>
+        }
+      </div>
       <button
         type="button"
         class="NotificationsWidget-close"
@@ -63,11 +66,7 @@
       <ul class="NotificationsWidget-list" role="list">
         @for (notification of notifications.notifications(); track $index) {
           <li class="NotificationsWidget-item">
-            <button
-              type="button"
-              class="NotificationsWidget-itemContent"
-              (click)="select(notification)"
-            >
+            <div class="NotificationsWidget-itemContent">
               @if (itemTemplate) {
                 <ng-container
                   *ngTemplateOutlet="itemTemplate; context: { $implicit: notification }"
@@ -75,20 +74,29 @@
               } @else {
                 <pre class="NotificationsWidget-itemFallback">{{ notification | json }}</pre>
               }
-            </button>
-            <button
-              type="button"
-              class="NotificationsWidget-dismiss"
-              [attr.aria-label]="text().dismiss"
-              (click)="dismiss(notification, $event)"
-            >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  fill="currentColor"
-                  d="M18.3 5.71 12 12.01l-6.3-6.3-1.4 1.42 6.29 6.29-6.3 6.3 1.42 1.4 6.29-6.29 6.29 6.3 1.42-1.42-6.3-6.29 6.3-6.29z"
-                />
-              </svg>
-            </button>
+            </div>
+            <div class="NotificationsWidget-itemActions">
+              <button
+                type="button"
+                class="NotificationsWidget-action"
+                (click)="select(notification)"
+              >
+                {{ text().action }}
+              </button>
+              <button
+                type="button"
+                class="NotificationsWidget-dismiss"
+                [attr.aria-label]="text().dismiss"
+                (click)="dismiss(notification, $event)"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    fill="currentColor"
+                    d="M18.3 5.71 12 12.01l-6.3-6.3-1.4 1.42 6.29 6.29-6.3 6.3 1.42 1.4 6.29-6.29 6.29 6.3 1.42-1.42-6.3-6.29 6.3-6.29z"
+                  />
+                </svg>
+              </button>
+            </div>
           </li>
         }
       </ul>

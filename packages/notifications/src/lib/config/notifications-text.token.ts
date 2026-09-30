@@ -7,6 +7,9 @@ export interface NotificationsText {
   loading: string;
   empty: string;
   error: string;
+  /** Label on each item's explicit action button — the only thing that triggers
+   *  `openNotification()`; the item itself is no longer a big click target. */
+  action: string;
   dismiss: string;
   close: string;
 }
@@ -18,6 +21,7 @@ export const DEFAULT_NOTIFICATIONS_TEXT: NotificationsText = {
   loading: 'Loading…',
   empty: 'No notifications.',
   error: 'Something went wrong loading notifications.',
+  action: 'View',
   dismiss: 'Dismiss',
   close: 'Close',
 };
