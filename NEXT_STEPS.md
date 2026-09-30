@@ -232,6 +232,100 @@ needed the same treatment:
 - [ ] api-client: `resource()`/`collectionResource()` now guard with `hasValue()` — bump + publish
       0.1.6, then update consumers. Other packages: first publish once reviewed.
 
+## Planned package `ngx-modals` (not started)
+
+Idea captured 2026-09-30, refined the same day with a layout spec and a real prior-art reference.
+Nothing built yet.
+
+### Prior art: `surveysUI`'s dialog service
+
+A few years old, in a sibling repo, not part of this monorepo:
+`/home/wilferraciolli/GIT/WILTECH/surveys/surveysUI/src/app/shared/`. Worth porting the *shape* of,
+not the code verbatim (it predates Signals, standalone components are inconsistent there, and the
+layout requirement below is new):
+
+- `dialog.service.ts` — a thin `DialogService` wrapping `MatDialog`, plus a `DialogClosedActionType`
+  enum (`CREATED`/`UPDATED`/`DELETED`/`DISMISSED`) right in the same file. Settles the
+  CDK-vs-Material question below: given `ngx-forms` already depends on Angular Material, and this
+  prior art already builds on `MatDialog` (not raw `@angular/cdk/dialog`), `ngx-modals` should too —
+  `MatDialog` already wraps CDK Dialog and adds the Material surface/animation/theming this needs
+  anyway.
+- Per-dialog `<X>DialogCloseData` interfaces (e.g. `SurveyInstanceDialogCloseData { actionType: 
+  DialogClosedActionType; id; surveyInstance }`) — the enum *and* the payload travel together in one
+  object. Exactly the "access to the data as well" shape asked for — `ngx-modals` should generalize
+  this into one typed shape (something like `ModalCloseResult<TAction, TData> = { action: TAction;
+  data: TData }`) instead of every app hand-writing its own close-data interface per dialog.
+- Caller pattern: `dialog.open(Component, config).afterClosed().subscribe(data => { if
+  (data.actionType === DialogClosedActionType.DELETED) { ... } })` — confirms the enum is read by the
+  *caller*, after close, not by the modal content itself.
+- `MatConfirmDialogComponent` + `DialogService.openConfirmDialog(msg)` — a small reusable Yes/No
+  dialog (`disableClose: true`, so the user must pick a button) used today only for delete
+  confirmations. `ngx-modals`' own unsaved-changes prompt (see below) is the same idea, generalized.
+- Responsive resize already exists there too: `BreakpointObserver.observe(Breakpoints.XSmall)`
+  (`@angular/cdk/layout`) subscribed per open dialog, calling `dialogRef.updateSize('100%', '100%')`
+  on the small breakpoint and back to a fixed size otherwise. `ngx-modals` should do the same kind of
+  reactive resize, just to the layout in the next section instead of a centered dialog.
+
+### Layout: a right-hand panel, not a centered dialog
+
+The actual ask is closer to a **side sheet** than a classic centered `MatDialog`: docked to the
+right edge, full viewport height (top to bottom), one third of the screen width — so on a wide
+screen the user can still see and act on what's behind it (e.g. approving a colleague's holiday
+request in the panel while their team's availability stays visible on the left).
+
+- [ ] Angular Material has no ready-made "side sheet" component to lean on (`MatSidenav`/`mat-drawer`
+      is a persistent layout element, not an on-demand modal). Build this as `MatDialog.open()` with
+      a custom `position: { top: '0', right: '0' }`, `height: '100vh'`, a width token (see below),
+      and a `panelClass` that overrides Material's default surface shape/animation for a slide-in
+      from the right with square left-hand corners, rather than the default centered fade/scale.
+- [ ] Width should be an overridable `--ngx-modal-width` custom property (house pattern: token
+      default, hex last), defaulting to something like `33vw` — not a hardcoded `33%`, so an app can
+      widen it for a modal whose content genuinely needs more room without this package hardcoding
+      "always exactly a third."
+- [ ] **Correction to the "breakpoints are already in a library" assumption**: they're not, yet.
+      `docs/ANGULAR_APP_CONVENTIONS.md` documents a *per-app* `src/styles/_breakpoints.scss` SCSS
+      partial (`sm`/`md`/`lg`, M3's window size classes) that every consuming app sets up itself, and
+      the CDK's `BreakpointObserver`/`Breakpoints.XSmall` for the JS-side reactive case (exactly what
+      the `surveysUI` prior art already uses) — see this file's still-open "Possibly `ngx-styles`"
+      item above. There's no shared `ngx-*` breakpoints package to depend on today. Until that lands,
+      `ngx-modals` follows the same convention every other package here already follows for anything
+      app-owned: react to the CDK's `Breakpoints.XSmall` at runtime (full-screen below that, the
+      one-third panel above it) via an injected observable/signal, and let CSS custom properties
+      (not a SCSS `@use` of an app-local partial this package can't see) carry the rest. If
+      `ngx-styles` ever ships breakpoints as tokens, revisit this.
+- [ ] Below the compact/`XSmall` breakpoint: full screen, same `updateSize()`-on-breakpoint-change
+      approach as the prior art, just swapping "centered / full-screen" for "one-third right panel /
+      full-screen."
+
+### Close reason + unsaved-changes guard
+
+- [ ] Standard close-reason enum (name/members TBD, but `DialogClosedActionType` above is the
+      starting point — likely something like `Cancelled`/`Dismissed` vs `Created`/`Updated`/`Deleted`
+      vs a generic `Done`, exact set still open) paired with whatever data the modal wants to hand
+      back, as one typed close-result object (see `ModalCloseResult<TAction, TData>` above) — so a
+      caller can switch on the reason and only read the data when it matters.
+- [ ] **New requirement, not in the `surveysUI` prior art**: an X button that closes immediately if
+      the modal's content has no unsaved changes, but — if it does — first shows a confirm prompt
+      ("You have unsaved changes, are you sure you want to close? It will lose data") before actually
+      closing. Needs:
+      - A small contract the modal's *content* component implements to report dirty state to the
+        shell (e.g. a `hasUnsavedChanges(): boolean` method or an injected signal) — the modal
+        package can't know this on its own, the same way `ngx-forms`' validation lives in the field
+        config, not the shell.
+      - The outer `MatDialog` opened with `disableClose: true` (or backdrop/Escape intercepted
+        manually), so a backdrop click or Escape can't bypass the same check the X button goes
+        through.
+      - The confirm prompt itself is the generalized, reusable version of `surveysUI`'s
+        `MatConfirmDialogComponent`/`openConfirmDialog()` — one shared component this package ships,
+        not something every consuming app re-implements.
+- [ ] Not designed yet — enum member names, the exact typed-wrapper API shape (a
+      `ModalService.open<T, R>()`-style method, presumably), and the precise shell/content contract
+      for the dirty check are all still open. Design before building, same as every other package
+      here.
+- [ ] No consumer yet. Not a straight port of `insurly-ui`/`resource-management-ui` code the way most
+      packages here started — closer to a redesign of the `surveysUI` prior art above, adapted to a
+      layout that prior art never had.
+
 ## packages/forms
 
 - [ ] No tests yet. Unlike `api-client` (a straight port of exercised `insurly-ui` code), forms
