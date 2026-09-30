@@ -37,13 +37,17 @@ export class RegionSettingsFormComponent {
 
   // ngx-forms' SelectField reads its choices from `fieldDef.options`, not a separate input —
   // each field's static definition and its API-provided options are merged into one FieldDef here.
+  // `RegionSettingsPayload`'s fields (timezone/language/locale/currency/theme) are plain domain
+  // strings, not ids referencing another resource, so the option's bound `value` is the metadata's
+  // own `viewValue` (e.g. 'EUR') — never `value` (the metadata row's internal id), which wouldn't
+  // match what's actually stored in `settings()` or expected back on save.
   private fieldDef(key: string, label: string): FieldDef {
     return {
       name: key,
       type: FormFieldType.SELECT,
       label,
       required: true,
-      options: this.options()[key]?.map((v) => ({ label: v.viewValue, value: v.value })) ?? [],
+      options: this.options()[key]?.map((v) => ({ label: v.viewValue, value: v.viewValue })) ?? [],
     };
   }
 

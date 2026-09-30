@@ -128,9 +128,22 @@ TProfile>` and `RegionSettingsStore<TSettings, TPayload>` are both parameterized
   `SystemSettingsStore`, `RegionSettingsFormComponent`, `NGX_REGION_SETTINGS_FORM_TEXT`, plus the
   `Identifiable`/`Me`/`UserProfile`/`RegionSettings`/`RegionSettingsPayload` types.
 - `RegionSettingsFormComponent` extracted 2026-09-30 from a form independently built and duplicated
-  in an external consuming app (`PythonTutorials/showcase`'s `RegionSettingsForm`) — not yet
-  typechecked/built against the library's own `tsconfig`/`ng-package.json` since the extraction, and
-  that external app hasn't yet been switched over to import it from here instead of its own local
-  copy. Do both before considering this component done.
+  in an external consuming app (`PythonTutorials/showcase`'s `RegionSettingsForm`) — typechecked and
+  built clean against the library's own `tsconfig`/`ng-package.json`. Two bugs surfaced once tried
+  against that external app's real API and screen, both fixed 2026-09-30:
+  - **No gap between fields.** Its SCSS set `column-gap` only, not `gap`/`row-gap` — invisible at the
+    two-column breakpoint (≥600px, where fields sit side by side) but every field touches its
+    neighbour's border in the default single-column layout, since a single column has no _columns_
+    to put a column-gap between. Fixed by using `gap` instead.
+  - **Select options bound to the metadata id, not its value.** Each option's `[value]` was
+    `ValueViewValue.value` (the metadata row's internal id, from `MetadataService.resolveMetadataIdValues`
+    — see `ngx-api-client`'s `CLAUDE.md`), not `.viewValue` (the domain string, e.g. `'EUR'`). Wrong
+    for this specific form: `RegionSettingsPayload`'s fields are the domain strings themselves
+    (`timezone`/`language`/`locale`/`currency`/`theme: string`), not ids referencing another
+    resource — unlike the more typical case elsewhere in this API-client convention where a select
+    submits a foreign-key id. Fixed by using `viewValue` for both the option's label and its bound
+    value.
+  - That external app hasn't yet been switched over to import this component from here instead of
+    its own local copy — see the open item below.
 - Not yet published to npm — under development.
 - No consumers yet within this monorepo.

@@ -749,6 +749,14 @@ it.
       app's `stylePreprocessorOptions.includePaths`, a different build entirely), and no package here
       has tried yet. Not worth the risk for two pixel values and one breakpoint.
 - [x] `tsc --noEmit`, `ng-packagr build`, and a full `scripts/build-packages.sh` run all clean.
+- [x] **Two bugs found once actually tried against `PythonTutorials/showcase`'s real screen/API —
+      fixed 2026-09-30**: (1) SCSS set `column-gap` only, not `gap`, so fields touched borders in the
+      default single-column layout (only visible on the two-column breakpoint's _column_ gap, not the
+      more common stacked case); (2) select options bound `[value]` to `ValueViewValue.value` (the
+      metadata row's internal id) instead of `.viewValue` (the domain string) — wrong here because
+      `RegionSettingsPayload`'s fields (`timezone`/`currency`/etc.) are the domain strings themselves,
+      not ids referencing another resource. See `packages/region-settings/CLAUDE.md`'s Status section
+      for the full detail.
 - [ ] **Not yet switched over in `PythonTutorials/showcase` itself** — that app's own
       `RegionSettingsForm` still exists as a local copy; it hasn't been repointed to import
       `RegionSettingsFormComponent` from `@wiltech-labs/ngx-region-settings` instead. Do this (and
