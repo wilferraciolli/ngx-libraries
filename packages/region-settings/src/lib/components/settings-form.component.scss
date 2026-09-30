@@ -1,0 +1,23 @@
+// Plain CSS, not a `ngx-styles` Sass dependency: ng-packagr compiles this package's component
+// styles at this package's own build time, before any consuming app's `stylePreprocessorOptions`
+// include paths exist, and no package here has resolved `ngx-styles` from that context before. The
+// two values below mirror `ngx-styles`' own scale (`spacing.space(3)`/`space(4)` = 12px/16px,
+// `breakpoints.$breakpoints.sm` = 600px) rather than depending on it.
+.RegionSettingsForm {
+  &-fields {
+    display: grid;
+    grid-template-columns: 1fr;
+    column-gap: 16px;
+
+    @media (min-width: 600px) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  &-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 8px;
+  }
+}

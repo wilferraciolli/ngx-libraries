@@ -4,5 +4,9 @@
   "lib": {
     "entryFile": "src/public-api.ts"
   },
-  "allowedNonPeerDependencies": ["@wiltech-labs/ngx-api-client", "@wiltech-labs/ngx-auth"]
+  "allowedNonPeerDependencies": [
+    "@wiltech-labs/ngx-api-client",
+    "@wiltech-labs/ngx-auth",
+    "@wiltech-labs/ngx-forms"
+  ]
 }
