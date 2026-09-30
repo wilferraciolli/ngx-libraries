@@ -132,6 +132,7 @@ to use which package and the rules for using it in an app.
 | AI interaction surfaces | `ngx-ai-tools` | `AiTextBox`, `AiButton`, `AiPanel`, `AiSparkleIcon` | Ad hoc gradient styling |
 | Realtime / websockets | `ngx-web-sockets` | `provideWebSocket()`, `WebSocketService`, `ChatRoom`, `ChatMessageBubble` | `ngx-socket-io`, hand-rolled socket services |
 | Translations | `ngx-translations` | `provideTranslations()`, `TranslationsService`, the `t` pipe | An app-local translation store (see `ngx-translations` below), raw Transloco use |
+| A side panel / modal | `ngx-modals` | `ModalService.open()`, `ModalCloseAction`/`ModalCloseResult`, `ModalContent` | Hand-rolled `MatDialog.open()` calls, an app-local close-reason enum per feature |
 
 ### Setup
 Install only the packages the app uses (`npm i @wiltech-labs/ngx-forms …`).
@@ -332,6 +333,23 @@ provideTranslations({ locales: [...], defaultLocale: '...', dictionaries: {...} 
 - `ngx-dates` has no dependency on `ngx-translations`, or on any other package here —
   see "Inter-package deps" in root `CLAUDE.md` for why, if a package here ever
   seems like it wants to import another directly.
+
+**`ngx-modals`**
+- `ModalService.open(component, config)` is the only way to open one — never call `MatDialog.open()`
+  directly for a right-panel modal (a plain centered dialog that isn't this pattern is still fine
+  via `MatDialog` directly). The content component takes a `data` input and injects `MatDialogRef`
+  to close itself, exactly as it would if you'd opened it with `MatDialog` yourself.
+- It can only be closed via its own close button or the content calling `MatDialogRef.close()` —
+  Escape and a backdrop click are disabled on purpose, so a content component's
+  `ModalContent.hasUnsavedChanges()` guard (optional; omit it when there's nothing to lose) can't be
+  bypassed.
+- `ModalCloseAction` (`Dismissed`/`Cancelled`/`Done`/`Created`/`Updated`/`Deleted`) is a starting
+  vocabulary — `open()` and `ModalCloseResult` are both generic, define your own action enum when a
+  modal's outcomes don't fit.
+- Width is `--ngx-modal-width` (default `33vw`), full screen below the CDK's `XSmall` breakpoint —
+  set the variable to change the default panel width app-wide, or pass `{ width: '...' }` per open.
+- `ModalService.confirm(message, options?)` is the same Yes/No prompt the unsaved-changes guard
+  uses, for anything else that wants it (a delete confirmation, say).
 
 ### Migrating an existing app
 Work through what the app actually has:

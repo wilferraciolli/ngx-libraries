@@ -231,11 +231,18 @@ needed the same treatment:
 - [ ] Run Prettier over the repo once and commit that separately.
 - [ ] api-client: `resource()`/`collectionResource()` now guard with `hasValue()` — bump + publish
       0.1.6, then update consumers. Other packages: first publish once reviewed.
+- [ ] `ngx-auth` and `ngx-region-settings` were both built without the doc-sync step every earlier
+      package got: neither has a "What to use for what" table row, a "Using each package" subsection,
+      or a showcase home-page tile (`ngx-modals` got all three — see above). Noticed while adding
+      `ngx-modals`' own entries; not fixed here to stay scoped to the package actually being built
+      today. Also neither is wired into `apps/showcase` with a real demo route yet (both need a
+      signed-in state to demo meaningfully, unlike the other packages — `ngx-auth`'s own "not yet
+      wired into apps/showcase" note above already flags this for itself).
 
-## Planned package `ngx-modals` (not started)
+## New package `ngx-modals` — built 2026-09-30
 
-Idea captured 2026-09-30, refined the same day with a layout spec and a real prior-art reference.
-Nothing built yet.
+Idea captured 2026-09-30, refined the same day with a layout spec and a real prior-art reference,
+built the same day too.
 
 ### Prior art: an existing app's dialog service
 
@@ -272,58 +279,81 @@ right edge, full viewport height (top to bottom), one third of the screen width 
 screen the user can still see and act on what's behind it (e.g. approving a colleague's holiday
 request in the panel while their team's availability stays visible on the left).
 
-- [ ] Angular Material has no ready-made "side sheet" component to lean on (`MatSidenav`/`mat-drawer`
-      is a persistent layout element, not an on-demand modal). Build this as `MatDialog.open()` with
-      a custom `position: { top: '0', right: '0' }`, `height: '100vh'`, a width token (see below),
-      and a `panelClass` that overrides Material's default surface shape/animation for a slide-in
-      from the right with square left-hand corners, rather than the default centered fade/scale.
-- [ ] Width should be an overridable `--ngx-modal-width` custom property (house pattern: token
-      default, hex last), defaulting to something like `33vw` — not a hardcoded `33%`, so an app can
-      widen it for a modal whose content genuinely needs more room without this package hardcoding
-      "always exactly a third."
-- [ ] **Correction to the "breakpoints are already in a library" assumption**: they're not, yet.
-      `docs/ANGULAR_APP_CONVENTIONS.md` documents a *per-app* `src/styles/_breakpoints.scss` SCSS
-      partial (`sm`/`md`/`lg`, M3's window size classes) that every consuming app sets up itself, and
-      the CDK's `BreakpointObserver`/`Breakpoints.XSmall` for the JS-side reactive case (exactly what
-      the prior-art app above already uses) — see this file's still-open "Possibly `ngx-styles`"
-      item above. There's no shared `ngx-*` breakpoints package to depend on today. Until that lands,
-      `ngx-modals` follows the same convention every other package here already follows for anything
-      app-owned: react to the CDK's `Breakpoints.XSmall` at runtime (full-screen below that, the
-      one-third panel above it) via an injected observable/signal, and let CSS custom properties
-      (not a SCSS `@use` of an app-local partial this package can't see) carry the rest. If
-      `ngx-styles` ever ships breakpoints as tokens, revisit this.
-- [ ] Below the compact/`XSmall` breakpoint: full screen, same `updateSize()`-on-breakpoint-change
-      approach as the prior art, just swapping "centered / full-screen" for "one-third right panel /
-      full-screen."
+- [x] Angular Material has no ready-made "side sheet" component to lean on (`MatSidenav`/`mat-drawer`
+      is a persistent layout element, not an on-demand modal). Built as `MatDialog.open()` with
+      `position: { top: '0', right: '0' }`, `height: '100vh'`, a width token (see below) — all pure
+      `MatDialogConfig` inline styles, no stylesheet needed for correct positioning/sizing.
+      **Descoped for v1**: the `panelClass` override for a slide-in-from-right transition with
+      square left-hand corners (Material's default centered fade/scale + rounded corners apply
+      as-is instead) — styling `.cdk-overlay-pane`/`.mat-mdc-dialog-container` needs a *global*,
+      non-component-encapsulated stylesheet (`::ng-deep` from the shell can't reach them — they're
+      CDK-created ancestors of the shell's own root element, not descendants), and this repo has no
+      established mechanism yet for a package to ship loose global CSS an app imports. See
+      `ngx-modals`' own `CLAUDE.md` for the full reasoning; revisit if/when that packaging question
+      gets solved (maybe by `ngx-styles`, maybe some other way).
+- [x] Width is an overridable `--ngx-modal-width` custom property, defaulting to `var(--ngx-modal-width,
+      33vw)` — settable app-wide via the CSS variable, or per-open via `ModalConfig.width`.
+- [x] **Correction to the "breakpoints are already in a library" assumption**: confirmed still true
+      — no `ngx-styles` yet (see that section below). `ngx-modals` reacts to the CDK's
+      `BreakpointObserver.observe(Breakpoints.XSmall)` directly at runtime, subscribed per `open()`
+      call and unsubscribed on `afterClosed()`. If `ngx-styles` ever ships breakpoints as tokens,
+      revisit this.
+- [x] Below the compact/`XSmall` breakpoint: full screen, via `dialogRef.updateSize('100vw', '100vh')`
+      on breakpoint match, same `updateSize()`-on-breakpoint-change approach as the prior art.
 
 ### Close reason + unsaved-changes guard
 
-- [ ] Standard close-reason enum (name/members TBD, but `DialogClosedActionType` above is the
-      starting point — likely something like `Cancelled`/`Dismissed` vs `Created`/`Updated`/`Deleted`
-      vs a generic `Done`, exact set still open) paired with whatever data the modal wants to hand
-      back, as one typed close-result object (see `ModalCloseResult<TAction, TData>` above) — so a
-      caller can switch on the reason and only read the data when it matters.
-- [ ] **New requirement, not in the prior-art app above**: an X button that closes immediately if
-      the modal's content has no unsaved changes, but — if it does — first shows a confirm prompt
-      ("You have unsaved changes, are you sure you want to close? It will lose data") before actually
-      closing. Needs:
-      - A small contract the modal's *content* component implements to report dirty state to the
-        shell (e.g. a `hasUnsavedChanges(): boolean` method or an injected signal) — the modal
-        package can't know this on its own, the same way `ngx-forms`' validation lives in the field
-        config, not the shell.
-      - The outer `MatDialog` opened with `disableClose: true` (or backdrop/Escape intercepted
-        manually), so a backdrop click or Escape can't bypass the same check the X button goes
-        through.
-      - The confirm prompt itself is the generalized, reusable version of the prior-art app's
-        `MatConfirmDialogComponent`/`openConfirmDialog()` — one shared component this package ships,
-        not something every consuming app re-implements.
-- [ ] Not designed yet — enum member names, the exact typed-wrapper API shape (a
-      `ModalService.open<T, R>()`-style method, presumably), and the precise shell/content contract
-      for the dirty check are all still open. Design before building, same as every other package
-      here.
+- [x] **Resolved**: `ModalCloseAction` enum — `Dismissed`/`Cancelled`/`Done`/`Created`/`Updated`/
+      `Deleted` — six members, a starting vocabulary rather than a closed list (see below), paired
+      with whatever data the modal wants to hand back via `ModalCloseResult<TAction, TData> = {
+      action: TAction; data: TData }`.
+- [x] **New requirement, not in the prior-art app above — built**: the shell's X button closes
+      immediately if the content has no unsaved changes; if it does, `ModalService`'s own
+      `ConfirmDialogComponent` prompts first ("You have unsaved changes. Are you sure you want to
+      close? It will lose data."), and only closes the panel if confirmed.
+      - Content reports dirty state via the optional `ModalContent.hasUnsavedChanges(): boolean` —
+        a component that doesn't implement it is treated as always safe to close (a `hasUnsavedChanges()`
+        helper checks `typeof instance?.hasUnsavedChanges === 'function'` before calling it, never throws).
+      - The outer `MatDialog` is opened with `disableClose: true` — Escape and a backdrop click do
+        nothing, so they can't bypass the same check the X button goes through.
+      - `ConfirmDialogComponent` is the generalized, reusable version of the prior-art app's
+        `MatConfirmDialogComponent`/`openConfirmDialog()` — also exposed directly as
+        `ModalService.confirm(message, options?)` for anything else that wants the same prompt (e.g.
+        a delete confirmation), not just this package's own internal use of it.
+- [x] **The exact typed-wrapper API shape, resolved**: `ModalService.open<TResult, TData>(component,
+      config)` — root-provided service, not a factory function or a directive. It wraps `component`
+      in an internal `ModalShellComponent` (chrome: positioning, the close button, the dirty-check
+      guard) and opens *that* through `MatDialog`, returning `MatDialogRef<unknown, TResult>` (the
+      shell's own type is erased from the public signature — nothing outside this package needs it).
+      `ModalShellComponent` creates the caller's `component` dynamically
+      (`ViewContainerRef.createComponent()`) inside its own view and feeds it `config.data` via
+      `.setInput('data', ...)` — the content component declares a matching `data` input. Because
+      that dynamic creation happens inside a view whose injector chains up through the dialog's own
+      injector, the content component can `inject(MatDialogRef<ItsOwnType, ItsOwnResultType>)`
+      directly and call `.close(result)` itself, exactly as if `MatDialog.open()` had opened it
+      directly — no shell-mediated close-event bus needed. (Generic parameters on `MatDialogRef` are
+      compile-time only; every component in the tree resolves the same runtime singleton for one
+      open dialog regardless of what generic argument each site uses.)
+- [x] Package scaffolded (`package.json`, `ng-package.json`, `tsconfig.json`, `README.md`,
+      `CLAUDE.md`), `tsc --noEmit` and `ng-packagr build` both clean. Root `CLAUDE.md` repo layout
+      and `docs/ANGULAR_APP_CONVENTIONS.md` ("What to use for what" table + a new `ngx-modals`
+      "Using each package" subsection) updated.
+- [x] Wired into `apps/showcase` at `/modals`: a holiday-approval demo (`ModalsDemoContentComponent`)
+      exercising `data` in, the dirty-check guard (typing into its note field marks it dirty before
+      the X button is clicked), and a typed `ModalCloseResult` read back via `afterClosed()`. Full
+      showcase `ng build` (all 11 packages + the app) confirmed clean with it wired in.
+      **Not yet clicked through in an actual browser** — no browser-automation tool was available in
+      this session (unlike the Playwright verification other demos in this repo got). The
+      dynamic-component/`MatDialogRef` mechanism above is sound per Angular's documented
+      `ViewContainerRef`/injector-hierarchy behaviour, but this is flagged explicitly rather than
+      claiming a check that didn't happen — do an actual browser pass (open the modal, type in the
+      note field, click the X button, confirm the prompt appears; also try Approve/Cancel; also
+      shrink the viewport below the `XSmall` breakpoint and confirm it goes full screen) before
+      trusting this beyond "it builds."
 - [ ] No consumer yet. Not a straight port of already-exercised consumer-app code the way most
       packages here started — closer to a redesign of the prior-art app above, adapted to a
       layout that prior art never had.
+- [ ] Not yet published to npm.
 
 ## New package `ngx-region-settings` — built 2026-09-30
 
@@ -579,6 +609,11 @@ See "New package `ngx-auth` — built 2026-09-30" above for what's built and wha
 ## packages/region-settings
 
 See "New package `ngx-region-settings` — built 2026-09-30" above for what's built and what's still open.
+
+## packages/modals
+
+See "New package `ngx-modals` — built 2026-09-30" above for what's built and what's still open —
+in particular, the not-yet-browser-verified flag.
 
 ## packages/media
 

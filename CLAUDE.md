@@ -21,7 +21,8 @@ ngx-libraries/
 │   ├── translations/       # @wiltech-labs/ngx-translations — see its own CLAUDE.md
 │   ├── dates/              # @wiltech-labs/ngx-dates — see its own CLAUDE.md
 │   ├── auth/               # @wiltech-labs/ngx-auth — see its own CLAUDE.md
-│   └── region-settings/    # @wiltech-labs/ngx-region-settings — see its own CLAUDE.md
+│   ├── region-settings/    # @wiltech-labs/ngx-region-settings — see its own CLAUDE.md
+│   └── modals/             # @wiltech-labs/ngx-modals — see its own CLAUDE.md
 ├── docs/
 │   └── ANGULAR_APP_CONVENTIONS.md  # conventions every consuming Angular app follows — its
 │                                   # "Shared libraries" section is the contract these packages meet

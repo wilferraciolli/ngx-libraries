@@ -1,0 +1,17 @@
+<div class="ModalShell-header">
+  @if (data.title) {
+    <h2 class="ModalShell-title">{{ data.title }}</h2>
+  }
+  <button
+    type="button"
+    mat-icon-button
+    class="ModalShell-close"
+    aria-label="Close"
+    (click)="requestClose()"
+  >
+    <mat-icon aria-hidden="true">close</mat-icon>
+  </button>
+</div>
+<div class="ModalShell-content">
+  <ng-container #contentHost></ng-container>
+</div>

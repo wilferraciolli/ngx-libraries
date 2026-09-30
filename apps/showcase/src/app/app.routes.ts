@@ -6,6 +6,7 @@ import { AiToolsDemoComponent } from './demos/ai-tools-demo/ai-tools-demo.compon
 import { GraphsDemoComponent } from './demos/graphs-demo/graphs-demo.component';
 import { HomeComponent } from './home/home.component';
 import { TranslationsDemoComponent } from './demos/translations-demo/translations-demo.component';
+import { ModalsDemoComponent } from './demos/modals-demo/modals-demo.component';
 
 export const routes: Routes = [
   {
@@ -35,5 +36,9 @@ export const routes: Routes = [
   {
     path: 'translations',
     component: TranslationsDemoComponent
+  },
+  {
+    path: 'modals',
+    component: ModalsDemoComponent
   }
 ];

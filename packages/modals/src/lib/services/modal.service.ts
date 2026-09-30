@@ -1,0 +1,75 @@
+import { Injectable, Type, inject } from '@angular/core';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { Observable, map } from 'rxjs';
+
+import { ModalShellComponent } from '../components/modal-shell/modal-shell.component.js';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../components/confirm-dialog/confirm-dialog.component.js';
+import type { ModalConfig, ModalShellData } from '../models/modal-config.model.js';
+import type { ModalCloseResult } from '../models/modal-close-result.model.js';
+
+const DEFAULT_WIDTH = 'var(--ngx-modal-width, 33vw)';
+
+@Injectable({ providedIn: 'root' })
+export class ModalService {
+  private readonly dialog = inject(MatDialog);
+  private readonly breakpointObserver = inject(BreakpointObserver);
+
+  /**
+   * Opens `component` in a right-docked panel: full viewport height, `config.width` (default
+   * `var(--ngx-modal-width, 33vw)`) wide, full screen below the CDK's `XSmall` breakpoint. The
+   * panel can only be closed via its own close button — Escape and a backdrop click are disabled,
+   * so a caller's in-progress work is never lost by accident. Content that implements
+   * `ModalContent.hasUnsavedChanges()` gets a confirm prompt before that close button actually
+   * closes it.
+   *
+   * `component` receives `config.data` via a `data` input (`data = input<TData>()`, or
+   * `@Input() data?: TData`) and can close itself with a typed result the same way it would if this
+   * had opened it directly: `inject(MatDialogRef<MyComponent, MyResult>).close(result)`.
+   */
+  open<TResult = ModalCloseResult, TData = unknown>(
+    component: Type<unknown>,
+    config: ModalConfig<TData> = {},
+  ): MatDialogRef<unknown, TResult> {
+    const width = config.width ?? DEFAULT_WIDTH;
+
+    const dialogRef = this.dialog.open<ModalShellComponent, ModalShellData<TData>, TResult>(ModalShellComponent, {
+      position: { top: '0', right: '0' },
+      height: '100vh',
+      maxHeight: '100vh',
+      width,
+      maxWidth: '100vw',
+      disableClose: true,
+      ariaLabel: config.ariaLabel ?? config.title,
+      data: {
+        contentComponent: component,
+        contentData: config.data,
+        title: config.title,
+      },
+    });
+
+    const breakpointSubscription = this.breakpointObserver.observe(Breakpoints.XSmall).subscribe(({ matches }) => {
+      dialogRef.updateSize(matches ? '100vw' : width, '100vh');
+    });
+    dialogRef.afterClosed().subscribe(() => breakpointSubscription.unsubscribe());
+
+    return dialogRef;
+  }
+
+  /**
+   * The reusable Yes/No prompt `open()`'s own unsaved-changes guard uses internally — also usable
+   * directly for anything else that wants the same prompt (e.g. a delete confirmation). Resolves
+   * `true` if confirmed, `false` if cancelled (including via Escape — `ConfirmDialogComponent`
+   * disables the backdrop/Escape close path, but `afterClosed()` can still emit `undefined` if a
+   * consumer force-closes it programmatically, which this treats as "not confirmed").
+   */
+  confirm(message: string, options?: Omit<ConfirmDialogData, 'message'>): Observable<boolean> {
+    return this.dialog
+      .open<ConfirmDialogComponent, ConfirmDialogData, boolean>(ConfirmDialogComponent, {
+        disableClose: true,
+        data: { message, ...options },
+      })
+      .afterClosed()
+      .pipe(map((confirmed) => confirmed ?? false));
+  }
+}

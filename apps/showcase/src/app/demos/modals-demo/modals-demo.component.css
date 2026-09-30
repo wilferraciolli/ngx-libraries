@@ -1,0 +1,55 @@
+.demo-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.demo-container h2 {
+  color: #333;
+  margin-top: 0;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.form-section {
+  background: #f9f9f9;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-primary {
+  background-color: #667eea;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #5568d3;
+}
+
+.info-section {
+  background: #f0f4ff;
+  border: 1px solid #d0deff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.info-section h3 {
+  margin-top: 0;
+  color: #667eea;
+}
