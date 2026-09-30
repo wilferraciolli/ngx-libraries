@@ -1,0 +1,72 @@
+<button
+  #trigger="cdkOverlayOrigin"
+  cdkOverlayOrigin
+  type="button"
+  class="NotificationsWidget-trigger"
+  [attr.aria-label]="triggerLabel()"
+  [attr.aria-expanded]="isOpen()"
+  (click)="toggle()"
+>
+  <svg class="NotificationsWidget-bellIcon" viewBox="0 0 24 24" aria-hidden="true">
+    <path
+      fill="currentColor"
+      d="M12 22a2.2 2.2 0 0 0 2.2-2.2h-4.4A2.2 2.2 0 0 0 12 22Zm7-6.2V11c0-3.3-1.8-6-5-6.7V3.5a2 2 0 1 0-4 0v.8C6.8 5 5 7.7 5 11v4.8L3 17.8V19h18v-1.2Z"
+    />
+  </svg>
+  @if (notifications.unreadCount() > 0) {
+    <span class="NotificationsWidget-badge">{{ notifications.unreadCount() > 99 ? '99+' : notifications.unreadCount() }}</span>
+  }
+</button>
+
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="trigger"
+  [cdkConnectedOverlayOpen]="isOpen()"
+  [cdkConnectedOverlayHasBackdrop]="true"
+  cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+  (backdropClick)="close()"
+  (detach)="close()"
+>
+  <div class="NotificationsWidget-panel" role="dialog" [attr.aria-label]="text().panelTitle" cdkTrapFocus cdkTrapFocusAutoCapture>
+    <div class="NotificationsWidget-header">
+      <h2 class="NotificationsWidget-title">{{ text().panelTitle }}</h2>
+      <button type="button" class="NotificationsWidget-close" [attr.aria-label]="text().close" (click)="close()">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M18.3 5.71 12 12.01l-6.3-6.3-1.4 1.42 6.29 6.29-6.3 6.3 1.42 1.4 6.29-6.29 6.29 6.3 1.42-1.42-6.3-6.29 6.3-6.29z" />
+        </svg>
+      </button>
+    </div>
+
+    @if (notifications.loading() && notifications.notifications().length === 0) {
+      <p class="NotificationsWidget-status">{{ text().loading }}</p>
+    } @else if (notifications.error()) {
+      <p class="NotificationsWidget-status" role="alert">{{ text().error }}</p>
+    } @else if (notifications.notifications().length === 0) {
+      <p class="NotificationsWidget-status">{{ text().empty }}</p>
+    } @else {
+      <ul class="NotificationsWidget-list" role="list">
+        @for (notification of notifications.notifications(); track $index) {
+          <li class="NotificationsWidget-item">
+            <button type="button" class="NotificationsWidget-itemContent" (click)="select(notification)">
+              @if (itemTemplate) {
+                <ng-container *ngTemplateOutlet="itemTemplate; context: { $implicit: notification }" />
+              } @else {
+                <pre class="NotificationsWidget-itemFallback">{{ notification | json }}</pre>
+              }
+            </button>
+            <button
+              type="button"
+              class="NotificationsWidget-dismiss"
+              [attr.aria-label]="text().dismiss"
+              (click)="dismiss(notification, $event)"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="currentColor" d="M18.3 5.71 12 12.01l-6.3-6.3-1.4 1.42 6.29 6.29-6.3 6.3 1.42 1.4 6.29-6.29 6.29 6.3 1.42-1.42-6.3-6.29 6.3-6.29z" />
+              </svg>
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</ng-template>

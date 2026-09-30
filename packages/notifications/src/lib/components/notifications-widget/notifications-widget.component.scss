@@ -1,0 +1,169 @@
+:host {
+  position: relative;
+  display: inline-block;
+}
+
+.NotificationsWidget-trigger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ngx-notifications-icon-color, var(--mat-sys-on-surface-variant, #49454f));
+  cursor: pointer;
+
+  &:hover {
+    background: var(--ngx-notifications-hover-background, var(--mat-sys-surface-variant, #e7e0ec));
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--ngx-notifications-focus-ring, var(--mat-sys-secondary, #625b71));
+    outline-offset: 2px;
+  }
+}
+
+.NotificationsWidget-bellIcon {
+  width: 24px;
+  height: 24px;
+}
+
+.NotificationsWidget-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: var(--ngx-notifications-badge-background, var(--mat-sys-error, #b3261e));
+  color: var(--ngx-notifications-badge-text, var(--mat-sys-on-error, #fff));
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+}
+
+.NotificationsWidget-panel {
+  width: 360px;
+  max-height: 480px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--ngx-notifications-corner, var(--mat-sys-corner-medium, 12px));
+  background: var(--ngx-notifications-panel-background, var(--mat-sys-surface-container, #fff));
+  color: var(--ngx-notifications-panel-text, var(--mat-sys-on-surface, #1d1b20));
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: NotificationsWidget-panel-in 120ms ease-out;
+  }
+}
+
+@keyframes NotificationsWidget-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.NotificationsWidget-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 8px 12px 16px;
+  border-bottom: 1px solid var(--ngx-notifications-divider, var(--mat-sys-outline-variant, #cac4d0));
+}
+
+.NotificationsWidget-title {
+  flex: 1;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.NotificationsWidget-close,
+.NotificationsWidget-dismiss {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ngx-notifications-icon-color, var(--mat-sys-on-surface-variant, #49454f));
+  cursor: pointer;
+
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background: var(--ngx-notifications-hover-background, var(--mat-sys-surface-variant, #e7e0ec));
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--ngx-notifications-focus-ring, var(--mat-sys-secondary, #625b71));
+    outline-offset: 2px;
+  }
+}
+
+.NotificationsWidget-status {
+  margin: 0;
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--ngx-notifications-muted-text, var(--mat-sys-on-surface-variant, #49454f));
+}
+
+.NotificationsWidget-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+}
+
+.NotificationsWidget-item {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid var(--ngx-notifications-divider, var(--mat-sys-outline-variant, #cac4d0));
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.NotificationsWidget-itemContent {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  padding: 12px 16px;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--ngx-notifications-hover-background, var(--mat-sys-surface-variant, #e7e0ec));
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--ngx-notifications-focus-ring, var(--mat-sys-secondary, #625b71));
+    outline-offset: -3px;
+  }
+}
+
+.NotificationsWidget-itemFallback {
+  margin: 0;
+  white-space: pre-wrap;
+  font-size: 12px;
+}

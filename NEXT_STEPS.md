@@ -452,42 +452,71 @@ roots.
 - [ ] Not yet wired into `apps/showcase` — no route in that app actually needs sign-in/settings yet.
 - [ ] Not yet published to npm — under development, no consumers yet.
 
-## Planned package `ngx-notifications` (not started)
+## New package `ngx-notifications` — built 2026-09-30
 
-Idea captured 2026-09-30. Not folded into `ngx-media` — that package is deliberately presentational
-and stateless (skeleton loaders, a YouTube embed), with no service layer or data-fetching at all.
-This needs a bell+badge icon, a panel/list, an unread count, dismiss (a mutation), and deep-linking
-(router integration) — state plus UI, closer in shape to `ngx-web-sockets` (a service + components on
-top of it) than to `ngx-media`.
+Idea captured 2026-09-30, built the same day. Not folded into `ngx-media` — that package is
+deliberately presentational and stateless (skeleton loaders, a YouTube embed), with no service layer
+or data-fetching at all. This needs a bell+badge icon, a panel/list, an unread count, dismiss (a
+mutation), and deep-linking (router integration) — state plus UI, closer in shape to
+`ngx-web-sockets` (a service + components on top of it) than to `ngx-media`.
 
-- [ ] **Stays fully app-pluggable — no dependency on `ngx-api-client`, unlike `ngx-region-settings`.**
-      The app resolves the person-profile's `links.notifications` HATEOAS link itself (it already
-      knows how) and hands this package a plain fetch function, same "app supplies an opaque
-      function" pattern as `ngx-translations`' `loader` / `ngx-dates`' `NGX_DATES_LOCALE`:
-      ```ts
-      provideNotifications({
-        fetchNotifications: () => inject(ApiClientService).get<NotificationsPage>(currentUser().links.notifications),
-        dismissNotification: (id) => inject(ApiClientService).delete(notification.links.dismiss),
-        pollIntervalMs: 5 * 60 * 1000 // default; app can override
-      })
-      ```
-      Deliberately *not* extending the `ngx-api-client`/`ngx-region-settings` sanctioned exception
-      here — nothing about this package needs it, and an app can just as easily source
-      `fetchNotifications` from `ngx-region-settings`' own `CurrentUserStore.link('notifications')` at
-      the call site above, which is an app-level composition choice, not a package dependency.
-- [ ] **Polling, not websockets** — confirmed explicitly, ruled out. A root-provided
-      `NotificationsService` runs its own interval (default 5 minutes, configurable via
-      `pollIntervalMs`), calls `fetchNotifications()` on tick, and exposes `notifications`/
-      `unreadCount` as signals for the bell/badge/panel to read.
-- [ ] **Deep-link and dismiss are both app-supplied callbacks too** — clicking a notification has to
-      navigate somewhere app-specific (a route this package can't know), so that's a callback in the
-      same config, not a route baked into the library.
-- [ ] **Open design question**: does this need Angular Material at all? Bell + badge + dropdown panel
-      could stay Material-free like `media`/`ai-tools`/`graphs`/`web-sockets` — CDK Overlay for the
-      panel positioning (dismiss-on-outside-click, focus trap), `--ngx-notifications-*` tokens for
-      styling — rather than pulling in `MatBadge`/`MatMenu`. Leaning Material-free to match that
-      family, not decided.
+- [x] **Stays fully app-pluggable — no dependency on `ngx-api-client`, unlike `ngx-region-settings`.**
+      Built as `provideNotifications(configFactory)` + `NotificationsConfig<TNotification>`
+      (`fetchNotifications`/`dismissNotification`/`openNotification`), same "app supplies an opaque
+      function" pattern as `ngx-translations`' `loader` / `ngx-dates`' `NGX_DATES_LOCALE`. Deliberately
+      *not* extending the `ngx-api-client`/`ngx-region-settings` sanctioned exception — an app can
+      still source `fetchNotifications` from `ngx-region-settings`' own
+      `CurrentUserStore.link('notifications')` at the call site, which is an app-level composition
+      choice, not a package dependency.
+- [x] **Real bug caught during build, not in the design sketch above**: the sketch's
+      `provideNotifications({ fetchNotifications: () => inject(ApiClientService)... })` — a *plain
+      config object* whose callbacks call `inject()` directly inside themselves — doesn't actually
+      work. `NotificationsService.refresh()` calls those callbacks later, on a poll tick or a dismiss
+      click, with no Angular injection context at all; a raw `inject()` call in there throws
+      `NG0203` the first time a poll tick fires. Fixed: `provideNotifications()` takes a **factory**
+      (`() => NotificationsConfig<T>`) registered via `useFactory` — the same fix `ngx-dates`'
+      `NGX_DATES_LOCALE` wiring recipe already uses for the identical reason — so `inject()` runs
+      once, inside a real injection context, and the returned callbacks close over the result
+      instead of injecting anything themselves.
+- [x] **Polling, not websockets** — confirmed explicitly, ruled out. Root-provided
+      `NotificationsService` (one per app, same "one instance, self-managing" shape as
+      `ngx-web-sockets`' `WebSocketService`) fetches once immediately at construction (eagerly, via
+      `provideAppInitializer` — same sequencing `ngx-auth`'s `provideAuth()` uses for `AuthStore`),
+      then on a `setInterval` (default 5 minutes, `pollIntervalMs` to override). Exposes
+      `notifications`/`unreadCount`/`loading`/`error` as signals.
+- [x] **Deep-link and dismiss are both app-supplied callbacks, resolved** — `openNotification` is
+      called on item click and does its own `Router.navigate()`; this package never imports
+      `@angular/router`. `dismiss()` re-fetches afterward (`config.dismissNotification()` then
+      `refresh()`) rather than guessing at an optimistic update — same pattern as
+      `ngx-region-settings`' `save()`/`reset()` → `resource.reload()`. `select()` (item click) also
+      refreshes, so an app whose `openNotification` marks the item read server-side sees the badge
+      update immediately rather than waiting for the next poll tick.
+- [x] **Open design question, resolved — Material-free**: built on `@angular/cdk/overlay`'s
+      `cdkConnectedOverlay`/`cdkOverlayOrigin` directives (panel positioning + backdrop dismiss) and
+      `@angular/cdk/a11y`'s `cdkTrapFocus` (focus containment while open) — no `@angular/material`
+      dependency, matching `media`/`ai-tools`/`graphs`/`web-sockets`. `--ngx-notifications-*` custom
+      properties default to `--mat-sys-*` tokens, hex fallback last, same as that family.
+- [x] **`NotificationsWidget<TNotification>` is generic**, and item rendering is content-projected
+      (`@ContentChild(TemplateRef)`) — the package has no canonical notification shape to default to
+      (unlike `ngx-region-settings`' `Me`/`RegionSettings`, which mirror a real, fixed API
+      convention). No projected template falls back to a raw `{{ notification | json }}` dump — a
+      debug view, not a real empty state.
+- [x] Text (`panelTitle`/`loading`/`empty`/`error`/`dismiss`/`close`/`triggerLabel`) comes from
+      `NGX_NOTIFICATIONS_TEXT`, same resolver-function pattern as `NGX_GRAPHS_TEXT`/`NGX_CHAT_TEXT`.
+- [x] Package scaffolded (`package.json`, `ng-package.json`, `tsconfig.json`, `README.md`,
+      `CLAUDE.md`), `tsc --noEmit` and `ng-packagr build` both clean. Root `CLAUDE.md` repo layout
+      and `docs/ANGULAR_APP_CONVENTIONS.md` ("What to use for what" table + a new `ngx-notifications`
+      "Using each package" subsection) updated.
+- [x] Wired into `apps/showcase` at `/notifications`: an in-memory fake backend (no real API) in
+      `main.ts`'s `provideNotifications()` call, demonstrating open-marks-read and dismiss-removes.
+      Full showcase `ng build` (all 12 packages + the app) confirmed clean; dev server started and
+      `/notifications` returned `200` with no errors in the server log — same caveat as `ngx-modals`
+      above: **not clicked through in an actual browser**, no browser-automation tool was available
+      this session. Do an actual browser pass (open the bell, confirm the badge shows 2, click a
+      notification and confirm the badge drops to 1, dismiss the other and confirm the list empties
+      to "No notifications.") before trusting this beyond "it builds and serves."
 - [ ] No consumer yet. Design before building, same as every other package here.
+- [ ] Not yet published to npm.
 
 ## Planned package `ngx-styles` (not started)
 
@@ -614,6 +643,11 @@ See "New package `ngx-region-settings` — built 2026-09-30" above for what's bu
 
 See "New package `ngx-modals` — built 2026-09-30" above for what's built and what's still open —
 in particular, the not-yet-browser-verified flag.
+
+## packages/notifications
+
+See "New package `ngx-notifications` — built 2026-09-30" above for what's built and what's still
+open — in particular, the not-yet-browser-verified flag.
 
 ## packages/media
 

@@ -133,6 +133,7 @@ to use which package and the rules for using it in an app.
 | Realtime / websockets | `ngx-web-sockets` | `provideWebSocket()`, `WebSocketService`, `ChatRoom`, `ChatMessageBubble` | `ngx-socket-io`, hand-rolled socket services |
 | Translations | `ngx-translations` | `provideTranslations()`, `TranslationsService`, the `t` pipe | An app-local translation store (see `ngx-translations` below), raw Transloco use |
 | A side panel / modal | `ngx-modals` | `ModalService.open()`, `ModalCloseAction`/`ModalCloseResult`, `ModalContent` | Hand-rolled `MatDialog.open()` calls, an app-local close-reason enum per feature |
+| Notification bell | `ngx-notifications` | `provideNotifications()`, `NotificationsService`, `<ngx-notifications>` | An app-local bell/badge/panel, a hand-rolled polling interval |
 
 ### Setup
 Install only the packages the app uses (`npm i @wiltech-labs/ngx-forms …`).
@@ -350,6 +351,22 @@ provideTranslations({ locales: [...], defaultLocale: '...', dictionaries: {...} 
   set the variable to change the default panel width app-wide, or pass `{ width: '...' }` per open.
 - `ModalService.confirm(message, options?)` is the same Yes/No prompt the unsaved-changes guard
   uses, for anything else that wants it (a delete confirmation, say).
+
+**`ngx-notifications`**
+- `provideNotifications(() => ({ fetchNotifications, dismissNotification, openNotification }))` —
+  a **factory**, not a plain config object, because the callbacks run later (a poll tick, a dismiss
+  click), outside any injection context — `inject()` anything you need once, inside the factory, and
+  close over it. See its own README for the full recipe (resolving the `notifications` link,
+  wiring `openNotification` to the router).
+- `<ngx-notifications>` needs a projected `<ng-template let-notification>` — it has no idea what your
+  notification's fields are called, so without one it falls back to a raw JSON dump (a debug view,
+  not something to ship).
+- Polling only, never websockets, default every 5 minutes (`pollIntervalMs` to override). No
+  dependency on `ngx-api-client` — pull `fetchNotifications`'s link from `ngx-region-settings`'
+  `CurrentUserStore.link('notifications')` yourself if you're already using that package.
+- Text (`panelTitle`/`loading`/`empty`/`error`/`dismiss`/`close`/`triggerLabel`) comes from
+  `NGX_NOTIFICATIONS_TEXT` — override it (e.g. wired to `ngx-translations`) to translate it; leave it
+  unset and it stays English.
 
 ### Migrating an existing app
 Work through what the app actually has:

@@ -45,6 +45,11 @@ export class HomeComponent {
       name: '@wiltech-labs/ngx-modals',
       description: 'Right-docked panel modal on MatDialog, with a typed close-reason + data and an unsaved-changes guard',
       route: '/modals'
+    },
+    {
+      name: '@wiltech-labs/ngx-notifications',
+      description: 'Polling notification bell + badge + dropdown panel, fully app-pluggable, no Angular Material',
+      route: '/notifications'
     }
   ];
 }
