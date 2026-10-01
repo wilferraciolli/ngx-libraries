@@ -8,6 +8,7 @@
     <ngx-region-settings-form
       [settings]="settings()"
       [options]="options()"
+      [hints]="hints()"
       [saving]="saving()"
       (save)="handleSave($event)"
     />
@@ -30,8 +31,10 @@
       that app does translation. The theme field (<code>ThemeField</code> from
       <code>ngx-forms</code>) uses the same <code>options</code> mechanism, just for label text only
       — its two values are always fixed (<code>'light'</code>/<code>'dark'</code>), each tied to its
-      own sun/moon icon. <code>(save)</code> only hands back the edited payload — saving it (here, a
-      fake 600ms delay) is entirely up to whoever owns the form.
+      own sun/moon icon. <code>hints</code> is separate — plain per-field hint text, same as any
+      <code>ngx-forms</code> field's <code>FieldDef.hint</code> (see the Locale field above).
+      <code>(save)</code> only hands back the edited payload — saving it (here, a fake 600ms delay)
+      is entirely up to whoever owns the form.
     </p>
   </div>
 </div>

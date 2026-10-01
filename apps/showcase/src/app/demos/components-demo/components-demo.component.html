@@ -1,0 +1,40 @@
+<div class="demo-container">
+  <h2>Components Demo</h2>
+  <p class="subtitle">Banner, Panel and Card from ngx-components — no backend</p>
+
+  <div class="form-section">
+    <h3>Banner</h3>
+    <ngx-banner [messages]="messages" />
+  </div>
+
+  <div class="form-section">
+    <h3>Panel</h3>
+    <ngx-panel header="Billing" subheader="Manage your payment details" icon="credit_card">
+      <p>Any content can go here — this one's a plain paragraph.</p>
+    </ngx-panel>
+    <ngx-panel header="No icon, no subheader">
+      <p>Only <code>header</code> is required — everything else is optional.</p>
+    </ngx-panel>
+  </div>
+
+  <div class="form-section">
+    <h3>Card</h3>
+    <ngx-card header="Account" subheader="Signed in as jane.doe@example.com" icon="account_circle">
+      <p>Cards are always expanded — no toggle, unlike Panel.</p>
+    </ngx-card>
+  </div>
+
+  <div class="info-section">
+    <h3>What's happening</h3>
+    <p>
+      <code>Banner</code> takes a flat <code>Message[]</code> (<code>{{ '{type, text}' }}</code
+      >) and renders one block per message with an icon for its type — no Material dependency, so it
+      works the same whether or not the app is Material-themed. <code>Panel</code> (on
+      <code>mat-expansion-panel</code>) and <code>Card</code> (on <code>mat-card</code>) share the
+      same header rules: an optional <code>icon</code> and required <code>header</code> on one line,
+      an optional <code>subheader</code> on the next, both always visible; their content is
+      projected in by the caller. <code>Panel</code>'s content only shows once expanded;
+      <code>Card</code>'s is always visible. Nothing here calls an API — everything is hardcoded.
+    </p>
+  </div>
+</div>

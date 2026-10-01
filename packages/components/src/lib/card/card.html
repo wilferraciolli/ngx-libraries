@@ -1,0 +1,19 @@
+<mat-card class="Card" appearance="outlined">
+  <mat-card-header>
+    <mat-card-title class="Card-title">
+      <span class="Card-titleRow">
+        @if (icon()) {
+          <mat-icon class="Card-icon" aria-hidden="true">{{ icon() }}</mat-icon>
+        }
+        <span class="Card-titleText">{{ header() }}</span>
+      </span>
+      @if (subheader()) {
+        <span class="Card-subheader">{{ subheader() }}</span>
+      }
+    </mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <ng-content />
+  </mat-card-content>
+</mat-card>

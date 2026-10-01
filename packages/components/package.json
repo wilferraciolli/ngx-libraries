@@ -1,0 +1,29 @@
+{
+  "name": "@wiltech-labs/ngx-components",
+  "version": "1.0.0",
+  "description": "Shared Angular reusable UI components — banners, panels, cards and more as they're added.",
+  "license": "Apache-2.0",
+  "sideEffects": false,
+  "peerDependencies": {
+    "@angular/core": "^22.0.0",
+    "@angular/common": "^22.0.0",
+    "@angular/cdk": "^22.0.0",
+    "@angular/material": "^22.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "ng-packagr -p ng-package.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@angular/cdk": "^22.0.0",
+    "@angular/common": "^22.0.0",
+    "@angular/compiler-cli": "^22.0.0",
+    "@angular/core": "^22.0.0",
+    "@angular/material": "^22.0.0",
+    "ng-packagr": "^22.0.0",
+    "typescript": "~6.0.2"
+  }
+}

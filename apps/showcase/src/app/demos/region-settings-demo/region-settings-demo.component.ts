@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { JsonPipe } from '@angular/common';
 import {
   RegionSettingsFormComponent,
+  type RegionSettingsFieldHints,
   type RegionSettingsFieldOptions,
   type RegionSettingsPayload,
 } from '@wiltech-labs/ngx-region-settings';
@@ -47,6 +48,10 @@ const FIELD_OPTIONS: RegionSettingsFieldOptions = {
   ],
 };
 
+const FIELD_HINTS: RegionSettingsFieldHints = {
+  locale: 'Changes how dates are typed and shown — e.g. US: MM/DD/YYYY, UK: DD/MM/YYYY.',
+};
+
 @Component({
   selector: 'app-region-settings-demo',
   standalone: true,
@@ -57,6 +62,7 @@ const FIELD_OPTIONS: RegionSettingsFieldOptions = {
 export class RegionSettingsDemoComponent {
   protected readonly settings = signal<RegionSettingsPayload>(INITIAL_SETTINGS);
   protected readonly options = signal<RegionSettingsFieldOptions>(FIELD_OPTIONS);
+  protected readonly hints = signal<RegionSettingsFieldHints>(FIELD_HINTS);
   protected readonly saving = signal(false);
   protected readonly lastSaved = signal<RegionSettingsPayload | null>(null);
 

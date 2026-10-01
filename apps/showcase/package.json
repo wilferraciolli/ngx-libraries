@@ -23,6 +23,7 @@
     "@wiltech-labs/ngx-ai-tools": "*",
     "@wiltech-labs/ngx-api-client": "*",
     "@wiltech-labs/ngx-auth": "*",
+    "@wiltech-labs/ngx-components": "*",
     "@wiltech-labs/ngx-dates": "*",
     "@wiltech-labs/ngx-forms": "*",
     "@wiltech-labs/ngx-graphs": "*",

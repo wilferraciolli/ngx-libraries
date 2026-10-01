@@ -25,6 +25,7 @@ ngx-libraries/
 │   ├── region-settings/    # @wiltech-labs/ngx-region-settings — see its own CLAUDE.md
 │   ├── modals/             # @wiltech-labs/ngx-modals — see its own CLAUDE.md
 │   ├── notifications/      # @wiltech-labs/ngx-notifications — see its own CLAUDE.md
+│   ├── components/         # @wiltech-labs/ngx-components — see its own CLAUDE.md
 │   └── styles/             # @wiltech-labs/ngx-styles — see its own CLAUDE.md
 ├── docs/
 │   └── ANGULAR_APP_CONVENTIONS.md  # conventions every consuming Angular app follows — its

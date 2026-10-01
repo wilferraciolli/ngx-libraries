@@ -19,6 +19,10 @@ export type RegionSettingsFieldOptions = Partial<
   Record<keyof RegionSettingsPayload, FieldOption[]>
 >;
 
+/** Optional hint text per field, shown under it same as any other `ngx-forms` field — Eg explaining
+ *  what changing `locale` actually affects before the user picks one. Omitted fields get no hint. */
+export type RegionSettingsFieldHints = Partial<Record<keyof RegionSettingsPayload, string>>;
+
 function toPayload(settings: RegionSettingsPayload): RegionSettingsPayload {
   const { timezone, language, locale, currency, theme } = settings;
   return { timezone, language, locale, currency, theme };
@@ -36,6 +40,7 @@ export class RegionSettingsFormComponent {
 
   readonly settings = input.required<RegionSettingsPayload>();
   readonly options = input.required<RegionSettingsFieldOptions>();
+  readonly hints = input<RegionSettingsFieldHints>({});
   readonly saving = input(false);
 
   readonly save = output<RegionSettingsPayload>();
@@ -65,6 +70,7 @@ export class RegionSettingsFormComponent {
       label,
       required: true,
       options: this.options()[key] ?? [],
+      hint: this.hints()[key],
     };
   }
 

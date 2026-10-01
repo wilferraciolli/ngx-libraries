@@ -939,6 +939,83 @@ works everywhere else.
     clean; confirmed the new labels (`'Day'`/`'Night'`) compile through into the production bundle
     for both demos.
 
+## New package `ngx-components`, plus `ngx-region-settings` gains `hints` — 2026-10-01
+
+Wanted to explain what changing `locale` actually affects (date format) before the user picks one.
+Discussed two approaches before building anything:
+
+- [x] **`FieldDef.hint` already does this, no new code** — pointed out mid-discussion. `ngx-forms`
+      fields already render `fieldDef.hint` as always-visible text under the field; the only gap was
+      `RegionSettingsFormComponent` itself not exposing a way to set one. Added a `hints` input
+      (`RegionSettingsFieldHints`, `Partial<Record<keyof RegionSettingsPayload, string>>`, defaults
+      `{}`), merged into `fieldDef()` alongside `options` and `label`. Exercised in
+      `apps/showcase`'s region-settings demo: `locale: 'Changes how dates are typed and shown — e.g.
+US: MM/DD/YYYY, UK: DD/MM/YYYY.'`.
+- [x] **New package `@wiltech-labs/ngx-components`**, built anyway — not for this specific case
+      (hint covered it), but because more reusable UI components (panels, cards) are planned for it
+      regardless. First component: `Banner` — takes a flat `Message[]` (`{type: 'info' | 'warning' |
+'error', text}`) and renders one block per message with an icon for its type. Asked directly
+      which shape to build (one component rendering the whole list vs. one component per message
+      with the app `@for`-ing over its own array) — picked the whole-list shape, matching how
+      `ngx-notifications` owns its own list internally.
+  - No Angular Material dependency, deliberately — same reasoning as `ngx-ai-tools`: plain inline
+    SVG icons (`currentColor` fill) and CSS-variable colours with hex fallbacks
+    (`--ngx-components-banner-<type>-background`, falling back to a matching `--mat-sys-*` role
+    where Material actually has one — `info`/`error` do, `warning` doesn't, so that one skips
+    straight to a hex default).
+  - `role="status"` for info, `role="alert"` for warning/error; icons `aria-hidden`.
+  - New package, no inter-package dependencies (`@angular/core`/`@angular/common` peers only) — no
+    `file:../x/dist` mechanism needed, picked up automatically by `scripts/build-packages.sh`'s
+    "everything else" loop without any script changes.
+  - Wired into `apps/showcase` (`demos/components-demo`, route `/components`, home tile) — same
+    "hardcoded demo data, no backend" convention as every other showcase demo; shows all three
+    message types including the same locale-explanation text as a tie-in example, even though the
+    actual region-settings demo uses `hints` for that, not `Banner`.
+  - `docs/ANGULAR_APP_CONVENTIONS.md`'s "Shared libraries" table and root `CLAUDE.md`'s repo layout
+    both updated with the new package.
+- [x] `tsc --noEmit`, `ng-packagr build` for both packages, a full `scripts/build-packages.sh` run,
+      full-repo `npm run typecheck`, the showcase app's `ng build --configuration production`, and a
+      dev-server smoke test (both `/region-settings` and `/components` serve, both ship in the
+      bundle) all clean.
+- [x] `ngx-components` gained `Panel` and `Card` the same day — see the next section.
+
+## `ngx-components` gains `Panel` and `Card` — 2026-10-01
+
+Asked for directly, same day as `Banner`: "an expandable mat component" for `Panel`, then "the same
+but with a card" for `Card`, both with the same header rules.
+
+- [x] Both share one header layout: `header` (required, the only mandatory input) with an optional
+      `icon` on the same line, an optional `subheader` on its own line below both — always visible,
+      regardless of expanded state for `Panel`. Neither uses Material's own default title/description
+      layout as-is (`mat-expansion-panel-header` puts title+description side by side;
+      `mat-card-header`'s avatar sits beside a stacked title/subtitle column) — both build the
+      icon+title row / subheader-below structure themselves inside `mat-panel-title`/`mat-card-title`
+      instead.
+- [x] `Panel` wraps `mat-expansion-panel` — real Angular Material, unlike `Banner`, since this is
+      genuinely interactive (the accordion mechanics — animation, keyboard a11y, ripple — are exactly
+      what `mat-expansion-panel` already does correctly, not worth rebuilding). Content is projected
+      via plain `<ng-content>`, not `<ng-template>`: still gets `mat-expansion-panel`'s
+      lazy-render-until-expanded behaviour for free, since content projection re-parents whatever the
+      caller passes to wherever `<ng-content>` sits in `Panel`'s template, and `MatExpansionPanel`'s
+      own content query sees it as a direct content child either way — no need for the caller to use
+      Material's own `<ng-template matExpansionPanelContent>` explicitly.
+- [x] `Card` wraps `mat-card` (`appearance="outlined"`) the same way, minus the expand/collapse — a
+      card isn't an accordion, its content is always visible.
+- [x] This is this package's first real Angular Material dependency — added `@angular/cdk` and
+      `@angular/material` as peer/dev deps. Updated `CLAUDE.md`'s "no Material dependency" bullet,
+      which had been written as a package-wide rule from `Banner` alone: it's actually a
+      per-component decision (`Banner` has none, deliberately; `Panel`/`Card` do, deliberately).
+- [x] Both full width (`:host { display: block; width: 100%; }` + `width: 100%` on the Material
+      element), matching `ngx-forms` fields' "fills its container" contract.
+- [x] Exercised in `apps/showcase`'s components demo: two `Panel`s (one with icon+subheader, one
+      with neither to show only `header` is required) and one `Card`.
+- [x] Pushed the showcase's production bundle from 1.58MB to 1.61MB, over the 1.6MB budget set
+      earlier today — bumped `maximumError` to 1.8MB rather than trim unrelated weight, same call as
+      the two times before.
+- [x] `tsc --noEmit`, `ng-packagr build`, full-repo `npm run typecheck`, `scripts/build-packages.sh`,
+      the showcase's `ng build --configuration production`, and a dev-server smoke test (route
+      serves, both components ship in the bundle) all clean.
+
 ## packages/api-client
 
 - [ ] Already published and consumed by `insurly-ui`. No known outstanding work beyond routine
@@ -975,6 +1052,12 @@ notifications browser pass — 2026-09-30" above for what's built and what's sti
 
 See "New package `ngx-styles` — built 2026-09-30" above for what's built and what's still open —
 in particular, no consumer yet and no showcase demo route.
+
+## packages/components
+
+See "New package `ngx-components`, plus `ngx-region-settings` gains `hints` — 2026-10-01" above for
+what's built and what's still open — in particular, only `Banner` exists so far; panels and cards are
+planned but not started.
 
 ## packages/media
 

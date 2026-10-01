@@ -9,6 +9,7 @@ import { TranslationsDemoComponent } from './demos/translations-demo/translation
 import { ModalsDemoComponent } from './demos/modals-demo/modals-demo.component';
 import { NotificationsDemoComponent } from './demos/notifications-demo/notifications-demo.component';
 import { RegionSettingsDemoComponent } from './demos/region-settings-demo/region-settings-demo.component';
+import { ComponentsDemoComponent } from './demos/components-demo/components-demo.component';
 
 export const routes: Routes = [
   {
@@ -50,5 +51,9 @@ export const routes: Routes = [
   {
     path: 'region-settings',
     component: RegionSettingsDemoComponent,
+  },
+  {
+    path: 'components',
+    component: ComponentsDemoComponent,
   },
 ];

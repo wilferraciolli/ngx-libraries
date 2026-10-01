@@ -190,6 +190,16 @@ TProfile>` and `RegionSettingsStore<TSettings, TPayload>` are both parameterized
   label text, same mechanism the other four fields use for both label and value. `themeField` is
   still built through the shared `fieldDef()` helper, just with `FormFieldType.THEME` instead of the
   default `SELECT`.
+- **`hints` input added, 2026-10-01** — `RegionSettingsFieldHints`
+  (`Partial<Record<keyof RegionSettingsPayload, string>>`), optional, defaults to `{}`. Separate from
+  `options` on purpose: `options` is about what a value means (label + sometimes bound value) and
+  translation; `hints` is plain explanatory text under a field, same `FieldDef.hint` every
+  `ngx-forms` field already supports — came up wanting to explain what changing `locale` actually
+  affects (date format) before the user picks one. Considered a dedicated info-banner component
+  (`@wiltech-labs/ngx-components`' new `Banner`, built the same day) for this, but settled on `hints`
+  for the field-level case since it's zero new surface area — `fieldDef()` already assembles
+  everything else per field, this is one more property on the same object. `Banner` is still useful
+  for something more prominent than a per-field hint (Eg a page-level notice), just not this case.
 - Not yet published to npm — under development.
 - First consumer within this monorepo: `apps/showcase`'s demo route (above). Still no consumer
   outside this monorepo using the published package itself.

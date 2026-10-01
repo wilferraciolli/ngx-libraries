@@ -124,9 +124,21 @@ protected readonly fieldOptions = computed<RegionSettingsFieldOptions>(() => {
 <ngx-region-settings-form
   [settings]="store.settings()"
   [options]="fieldOptions()"
+  [hints]="fieldHints"
   [saving]="store.saving()"
   (save)="store.save($event)"
 />
+```
+
+`hints` is optional and separate from `options` — plain per-field hint text (`RegionSettingsFieldHints`,
+`Partial<Record<keyof RegionSettingsPayload, string>>`), same `FieldDef.hint` every `ngx-forms` field
+already renders. Useful for explaining what a field actually affects before the user picks a value,
+Eg:
+
+```ts
+protected readonly fieldHints: RegionSettingsFieldHints = {
+  locale: 'Changes how dates are typed and shown — e.g. US: MM/DD/YYYY, UK: DD/MM/YYYY.',
+};
 ```
 
 The component only emits `save` with the edited payload — it never calls the store itself, so saving

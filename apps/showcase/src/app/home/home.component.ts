@@ -61,5 +61,10 @@ export class HomeComponent {
         'Current-user and region-settings signal stores, plus a ready-made settings-editing form',
       route: '/region-settings',
     },
+    {
+      name: '@wiltech-labs/ngx-components',
+      description: 'Reusable UI components — Banner (info/warning/error) to start, more to come',
+      route: '/components',
+    },
   ];
 }

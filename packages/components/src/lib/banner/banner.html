@@ -1,0 +1,32 @@
+<div class="Banner">
+  @for (message of messages(); track $index) {
+    <div
+      class="Banner-item"
+      [class.is-info]="message.type === 'info'"
+      [class.is-warning]="message.type === 'warning'"
+      [class.is-error]="message.type === 'error'"
+      [attr.role]="message.type === 'info' ? 'status' : 'alert'"
+    >
+      <span class="Banner-icon" aria-hidden="true">
+        @switch (message.type) {
+          @case ('info') {
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 15h-2v-6h2zm0-8h-2V7h2z" />
+            </svg>
+          }
+          @case ('warning') {
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M1 21h22L12 2zm12-3h-2v-2h2zm0-4h-2v-4h2z" />
+            </svg>
+          }
+          @case ('error') {
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+              <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 15h-2v-2h2zm0-4h-2V7h2z" />
+            </svg>
+          }
+        }
+      </span>
+      <span class="Banner-text">{{ message.text }}</span>
+    </div>
+  }
+</div>
