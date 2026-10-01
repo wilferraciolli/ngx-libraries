@@ -44,9 +44,9 @@ interface Message {
 ```
 
 Override its colours per type via `--ngx-components-banner-<type>-background` /
-`-<type>-text` (Eg `--ngx-components-banner-info-background`); each falls back to the app's M3
-theme (where Material defines a matching role) or a fixed hex otherwise — see `CLAUDE.md` for why
-`warning` has no `--mat-sys-*` fallback tier.
+`-<type>-text` (Eg `--ngx-components-banner-info-background`); `error` falls back to the app's M3
+theme (`--mat-sys-error-container`), `info`/`warning` fall back to a fixed light blue/amber — see
+`CLAUDE.md` for why.
 
 ### Panel
 

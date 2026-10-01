@@ -1016,6 +1016,31 @@ but with a card" for `Card`, both with the same header rules.
       the showcase's `ng build --configuration production`, and a dev-server smoke test (route
       serves, both components ship in the bundle) all clean.
 
+## `Panel`/`Banner` polish, after trying the showcase demo — 2026-10-01
+
+Three fixes from actually looking at the components demo:
+
+- [x] **`Panel` instances sat flush against each other** — neither the component nor
+      `mat-expansion-panel` itself adds spacing between siblings, so two stacked `ngx-panel`
+      elements had zero gap. Fixed with a 10px `margin-bottom` on `Panel`'s host — hardcodes
+      `ngx-styles`' `spacing.$padding-mobile` (10px, confirmed by checking that package's
+      `_spacing.scss`) rather than `@use`-ing it, same reasoning `ngx-region-settings` already
+      documents for why its own SCSS can't resolve `ngx-styles`' Sass partials from `ng-packagr`'s
+      build step. Deliberately `Panel`-only, not `Card` — only `Panel` was asked for; added a second
+      `Card` example to the showcase demo too (for symmetry with `Panel`'s two), so gave that
+      section its own app-level spacing in the demo's own stylesheet instead, same as any app would
+      need to for a component with no built-in gap.
+- [x] **`Banner`'s `info` colour and icon** — was `--mat-sys-tertiary-container` (purple-ish in this
+      house theme, not blue) with a plain info-circle icon. Changed to a fixed light blue (`#e3f2fd`
+      background / `#0d47a1` text, no `--mat-sys-*` middle tier — same reasoning as `warning`: the
+      point is a specific recognizable colour, not whatever the theme's tertiary role happens to be)
+      and a lightbulb glyph instead of the circle-i, asked for as "a friendlier icon."
+- [x] Confirmed directly: yes, `Card` already wraps real `mat-card` (`MatCardModule`) — it always
+      did, since it was built the same way as `Panel` from the start.
+- [x] `tsc --noEmit`, `ng-packagr build`, full-repo `npm run typecheck`, `scripts/build-packages.sh`,
+      and the showcase's `ng build --configuration production` all clean; confirmed the compiled
+      output has the new `margin-bottom:10px` and `#e3f2fd`/`#0d47a1` colours.
+
 ## packages/api-client
 
 - [ ] Already published and consumed by `insurly-ui`. No known outstanding work beyond routine

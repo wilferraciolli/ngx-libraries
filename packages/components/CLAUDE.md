@@ -32,11 +32,15 @@ src/
   rebuilding their accordion mechanics (animation, keyboard a11y, ripple) or card elevation/shape
   from scratch, the same real-Material-dependency choice `ngx-forms`/`ngx-modals` already make for
   genuinely interactive widgets. Check each component's own reasoning before assuming either way.
-- `Banner`'s `warning` state has no `--mat-sys-*` middle fallback tier
-  (`--ngx-components-banner-warning-background, #fff3cd`, not `..., var(--mat-sys-??, #fff3cd)`) —
-  Material 3 reserves `error`/`tertiary`/etc. roles but no canonical "warning" role, so there's
-  nothing semantically correct to fall back to. `info` and `error` do have a real M3 role
-  (`tertiary-container`/`error-container`) and use it as the middle tier.
+- `Banner`'s `warning` and `info` states have no `--mat-sys-*` middle fallback tier — only `error`
+  does (`var(--mat-sys-error-container, #f9dedc)`). `warning` never had one: Material 3 reserves no
+  canonical "warning" role, nothing semantically correct to fall back to. `info` originally used
+  `--mat-sys-tertiary-container` (a real M3 role) but was changed 2026-10-01 to a fixed light blue
+  (`#e3f2fd` background / `#0d47a1` text) instead — asked for directly ("light blue"), and
+  `tertiary-container` renders purple-ish in this house theme, not blue, so keeping it as the
+  fallback would've meant the default never actually looked like what was asked for. Its icon
+  changed from a plain info-circle to a lightbulb glyph at the same time, for the same "friendlier"
+  ask.
 - `Banner` renders the whole list itself (`[messages]="Message[]"`), not one component per message
   that the app `@for`s over — asked directly which shape to build, this one was picked because it
   matches how `ngx-notifications` owns its whole list internally, and gives one place to keep "a
@@ -62,6 +66,15 @@ src/
   `<ng-template matExpansionPanelContent>` for that.
 - `Card` has no expand/collapse — its content is always visible, since a card isn't an accordion;
   `appearance="outlined"` chosen over the (deprecated) `"raised"` default.
+- **`Panel` always has a 10px `margin-bottom` on its host, 2026-10-01** — found in real use:
+  several `ngx-panel` elements stacked directly sat flush against each other with zero gap, since
+  neither the component nor `mat-expansion-panel` itself adds any spacing between siblings. The
+  value hardcodes `ngx-styles`' `spacing.$padding-mobile` (10px) rather than `@use`-ing it — same
+  "no confirmed way to resolve `ngx-styles`' Sass partials from `ng-packagr`'s own build step"
+  reasoning `ngx-region-settings`' SCSS already documents. `Card` deliberately did **not** get the
+  same treatment — only `Panel` was asked for — so an app stacking multiple `ngx-card` elements
+  needs its own spacing, same as it would for any other block-level element (see
+  `apps/showcase`'s own demo for an example).
 
 ## Status
 
