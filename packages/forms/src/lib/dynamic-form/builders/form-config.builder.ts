@@ -90,6 +90,18 @@ export class FormConfigBuilder<T extends BaseSchema> {
     return this.add(FormFieldType.CHIPS, name, label, options);
   }
 
+  /** Fixed 'light'/'dark' choice, shown as a sun/moon icon toggle pair. `choices` only supplies
+   *  each value's label text (defaults to English 'Light'/'Dark') — the values themselves are
+   *  always 'light'/'dark', each tied to its own icon, so there's nothing else to choose here. */
+  public theme(
+    name: FieldName<T>,
+    label: string,
+    choices?: FieldOption[],
+    options?: FieldOptions,
+  ): this {
+    return this.add(FormFieldType.THEME, name, label, { ...options, options: choices });
+  }
+
   /** Calendar date with no timezone, stored as 'YYYY-MM-DD'. */
   public businessDate(name: FieldName<T>, label: string, options?: DateTimeFieldOptions): this {
     return this.add(FormFieldType.BUSINESS_DATE, name, label, options);

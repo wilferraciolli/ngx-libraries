@@ -211,6 +211,7 @@ container. `DynamicForm` adds no padding or background of its own — put it in 
 | `RADIO`             | `radio(name, label, choices)`  | `RadioField`           | option value                 | `mat-radio-group`                                       |
 | `SELECT`            | `select(name, label, choices)` | `SelectField`          | option value                 | `mat-select`                                            |
 | `CHIPS`             | `chips()`                      | `ChipsField`           | `string[]`                   | `mat-chip-grid`, one token typed at a time              |
+| `THEME`             | `theme(name, label, choices?)` | `ThemeField`           | `'light'` / `'dark'`         | `mat-button-toggle-group`, sun/moon icon pair           |
 | `RANGE`             | `range()`                      | `SliderField`          | `number`                     | `mat-slider` (`min`/`max`/`step`, default 0–100)        |
 | `BUSINESS_DATE`     | `businessDate()`               | `BusinessDateField`    | `'YYYY-MM-DD'`               | Datepicker                                              |
 | `BUSINESS_TIME`     | `businessTime()`               | `BusinessTimeField`    | `'HH:mm'`                    | Timepicker                                              |
@@ -250,6 +251,21 @@ _typed_ day/month order the picker's input accepts — changing it changes user 
 just wording, so it isn't defaulted to the browser's own language the way `ngx-dates` is. Leave it
 unset and every field keeps today's default (`'en-GB'`).
 
+### Theme field labels
+
+`ThemeField`'s two icon toggles (sun = `'light'`, moon = `'dark'`) have no visible text — their
+accessible label comes from `choices`, same `FieldOption[]` mechanism `radio()`/`select()` already
+use, not a separate config or token. The two values are always fixed (`'light'`/`'dark'`, each tied
+to its own icon), so `choices` only ever supplies each one's label text — defaults to English
+`'Light'`/`'Dark'` when omitted:
+
+```ts
+formConfig<MySchema>('settings').theme('colorScheme', 'Color Scheme', [
+  { label: 'Day', value: 'light' },
+  { label: 'Night', value: 'dark' },
+]);
+```
+
 ## Field definition
 
 ```typescript
@@ -265,7 +281,7 @@ interface FieldDef {
   min?: number; // Number and range fields
   max?: number; // Number and range fields
   step?: number; // Range fields
-  options?: FieldOption[]; // Radio and select: [{ label, value }]
+  options?: FieldOption[]; // Radio and select: [{ label, value }]. Theme: label text only, value is always 'light'/'dark'
   orientation?: 'horizontal' | 'vertical'; // Radio: a wrapping row (default) or one option per line
   dateTimeConfig?: DateTimeConfig; // Business date/time and instant date-time
   hidden?: boolean; // Part of the model, never rendered

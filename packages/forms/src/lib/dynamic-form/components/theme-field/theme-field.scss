@@ -1,0 +1,24 @@
+@use '../../styles/field.mixins' as mix;
+
+:host {
+  display: block;
+}
+
+.ThemeField {
+  &-label {
+    @include mix.field-label;
+    margin-bottom: 0;
+  }
+
+  &-group {
+    display: flex;
+    width: 100%;
+
+    // `mat-button-toggle` is a direct element in this component's own template, so this reaches it
+    // without `::ng-deep` — only shrink-wrapped to its icon by default, so the pair split unevenly
+    // (one narrow, the rest of the row left empty) instead of the row split evenly down the middle.
+    mat-button-toggle {
+      flex: 1;
+    }
+  }
+}

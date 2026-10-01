@@ -11,6 +11,7 @@ export { CheckboxField } from './lib/dynamic-form/components/checkbox-field/chec
 export { RadioField } from './lib/dynamic-form/components/radio-field/radio-field';
 export { SelectField } from './lib/dynamic-form/components/select-field/select-field';
 export { ChipsField } from './lib/dynamic-form/components/chips-field/chips-field';
+export { ThemeField } from './lib/dynamic-form/components/theme-field/theme-field';
 export { SliderField } from './lib/dynamic-form/components/slider-field/slider-field';
 export { BusinessDateField } from './lib/dynamic-form/components/business-date-field/business-date-field';
 export { BusinessTimeField } from './lib/dynamic-form/components/business-time-field/business-time-field';

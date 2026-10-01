@@ -8,6 +8,7 @@ import { HomeComponent } from './home/home.component';
 import { TranslationsDemoComponent } from './demos/translations-demo/translations-demo.component';
 import { ModalsDemoComponent } from './demos/modals-demo/modals-demo.component';
 import { NotificationsDemoComponent } from './demos/notifications-demo/notifications-demo.component';
+import { RegionSettingsDemoComponent } from './demos/region-settings-demo/region-settings-demo.component';
 
 export const routes: Routes = [
   {
@@ -45,5 +46,9 @@ export const routes: Routes = [
   {
     path: 'notifications',
     component: NotificationsDemoComponent,
+  },
+  {
+    path: 'region-settings',
+    component: RegionSettingsDemoComponent,
   },
 ];

@@ -780,8 +780,7 @@ it.
       `RegionSettingsFormComponent` from `@wiltech-labs/ngx-region-settings` instead. Do this (and
       delete the local copy) once that app is set up to consume this monorepo's packages — see the
       "Housekeeping" section's note on starting that as its own session.
-- [ ] Not yet exercised in `apps/showcase` here either (this package has no showcase demo route at
-      all yet, form included).
+- [x] Exercised in `apps/showcase` here 2026-10-01 — see the dated section below.
 
 - [ ] No tests yet. Unlike `api-client` (a straight port of exercised `insurly-ui` code), forms
       has grown real logic that isn't already covered elsewhere: `toSchema()` validation rules,
@@ -845,8 +844,100 @@ FieldOption[]>`, from the original request that started this whole extraction) t
       `RegionSettingsStore.options()` into `FieldOption[]` (translating each label), and now states
       explicitly that the component never calls the store itself — only emits `save`.
 - [x] `tsc --noEmit`, `ng-packagr build`, and a full `scripts/build-packages.sh` run all clean.
-- [ ] Still not switched over in `PythonTutorials/showcase` or exercised in this repo's own
-      `apps/showcase` — same two open items as before, now also needing the new `options` shape.
+- [ ] Still not switched over in `PythonTutorials/showcase` — only exercised in this repo's own
+      `apps/showcase` so far (see the dated section below), not that external app.
+
+## `apps/showcase` gains a `ngx-region-settings` demo route — 2026-10-01
+
+First time this package has been exercised anywhere in this monorepo (it's never had a showcase demo
+route, form included, since it was created). `demos/region-settings-demo`, routed at `/region-settings`,
+tiled on the home page.
+
+- [x] `settings`/`options` are hardcoded in the demo component (`INITIAL_SETTINGS`/`FIELD_OPTIONS`) —
+      this showcase app has no backend, same "in-memory fake data, no backend" convention
+      `notifications-demo` already established. Each option's label is deliberately distinct from its
+      bound value (e.g. `{ label: 'British Pound (£)', value: 'GBP' }`) to demonstrate that
+      `RegionSettingsFormComponent` renders whatever it's handed, translated or not — it was rolled
+      back the same day specifically so this would be possible (see the section above).
+- [x] `(save)` is wired to a fake 600ms `setTimeout` standing in for a real `RegionSettingsStore.save()`
+      round trip; the demo renders the last-saved payload back as JSON once it resolves.
+- [x] Needed `@wiltech-labs/ngx-auth` added to the showcase's `tsconfig.json` `paths` and
+      `package.json` for the first time, even though the demo never imports anything from it directly
+      — `ngx-region-settings`'s `public-api.ts` barrel re-exports `CurrentUserStore`, which imports
+      `AuthStore`, so the whole module graph has to resolve for the showcase's TS path-mapped source
+      import to type-check, regardless of what the demo itself actually uses.
+- [x] `npm install` (to link the two new workspace deps), `tsc --noEmit` (both `apps/showcase` and the
+      full-repo `npm run typecheck`), `ng build --configuration production`, and `ng serve` (checked
+      the route serves and the component ships in the bundle) all clean. Didn't visually click-test in
+      a real browser — no browser tool available in this session; the person following up should
+      eyeball `/region-settings` themselves.
+
+## `ngx-forms` gains a `THEME` field type, used by `ngx-region-settings` — 2026-10-01
+
+Theme only ever has two values (`'light'`/`'dark'`), so a dropdown or radio list was the wrong shape
+for it — asked for a dedicated field: two icons (sun/moon), click one the same way selecting a value
+works everywhere else.
+
+- [x] Added `ThemeField` (`ngx-theme-field`): `mat-button-toggle-group` with two icon-only toggles
+      (`light_mode`/`dark_mode`), bound via `[formField]` directly — `MatButtonToggleGroup` is a
+      `ControlValueAccessor`, same as `MatRadioGroup`/`MatSelect`, confirmed by `RadioField` already
+      doing exactly this on `mat-radio-group`, so no hand-written value sync was needed (unlike
+      `ChipsField`/the date fields).
+- [x] Each toggle's accessible label (not visible text — the UI is icon-only) comes from
+      `fieldDef.options`, same `FieldOption[]` mechanism `RadioField`/`SelectField` already use —
+      see the "settled design" bullet below for how this landed here after two more elaborate
+      attempts the same day.
+- [x] Wired into `FormFieldType.THEME`, `DynamicForm`'s `@switch`, `FormConfigBuilder.theme()`, and
+      `public-api.ts`; exercised in `apps/showcase`'s "All Fields" forms demo (`colorScheme` field).
+- [x] **Then added to `ngx-region-settings`**, as asked: `RegionSettingsFormComponent`'s `theme`
+      field switched from `SelectField` to `ThemeField`.
+- [x] `tsc --noEmit`, `ng-packagr build` for both packages, a full `scripts/build-packages.sh` run,
+      full-repo `npm run typecheck`, and the showcase app's `ng build --configuration production` +
+      `ng serve` (confirmed the toggle group ships in the bundle and the route serves) all clean.
+- [x] **Layout bug found right after, 2026-10-01**: `.ThemeField-group` had no `width: 100%`, so the
+      toggle pair shrink-wrapped to just the two icons instead of filling its row the way its sibling
+      `SelectField`s do — looked like the icons took ~20% of the row with the rest left empty. Fixed
+      by giving the group `width: 100%` and each `mat-button-toggle` `flex: 1` (reachable with a
+      plain, non-`::ng-deep` selector since `mat-button-toggle` is a direct element in this
+      component's own template, not projected content). Confirmed in the compiled production bundle.
+- [x] **Asked directly why this was a DI token instead of a component `@Input()`, then why not a
+      config interface instead of a token** — both answered, and the second one changed the design:
+      a plain `@Input()` would've broken once rendered through `DynamicForm`'s generic `@switch`
+      (every field's contract is strictly `[fieldDef]`/`[field]`, nothing else — `DynamicForm` can't
+      know `ThemeField` needs a third binding). The config-interface suggestion was the better fit
+      though: `FieldDef` already has exactly this shape for `dateTimeConfig`/`NGX_FORMS_LOCALE`, so
+      added `FieldDef.themeConfig?: Partial<ThemeFieldText>` the same way — a per-field override that
+      wins over `NGX_THEME_FIELD_TEXT`'s app-wide default, merged in `ThemeField` itself. Kept the
+      token too rather than replacing it, since the "set once in `app.config.ts`, every field picks
+      it up" case is still real and the two aren't mutually exclusive — matches the existing
+      `dateTimeConfig.locale`/`NGX_FORMS_LOCALE` hybrid exactly. Verified the override compiles
+      through into the production bundle (`apps/showcase`'s "All Fields" demo now passes
+      `themeConfig: { light: 'Day', dark: 'Night' }`).
+- [x] **Settled design, same day**: asked directly "could [`options`] not be reused" — pointed at
+      `FieldDef.options: FieldOption[]`, the exact mechanism `RadioField`/`SelectField` already have.
+      It could, and is simpler than the token/`themeConfig` pair above: removed
+      `NGX_THEME_FIELD_TEXT`/`ThemeFieldText`/`theme-field-text.token.ts` and `FieldDef.themeConfig`
+      entirely. `ThemeField` now reads `fieldDef.options`, matching each option's `value` against the
+      fixed `'light'`/`'dark'` strings to find that icon's label (defaulting to English when absent)
+      — the values themselves stay fixed (each tied to its own hardcoded icon), only the label text
+      comes from `options`. `FormConfigBuilder.theme()` gained a `choices?: FieldOption[]` third
+      param, mirroring `radio()`/`select()`'s required `choices` (optional here, since there's a
+      sensible English default). This is also more consistent with the rest of the package, not
+      just simpler: no other choice-list field here has an "app-wide options translation" token —
+      `RadioField`/`SelectField` both just repeat their own `choices` at each call site — so the
+      token/config detour had actually been the odd one out.
+  - **Full circle in `ngx-region-settings`**: `RegionSettingsFieldOptions` keeps its `theme` key
+    again (reusing the same input every other field already uses, just for label text instead of
+    label+value) — this is exactly `RegionSettingsFormComponent`'s very first spec from before any
+    of this day's detours (`@Input() options: Record<string, FieldOption[]>`, covering every field
+    uniformly, theme included). `themeField` goes back through the shared `fieldDef()` helper instead
+    of being built separately, just passing `FormFieldType.THEME` instead of the default `SELECT`.
+    Updated both showcase demos (`forms-demo`'s `colorScheme`, `region-settings-demo`) to pass
+    `choices`/`options.theme` the same way as every other field instead of the removed `themeConfig`.
+  - `tsc --noEmit`, `ng-packagr build` for both packages, a full `scripts/build-packages.sh` run,
+    full-repo `npm run typecheck`, and the showcase app's `ng build --configuration production` all
+    clean; confirmed the new labels (`'Day'`/`'Night'`) compile through into the production bundle
+    for both demos.
 
 ## packages/api-client
 

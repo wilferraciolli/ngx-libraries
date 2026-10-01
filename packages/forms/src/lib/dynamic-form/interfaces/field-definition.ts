@@ -18,7 +18,7 @@ export interface FieldDef {
   min?: number; // For number and range fields
   max?: number; // For number and range fields
   step?: number; // For number and range fields
-  options?: FieldOption[]; // For radio buttons and select dropdowns
+  options?: FieldOption[]; // For radio buttons, select dropdowns, and theme (value 'light'/'dark')
   orientation?: 'horizontal' | 'vertical'; // For radio buttons: a wrapping row (default) or one option per line
   dateTimeConfig?: DateTimeConfig; // For business-date, business-time and instant-date-time
 

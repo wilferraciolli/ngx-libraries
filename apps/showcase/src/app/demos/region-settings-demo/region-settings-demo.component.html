@@ -1,0 +1,37 @@
+<div class="demo-container">
+  <h2>Region Settings Demo</h2>
+  <p class="subtitle">
+    RegionSettingsFormComponent from ngx-region-settings (hardcoded initial values, no backend)
+  </p>
+
+  <div class="form-section">
+    <ngx-region-settings-form
+      [settings]="settings()"
+      [options]="options()"
+      [saving]="saving()"
+      (save)="handleSave($event)"
+    />
+  </div>
+
+  @if (lastSaved(); as saved) {
+    <div class="info-section">
+      <h3>Last saved</h3>
+      <pre>{{ saved | json }}</pre>
+    </div>
+  }
+
+  <div class="info-section">
+    <h3>What's happening</h3>
+    <p>
+      <code>settings</code> and <code>options</code> are hardcoded in this component instead of
+      coming from <code>RegionSettingsStore</code> — there's no live API in this showcase app. In a
+      real app, <code>options</code> is built from <code>RegionSettingsStore.options()</code>'s raw
+      <code>{{ '{value, viewValue}' }}</code> API metadata pairs, translating each label however
+      that app does translation. The theme field (<code>ThemeField</code> from
+      <code>ngx-forms</code>) uses the same <code>options</code> mechanism, just for label text only
+      — its two values are always fixed (<code>'light'</code>/<code>'dark'</code>), each tied to its
+      own sun/moon icon. <code>(save)</code> only hands back the edited payload — saving it (here, a
+      fake 600ms delay) is entirely up to whoever owns the form.
+    </p>
+  </div>
+</div>

@@ -9,6 +9,7 @@ export enum FormFieldType {
   RANGE = 'range',
   SELECT = 'select',
   CHIPS = 'chips',
+  THEME = 'theme',
   TEXTAREA = 'textarea',
   CODE = 'code',
   BUSINESS_DATE = 'business-date',

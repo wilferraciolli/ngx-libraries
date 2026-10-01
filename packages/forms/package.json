@@ -1,6 +1,6 @@
 {
   "name": "@wiltech-labs/ngx-forms",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Shared Angular forms library — form builders, validators, and utility services for common form patterns.",
   "license": "Apache-2.0",
   "sideEffects": false,

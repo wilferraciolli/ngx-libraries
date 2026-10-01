@@ -1,0 +1,19 @@
+<div class="ThemeField-label" [id]="labelId">
+  {{ fieldDef().label }}
+  @if (field()().required()) {
+    <span aria-hidden="true"> *</span>
+  }
+</div>
+<mat-button-toggle-group
+  class="ThemeField-group"
+  [formField]="field()"
+  [attr.aria-labelledby]="labelId"
+>
+  <mat-button-toggle value="light" [attr.aria-label]="lightLabel()">
+    <mat-icon aria-hidden="true">light_mode</mat-icon>
+  </mat-button-toggle>
+  <mat-button-toggle value="dark" [attr.aria-label]="darkLabel()">
+    <mat-icon aria-hidden="true">dark_mode</mat-icon>
+  </mat-button-toggle>
+</mat-button-toggle-group>
+<ngx-field-subscript [field]="field()" [hint]="fieldDef().hint" />

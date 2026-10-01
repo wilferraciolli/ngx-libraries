@@ -55,5 +55,11 @@ export class HomeComponent {
         'Polling notification bell + badge + dropdown panel, fully app-pluggable, no Angular Material',
       route: '/notifications',
     },
+    {
+      name: '@wiltech-labs/ngx-region-settings',
+      description:
+        'Current-user and region-settings signal stores, plus a ready-made settings-editing form',
+      route: '/region-settings',
+    },
   ];
 }

@@ -172,5 +172,24 @@ TProfile>` and `RegionSettingsStore<TSettings, TPayload>` are both parameterized
     value.
   - That external app hasn't yet been switched over to import this component from here instead of
     its own local copy — see the open item below.
+- **Exercised in this monorepo's own `apps/showcase` for the first time, 2026-10-01**
+  (`demos/region-settings-demo`) — hardcoded `settings`/`options` (no backend in this showcase app,
+  same "in-memory fake data" convention as `notifications-demo`), with each option's label distinct
+  from its bound value to demonstrate that the component renders whatever it's given, translated or
+  not. Required adding `@wiltech-labs/ngx-auth` to the showcase's own `tsconfig.json` `paths` /
+  `package.json` for the first time too — not used by the demo directly, but this package's
+  `public-api.ts` barrel re-exports `CurrentUserStore`, which imports `AuthStore` from it, so the
+  whole module graph needs to resolve even though the demo only ever touches
+  `RegionSettingsFormComponent`.
+- **`theme` field switched from `SelectField` to `ngx-forms`' `ThemeField`, 2026-10-01** — a fixed
+  light/dark icon toggle (sun/moon) instead of a dropdown, since theme only ever has those two
+  values. `RegionSettingsFieldOptions` keeps its `theme` key (settled back after a same-day detour
+  where `ThemeField` briefly took a separate config/token instead of `fieldDef.options` — see that
+  package's `CLAUDE.md` for the full back-and-forth): `ThemeField`'s two values are fixed
+  (`'light'`/`'dark'`, each tied to its own icon), so `options.theme` only ever supplies each one's
+  label text, same mechanism the other four fields use for both label and value. `themeField` is
+  still built through the shared `fieldDef()` helper, just with `FormFieldType.THEME` instead of the
+  default `SELECT`.
 - Not yet published to npm — under development.
-- No consumers yet within this monorepo.
+- First consumer within this monorepo: `apps/showcase`'s demo route (above). Still no consumer
+  outside this monorepo using the published package itself.

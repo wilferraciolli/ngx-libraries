@@ -100,6 +100,7 @@ interface AllFieldsSchema extends BaseSchema {
   bio: string;
   snippet: string;
   keywords: string[];
+  colorScheme: string;
 }
 
 @Component({
@@ -305,6 +306,17 @@ export class FormsDemoComponent {
         maxWidth: '900px',
         hint: 'Type a word and press Enter (or comma) to add it as a chip; click the x to remove one.',
       })
+      .theme(
+        'colorScheme',
+        'Color Scheme',
+        [
+          { label: 'Day', value: 'light' },
+          { label: 'Night', value: 'dark' },
+        ],
+        {
+          hint: 'A fixed light/dark choice, shown as a sun/moon icon toggle instead of a dropdown.',
+        },
+      )
       .build({
         username: 'jane.doe',
         email: 'jane.doe@example.com',
@@ -321,6 +333,7 @@ export class FormsDemoComponent {
         bio: 'Full-stack engineer who likes strongly-typed forms and hates YAML.\n\nBased in Cyprus, previously London. Always up for a good debugging story.',
         snippet: 'function greet(name: string): string {\n  return `Hello, ${name}!`;\n}',
         keywords: ['angular', 'signals', 'typescript'],
+        colorScheme: 'light',
       });
 
   protected readonly allFieldsEntity: WritableSignal<AllFieldsSchema> = signal(

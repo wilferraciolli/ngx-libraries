@@ -12,7 +12,8 @@ src/
         ├── components/
         │   ├── dynamic-form/      # @switch on FieldDef.type -> one field component per type, plus Save/Clear
         │   └── *-field/           # One Material component per field type (text, textarea, checkbox, radio,
-        │                          #   select, chips, slider, business-date, business-time, instant-date-time)
+        │                          #   select, chips, theme, slider, business-date, business-time,
+        │                          #   instant-date-time)
         ├── builders/              # formConfig<T>() / FormConfigBuilder
         ├── adapters/              # LocaleDateAdapter + provideLocaleDateAdapter() for the pickers
         ├── config/                # NGX_FORMS_LOCALE — app-wide date/time field locale fallback
@@ -37,7 +38,9 @@ src/
   values), so they write `field().value` by hand and use `syncMatInputErrorState()` for errors.
   `ChipsField` is the same case for a different reason: `[formField]` binds one control to one
   value, but a chip grid adds/removes one token at a time, so it also writes `state().value.update()`
-  by hand.
+  by hand. `ThemeField`'s `mat-button-toggle-group` doesn't need this workaround — it's a
+  `ControlValueAccessor` the same as `MatRadioGroup`/`MatSelect`, so `[formField]` works on it
+  directly, confirmed by `RadioField` already doing the same thing on `mat-radio-group`.
 - Validation lives in `toSchema()`, driven by `FieldDef`, never in the components.
 - The showcase dev server doesn't watch `packages/forms` (it's only reached through a TS path
   mapping) — restart `ng serve` after library changes.
@@ -49,6 +52,24 @@ src/
   browser's own language the way `ngx-dates` is — this locale also decides which typed day/month
   order `LocaleDateAdapter.parse()` accepts, so changing it changes input behaviour, not just
   wording, and an app should opt into that rather than have it happen silently.
+- **Theme field labels**: `ThemeField`'s two icon toggles read their label text from
+  `fieldDef.options` — same `FieldOption[]` mechanism `RadioField`/`SelectField` already use, not a
+  separate config or token. Went through two more elaborate designs first, added and then undone the
+  same day (2026-10-01), each time after being asked directly to justify the shape:
+  1. A component `@Input()` — would've broken once rendered through `DynamicForm`'s generic
+     `@switch` (every field's contract is strictly `[fieldDef]`/`[field]`, nothing else — it has no
+     way to know `ThemeField` needs a third binding and `SelectField` doesn't).
+  2. An `NGX_THEME_FIELD_TEXT` DI token (app-wide default) plus a `FieldDef.themeConfig` override
+     (mirroring `dateTimeConfig.locale`/`NGX_FORMS_LOCALE`) — fixed the `DynamicForm` problem, but
+     introduced a whole new config shape (`ThemeFieldText` interface, a token, a merge in the
+     component) for something `options: FieldOption[]` already covers. Asked directly "could this
+     [`options`] not be reused" — it could, and should: `ThemeField`'s two values are fixed
+     (`'light'`/`'dark'`, each tied to its own icon) so `options` only ever supplies each one's label,
+     same shape `RadioField`/`SelectField` already have, no new type or token needed at all. This is
+     also what every other choice-list field in this package does — repeat its own `choices` at each
+     call site, no shared "app-wide select option translations" token exists for `RadioField`/
+     `SelectField` either, so the token/config detour was actually _less_ consistent with the rest of
+     the package, not more.
 
 ## Status
 

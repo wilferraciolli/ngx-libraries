@@ -5,6 +5,7 @@
     "rootDir": "../..",
     "paths": {
       "@wiltech-labs/ngx-api-client": ["../../packages/api-client/src/public-api.ts"],
+      "@wiltech-labs/ngx-auth": ["../../packages/auth/src/public-api.ts"],
       "@wiltech-labs/ngx-dates": ["../../packages/dates/src/public-api.ts"],
       "@wiltech-labs/ngx-forms": ["../../packages/forms/src/public-api.ts"],
       "@wiltech-labs/ngx-media": ["../../packages/media/src/public-api.ts"],
@@ -12,7 +13,8 @@
       "@wiltech-labs/ngx-graphs": ["../../packages/graphs/src/public-api.ts"],
       "@wiltech-labs/ngx-translations": ["../../packages/translations/src/public-api.ts"],
       "@wiltech-labs/ngx-modals": ["../../packages/modals/src/public-api.ts"],
-      "@wiltech-labs/ngx-notifications": ["../../packages/notifications/src/public-api.ts"]
+      "@wiltech-labs/ngx-notifications": ["../../packages/notifications/src/public-api.ts"],
+      "@wiltech-labs/ngx-region-settings": ["../../packages/region-settings/src/public-api.ts"]
     },
     "experimentalDecorators": true,
     "useDefineForClassFields": false,

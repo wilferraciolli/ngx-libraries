@@ -83,14 +83,20 @@ export class MySettingsPage {
 
 ### Ready-made settings form
 
-`RegionSettingsFormComponent` renders the five region fields (timezone, language, locale, currency,
-theme) as `@wiltech-labs/ngx-forms` `SelectField`s — no need to build this form's layout, dirty-check
-or submit wiring yourself. It does **not** decide what each option's label says or which value it's
-bound to: `options` takes ready-made `FieldOption[]` (ngx-forms' own `{label, value}` type) per field,
-already resolved — and, if you're showing translated text, already translated — by you. Same boundary
-`ngx-forms`' own date/time fields draw around the browser's locale (never defaulted to it — see that
-package's `NGX_FORMS_LOCALE`): this component never reaches for anything ambient on its own, the app
-controls it explicitly.
+`RegionSettingsFormComponent` renders all five region fields — no need to build this form's layout,
+dirty-check or submit wiring yourself. Four of them (timezone, language, locale, currency) render as
+`@wiltech-labs/ngx-forms` `SelectField`s; `theme` renders as its `ThemeField`, a fixed light/dark
+sun/moon icon toggle. All five use the same `options` input: for the four select-driven fields it's
+both each option's label and its bound value; `theme`'s two values are always fixed
+(`'light'`/`'dark'`, each tied to its own icon), so `options.theme` only ever supplies the label text
+— defaults to English "Light"/"Dark" when you don't set one.
+
+This component does **not** decide what any label says or, for the four select-driven fields, which
+value an option is bound to: `options` takes ready-made `FieldOption[]` (ngx-forms' own `{label,
+value}` type) per field, already resolved — and, if you're showing translated text, already
+translated — by you. Same boundary `ngx-forms`' own date/time fields draw around the browser's locale
+(never defaulted to it — see that package's `NGX_FORMS_LOCALE`): this component never reaches for
+anything ambient on its own, the app controls it explicitly.
 
 `RegionSettingsStore.options()` gives you the raw `{value, viewValue}` pairs straight from the API's
 own metadata (see "Settings screens" above) — map those into `FieldOption[]` yourself, applying
@@ -105,7 +111,11 @@ protected readonly fieldOptions = computed<RegionSettingsFieldOptions>(() => {
       label: this.i18n.translate(o.viewValue),
       value: o.value,
     })),
-    // ...locale, currency, theme the same way
+    // ...locale, currency the same way
+    theme: [
+      { label: 'Day', value: 'light' },
+      { label: 'Night', value: 'dark' },
+    ], // label text only — ThemeField's values are always 'light'/'dark'
   };
 });
 ```
