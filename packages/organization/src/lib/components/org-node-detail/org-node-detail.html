@@ -1,0 +1,57 @@
+@let card = data();
+<div class="OrgNodeDetail">
+  <p class="OrgNodeDetail-type">{{ typeLabel() }}</p>
+
+  @if (card.path.length) {
+    <nav class="OrgNodeDetail-path" [attr.aria-label]="text.reportsTo">
+      <span class="OrgNodeDetail-label">{{ text.reportsTo }}</span>
+      <ol class="OrgNodeDetail-trail">
+        @for (step of card.path; track $index) {
+          <li class="OrgNodeDetail-step">{{ step }}</li>
+        }
+      </ol>
+    </nav>
+  }
+
+  @if (job(); as job) {
+    <section class="OrgNodeDetail-section">
+      <h3 class="OrgNodeDetail-label">
+        {{ card.type === 'DEPARTMENT' ? text.head : text.occupiedBy }}
+      </h3>
+      <div class="OrgNodeDetail-holder">
+        @if (card.occupancy; as person) {
+          <span class="OrgNodeDetail-avatar" aria-hidden="true">{{ personInitials() }}</span>
+          <span class="OrgNodeDetail-holder-text">
+            <span class="OrgNodeDetail-person">{{ person.name }}</span>
+            <span class="OrgNodeDetail-job">{{ job.name }}</span>
+          </span>
+        } @else {
+          <span class="OrgNodeDetail-avatar is-vacant" aria-hidden="true">
+            <mat-icon>person</mat-icon>
+          </span>
+          <span class="OrgNodeDetail-holder-text">
+            <span class="OrgNodeDetail-person is-vacant">{{ text.vacant }}</span>
+            <span class="OrgNodeDetail-job">{{ job.name }}</span>
+          </span>
+        }
+      </div>
+    </section>
+  }
+
+  @if (showCounts()) {
+    <dl class="OrgNodeDetail-counts">
+      <div class="OrgNodeDetail-count">
+        <dt>{{ text.departments }}</dt>
+        <dd>{{ card.departmentCount }}</dd>
+      </div>
+      <div class="OrgNodeDetail-count">
+        <dt>{{ text.jobs }}</dt>
+        <dd>{{ card.jobCount }}</dd>
+      </div>
+    </dl>
+  }
+
+  @if (card.item.description) {
+    <p class="OrgNodeDetail-description">{{ card.item.description }}</p>
+  }
+</div>

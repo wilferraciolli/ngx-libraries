@@ -56,4 +56,16 @@ export const routes: Routes = [
     path: 'components',
     component: ComponentsDemoComponent,
   },
+  {
+    path: 'calendar',
+    loadComponent: () =>
+      import('./demos/calendar-demo/calendar-demo.component').then((m) => m.CalendarDemoComponent),
+  },
+  {
+    path: 'organization',
+    loadComponent: () =>
+      import('./demos/organization-demo/organization-demo.component').then(
+        (m) => m.OrganizationDemoComponent,
+      ),
+  },
 ];

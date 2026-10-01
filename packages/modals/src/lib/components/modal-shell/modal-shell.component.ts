@@ -1,3 +1,4 @@
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -5,8 +6,12 @@ import {
   ComponentRef,
   ViewChild,
   ViewContainerRef,
+  computed,
   inject,
+  signal,
 } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { map } from 'rxjs';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
@@ -48,6 +53,61 @@ export class ModalShellComponent implements AfterViewInit {
   private readonly dialog = inject(MatDialog);
 
   private contentRef?: ComponentRef<unknown>;
+
+  protected readonly title = signal(this.data.title);
+  protected readonly minimized = signal(false);
+  private readonly compact = toSignal(
+    inject(BreakpointObserver)
+      .observe(Breakpoints.XSmall)
+      .pipe(map((state) => state.matches)),
+    { initialValue: false },
+  );
+  protected readonly minimizeIcon = computed(() =>
+    this.data.side === 'left' ? 'left_panel_close' : 'right_panel_close',
+  );
+  protected readonly restoreIcon = computed(() =>
+    this.data.side === 'left' ? 'left_panel_open' : 'right_panel_open',
+  );
+
+  constructor() {
+    inject(BreakpointObserver)
+      .observe(Breakpoints.XSmall)
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this.layout());
+  }
+
+  /** Called through `ModalService.update()`. */
+  public update(changes: { data?: unknown; title?: string }): void {
+    if (changes.title !== undefined) this.title.set(changes.title);
+    if (changes.data !== undefined) {
+      this.contentRef?.setInput('data', changes.data);
+      this.contentRef?.changeDetectorRef.markForCheck();
+    }
+    if (this.minimized()) this.restore();
+  }
+
+  protected minimize(): void {
+    this.minimized.set(true);
+    this.layout();
+  }
+
+  protected restore(): void {
+    this.minimized.set(false);
+    this.layout();
+  }
+
+  /** Docked: full height at the configured width (full screen below XSmall). Minimized: a bar at
+   *  the bottom of the same edge. */
+  private layout(): void {
+    const edge = this.data.side === 'left' ? 'left' : 'right';
+    if (this.minimized()) {
+      this.dialogRef.updateSize('auto', 'auto');
+      this.dialogRef.updatePosition({ bottom: '16px', [edge]: '16px' });
+      return;
+    }
+    this.dialogRef.updateSize(this.compact() ? '100vw' : this.data.width, '100vh');
+    this.dialogRef.updatePosition({ top: '0', [edge]: '0' });
+  }
 
   ngAfterViewInit(): void {
     this.contentRef = this.contentHost.createComponent(this.data.contentComponent);

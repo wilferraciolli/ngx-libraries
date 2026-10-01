@@ -1,0 +1,16 @@
+<div class="CalendarDemo">
+  <h2 class="CalendarDemo-title">Calendar</h2>
+  <p class="CalendarDemo-subtitle">
+    <code>&lt;ngx-calendar&gt;</code> from ngx-calendar. Day, week and month views; click a day for
+    its agenda, click an event to open it, then Edit and Save.
+  </p>
+
+  <ngx-calendar [events]="events()" [(view)]="view" (eventSave)="onEventSave($event)" />
+
+  @if (lastSaved(); as saved) {
+    <section class="CalendarDemo-output">
+      <h3>Last <code>eventSave</code></h3>
+      <pre>{{ saved | json }}</pre>
+    </section>
+  }
+</div>

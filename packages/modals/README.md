@@ -91,11 +91,37 @@ export class TeamCalendar {
 }
 ```
 
-The panel docks to the right edge, full height, `33vw` wide by default — override the width per-open
+The panel docks to the right edge, full height, `33vw` wide by default. Pass `{ side: 'left' }` to
+dock it to the left edge instead. Override the width per-open
 (`{ width: '480px' }`) or app-wide via the `--ngx-modal-width` CSS custom property. Below the CDK's
 `XSmall` breakpoint it's always full screen, regardless of the configured width. It can only be
 closed via its own close button (or the content closing itself) — Escape and a backdrop click are
 disabled, so the unsaved-changes guard can't be bypassed.
+
+### Modeless and minimizable panels
+
+For a panel that sits beside what it describes (an org chart's node details), pass
+`backdrop: false`: no dimming, no click-blocking and page scroll kept, so the user can keep working
+with the page. `minimizable: true` adds a minimize button that shrinks the panel to a small bar at
+the bottom of its edge (title, restore, close).
+
+To follow the user's selection without stacking panels, keep the `MatDialogRef` and swap what it
+shows with `update()` (this also restores a minimized panel):
+
+```ts
+if (this.panel) {
+  this.modals.update(this.panel, { title: node.name, data: node });
+} else {
+  this.panel = this.modals.open(NodeDetail, {
+    title: node.name,
+    side: 'left',
+    backdrop: false,
+    minimizable: true,
+    data: node,
+  });
+  this.panel.afterClosed().subscribe(() => (this.panel = null));
+}
+```
 
 ### A different close-reason vocabulary
 

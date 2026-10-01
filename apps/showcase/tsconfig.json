@@ -15,7 +15,9 @@
       "@wiltech-labs/ngx-translations": ["../../packages/translations/src/public-api.ts"],
       "@wiltech-labs/ngx-modals": ["../../packages/modals/src/public-api.ts"],
       "@wiltech-labs/ngx-notifications": ["../../packages/notifications/src/public-api.ts"],
-      "@wiltech-labs/ngx-region-settings": ["../../packages/region-settings/src/public-api.ts"]
+      "@wiltech-labs/ngx-region-settings": ["../../packages/region-settings/src/public-api.ts"],
+      "@wiltech-labs/ngx-calendar": ["../../packages/calendar/src/public-api.ts"],
+      "@wiltech-labs/ngx-organization": ["../../packages/organization/src/public-api.ts"]
     },
     "experimentalDecorators": true,
     "useDefineForClassFields": false,

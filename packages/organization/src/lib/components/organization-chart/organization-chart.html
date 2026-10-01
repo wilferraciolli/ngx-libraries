@@ -1,0 +1,63 @@
+<section class="OrganizationChart" [attr.aria-label]="text().chartLabel">
+  @if (tree(); as tree) {
+    <ngx-interactive-org-chart
+      class="OrganizationChart-canvas"
+      [data]="tree"
+      [themeOptions]="theme()"
+      [displayChildrenCount]="true"
+      [showMiniMap]="miniMapVisible()"
+      miniMapPosition="bottom-right"
+      [miniMapWidth]="168"
+      [miniMapHeight]="112"
+      [minZoom]="0.2"
+      [maxZoom]="1.25"
+      [highlightZoomMinimum]="1"
+    >
+      <ng-template #nodeTemplate let-node="node">
+        <ngx-org-node-card
+          [attr.data-id]="node.data.item.id"
+          [card]="node.data"
+          [text]="text()"
+          [active]="node.data.item.id === selectedId()"
+          (selected)="open($event)"
+        />
+      </ng-template>
+    </ngx-interactive-org-chart>
+
+    <div class="OrganizationChart-controls">
+      <button
+        matIconButton
+        type="button"
+        [attr.aria-label]="text().zoomIn"
+        [title]="text().zoomIn"
+        (click)="zoomIn()"
+      >
+        <mat-icon aria-hidden="true">add</mat-icon>
+      </button>
+      <button
+        matIconButton
+        type="button"
+        [attr.aria-label]="text().zoomOut"
+        [title]="text().zoomOut"
+        (click)="zoomOut()"
+      >
+        <mat-icon aria-hidden="true">remove</mat-icon>
+      </button>
+      <span class="OrganizationChart-divider" aria-hidden="true"></span>
+      <button
+        matIconButton
+        type="button"
+        [attr.aria-label]="text().fitToScreen"
+        [title]="text().fitToScreen"
+        (click)="fit()"
+      >
+        <mat-icon aria-hidden="true">fit_screen</mat-icon>
+      </button>
+    </div>
+  } @else {
+    <p class="OrganizationChart-empty" role="status">
+      <mat-icon aria-hidden="true">account_tree</mat-icon>
+      {{ text().empty }}
+    </p>
+  }
+</section>

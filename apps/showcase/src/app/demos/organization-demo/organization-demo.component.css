@@ -1,0 +1,17 @@
+.OrganizationDemo {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+.OrganizationDemo-title {
+  margin: 0;
+  font: var(--mat-sys-headline-medium);
+}
+
+.OrganizationDemo-subtitle {
+  margin: 4px 0 24px;
+  max-width: 65ch;
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+}

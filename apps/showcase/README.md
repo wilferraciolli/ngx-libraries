@@ -11,6 +11,8 @@ A demo Angular application for testing and showcasing the shared libraries in th
 - **@wiltech-labs/ngx-graphs** — All 8 non-mixed chart.js chart types, built on ng2-charts
 - **@wiltech-labs/ngx-translations** — Instant (no-reload) language switching, translation pipe/service
 - **@wiltech-labs/ngx-dates** — `relativeTime` pipe, exercised inside the translations demo (no separate route)
+- **@wiltech-labs/ngx-calendar** — Day/week/month calendar with a day agenda and an event edit panel
+- **@wiltech-labs/ngx-organization** — Org chart on a pan/zoom canvas with a node detail panel
 
 `@wiltech-labs/ngx-web-sockets` is deliberately **not** wired in here — there's no Socket.IO backend
 for it to connect to yet. See that package's own `CLAUDE.md`.
@@ -58,6 +60,9 @@ Navigate to `http://localhost:4200/` to see the application.
 - **Graphs Demo** (`/graphs`) — All 8 chart types, each with its "Show data" table toggle
 - **Translations Demo** (`/translations`) — Language switcher, the `t` pipe/service, `formatDate()`/`formatNumber()`,
   and `ngx-dates`' `relativeTime` pipe reacting to the same switch
+- **Calendar Demo** (`/calendar`, lazy) — Sample events around today; pick a day, open an event, Edit and Save
+- **Organization Demo** (`/organization`, lazy) — A sample group with entities, departments, vacant jobs and a
+  person holding two jobs
 
 ### Building
 
@@ -83,7 +88,9 @@ src/
 │       ├── media-demo/           # Loading skeletons + YouTube player demo
 │       ├── ai-tools-demo/        # AI surfaces demo
 │       ├── graphs-demo/          # All 8 chart types demo
-│       └── translations-demo/    # ngx-translations + ngx-dates demo
+│       ├── translations-demo/    # ngx-translations + ngx-dates demo
+│       ├── calendar-demo/        # ngx-calendar demo
+│       └── organization-demo/    # ngx-organization demo
 ├── translations/                  # Demo dictionaries (en-GB.json, el-GR.json) for ngx-translations
 ├── main.ts                        # Application entry point (bootstrapApplication + providers)
 ├── index.html                     # HTML template

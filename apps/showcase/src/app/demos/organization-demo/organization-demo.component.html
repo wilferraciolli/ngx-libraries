@@ -1,0 +1,13 @@
+<div class="OrganizationDemo">
+  <h2 class="OrganizationDemo-title">Organization</h2>
+  <p class="OrganizationDemo-subtitle">
+    <code>&lt;ngx-organization-chart&gt;</code> from ngx-organization. Drag to move, scroll or pinch
+    to zoom, click a card for its details.
+    @if (selected(); as item) {
+      Last selected: <strong>{{ item.name }}</strong
+      >.
+    }
+  </p>
+
+  <ngx-organization-chart [items]="items()" (nodeSelect)="selected.set($event)" />
+</div>

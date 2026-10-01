@@ -1,0 +1,88 @@
+<div class="Calendar">
+  <header class="Calendar-toolbar">
+    <div class="Calendar-nav">
+      @if (compact()) {
+        <button
+          matIconButton
+          type="button"
+          [attr.aria-label]="text().today"
+          [title]="text().today"
+          (click)="goToToday()"
+        >
+          <mat-icon aria-hidden="true">today</mat-icon>
+        </button>
+      } @else {
+        <button matButton="outlined" type="button" (click)="goToToday()">{{ text().today }}</button>
+      }
+      <button
+        matIconButton
+        type="button"
+        [attr.aria-label]="text().previous"
+        [title]="text().previous"
+        (click)="previous()"
+      >
+        <mat-icon aria-hidden="true">chevron_left</mat-icon>
+      </button>
+      <button
+        matIconButton
+        type="button"
+        [attr.aria-label]="text().next"
+        [title]="text().next"
+        (click)="next()"
+      >
+        <mat-icon aria-hidden="true">chevron_right</mat-icon>
+      </button>
+    </div>
+
+    <h2 class="Calendar-title" aria-live="polite">{{ title() }}</h2>
+
+    <mat-button-toggle-group
+      class="Calendar-views"
+      hideSingleSelectionIndicator
+      [attr.aria-label]="text().viewLabel"
+      [value]="view()"
+      (change)="setView($event.value)"
+    >
+      <mat-button-toggle value="day">{{ text().day }}</mat-button-toggle>
+      <mat-button-toggle value="week">{{ text().week }}</mat-button-toggle>
+      <mat-button-toggle value="month">{{ text().month }}</mat-button-toggle>
+    </mat-button-toggle-group>
+  </header>
+
+  <div class="Calendar-body" [class.is-split]="expanded() && panelDate()">
+    <div class="Calendar-grid" [class.is-compact]="compact()">
+      <full-calendar [options]="options()" [events]="calendarEvents()">
+        <ng-template #dayCellTopContent let-arg>
+          <span class="Calendar-day-number" [class.is-today]="arg.isToday">{{
+            arg.dayNumberText
+          }}</span>
+        </ng-template>
+        <ng-template #eventContent let-arg>
+          <span
+            class="Calendar-chip"
+            [class.is-stacked]="arg.view.type !== 'dayGridMonth' && !arg.isShort"
+          >
+            <span class="Calendar-chip-time">{{ chipTime(arg.timeText, arg.event.start) }}</span>
+            @if (!compact()) {
+              <span class="Calendar-chip-title">{{ arg.event.title }}</span>
+            }
+          </span>
+        </ng-template>
+      </full-calendar>
+    </div>
+
+    @if (panelDate(); as date) {
+      <ngx-calendar-day-events
+        class="Calendar-day"
+        [date]="date"
+        [events]="panelEvents()"
+        [timeZone]="timeZone()"
+        [locale]="locale()"
+        [text]="text()"
+        [closable]="expanded()"
+        (eventOpen)="openEvent($event.id)"
+        (closed)="closeDay()"
+      />
+    }
+  </div>
+</div>

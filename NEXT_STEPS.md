@@ -1041,6 +1041,145 @@ Three fixes from actually looking at the components demo:
       and the showcase's `ng build --configuration production` all clean; confirmed the compiled
       output has the new `margin-bottom:10px` and `#e3f2fd`/`#0d47a1` colours.
 
+## New packages `ngx-calendar` and `ngx-organization` — planned and built 2026-10-01
+
+Both built the same day, designed to Material 3 with the `impeccable` skill's playbooks and
+`docs/ANGULAR_APP_CONVENTIONS.md` as the brief. Each has its own README/CLAUDE.md. The scope agreed
+before building is kept below for reference, after what was built and what is still open.
+
+**Built:**
+
+- [x] `ngx-modals` 1.1.0: `ModalConfig.side: 'left' | 'right'` (default right). Not yet published.
+- [x] `ngx-calendar` 0.1.0 wraps **FullCalendar 7** (`@fullcalendar/angular`). Chosen over building
+      our own because it is Temporal-based (matches our date rules), MIT, on Angular 22, and has a
+      Material 3 theme ("monarch") whose variables map 1:1 to `--mat-sys-*`. Our own parts: the
+      toolbar, day panel (side ≥ 840px, below otherwise), event panel (`ngx-modals`) with an
+      `ngx-forms` edit form, `CalendarEventMapper`, locale and text tokens.
+- [x] `ngx-organization` 0.1.0 wraps **`ngx-interactive-org-chart` 1.5** (Angular 22, signals, MIT,
+      pan/zoom, mini map, collapse; not PrimeNG). Our own parts: per-type M3 cards (department
+      merged with its reporting job), zoom controls, left-hand node panel, flat-to-tree builder,
+      `OrgChartStore`, text token. Proposed API shape: `_data.orgNodes: OrgItem[]`, flat, with
+      `parentId`; occupancies are items of type `OCCUPANCY` under their job.
+- [x] Showcase routes `/calendar` and `/organization` (lazy-loaded). Checked in a browser at 1280
+      and 390px, light and dark: no console errors. Edit → Save emits `eventSave` and updates the
+      grid. Closing with unsaved edits shows the prompt. `editable: false` hides Edit. The org panel
+      opens on the left.
+- [x] `modals` added to `scripts/build-packages.sh`' foundation list. All packages, workspace
+      typecheck and the showcase production build pass (only the two pre-existing budget warnings).
+
+- [x] Polish pass (impeccable `polish`), same day. Calendar: "+N more" opens the day panel instead of
+      FullCalendar's unstyled popover; the day panel follows the visible range (it went stale in
+      Day view); it sits beside the grid only from 1200px (the 840–1199px split squeezed chips
+      unreadable); short events keep time and title on one line; Day view opens at 07:30 so the 8am
+      label isn't clipped. Org chart: the node panel is modeless and minimizable (asked for: the
+      chart was blocked while it was open, and it could only be opened or closed), reused across
+      clicks; the selected card is outlined and slid clear of the panel; hover connectors use the
+      outline colour instead of heavy full-width primary lines; phones open at a readable zoom,
+      one level expanded, no mini map.
+- [x] `ngx-modals` 1.2.0: `backdrop: false` (modeless), `minimizable: true`, `ModalService.update()`.
+      The shell now sizes and places itself (it owns the XSmall switch, so a resize can't undo a
+      minimize). Not yet published.
+
+**Still open:**
+
+- [ ] A modeless panel still traps Tab inside it (MatDialog's focus trap); mouse and touch users
+      can use the chart freely, keyboard users have to close or minimize the panel first.
+- [ ] Agree the org chart response shape with the API (`OrgItem`, `_data.orgNodes`) before the first
+      real consumer.
+- [ ] Org chart CRUD from each item's `links` (version 1 is read-only).
+- [ ] Calendar: no create-event flow, no drag-to-move/resize (FullCalendar's `interaction` plugin is
+      already loaded for clicks). The end-before-start error path in the edit form was not exercised
+      in the browser.
+- [ ] Calendar on narrow screens: month view draws events as colour bars (FullCalendar's narrow
+      mode has no room for text); times are in the day list below. Revisit if time-in-chip is a
+      must there.
+- [ ] Publish `ngx-modals` 1.2.0 before publishing either new package (both depend on it).
+- [ ] No tests yet, for either package.
+
+**Scope as agreed before building:**
+
+- [x] **Calendar: new package `@wiltech-labs/ngx-calendar`.**
+  - **Build or wrap**: wrapped FullCalendar 7 (see "Built" above).
+  - **Views**: day, week and month.
+  - **Events**: mandatory properties are `id`, `title`, `description`, `startDateTime` and
+    `endDateTime`. Both date-times are UTC strings, `YYYY-MM-DDTHH:MMZ`. Each event also takes a
+    config object that sets its styles (colours and so on). Style values should still follow the
+    conventions doc's token pattern, `var(--ngx-calendar-*, var(--mat-sys-*, #hex))`, with the
+    event config overriding them.
+  - **Timezones**: events arrive in UTC and are shown in the user's timezone, converted the same way
+    `ngx-forms`' date-time field does it (`ZonedDateTimeService`). Follow
+    `docs/ANGULAR_APP_CONVENTIONS.md`'s "Dates and times" (`Temporal`, string wire formats).
+  - **Big screens**: a day/event shows the event title and times. Clicking a day opens a side
+    section that clearly names that day and lists all its events.
+  - **Small screens**: a day/event shows only the times. A section below the calendar lists all the
+    events for the selected day. This works the same way in every view (day, week and month).
+  - **Event detail**: clicking an event opens the whole event, including its description, in a
+    modal. The modal follows `ngx-modals`' layout: a right-hand panel, full height, 33% of the
+    screen wide (`var(--ngx-modal-width, 33vw)`), full screen below the CDK `XSmall` breakpoint.
+  - **Editing**: the event modal lets the user edit the event. For now, saving only emits an output
+    with the updated event. The calendar doesn't save anything itself; the consuming app does.
+  - **Decided 2026-10-01: depend on `ngx-modals`, don't copy it.** The event-edit panel needs
+    what `ngx-modals` already does: the unsaved-changes guard (`ModalContent.hasUnsavedChanges()`
+    plus the confirm prompt), the typed close result, and the 33vw / full-screen switch on the CDK
+    `XSmall` breakpoint. A copy would drift from the original. `ngx-modals` has no sibling `ngx-*`
+    dependency, so it was added to root `CLAUDE.md`'s sanctioned foundation leaves. The edit form
+    is built on `ngx-forms`, which was already sanctioned. When building:
+    - In `packages/calendar/package.json` `dependencies`, use `"file:../modals/dist"` and
+      `"file:../forms/dist"`, not semver ranges.
+    - Add `"postbuild": "node ../../scripts/fix-dist-file-deps.js ."` to the same file.
+    - Add `packages/modals` to the `foundation` array in `scripts/build-packages.sh`, so it builds
+      before the calendar.
+  - Locale (week start, day and month names) should come from a token the app supplies, the way
+    `ngx-dates` uses `NGX_DATES_LOCALE`, not from a direct dependency on `ngx-dates` or
+    `ngx-translations`.
+  - Add a showcase demo route at `/calendar` with sample events spread across day, week and month.
+- [x] **Organization: new package `@wiltech-labs/ngx-organization`.** An org chart. It loads and
+      gates its data the same way `ngx-region-settings` does, but it is its own package and more
+      complex. Scope confirmed with the user 2026-10-01.
+  - **The API owns the business logic.** The structure rules below are for understanding the data
+    and laying out the chart. The library doesn't enforce them: the API decides what is valid, and
+    each node carries `links` for whatever CRUD actions are allowed on it (`ngx-api-client`'s
+    HATEOAS envelope: `_data`, `_metadata`, `_metaLinks`, `_messages`). The library renders actions
+    from whichever links are present and never works out permissions itself.
+  - **Version 1 is read-only.** Show the chart and the node panel. CRUD through the node links comes
+    later.
+  - **Canvas**: the chart sits on a canvas the user can drag to pan, and zoom, because an org chart
+    is always bigger than the screen. Use an open-source library if a suitable one exists, but
+    **not PrimeNG**. Otherwise build it ourselves (CSS transforms for pan and zoom, SVG connector
+    lines, our own tree layout).
+  - **API response**: not designed yet. It will be a response of nodes, each with a `type`: `ORG`,
+    `ORG_ENTITY`, `DEPARTMENT` or `JOB`. `OCCUPANCY` is also a type in the response, but it is not
+    a node on the chart (see Jobs below). Agree the exact shape with the API before building.
+  - **Structure rules** (enforced by the API):
+    - Exactly one `ORG`, at the very top.
+    - Under the org: departments or org entities, mixed.
+    - Under a department: other departments, jobs or an org entity, mixed.
+    - Under an org entity: departments, or an org entity. Never a job.
+    - At most one org entity on any reporting line from the top. An org entity can sit under the
+      org or under a department, as long as no org entity is above it.
+    - A job is always under a department, never directly under the org or an org entity.
+  - **Jobs**:
+    - A job is either vacant or has an occupancy.
+    - An occupancy is a person occupying a job. People are not nodes; they appear only through the
+      job they occupy.
+    - A person can hold several jobs. A job holds at most one person.
+  - **Departments**: every department has exactly one reporting job (its head, e.g. the CEO job of
+    the Board department). On the chart, the reporting job is drawn on top of its department and
+    merged with it into one card, so it is clear who manages it. A vacant head shows as vacant.
+    Every other job in the department reports straight to the reporting job, one level only.
+  - **Example reporting line**: Org → OrgEntity → Board department, merged with its reporting job
+    (CEO, held by a named person) → Job A. Further departments can then hang under the Board
+    department.
+  - **Node panel**: clicking any node opens a panel showing that node. It slides in from the
+    **left** (full height, 33% wide, full screen on small screens). `ngx-modals` only opens on the
+    right today, so give it a `side: 'left' | 'right'` option (default `'right'`) rather than
+    copying it into this package.
+  - **Dependencies**: `ngx-api-client`, `ngx-auth` (store gated on `AuthStore.isSignedIn()`, as in
+    `ngx-region-settings`) and `ngx-modals`. All three are sanctioned. Add `ngx-forms` when editing
+    arrives. Same `"file:../x/dist"` + `postbuild` `fix-dist-file-deps` setup as the calendar.
+  - Add a showcase demo route at `/organization`, with sample data deep and wide enough to need
+    dragging. Include vacant jobs, a person holding two jobs, and an org entity under a department.
+
 ## packages/api-client
 
 - [ ] Already published and consumed by `insurly-ui`. No known outstanding work beyond routine
@@ -1083,6 +1222,14 @@ in particular, no consumer yet and no showcase demo route.
 See "New package `ngx-components`, plus `ngx-region-settings` gains `hints` — 2026-10-01" above for
 what's built and what's still open — in particular, only `Banner` exists so far; panels and cards are
 planned but not started.
+
+## packages/calendar
+
+See "New packages `ngx-calendar` and `ngx-organization`" above.
+
+## packages/organization
+
+See "New packages `ngx-calendar` and `ngx-organization`" above.
 
 ## packages/media
 

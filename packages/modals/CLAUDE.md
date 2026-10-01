@@ -52,12 +52,16 @@ src/
   X button (which runs the dirty check) or the content calling `MatDialogRef.close()` itself
   (e.g. after a successful save) are the only ways out. This is deliberate, not an oversight: it's
   what makes the dirty-check guarantee actually hold — a bypassable Escape/backdrop would defeat it.
-- **Positioning and responsiveness are pure `MatDialogConfig`, no shipped global CSS.** `position:
-{top:'0', right:'0'}`, `height: '100vh'`, `width: config.width ?? 'var(--ngx-modal-width, 33vw)'`
-  are all inline styles CDK applies directly to the overlay pane — no stylesheet needed. Below the
-  CDK's `Breakpoints.XSmall`, `ModalService.open()` calls `dialogRef.updateSize('100vw', '100vh')`
-  via a `BreakpointObserver.observe()` subscription (unsubscribed on `afterClosed()`), same pattern
-  the prior art used for its own responsive resize.
+- **Positioning and responsiveness are pure `MatDialogConfig`, no shipped global CSS.** `open()`
+  sets the initial position/size as inline overlay-pane styles; from then on **`ModalShellComponent`
+  owns its own sizing** (`layout()`): docked at `config.width` on `config.side` (default right),
+  `100vw` below `Breakpoints.XSmall`, or a bottom-edge bar when minimized. It lives in the shell
+  (not the service) since 1.2.0 so a breakpoint change can't undo a minimize.
+- **Modeless panels (1.2.0, for `ngx-organization`)**: `backdrop: false` → `hasBackdrop: false`,
+  `ariaModal: false`, a `noop` scroll strategy. `minimizable: true` adds a minimize/restore button
+  (`left_panel_close`/`right_panel_close` icons). `ModalService.update(ref, { data, title })` swaps an
+  open panel's content via the shell (`setInput('data', …)`) and restores it if minimized. Known gap:
+  MatDialog's focus trap still keeps Tab inside a modeless panel.
 - **Known v1 gap, deliberately deferred**: no slide-in-from-right transition or square-left-corner
   surface shape — Material's default fade/scale transition and rounded corners apply as-is. Fixing
   this means styling `.cdk-overlay-pane`/`.mat-mdc-dialog-container` via `panelClass`, which needs a

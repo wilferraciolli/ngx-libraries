@@ -1,6 +1,6 @@
 import { Injectable, Type, inject } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { Overlay } from '@angular/cdk/overlay';
 import { Observable, map } from 'rxjs';
 
 import { ModalShellComponent } from '../components/modal-shell/modal-shell.component.js';
@@ -16,10 +16,10 @@ const DEFAULT_WIDTH = 'var(--ngx-modal-width, 33vw)';
 @Injectable({ providedIn: 'root' })
 export class ModalService {
   private readonly dialog = inject(MatDialog);
-  private readonly breakpointObserver = inject(BreakpointObserver);
+  private readonly overlay = inject(Overlay);
 
   /**
-   * Opens `component` in a right-docked panel: full viewport height, `config.width` (default
+   * Opens `component` in a panel docked to `config.side` (default `'right'`): full viewport height, `config.width` (default
    * `var(--ngx-modal-width, 33vw)`) wide, full screen below the CDK's `XSmall` breakpoint. The
    * panel can only be closed via its own close button — Escape and a backdrop click are disabled,
    * so a caller's in-progress work is never lost by accident. Content that implements
@@ -35,33 +35,47 @@ export class ModalService {
     config: ModalConfig<TData> = {},
   ): MatDialogRef<unknown, TResult> {
     const width = config.width ?? DEFAULT_WIDTH;
+    const side = config.side ?? 'right';
+    const backdrop = config.backdrop ?? true;
 
-    const dialogRef = this.dialog.open<ModalShellComponent, ModalShellData<TData>, TResult>(
+    // The shell sizes and places itself (docked, full screen below XSmall, or minimized).
+    return this.dialog.open<ModalShellComponent, ModalShellData<TData>, TResult>(
       ModalShellComponent,
       {
-        position: { top: '0', right: '0' },
+        position: side === 'left' ? { top: '0', left: '0' } : { top: '0', right: '0' },
         height: '100vh',
         maxHeight: '100vh',
         width,
         maxWidth: '100vw',
         disableClose: true,
+        hasBackdrop: backdrop,
+        ariaModal: backdrop,
+        scrollStrategy: backdrop ? undefined : this.overlay.scrollStrategies.noop(),
+        panelClass: backdrop ? 'ngx-modal-pane' : ['ngx-modal-pane', 'is-modeless'],
         ariaLabel: config.ariaLabel ?? config.title,
         data: {
           contentComponent: component,
           contentData: config.data,
           title: config.title,
+          width,
+          side,
+          minimizable: config.minimizable ?? false,
         },
       },
     );
+  }
 
-    const breakpointSubscription = this.breakpointObserver
-      .observe(Breakpoints.XSmall)
-      .subscribe(({ matches }) => {
-        dialogRef.updateSize(matches ? '100vw' : width, '100vh');
-      });
-    dialogRef.afterClosed().subscribe(() => breakpointSubscription.unsubscribe());
-
-    return dialogRef;
+  /**
+   * Swaps what an open panel shows, without closing it: new `data` for its content component and/or
+   * a new `title`. Restores it if it was minimized. For a modeless panel (`backdrop: false`) that
+   * follows the user's selection, Eg the node they last clicked.
+   */
+  update<TData>(
+    ref: MatDialogRef<unknown, unknown>,
+    changes: { data?: TData; title?: string },
+  ): void {
+    const shell = ref.componentInstance;
+    if (shell instanceof ModalShellComponent) shell.update(changes);
   }
 
   /**

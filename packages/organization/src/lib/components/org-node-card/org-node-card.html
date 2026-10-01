@@ -1,0 +1,54 @@
+@let c = card();
+<button
+  type="button"
+  class="OrgNodeCard"
+  [class.is-org]="c.type === 'ORG'"
+  [class.is-entity]="c.type === 'ORG_ENTITY'"
+  [class.is-department]="c.type === 'DEPARTMENT'"
+  [class.is-job]="c.type === 'JOB'"
+  [class.is-vacant]="c.type === 'JOB' && !person()"
+  [class.is-active]="active()"
+  [attr.aria-pressed]="active()"
+  [attr.aria-label]="ariaLabel()"
+  (click)="selected.emit(c)"
+>
+  @if (c.type !== 'JOB') {
+    <span class="OrgNodeCard-header">
+      <span class="OrgNodeCard-well" aria-hidden="true">
+        <mat-icon>{{ icon() }}</mat-icon>
+      </span>
+      <span class="OrgNodeCard-heading">
+        <span class="OrgNodeCard-name">{{ c.item.name }}</span>
+        <span class="OrgNodeCard-meta">{{ typeLabel() }}</span>
+      </span>
+    </span>
+  }
+
+  @if (job(); as job) {
+    <span class="OrgNodeCard-holder" [class.is-merged]="c.type === 'DEPARTMENT'">
+      @if (person(); as person) {
+        <span class="OrgNodeCard-avatar" aria-hidden="true">{{ personInitials() }}</span>
+        <span class="OrgNodeCard-heading">
+          <span class="OrgNodeCard-person">{{ person.name }}</span>
+          <span class="OrgNodeCard-meta">{{ job.name }}</span>
+        </span>
+        @if (c.type === 'JOB') {
+          <span class="OrgNodeCard-badge" aria-hidden="true"
+            ><mat-icon>{{ icon() }}</mat-icon></span
+          >
+        }
+      } @else {
+        <span class="OrgNodeCard-avatar is-vacant" aria-hidden="true">
+          <mat-icon>person</mat-icon>
+        </span>
+        <span class="OrgNodeCard-heading">
+          <span class="OrgNodeCard-person is-vacant">{{ text().vacant }}</span>
+          <span class="OrgNodeCard-meta">{{ job.name }}</span>
+        </span>
+        @if (c.type === 'JOB') {
+          <span class="OrgNodeCard-badge" aria-hidden="true"><mat-icon>work_off</mat-icon></span>
+        }
+      }
+    </span>
+  }
+</button>

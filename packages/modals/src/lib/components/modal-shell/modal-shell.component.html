@@ -1,17 +1,36 @@
-<div class="ModalShell-header">
-  @if (data.title) {
-    <h2 class="ModalShell-title">{{ data.title }}</h2>
+<div class="ModalShell-header" [class.is-minimized]="minimized()">
+  @if (title()) {
+    <h2 class="ModalShell-title">{{ title() }}</h2>
   }
-  <button
-    type="button"
-    mat-icon-button
-    class="ModalShell-close"
-    aria-label="Close"
-    (click)="requestClose()"
-  >
-    <mat-icon aria-hidden="true">close</mat-icon>
-  </button>
+  <span class="ModalShell-actions">
+    @if (data.minimizable) {
+      @if (minimized()) {
+        <button
+          type="button"
+          mat-icon-button
+          aria-label="Restore"
+          title="Restore"
+          (click)="restore()"
+        >
+          <mat-icon aria-hidden="true">{{ restoreIcon() }}</mat-icon>
+        </button>
+      } @else {
+        <button
+          type="button"
+          mat-icon-button
+          aria-label="Minimize"
+          title="Minimize"
+          (click)="minimize()"
+        >
+          <mat-icon aria-hidden="true">{{ minimizeIcon() }}</mat-icon>
+        </button>
+      }
+    }
+    <button type="button" mat-icon-button aria-label="Close" title="Close" (click)="requestClose()">
+      <mat-icon aria-hidden="true">close</mat-icon>
+    </button>
+  </span>
 </div>
-<div class="ModalShell-content">
+<div class="ModalShell-content" [hidden]="minimized()">
   <ng-container #contentHost></ng-container>
 </div>

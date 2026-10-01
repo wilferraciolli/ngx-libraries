@@ -1,0 +1,41 @@
+{
+  "name": "@wiltech-labs/ngx-calendar",
+  "version": "1.0.0",
+  "description": "Shared Angular calendar — day/week/month views on FullCalendar, Material 3 styled, with a day panel and an event detail/edit side panel.",
+  "license": "Apache-2.0",
+  "sideEffects": false,
+  "dependencies": {
+    "@fullcalendar/angular": "^7.1.0",
+    "fullcalendar": "^7.1.0",
+    "temporal-polyfill": "^1.0.5",
+    "@wiltech-labs/ngx-forms": "file:../forms/dist",
+    "@wiltech-labs/ngx-modals": "file:../modals/dist"
+  },
+  "peerDependencies": {
+    "@angular/core": "^22.0.0",
+    "@angular/common": "^22.0.0",
+    "@angular/cdk": "^22.0.0",
+    "@angular/forms": "^22.0.0",
+    "@angular/material": "^22.0.0",
+    "rxjs": "^7.4.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "ng-packagr -p ng-package.json",
+    "postbuild": "node ../../scripts/fix-dist-file-deps.js .",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@angular/cdk": "^22.0.0",
+    "@angular/common": "^22.0.0",
+    "@angular/compiler-cli": "^22.0.0",
+    "@angular/core": "^22.0.0",
+    "@angular/forms": "^22.0.0",
+    "@angular/material": "^22.0.0",
+    "ng-packagr": "^22.0.0",
+    "rxjs": "~7.8.0",
+    "typescript": "~6.0.2"
+  }
+}

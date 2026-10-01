@@ -66,5 +66,17 @@ export class HomeComponent {
       description: 'Reusable UI components — Banner (info/warning/error) to start, more to come',
       route: '/components',
     },
+    {
+      name: '@wiltech-labs/ngx-calendar',
+      description:
+        'Day, week and month calendar on FullCalendar, M3 styled, with a day agenda and an event edit panel',
+      route: '/calendar',
+    },
+    {
+      name: '@wiltech-labs/ngx-organization',
+      description:
+        'Org chart on a pan/zoom canvas: organization, entities, departments with their heads, and jobs',
+      route: '/organization',
+    },
   ];
 }

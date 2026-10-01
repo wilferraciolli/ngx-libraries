@@ -1,0 +1,43 @@
+<section class="DayEvents" [attr.aria-label]="heading().weekday + ' ' + heading().date">
+  <header class="DayEvents-header">
+    <h2 class="DayEvents-heading">
+      <span class="DayEvents-weekday">{{ heading().weekday }}</span>
+      <span class="DayEvents-date">{{ heading().date }}</span>
+    </h2>
+    @if (closable()) {
+      <button
+        matIconButton
+        type="button"
+        class="DayEvents-close"
+        [attr.aria-label]="text().closeDay"
+        [title]="text().closeDay"
+        (click)="closed.emit()"
+      >
+        <mat-icon aria-hidden="true">close</mat-icon>
+      </button>
+    }
+  </header>
+
+  @if (rows().length) {
+    <ul class="DayEvents-list" aria-live="polite">
+      @for (row of rows(); track row.event.id) {
+        <li class="DayEvents-item">
+          <button type="button" class="DayEvents-row" (click)="eventOpen.emit(row.event)">
+            <span
+              class="DayEvents-accent"
+              [style.background]="row.accent"
+              aria-hidden="true"
+            ></span>
+            <span class="DayEvents-text">
+              <span class="DayEvents-title">{{ row.event.title }}</span>
+              <span class="DayEvents-time">{{ row.time }}</span>
+            </span>
+            <mat-icon class="DayEvents-chevron" aria-hidden="true">chevron_right</mat-icon>
+          </button>
+        </li>
+      }
+    </ul>
+  } @else {
+    <p class="DayEvents-empty" role="status">{{ text().noEvents }}</p>
+  }
+</section>

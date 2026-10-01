@@ -1,6 +1,6 @@
 {
   "name": "@wiltech-labs/ngx-modals",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Shared Angular right-hand panel modal — MatDialog-based, typed close-reason + data, unsaved-changes guard on its close button.",
   "license": "Apache-2.0",
   "sideEffects": false,
