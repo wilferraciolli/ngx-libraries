@@ -2,11 +2,19 @@ import { Component, computed, inject, input, linkedSignal, output } from '@angul
 import { form, FormRoot } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
 import { RegionSettingsPayload } from '../models/region-settings.model';
-import { ValueViewValue } from '@wiltech-labs/ngx-api-client';
-import { SelectField, FormFieldType, type FieldDef } from '@wiltech-labs/ngx-forms';
+import {
+  SelectField,
+  FormFieldType,
+  type FieldDef,
+  type FieldOption,
+} from '@wiltech-labs/ngx-forms';
 import { NGX_REGION_SETTINGS_FORM_TEXT } from '../config/settings-form-text.token';
 
-type RegionSettingsOptions = Partial<Record<string, ValueViewValue[]>>;
+/** One `{label, value}` list per editable field, already resolved and translated by the caller —
+ *  this component never decides what a value means or how it reads, only how it's laid out. */
+export type RegionSettingsFieldOptions = Partial<
+  Record<keyof RegionSettingsPayload, FieldOption[]>
+>;
 
 function toPayload(settings: RegionSettingsPayload): RegionSettingsPayload {
   const { timezone, language, locale, currency, theme } = settings;
@@ -24,7 +32,7 @@ export class RegionSettingsFormComponent {
   protected readonly text = computed(() => this.textResolver());
 
   readonly settings = input.required<RegionSettingsPayload>();
-  readonly options = input.required<RegionSettingsOptions>();
+  readonly options = input.required<RegionSettingsFieldOptions>();
   readonly saving = input(false);
 
   readonly save = output<RegionSettingsPayload>();
@@ -35,27 +43,34 @@ export class RegionSettingsFormComponent {
     () => JSON.stringify(this.model()) !== JSON.stringify(toPayload(this.settings())),
   );
 
-  // ngx-forms' SelectField reads its choices from `fieldDef.options`, not a separate input —
-  // each field's static definition and its API-provided options are merged into one FieldDef here.
-  // `RegionSettingsPayload`'s fields (timezone/language/locale/currency/theme) are plain domain
-  // strings, not ids referencing another resource, so the option's bound `value` is the metadata's
-  // own `viewValue` (e.g. 'EUR') — never `value` (the metadata row's internal id), which wouldn't
-  // match what's actually stored in `settings()` or expected back on save.
-  private fieldDef(key: string, label: string): FieldDef {
+  // ngx-forms' SelectField reads its choices from `fieldDef.options`, not a separate input — each
+  // field's static definition and the caller's own options for it are merged into one FieldDef here.
+  // The options themselves (label text, bound value) come straight from the `options` input as
+  // given — this component makes no decision about translation, locale, or which underlying value
+  // an option carries. Same boundary `ngx-forms`' date/time fields draw around the browser's own
+  // locale (see that package's `NGX_FORMS_LOCALE` — never defaulted to it): the app controls
+  // presentation explicitly, never something ambient the library would otherwise reach for.
+  private fieldDef(key: keyof RegionSettingsPayload, label: string): FieldDef {
     return {
       name: key,
       type: FormFieldType.SELECT,
       label,
       required: true,
-      options: this.options()[key]?.map((v) => ({ label: v.viewValue, value: v.viewValue })) ?? [],
+      options: this.options()[key] ?? [],
     };
   }
 
-  protected readonly timezoneField = computed(() => this.fieldDef('timezone', 'Timezone'));
-  protected readonly languageField = computed(() => this.fieldDef('language', 'Language'));
-  protected readonly localeField = computed(() => this.fieldDef('locale', 'Locale'));
-  protected readonly currencyField = computed(() => this.fieldDef('currency', 'Currency'));
-  protected readonly themeField = computed(() => this.fieldDef('theme', 'Theme'));
+  protected readonly timezoneField = computed(() =>
+    this.fieldDef('timezone', this.text().timezoneLabel),
+  );
+  protected readonly languageField = computed(() =>
+    this.fieldDef('language', this.text().languageLabel),
+  );
+  protected readonly localeField = computed(() => this.fieldDef('locale', this.text().localeLabel));
+  protected readonly currencyField = computed(() =>
+    this.fieldDef('currency', this.text().currencyLabel),
+  );
+  protected readonly themeField = computed(() => this.fieldDef('theme', this.text().themeLabel));
 
   protected readonly settingsForm = form(this.model, {
     submission: {

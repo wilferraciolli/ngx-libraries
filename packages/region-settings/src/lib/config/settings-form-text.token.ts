@@ -3,11 +3,21 @@ import { InjectionToken } from '@angular/core';
 export interface RegionSettingsFormText {
   save: string;
   saving: string;
+  timezoneLabel: string;
+  languageLabel: string;
+  localeLabel: string;
+  currencyLabel: string;
+  themeLabel: string;
 }
 
 export const DEFAULT_REGION_SETTINGS_FORM_TEXT: RegionSettingsFormText = {
   save: 'Save',
   saving: 'Saving…',
+  timezoneLabel: 'Timezone',
+  languageLabel: 'Language',
+  localeLabel: 'Locale',
+  currencyLabel: 'Currency',
+  themeLabel: 'Theme',
 };
 
 /**

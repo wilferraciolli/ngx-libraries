@@ -84,21 +84,47 @@ export class MySettingsPage {
 ### Ready-made settings form
 
 `RegionSettingsFormComponent` renders the five region fields (timezone, language, locale, currency,
-theme) as `@wiltech-labs/ngx-forms` `SelectField`s, wired to whichever store's `settings()`/`options()`
-you pass in — no need to build this form yourself:
+theme) as `@wiltech-labs/ngx-forms` `SelectField`s — no need to build this form's layout, dirty-check
+or submit wiring yourself. It does **not** decide what each option's label says or which value it's
+bound to: `options` takes ready-made `FieldOption[]` (ngx-forms' own `{label, value}` type) per field,
+already resolved — and, if you're showing translated text, already translated — by you. Same boundary
+`ngx-forms`' own date/time fields draw around the browser's locale (never defaulted to it — see that
+package's `NGX_FORMS_LOCALE`): this component never reaches for anything ambient on its own, the app
+controls it explicitly.
+
+`RegionSettingsStore.options()` gives you the raw `{value, viewValue}` pairs straight from the API's
+own metadata (see "Settings screens" above) — map those into `FieldOption[]` yourself, applying
+whatever translation your app uses:
+
+```ts
+protected readonly fieldOptions = computed<RegionSettingsFieldOptions>(() => {
+  const options = this.store.options();
+  return {
+    timezone: options.timezone?.map((o) => ({ label: o.viewValue, value: o.value })),
+    language: options.language?.map((o) => ({
+      label: this.i18n.translate(o.viewValue),
+      value: o.value,
+    })),
+    // ...locale, currency, theme the same way
+  };
+});
+```
 
 ```html
 <ngx-region-settings-form
   [settings]="store.settings()"
-  [options]="store.options()"
+  [options]="fieldOptions()"
   [saving]="store.saving()"
   (save)="store.save($event)"
 />
 ```
 
-Override the Save/Saving button text by providing `NGX_REGION_SETTINGS_FORM_TEXT` (a
-`() => RegionSettingsFormText` resolver — same pattern as `ngx-notifications`' text token); it stays
-English by default.
+The component only emits `save` with the edited payload — it never calls the store itself, so saving
+(and whatever happens after, e.g. reloading) stays entirely the app's call.
+
+Override the Save/Saving button text and the five field labels by providing
+`NGX_REGION_SETTINGS_FORM_TEXT` (a `() => RegionSettingsFormText` resolver — same pattern as
+`ngx-notifications`' text token); everything stays English by default.
 
 ### A different payload shape
 

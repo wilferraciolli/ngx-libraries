@@ -41,15 +41,35 @@ src/
   rendering the five region fields (`timezone`/`language`/`locale`/`currency`/`theme`) as `ngx-forms`
   `SelectField`s. Dirty-checking (`changed`) compares the edited model against the last-saved
   settings via `linkedSignal`, same "re-seed on reload, stay editable in between" pattern the
-  original app-level form used. Text (currently just the Save/Saving button label) comes from
-  `NGX_REGION_SETTINGS_FORM_TEXT`, the same resolver-function pattern as `ngx-notifications`'
-  `NGX_NOTIFICATIONS_TEXT` — deliberately not a direct `@jsverse/transloco` dependency, consistent
-  with this package's existing "no dependency on `ngx-translations`" decision below. Its own SCSS
-  hardcodes the two spacing values and one breakpoint it needs (16px/12px/8px, 600px) instead of
-  depending on `@wiltech-labs/ngx-styles`: `ngx-styles` has no consumer yet in this monorepo (app or
-  package), so there's no confirmed way to resolve its Sass partials from `ng-packagr`'s own build
-  step (as opposed to an app's `stylePreprocessorOptions.includePaths`, which only exists at the
-  consuming _app_'s build time) — not worth the risk for two pixel values and one breakpoint.
+  original app-level form used. The component never calls the store itself — it only emits `save`
+  with the edited payload, so saving (and anything that follows it, e.g. reloading) stays the app's
+  call, not this component's.
+  - **`options: RegionSettingsFieldOptions` — `ngx-forms`' own `FieldOption[]` per field, not the
+    store's raw `ValueViewValue[]`, rolled back to this 2026-10-01.** An earlier version had this
+    component build `FieldDef.options` itself straight from `RegionSettingsStore.options()`
+    (`{value, viewValue}` pairs from the API's own metadata), picking which of the two fields to bind
+    and show — which quietly meant every label was whatever raw string the API returned, with no way
+    for an app to translate it. Asked directly: each consuming app needs its _own_ translation for
+    these values (not a single shared one, and explicitly not the browser's own locale/`Intl` — same
+    reasoning `ngx-forms`' date/time fields don't default to the browser's locale either, see
+    `NGX_FORMS_LOCALE` in that package's `CLAUDE.md`: the app controls presentation explicitly, this
+    library never reaches for anything ambient on its own). Rolled back so the component takes
+    ready-made `FieldOption[]` and makes no decision about label text or bound value at all — the app
+    maps `RegionSettingsStore.options()`'s raw pairs into `FieldOption[]` itself, translating however
+    it wants, as part of that mapping. This is also what the very first request for this component
+    asked for before the dependency question (`ngx-forms`) pulled the shape toward building `FieldDef`
+    internally — see root `NEXT_STEPS.md`'s dated section for the full back-and-forth.
+  - **Field labels** ("Timezone", "Language", ...) come from `NGX_REGION_SETTINGS_FORM_TEXT`
+    (alongside the pre-existing Save/Saving button text), the same resolver-function pattern as
+    `ngx-notifications`' `NGX_NOTIFICATIONS_TEXT` — deliberately not a direct `@jsverse/transloco`
+    dependency, consistent with this package's existing "no dependency on `ngx-translations`"
+    decision below.
+  - Its own SCSS hardcodes the two spacing values and one breakpoint it needs (16px/12px/8px, 600px)
+    instead of depending on `@wiltech-labs/ngx-styles`: `ngx-styles` has no consumer yet in this
+    monorepo (app or package), so there's no confirmed way to resolve its Sass partials from
+    `ng-packagr`'s own build step (as opposed to an app's `stylePreprocessorOptions.includePaths`,
+    which only exists at the consuming _app_'s build time) — not worth the risk for two pixel values
+    and one breakpoint.
 - **How the dependency actually resolves, in this monorepo specifically**: `package.json` points at
   `"@wiltech-labs/ngx-api-client": "file:../api-client/dist"`,
   `"@wiltech-labs/ngx-auth": "file:../auth/dist"`, and `"@wiltech-labs/ngx-forms": "file:../forms/dist"`

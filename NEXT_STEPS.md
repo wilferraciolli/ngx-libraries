@@ -817,6 +817,37 @@ it.
       app's production build all clean.
 - [ ] Not covered by the "No tests yet" gap noted below — same boundary, no unit tests added.
 
+## `RegionSettingsFormComponent` options rolled back to caller-supplied `FieldOption[]` — 2026-10-01
+
+Found in real use: the component built `FieldDef.options` itself straight from
+`RegionSettingsStore.options()`'s raw `{value, viewValue}` API metadata pairs, so every dropdown
+label was whatever string the API returned — no way for an app to translate it. Asked directly:
+translation needs to be per-app (not one shared translation, and explicitly not the browser's own
+`Intl`/locale — same reasoning `ngx-forms`' date/time fields never default to the browser's locale,
+see `NGX_FORMS_LOCALE`), since "I created the region-settings library so users can choose it," not so
+the library or the browser would.
+
+- [x] `options` input changed from `Partial<Record<string, ValueViewValue[]>>` to a new exported
+      `RegionSettingsFieldOptions` (`Partial<Record<keyof RegionSettingsPayload, FieldOption[]>>` —
+      `ngx-forms`' own `{label, value}` type). The component no longer touches `ValueViewValue` at
+      all, or decides what an option's label says or which value it binds — purely renders what it's
+      handed. This also fully resolves the earlier id-vs-value bug (2026-09-30) architecturally
+      rather than by picking the right field: the app now decides the bound value explicitly.
+  - This is also closer to the component's very first spec (`@Input() options: Record<string,
+FieldOption[]>`, from the original request that started this whole extraction) than the version
+    that shipped 2026-09-30 — the `ngx-forms` dependency question pulled the shape toward building
+    `FieldDef` internally; this undoes that part while keeping the dependency itself (still needed
+    for `SelectField`/`FormFieldType`/`FieldDef` types).
+- [x] Field labels ("Timezone", "Language", ...) extended onto the existing
+      `NGX_REGION_SETTINGS_FORM_TEXT` resolver token, alongside the pre-existing Save/Saving text —
+      previously hardcoded English, now translatable the same way.
+- [x] README's "Ready-made settings form" section rewritten with a `computed()` example mapping
+      `RegionSettingsStore.options()` into `FieldOption[]` (translating each label), and now states
+      explicitly that the component never calls the store itself — only emits `save`.
+- [x] `tsc --noEmit`, `ng-packagr build`, and a full `scripts/build-packages.sh` run all clean.
+- [ ] Still not switched over in `PythonTutorials/showcase` or exercised in this repo's own
+      `apps/showcase` — same two open items as before, now also needing the new `options` shape.
+
 ## packages/api-client
 
 - [ ] Already published and consumed by `insurly-ui`. No known outstanding work beyond routine
