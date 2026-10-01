@@ -16,12 +16,13 @@
     font-size: 14px;
     line-height: 20px;
 
+    // Fixed light blue, not --mat-sys-tertiary-container (that role renders purple-ish in this
+    // theme) — asked for explicitly, so no --mat-sys-* middle tier here either, same reasoning as
+    // warning below: the point is a specific, recognizable "info blue", not whatever tertiary
+    // happens to resolve to.
     &.is-info {
-      background: var(
-        --ngx-components-banner-info-background,
-        var(--mat-sys-tertiary-container, #e9ddff)
-      );
-      color: var(--ngx-components-banner-info-text, var(--mat-sys-on-tertiary-container, #21005d));
+      background: var(--ngx-components-banner-info-background, #e3f2fd);
+      color: var(--ngx-components-banner-info-text, #0d47a1);
     }
 
     // M3 reserves no canonical "warning" role, unlike error/tertiary — plain var()+hex, no

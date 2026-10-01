@@ -22,6 +22,17 @@
   margin-bottom: 2rem;
 }
 
+/* Card has no built-in gap between instances (only Panel does, per its own component) — the app
+   adds its own spacing, same as it would for any other block-level element. */
+ngx-card {
+  display: block;
+  margin-bottom: 10px;
+}
+
+ngx-card:last-child {
+  margin-bottom: 0;
+}
+
 .info-section {
   background: #f0f4ff;
   border: 1px solid #d0deff;

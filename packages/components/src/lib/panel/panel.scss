@@ -1,6 +1,13 @@
+// margin-bottom hardcodes ngx-styles' spacing.$padding-mobile (10px) rather than @use-ing it — same
+// "no confirmed way to resolve ngx-styles' Sass partials from ng-packagr's own build step" reasoning
+// ngx-region-settings' SCSS already documents (only an app's stylePreprocessorOptions.includePaths
+// can do that, a different build entirely). Always on, not :not(:last-child), since the common case
+// is several ngx-panel elements stacked directly with no wrapper gap of their own — without this,
+// they sit flush against each other.
 :host {
   display: block;
   width: 100%;
+  margin-bottom: 10px;
 }
 
 .Panel {
