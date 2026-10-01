@@ -1,6 +1,6 @@
 {
   "name": "@wiltech-labs/ngx-region-settings",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Shared Angular current-user and region-settings stores — /me, userProfile, userSettings/systemSettings, all followed via HATEOAS links, never a hand-built URL.",
   "license": "Apache-2.0",
   "sideEffects": false,
