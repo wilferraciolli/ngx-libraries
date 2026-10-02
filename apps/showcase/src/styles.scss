@@ -13,6 +13,7 @@
 @use '@angular/material' as mat;
 @use 'styles/themes/minimalistic' as minimalistic-theme;
 @use 'styles/themes/teal' as teal-theme; // `as`: bare `teal` is a CSS colour keyword
+@use 'styles/themes/red-yellow' as red-yellow-theme;
 @use 'styles/themes/magenta' as magenta-theme; // `as`: bare `magenta` is a CSS colour keyword too
 
 html {
@@ -62,6 +63,20 @@ html[data-theme='magenta'] {
       color: (
         primary: magenta-theme.$primary-palette,
         tertiary: magenta-theme.$tertiary-palette,
+      ),
+    )
+  );
+}
+
+// Red #DA291C (primary) + yellow #FFC72C (tertiary). Neutral seed left to the schematic default
+// (derived from primary). In light mode M3 darkens the yellow to tone 40 (#775A00) for contrast;
+// the bright yellow shows in dark mode and in the tertiary-container roles.
+html[data-theme='red-yellow'] {
+  @include mat.theme(
+    (
+      color: (
+        primary: red-yellow-theme.$primary-palette,
+        tertiary: red-yellow-theme.$tertiary-palette,
       ),
     )
   );

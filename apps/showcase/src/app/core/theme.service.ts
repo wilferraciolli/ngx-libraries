@@ -20,6 +20,7 @@ export const THEME_FAMILIES: readonly ThemeFamily[] = [
   { id: 'minimalistic', label: 'Minimalistic' },
   { id: 'teal', label: 'Teal' },
   { id: 'magenta', label: 'Magenta' },
+  { id: 'red-yellow', label: 'Red & Yellow' },
 ];
 
 const DEFAULT_FAMILY = 'minimalistic';

@@ -1441,3 +1441,10 @@ App-local by decision (not a library yet — extract once a second real consumer
       the brand's `primary_dark` `#C21763`), the exact `#EC1E79` sits around tone 50, dark-mode
       primary is tone 80 `#FFB1C5`. Imported `as magenta-theme` — bare `magenta` is a CSS colour
       keyword, same trap as `teal`. Browser-checked light + dark, no console errors.
+- [x] Fourth family, `red-yellow` ("Red & Yellow"): primary `#DA291C`, tertiary `#FFC72C`, neutral
+      left to the schematic default. Light: primary tone 40 `#BE0F09` (strong red), but tertiary
+      tone 40 is a dark mustard `#775A00` — M3 can't keep a bright yellow at light-mode contrast, so
+      the primary→tertiary hero gradient reads red→olive. Dark: primary tone 80 `#FFB4A8` reads
+      salmon, and the bright yellow does appear (tertiary tone 80). Browser-checked, no console
+      errors. Playwright gotcha: `:has-text("Red & Yellow")` doesn't match the `&` — use
+      `getByRole('menuitemradio', { name: 'Red & Yellow' })`.
