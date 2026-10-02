@@ -13,6 +13,7 @@
 @use '@angular/material' as mat;
 @use 'styles/themes/minimalistic' as minimalistic-theme;
 @use 'styles/themes/teal' as teal-theme; // `as`: bare `teal` is a CSS colour keyword
+@use 'styles/themes/magenta' as magenta-theme; // `as`: bare `magenta` is a CSS colour keyword too
 
 html {
   @include mat.theme(
@@ -48,6 +49,19 @@ html[data-theme='teal'] {
       color: (
         primary: teal-theme.$primary-palette,
         tertiary: teal-theme.$tertiary-palette,
+      ),
+    )
+  );
+}
+
+// Customer brand: magenta-pink #EC1E79 (primary), #F472B0 accent (tertiary), lavender-grey
+// #E8E6F0 neutral seed (tints surfaces/backgrounds).
+html[data-theme='magenta'] {
+  @include mat.theme(
+    (
+      color: (
+        primary: magenta-theme.$primary-palette,
+        tertiary: magenta-theme.$tertiary-palette,
       ),
     )
   );

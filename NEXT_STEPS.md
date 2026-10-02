@@ -1435,3 +1435,9 @@ App-local by decision (not a library yet — extract once a second real consumer
       `styleUrls: ['…css']` → `styleUrl: '…scss'`. Both `apps/showcase` and `apps/storybook`
       `angular.json` now set `schematics["@schematics/angular:component"].style = "scss"` and
       `inlineStyleLanguage: "scss"`, so a generated component can't reintroduce `.css`.
+- [x] Third family, `magenta` (customer brand): generated from primary `#EC1E79`, tertiary
+      `#F472B0` (brand accent), neutral seed `#E8E6F0` (lavender-grey, tints surfaces). M3 derives
+      tones rather than using the seed verbatim: light-mode primary is tone 40 `#BA005C` (close to
+      the brand's `primary_dark` `#C21763`), the exact `#EC1E79` sits around tone 50, dark-mode
+      primary is tone 80 `#FFB1C5`. Imported `as magenta-theme` — bare `magenta` is a CSS colour
+      keyword, same trap as `teal`. Browser-checked light + dark, no console errors.

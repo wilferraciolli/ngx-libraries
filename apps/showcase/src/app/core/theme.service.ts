@@ -19,6 +19,7 @@ export interface ThemeFamily {
 export const THEME_FAMILIES: readonly ThemeFamily[] = [
   { id: 'minimalistic', label: 'Minimalistic' },
   { id: 'teal', label: 'Teal' },
+  { id: 'magenta', label: 'Magenta' },
 ];
 
 const DEFAULT_FAMILY = 'minimalistic';
