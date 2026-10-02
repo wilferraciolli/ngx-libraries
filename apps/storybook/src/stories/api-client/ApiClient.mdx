@@ -1,0 +1,48 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="ngx-api-client/Overview" />
+
+# ngx-api-client
+
+Shared Angular client for Wiltech HTTP APIs. No UI of its own — this page is reference only; see
+`packages/api-client/README.md` for the full API.
+
+## ApiClientService
+
+`inject(ApiClientService)` gives GET/POST/PUT/DELETE methods that unwrap the API's envelope shape
+(`{ _data, _metadata, _links }`) automatically, plus two signal-based helpers:
+
+- **`resource(key, urlFactory)`** — wraps `httpResource`, re-fetches whenever `urlFactory()`
+  returns a new URL (or stops fetching when it returns `undefined`, e.g. while signed out).
+- **`collectionResource(key, urlFactory)`** — same, for a `_data[key]: T[]` collection response.
+  `OrgChartStore` in `ngx-organization` is a real example.
+
+## HATEOAS links
+
+Every response can carry `_links`/per-item `links`. **Never build a URL by hand** — always follow a
+link the API gave you:
+
+```ts
+const url = this.api.requireLink(resource()?.links['updateSettings'], 'Not permitted.');
+await this.api.put(root, url, payload);
+```
+
+`LinkService` has `hasLink()` / `isTemplateLink()` / `getCreateUrlFromTemplateUrl()` for checking
+and expanding links before following them.
+
+## Metadata and `convertIdToValues`
+
+`MetadataService.resolveMetadataIdValues()` turns an API's `_metadata` value list into
+`{ value, viewValue }[]` — the same shape `ngx-forms`' `FieldOption[]` and `ngx-region-settings`'
+`RegionSettingsFieldOptions` both expect. The `convertIdToValues` pipe does the reverse lookup in a
+template, id → display label:
+
+```html
+{{ statusId | convertIdToValues: statusOptions }}
+```
+
+## Sanctioned dependents
+
+Per the root `CLAUDE.md`'s "Inter-package deps", `ngx-api-client` is a foundation leaf: other
+packages here (`ngx-region-settings`, `ngx-organization`) may depend on it, but it never depends on
+any sibling `@wiltech-labs/ngx-*` package itself.

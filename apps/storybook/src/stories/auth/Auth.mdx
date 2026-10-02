@@ -1,0 +1,37 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="ngx-auth/Overview" />
+
+# ngx-auth
+
+Shared Angular authentication: a Clerk-backed `AuthStore`, an `authGuard`, and an `authInterceptor`
+that scopes the bearer token to your own API origin. No UI of its own, and no live story here —
+every story in this catalogue runs against a fake API origin (see `docs/Storybook.md`
+"Deployment"), and Clerk needs a real publishable key to do anything, so there's nothing safe to
+demo without one. See `packages/auth/README.md` for the full API.
+
+## AuthStore
+
+`inject(AuthStore)` gives the current sign-in state as signals:
+
+- `isSignedIn()` — gates every store in `ngx-region-settings`/`ngx-organization` that talks to the
+  API, so nothing fetches while signed out.
+- `user()` — the signed-in Clerk user, or `undefined`.
+
+## provideAuth()
+
+Wires Clerk up app-wide — publishable key, and (same sequencing as `ngx-notifications`'
+`provideNotifications()`) eagerly constructs `AuthStore` at startup via `provideAppInitializer`, so
+sign-in state is known before any component that injects it renders.
+
+## authGuard / authInterceptor
+
+- `authGuard` — a `CanActivateFn` that redirects to sign-in when `isSignedIn()` is false.
+- `authInterceptor` — attaches the bearer token to requests whose origin matches your configured
+  `API_ORIGIN` (from `ngx-api-client`) only — never to a third-party request.
+
+## Sanctioned dependents
+
+Per the root `CLAUDE.md`'s "Inter-package deps", `ngx-auth` is a foundation leaf, the same as
+`ngx-api-client`: other packages may depend on it, it never depends on any sibling
+`@wiltech-labs/ngx-*` package.

@@ -29,9 +29,14 @@ ngx-libraries/
 │   ├── calendar/           # @wiltech-labs/ngx-calendar — see its own CLAUDE.md
 │   ├── organization/       # @wiltech-labs/ngx-organization — see its own CLAUDE.md
 │   └── styles/             # @wiltech-labs/ngx-styles — see its own CLAUDE.md
+├── apps/
+│   ├── showcase/           # routed demo app consuming every package from source
+│   └── storybook/          # component catalogue — every package, one story per use case
 ├── docs/
-│   └── ANGULAR_APP_CONVENTIONS.md  # conventions every consuming Angular app follows — its
-│                                   # "Shared libraries" section is the contract these packages meet
+│   ├── ANGULAR_APP_CONVENTIONS.md  # conventions every consuming Angular app follows — its
+│   │                               # "Shared libraries" section is the contract these packages meet
+│   └── Storybook.md        # how apps/storybook works, its phases and conventions — read before
+│                           # adding a story
 ├── tsconfig.base.json     # shared compiler options, extended by every package
 ├── package.json           # npm workspaces root (packages/*)
 └── LICENSE                # Apache-2.0, applies to every package
@@ -86,6 +91,11 @@ ngx-libraries/
   consumer-less until it's published and adopted somewhere — check the
   package's own `CLAUDE.md`/`README.md` "Status"/"Publishing" section for
   where things actually stand before assuming it's live anywhere.
+- **Storybook** (`apps/storybook`): renders every package's components from source, one story per
+  use case, with Compodoc-backed input tables and a theme/locale toolbar. A new component gets at
+  least a `Default` story; a package with no UI gets an MDX usage page. Stories live there, never
+  in `packages/`. Not yet hosted on Cloudflare Pages — still run locally (`npm run storybook`).
+  Full conventions in `docs/Storybook.md`.
 - No tests yet — everything so far is a straight port of already-exercised
   `insurly-ui` code. Add real tests once a package grows logic that isn't
   already covered by that consumer.

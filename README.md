@@ -24,6 +24,19 @@ npm run build:packages   # every package only — skips the showcase app, much f
 Both skip anything without a `build` script, and are no substitute for `cd`-ing into a single
 package when you're only working on that one (see "Publishing a package" below).
 
+## Storybook
+
+A Storybook catalogue of every package and its use cases, as a separate `apps/storybook`
+workspace, rendering straight from each package's source:
+
+```bash
+npm run storybook          # http://localhost:6006
+npm run build-storybook    # static build, apps/storybook/storybook-static/
+```
+
+Not yet deployed — hosting on Cloudflare Pages is still planned. See
+[docs/Storybook.md](docs/Storybook.md) for how it's put together and how to add a story.
+
 ## Publishing a package
 
 1. **Log in once** (per machine) — needs an npm account able to publish

@@ -1,0 +1,86 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="ngx-styles/Overview" />
+
+# ngx-styles
+
+Shared Material 3 Sass partials — breakpoints, a spacing scale, and design-system mixins. Raw
+`.scss`, no compile step, no Angular dependency. Add `packages/styles/src` to your app's Sass
+`includePaths` (this catalogue does the same — see `angular.json`), then `@use` whichever partial
+you need.
+
+## Breakpoints
+
+Material 3's window size classes — compact below `sm`, medium from `sm`, expanded from `md`, large
+from `lg`.
+
+```scss
+@use 'breakpoints';
+
+.Sidebar {
+  display: none;
+  @include breakpoints.up(md) {
+    display: block;
+  }
+}
+```
+
+<div style="display: flex; gap: 8px; flex-wrap: wrap; font: var(--mat-sys-body-small)">
+  <span style="padding: 4px 10px; border-radius: 999px; background: var(--mat-sys-surface-container)">
+    compact &lt; 600px
+  </span>
+  <span style="padding: 4px 10px; border-radius: 999px; background: var(--mat-sys-surface-container)">
+    medium ≥ 600px
+  </span>
+  <span style="padding: 4px 10px; border-radius: 999px; background: var(--mat-sys-surface-container)">
+    expanded ≥ 840px
+  </span>
+  <span style="padding: 4px 10px; border-radius: 999px; background: var(--mat-sys-surface-container)">
+    large ≥ 1200px
+  </span>
+</div>
+
+## Spacing scale
+
+A 4px base unit, so paddings/gaps/margins stay on a consistent grid instead of ad hoc pixel values.
+
+```scss
+@use 'spacing';
+
+.Card {
+  padding: spacing.space(4); // 16px
+  gap: spacing.space(2); // 8px
+}
+```
+
+<div style="display: flex; align-items: flex-end; gap: 8px">
+  {[1, 2, 3, 4, 6, 8].map((n) => (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+      <div
+        style={{
+          width: '24px',
+          height: `${n * 4}px`,
+          background: 'var(--mat-sys-primary)',
+          borderRadius: '2px',
+        }}
+      />
+      <span style={{ font: 'var(--mat-sys-label-small)' }}>{n * 4}px</span>
+    </div>
+  ))}
+</div>
+
+## Mixins (`_ui.scss`)
+
+| Mixin                                              | What it's for                                                                                                    |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `page-title` / `section-title` / `supporting-text` | Consistent heading/body type without repeating a `font:` value everywhere                                        |
+| `banner($tone)`                                    | The visual recipe `ngx-components`' `Banner` itself follows                                                      |
+| `state-layer($color)`                              | Hover/focus/press overlay on a custom interactive element                                                        |
+| `focus-ring`                                       | Visible keyboard-focus ring — required on every custom interactive element per `docs/ANGULAR_APP_CONVENTIONS.md` |
+| `fab-position`                                     | Fixed-position floating action button placement                                                                  |
+| `empty-state`                                      | Centered icon + text layout for an empty list/table                                                              |
+| `filled-icon-button`                               | A filled (not just icon) Material-style icon button, for when `mat-icon-button` isn't filled enough              |
+| `danger-button($appearance)`                       | A destructive-action button in the error colour role                                                             |
+
+All of them read `--mat-sys-*` tokens, with a hex fallback last — see the root `CLAUDE.md`'s
+"colours, type and shape" rule — so they stay usable in an app with no Material theme loaded.

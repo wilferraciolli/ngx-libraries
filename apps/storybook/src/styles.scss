@@ -1,0 +1,92 @@
+// Material 3 theme for every story. Reuses the showcase's palettes — one copy, not a fork (see
+// docs/Storybook.md "Theme"): `angular.json` adds `../showcase/src` to the Sass include paths, so
+// `styles/theme-colors` below is `apps/showcase/src/styles/_theme-colors.scss`. Temporary until the
+// per-customer theme rewrite gives the palettes a shared home.
+@use '@angular/material' as mat;
+@use 'styles/theme-colors' as theme;
+
+html {
+  @include mat.theme(
+    (
+      color: (
+        primary: theme.$primary-palette,
+        tertiary: theme.$tertiary-palette,
+      ),
+      typography: (
+        plain-family: (
+          Roboto,
+          system-ui,
+          sans-serif,
+        ),
+        brand-family: (
+          'Roboto Flex',
+          Roboto,
+          system-ui,
+          sans-serif,
+        ),
+      ),
+      density: 0,
+    )
+  );
+  // The `theme` toolbar overrides this inline on <html> (light / dark); "system" leaves it as is.
+  color-scheme: light dark;
+  -webkit-text-size-adjust: 100%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--mat-sys-on-surface);
+  background-color: var(--mat-sys-surface);
+  line-height: 1.5;
+}
+
+a {
+  color: var(--mat-sys-primary);
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+// Shared layout helpers for story templates (wrapper markup only — never used by the libraries).
+.Story-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.Story-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.Story-note {
+  margin: 0;
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.Story-output {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: var(--mat-sys-corner-small, 8px);
+  background: var(--mat-sys-surface-container);
+  font: var(--mat-sys-body-small);
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  white-space: pre-wrap;
+  overflow-x: auto;
+}

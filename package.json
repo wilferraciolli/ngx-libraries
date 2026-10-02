@@ -9,6 +9,8 @@
   "scripts": {
     "build": "npm run build:packages && for d in apps/*/; do npm run build --workspace=\"${d%/}\" --if-present || exit 1; done",
     "build:packages": "bash scripts/build-packages.sh",
+    "storybook": "npm run storybook --workspace=ngx-storybook",
+    "build-storybook": "npm run build-storybook --workspace=ngx-storybook",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "fix-dist-file-deps": "node scripts/fix-dist-file-deps.js",
     "format": "prettier --write .",

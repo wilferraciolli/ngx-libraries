@@ -1352,3 +1352,42 @@ See "New packages `ngx-calendar` and `ngx-organization`" above.
 ## Repo-wide
 
 - [ ] No CI configured yet (build/typecheck/publish are all manual, per each package's README).
+
+## Storybook catalogue (`apps/storybook`) — built 2026-10-02
+
+Scaffolded and filled through phase 7 of `docs/Storybook.md`'s plan in one pass: `npm run
+storybook` / `npm run build-storybook` from the repo root (or `npm -w apps/storybook run
+storybook`), Compodoc wired into both targets (confirmed it resolves signal `input()`s, not just
+`@Input()`, into the inputs tables), theme reused from `apps/showcase` via `includePaths`, a
+`theme`/`locale` toolbar. `npx tsc -p .storybook/tsconfig.json --noEmit` and a full
+`build-storybook` both verified clean (asset-size warnings only, from axe-core/Angular/Material in
+dev mode — not addressed, since this isn't deployed yet).
+
+- [x] `ngx-components` (Banner/Panel/Card), `ngx-ai-tools` (all 4), `ngx-media` (all 3) — plain
+      visual packages, no providers beyond the global ones.
+- [x] `ngx-graphs` — one story file per chart type (8), each with 2 Layer: single-series,
+      many-categories/single-profile, empty-data stories.
+- [x] `ngx-forms` — `DynamicForm` (6 stories: minimal, radio+date/time, every field type, prefilled,
+      custom labels), 12 standalone field-component stories, and a dedicated date/time-fields story
+      showing the timezone picker + locale toolbar together.
+- [x] `ngx-modals` — 6 `ModalService.open()` stories (right/left/custom width/minimizable/modeless/
+      no-title) plus `ModalService.confirm()`.
+- [x] `ngx-notifications` — 4 stories (unread/all-read/empty/fetch-error), each providing its own
+      fake backend at the component level since `NotificationsService` is root-provided (no
+      app-wide `provideNotifications()` in `preview.ts`).
+- [x] `ngx-translations`/`ngx-dates` — locale-driven via the toolbar global, not an in-story picker;
+      `relativeTime` has 5 stories including a side-by-side "several at once".
+- [x] `ngx-calendar` — 10 stories (3 views, empty month, overlapping events, read-only, fixed
+      timezone, Monday-first, and an interactive one that actually applies `eventSave`).
+- [x] `ngx-organization` — turned out not to need MSW: `OrganizationChart` itself takes a plain
+      `OrgItem[]` input, no store/API dependency (the store is a separate, feature-local concern).
+      7 stories (small/larger/vacant-jobs/deep-tree/collapsed/no-minimap/empty).
+- [x] `ngx-region-settings` — same finding: `RegionSettingsFormComponent` is plain inputs/outputs,
+      no `AuthStore`/`ApiClientService` dependency of its own. 4 stories.
+- [x] `ngx-web-sockets` — `ChatMessageBubble` only (4 stories); `ChatRoom` still needs a fake
+      `WebSocketService` (phase 8, not done).
+- [x] MDX usage pages for `ngx-api-client`, `ngx-auth`, `ngx-styles`.
+- [ ] Phase 8 (later/optional): the `brand` toolbar global once the per-customer theme rewrite
+      lands, a fake `WebSocketService` for `ChatRoom`, interaction tests.
+- [ ] Cloudflare Pages project not yet connected — still local-only (`docs/Storybook.md`
+      "Deployment" has the build settings to use).

@@ -1,0 +1,44 @@
+{
+  "name": "ngx-storybook",
+  "version": "0.1.0",
+  "description": "Storybook catalogue of every @wiltech-labs/ngx-* package and its use cases",
+  "private": true,
+  "scripts": {
+    "storybook": "ng run ngx-storybook:storybook",
+    "build-storybook": "ng run ngx-storybook:build-storybook",
+    "typecheck": "tsc -p .storybook/tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@angular/animations": "^22.0.0",
+    "@angular/cdk": "^22.0.0",
+    "@angular/common": "^22.0.0",
+    "@angular/compiler": "^22.0.0",
+    "@angular/core": "^22.0.0",
+    "@angular/forms": "^22.0.0",
+    "@angular/material": "^22.0.0",
+    "@angular/platform-browser": "^22.0.0",
+    "@angular/platform-browser-dynamic": "^22.0.0",
+    "@angular/router": "^22.0.0",
+    "@fullcalendar/angular": "^7.1.0",
+    "ng2-charts": "^11.0.0",
+    "rxjs": "~7.8.0",
+    "temporal-polyfill": "^1.0.5",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.15.0"
+  },
+  "devDependencies": {
+    "@angular-devkit/architect": "^0.2200.0",
+    "@angular-devkit/build-angular": "^22.0.0",
+    "@angular-devkit/core": "^22.0.0",
+    "@angular/cli": "^22.0.0",
+    "@angular/compiler-cli": "^22.0.0",
+    "@compodoc/compodoc": "^2.0.0",
+    "@storybook/addon-a11y": "^10.6.1",
+    "@storybook/addon-docs": "^10.6.1",
+    "@storybook/angular": "^10.6.1",
+    "msw": "^3.0.1",
+    "msw-storybook-addon": "^3.0.3",
+    "storybook": "^10.6.1",
+    "typescript": "~6.0.2"
+  }
+}

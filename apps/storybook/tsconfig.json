@@ -1,0 +1,36 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "../../dist/out-tsc/storybook",
+    "rootDir": "../..",
+    "paths": {
+      "@wiltech-labs/ngx-api-client": ["../../packages/api-client/src/public-api.ts"],
+      "@wiltech-labs/ngx-auth": ["../../packages/auth/src/public-api.ts"],
+      "@wiltech-labs/ngx-dates": ["../../packages/dates/src/public-api.ts"],
+      "@wiltech-labs/ngx-forms": ["../../packages/forms/src/public-api.ts"],
+      "@wiltech-labs/ngx-media": ["../../packages/media/src/public-api.ts"],
+      "@wiltech-labs/ngx-ai-tools": ["../../packages/ai-tools/src/public-api.ts"],
+      "@wiltech-labs/ngx-components": ["../../packages/components/src/public-api.ts"],
+      "@wiltech-labs/ngx-graphs": ["../../packages/graphs/src/public-api.ts"],
+      "@wiltech-labs/ngx-translations": ["../../packages/translations/src/public-api.ts"],
+      "@wiltech-labs/ngx-modals": ["../../packages/modals/src/public-api.ts"],
+      "@wiltech-labs/ngx-notifications": ["../../packages/notifications/src/public-api.ts"],
+      "@wiltech-labs/ngx-region-settings": ["../../packages/region-settings/src/public-api.ts"],
+      "@wiltech-labs/ngx-calendar": ["../../packages/calendar/src/public-api.ts"],
+      "@wiltech-labs/ngx-organization": ["../../packages/organization/src/public-api.ts"],
+      "@wiltech-labs/ngx-web-sockets": ["../../packages/web-sockets/src/public-api.ts"]
+    },
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "emitDecoratorMetadata": true,
+    "resolveJsonModule": true
+  },
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "storybook-static"]
+}
