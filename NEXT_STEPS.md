@@ -1384,10 +1384,22 @@ dev mode — not addressed, since this isn't deployed yet).
       7 stories (small/larger/vacant-jobs/deep-tree/collapsed/no-minimap/empty).
 - [x] `ngx-region-settings` — same finding: `RegionSettingsFormComponent` is plain inputs/outputs,
       no `AuthStore`/`ApiClientService` dependency of its own. 4 stories.
-- [x] `ngx-web-sockets` — `ChatMessageBubble` only (4 stories); `ChatRoom` still needs a fake
-      `WebSocketService` (phase 8, not done).
+- [x] `ngx-web-sockets` — `ChatMessageBubble` (4 stories) plus, added 2026-10-02,
+      `ChatRoom` (2 stories) against a `FakeWebSocketService`
+      (`src/stories/web-sockets/fake-web-socket-service.ts`) that duck-types `WebSocketService`'s
+      surface and scripts a "client connected" status message plus a canned reply to anything
+      sent — provided via `useValue` (not `useClass`, which would need structural assignability to
+      `WebSocketService` including its private fields). No real Socket.IO backend involved, same
+      as `apps/showcase` never wiring `ChatRoom` in either.
 - [x] MDX usage pages for `ngx-api-client`, `ngx-auth`, `ngx-styles`.
-- [ ] Phase 8 (later/optional): the `brand` toolbar global once the per-customer theme rewrite
-      lands, a fake `WebSocketService` for `ChatRoom`, interaction tests.
+- [x] `apps/showcase/README.md` — added 2026-10-02: "Available Libraries"/"Testing the
+      Libraries"/"Project Structure" were missing the modals, notifications, region-settings and
+      components demos, which exist and are routed but were never added to this doc as they
+      landed.
+- [x] `apps/storybook/README.md` — added 2026-10-02 (was missing; every other app/package has
+      one).
+- [ ] Phase 8 (later/optional), still open: the `brand` toolbar global once the per-customer theme
+      rewrite lands; interaction tests — holding off per the root `CLAUDE.md`'s "No tests yet"
+      until there's a concrete reason to add the first one.
 - [ ] Cloudflare Pages project not yet connected — still local-only (`docs/Storybook.md`
       "Deployment" has the build settings to use).

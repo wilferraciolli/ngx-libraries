@@ -13,6 +13,12 @@ A demo Angular application for testing and showcasing the shared libraries in th
 - **@wiltech-labs/ngx-dates** — `relativeTime` pipe, exercised inside the translations demo (no separate route)
 - **@wiltech-labs/ngx-calendar** — Day/week/month calendar with a day agenda and an event edit panel
 - **@wiltech-labs/ngx-organization** — Org chart on a pan/zoom canvas with a node detail panel
+- **@wiltech-labs/ngx-modals** — Right-docked panel: approve/reject with data passed in, and a
+  plain sign-up form, both with a typed close result
+- **@wiltech-labs/ngx-notifications** — Polling bell + badge + dropdown panel, in-memory fake data
+- **@wiltech-labs/ngx-region-settings** — `RegionSettingsFormComponent` with hardcoded initial
+  values, no backend
+- **@wiltech-labs/ngx-components** — Banner, Panel and Card, no backend
 
 `@wiltech-labs/ngx-web-sockets` is deliberately **not** wired in here — there's no Socket.IO backend
 for it to connect to yet. See that package's own `CLAUDE.md`.
@@ -63,6 +69,14 @@ Navigate to `http://localhost:4200/` to see the application.
 - **Calendar Demo** (`/calendar`, lazy) — Sample events around today; pick a day, open an event, Edit and Save
 - **Organization Demo** (`/organization`, lazy) — A sample group with entities, departments, vacant jobs and a
   person holding two jobs
+- **Modals Demo** (`/modals`) — Approve/reject with data passed in, and a plain sign-up form, each
+  closing with a typed result
+- **Notifications Demo** (`/notifications`) — Click the bell for the right-docked panel; "View"
+  marks an item read, the X dismisses it
+- **Region Settings Demo** (`/region-settings`) — Timezone/language/locale/currency/theme form,
+  Save only enables once something changes
+- **Components Demo** (`/components`) — Banner (info/warning/error), Panel (with and without an
+  icon/subheader), and Card
 
 ### Building
 
@@ -90,7 +104,11 @@ src/
 │       ├── graphs-demo/          # All 8 chart types demo
 │       ├── translations-demo/    # ngx-translations + ngx-dates demo
 │       ├── calendar-demo/        # ngx-calendar demo
-│       └── organization-demo/    # ngx-organization demo
+│       ├── organization-demo/    # ngx-organization demo
+│       ├── modals-demo/          # ngx-modals demo
+│       ├── notifications-demo/   # ngx-notifications demo
+│       ├── region-settings-demo/ # ngx-region-settings demo
+│       └── components-demo/      # ngx-components demo
 ├── translations/                  # Demo dictionaries (en-GB.json, el-GR.json) for ngx-translations
 ├── main.ts                        # Application entry point (bootstrapApplication + providers)
 ├── index.html                     # HTML template

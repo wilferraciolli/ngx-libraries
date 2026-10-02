@@ -4,10 +4,10 @@ A Storybook workspace that shows every `@wiltech-labs/ngx-*` package and its use
 browsable catalogue: one sidebar group per package, one story per use case, with live controls,
 light/dark and locale switching, and an accessibility panel.
 
-**Status: built through phase 7 (2026-10-02), not yet deployed.** Run it locally — `npm run
-storybook` from the repo root, then `http://localhost:6006`. This file is the reference for how it
-works and the plan for what's left (phase 8, Cloudflare Pages). Other docs only link here; see
-`NEXT_STEPS.md` for exactly what shipped in the first pass.
+**Status: built through phase 7 plus `ChatRoom` from phase 8 (2026-10-02), not yet deployed.** Run
+it locally — `npm run storybook` from the repo root, then `http://localhost:6006`. This file is
+the reference for how it works and the plan for what's left (the rest of phase 8, Cloudflare
+Pages). Other docs only link here; see `NEXT_STEPS.md` for exactly what shipped.
 
 ## Why a separate workspace (and not part of the showcase app)
 
@@ -184,24 +184,24 @@ breakpoints from `ngx-styles`.
 
 ## What each package gets
 
-| Package               | Kind                  | Stories / use cases                                                                                                                                           |
-| --------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ngx-components`      | Visual                | `Banner` (each `MessageType`, dismissible, long text), `Panel`, `Card` (with/without actions, media)                                                          |
-| `ngx-ai-tools`        | Visual                | `AiPanel`, `AiTextBox` (empty, filled, disabled), `AiButton` (states), `AiSparkleIcon`; reduced-motion check                                                  |
-| `ngx-media`           | Visual                | `CardLoader`, `ContentLoader` (sizes/counts), `YoutubePlayer` (loading vs loaded)                                                                             |
-| `ngx-graphs`          | Visual                | One story per chart type (8), plus: single series (no legend), many series, empty data, "Show data" table open                                                |
-| `ngx-forms`           | Visual                | One story per field type; `DynamicForm` from a `formConfig()` builder: minimal, every field, validation errors, prefilled entity, date/time fields per locale |
-| `ngx-modals`          | Overlay (host)        | Trigger button opening: simple content, form with unsaved-changes guard, confirm dialog, left vs right side; typed close result shown in Actions              |
-| `ngx-notifications`   | Overlay (host)        | Widget with unread items, all read, empty, dismiss/open flows against the fake backend                                                                        |
-| `ngx-translations`    | Service + pipe (host) | `t` pipe, `formatDate()`/`formatNumber()`, reacting to the `locale` toolbar                                                                                   |
-| `ngx-dates`           | Pipe (host)           | `relativeTime` across past/future ranges, both locales                                                                                                        |
-| `ngx-calendar`        | Visual + data         | Day / week / month views, empty month, overlapping events, day panel, event edit panel                                                                        |
-| `ngx-organization`    | Visual + data (MSW)   | Small org, deep tree, vacant jobs, person holding two jobs, node detail panel                                                                                 |
-| `ngx-region-settings` | Visual + data (MSW)   | `RegionSettingsFormComponent` loaded, saving, error response; signed-in vs signed-out via a fake `AuthStore`                                                  |
-| `ngx-styles`          | Docs (MDX)            | Breakpoints, spacing scale, mixin gallery (page-title, banner, state-layer, focus-ring) rendered with small sample elements                                   |
-| `ngx-api-client`      | Docs (MDX)            | Usage page: envelope, links, metadata; `convertIdToValue` pipe in a host story                                                                                |
-| `ngx-auth`            | Docs (MDX)            | Usage page only. Clerk needs a real publishable key, so there's no live story                                                                                 |
-| `ngx-web-sockets`     | Later                 | `ChatRoom`/`ChatMessageBubble` with a fake `WebSocketService` (no Socket.IO backend exists). `ChatMessageBubble` alone can come first, since it's pure input  |
+| Package               | Kind                  | Stories / use cases                                                                                                                                                                                               |
+| --------------------- | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ngx-components`      | Visual                | `Banner` (each `MessageType`, dismissible, long text), `Panel`, `Card` (with/without actions, media)                                                                                                              |
+| `ngx-ai-tools`        | Visual                | `AiPanel`, `AiTextBox` (empty, filled, disabled), `AiButton` (states), `AiSparkleIcon`; reduced-motion check                                                                                                      |
+| `ngx-media`           | Visual                | `CardLoader`, `ContentLoader` (sizes/counts), `YoutubePlayer` (loading vs loaded)                                                                                                                                 |
+| `ngx-graphs`          | Visual                | One story per chart type (8), plus: single series (no legend), many series, empty data, "Show data" table open                                                                                                    |
+| `ngx-forms`           | Visual                | One story per field type; `DynamicForm` from a `formConfig()` builder: minimal, every field, validation errors, prefilled entity, date/time fields per locale                                                     |
+| `ngx-modals`          | Overlay (host)        | Trigger button opening: simple content, form with unsaved-changes guard, confirm dialog, left vs right side; typed close result shown in Actions                                                                  |
+| `ngx-notifications`   | Overlay (host)        | Widget with unread items, all read, empty, dismiss/open flows against the fake backend                                                                                                                            |
+| `ngx-translations`    | Service + pipe (host) | `t` pipe, `formatDate()`/`formatNumber()`, reacting to the `locale` toolbar                                                                                                                                       |
+| `ngx-dates`           | Pipe (host)           | `relativeTime` across past/future ranges, both locales                                                                                                                                                            |
+| `ngx-calendar`        | Visual + data         | Day / week / month views, empty month, overlapping events, day panel, event edit panel                                                                                                                            |
+| `ngx-organization`    | Visual + data (MSW)   | Small org, deep tree, vacant jobs, person holding two jobs, node detail panel                                                                                                                                     |
+| `ngx-region-settings` | Visual + data (MSW)   | `RegionSettingsFormComponent` loaded, saving, error response; signed-in vs signed-out via a fake `AuthStore`                                                                                                      |
+| `ngx-styles`          | Docs (MDX)            | Breakpoints, spacing scale, mixin gallery (page-title, banner, state-layer, focus-ring) rendered with small sample elements                                                                                       |
+| `ngx-api-client`      | Docs (MDX)            | Usage page: envelope, links, metadata; `convertIdToValue` pipe in a host story                                                                                                                                    |
+| `ngx-auth`            | Docs (MDX)            | Usage page only. Clerk needs a real publishable key, so there's no live story                                                                                                                                     |
+| `ngx-web-sockets`     | Visual (fake service) | `ChatMessageBubble` (pure input) and `ChatRoom` with a `FakeWebSocketService` duck-typing `WebSocketService`'s surface — no real Socket.IO backend exists (same reason `apps/showcase` doesn't wire it in either) |
 
 ## Scripts
 
@@ -276,10 +276,12 @@ Notes:
 7. **Docs pages**: MDX for `ngx-styles`, `ngx-api-client`, `ngx-auth`, each linking to that
    package's README rather than repeating it.
 8. **Later / optional**:
+   - ~~`ngx-web-sockets` with a fake socket service~~ — done (`ChatRoom` + `ChatMessageBubble`,
+     `src/stories/web-sockets/fake-web-socket-service.ts`);
    - the `brand` toolbar global, once the per-customer theme rewrite lands (see "Theme");
-   - `ngx-web-sockets` with a fake socket service;
    - interaction tests (`play` functions, run with Storybook's Vitest addon), which would be the
-     repo's first real tests.
+     repo's first real tests — holding off given the root `CLAUDE.md`'s "No tests yet" convention,
+     until there's a concrete reason to add the first one.
 
 Each phase is self-contained, so Storybook is usable after phase 1, is online after phase 2, and
 grows package by package after that.
