@@ -5,7 +5,11 @@
   "projects": {
     "ngx-showcase": {
       "projectType": "application",
-      "schematics": {},
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
@@ -25,7 +29,8 @@
               "src/styles.scss"
             ],
             "scripts": [],
-            "allowedCommonJsDependencies": ["panzoom"]
+            "allowedCommonJsDependencies": ["panzoom"],
+            "inlineStyleLanguage": "scss"
           },
           "configurations": {
             "production": {

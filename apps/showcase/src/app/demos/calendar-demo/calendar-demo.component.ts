@@ -109,7 +109,7 @@ const SAMPLE_EVENTS: CalendarEvent[] = [
   standalone: true,
   imports: [Calendar, JsonPipe],
   templateUrl: './calendar-demo.component.html',
-  styleUrls: ['./calendar-demo.component.css'],
+  styleUrl: './calendar-demo.component.scss',
 })
 export class CalendarDemoComponent {
   protected readonly events = signal<CalendarEvent[]>(SAMPLE_EVENTS);

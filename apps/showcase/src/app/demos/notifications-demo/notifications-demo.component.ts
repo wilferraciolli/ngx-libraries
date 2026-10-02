@@ -6,6 +6,6 @@ import { NotificationsWidget } from '@wiltech-labs/ngx-notifications';
   standalone: true,
   imports: [NotificationsWidget],
   templateUrl: './notifications-demo.component.html',
-  styleUrls: ['./notifications-demo.component.css'],
+  styleUrl: './notifications-demo.component.scss',
 })
 export class NotificationsDemoComponent {}

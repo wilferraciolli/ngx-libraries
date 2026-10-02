@@ -1,7 +1,8 @@
 .navbar {
-  background-color: #333;
+  background-color: var(--mat-sys-surface-container);
+  color: var(--mat-sys-on-surface);
   padding: 1rem 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--mat-sys-level1);
 }
 
 .nav-container {
@@ -11,10 +12,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
 }
 
 .navbar h1 {
-  color: #fff;
+  color: var(--mat-sys-on-surface);
   margin: 0;
   font-size: 1.5rem;
 }
@@ -28,7 +30,7 @@
 }
 
 .nav-links a {
-  color: #fff;
+  color: var(--mat-sys-on-surface-variant);
   text-decoration: none;
   padding: 0.5rem 1rem;
   border-radius: 4px;
@@ -36,7 +38,7 @@
 }
 
 .nav-links a:hover {
-  background-color: #555;
+  background-color: color-mix(in srgb, var(--mat-sys-on-surface) 8%, transparent);
 }
 
 .main-content {

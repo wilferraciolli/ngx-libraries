@@ -53,12 +53,12 @@ their own `styles.scss` value.
 
 ## Not wired into the showcase app
 
-Unlike every other package here, this one has no showcase demo route.
-`apps/showcase` uses plain `.css` (no M3 theme foundation —
-`_theme-colors.scss`/`mat.theme()` — set up), so there's nothing for these
-mixins to plug into without first building out that foundation in the demo
-app, which is out of scope for this package. No consumer yet either way —
-see README "Status".
+Unlike every other package here, this one has no showcase demo route yet.
+The original blocker — `apps/showcase` using plain `.css` with no M3 theme
+foundation — is gone as of 2026-10-02: every showcase stylesheet is `.scss`
+and `styles.scss` runs `mat.theme()` (with switchable palette families), so
+these mixins now have something to plug into. The route just hasn't been
+built. No consumer yet either way — see README "Status".
 
 ## Open, not yet decided
 

@@ -57,7 +57,7 @@ const FIELD_HINTS: RegionSettingsFieldHints = {
   standalone: true,
   imports: [RegionSettingsFormComponent, JsonPipe],
   templateUrl: './region-settings-demo.component.html',
-  styleUrls: ['./region-settings-demo.component.css'],
+  styleUrl: './region-settings-demo.component.scss',
 })
 export class RegionSettingsDemoComponent {
   protected readonly settings = signal<RegionSettingsPayload>(INITIAL_SETTINGS);

@@ -7,7 +7,7 @@ import { CardLoader, ContentLoader, YoutubePlayer } from '@wiltech-labs/ngx-medi
   standalone: true,
   imports: [CommonModule, CardLoader, ContentLoader, YoutubePlayer],
   templateUrl: './media-demo.component.html',
-  styleUrls: ['./media-demo.component.css'],
+  styleUrl: './media-demo.component.scss',
 })
 export class MediaDemoComponent {
   loading = signal(true);

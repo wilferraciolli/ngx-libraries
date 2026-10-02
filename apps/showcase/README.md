@@ -112,7 +112,7 @@ src/
 ├── translations/                  # Demo dictionaries (en-GB.json, el-GR.json) for ngx-translations
 ├── main.ts                        # Application entry point (bootstrapApplication + providers)
 ├── index.html                     # HTML template
-└── styles.css                     # Global styles
+└── styles.scss                    # Global styles + M3 theme families (see styles/themes/)
 ```
 
 ## Adding New Demos
@@ -127,5 +127,7 @@ To add a demo for a new library:
 ## Notes
 
 - This app uses standalone components (no NgModules)
+- All styles are SCSS — `angular.json` sets `scss` as the component schematic default and the
+  `inlineStyleLanguage`, so `ng generate component` never creates a `.css` file
 - The app links directly to local packages via path mappings
 - For testing with published packages, update the `@wiltech-labs/*` dependencies in `package.json`

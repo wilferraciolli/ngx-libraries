@@ -5,12 +5,12 @@
 }
 
 .demo-container h2 {
-  color: #333;
+  color: var(--mat-sys-on-surface);
   margin-top: 0;
 }
 
 .subtitle {
-  color: #666;
+  color: var(--mat-sys-on-surface-variant);
   font-size: 0.95rem;
 }
 
@@ -22,13 +22,13 @@
 }
 
 .info-section {
-  background: #f0f4ff;
-  border: 1px solid #d0deff;
+  background: var(--mat-sys-surface-container);
+  border: 1px solid var(--mat-sys-outline-variant);
   border-radius: 8px;
   padding: 1.5rem;
 }
 
 .info-section h3 {
   margin-top: 0;
-  color: #667eea;
+  color: var(--mat-sys-primary);
 }

@@ -122,7 +122,7 @@ interface AllFieldsSchema extends BaseSchema {
     MatOption,
   ],
   templateUrl: './forms-demo.component.html',
-  styleUrls: ['./forms-demo.component.css'],
+  styleUrl: './forms-demo.component.scss',
 })
 export class FormsDemoComponent {
   /** Every current validation message in a form, including fields the user hasn't touched yet. */

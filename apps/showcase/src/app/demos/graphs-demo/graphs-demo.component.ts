@@ -28,7 +28,7 @@ import {
     ScatterGraph,
   ],
   templateUrl: './graphs-demo.component.html',
-  styleUrls: ['./graphs-demo.component.css'],
+  styleUrl: './graphs-demo.component.scss',
 })
 export class GraphsDemoComponent {
   protected readonly salesByQuarter = graphConfig()

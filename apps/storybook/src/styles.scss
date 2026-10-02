@@ -1,9 +1,9 @@
 // Material 3 theme for every story. Reuses the showcase's palettes — one copy, not a fork (see
 // docs/Storybook.md "Theme"): `angular.json` adds `../showcase/src` to the Sass include paths, so
-// `styles/theme-colors` below is `apps/showcase/src/styles/_theme-colors.scss`. Temporary until the
-// per-customer theme rewrite gives the palettes a shared home.
+// `styles/themes/minimalistic` below is `apps/showcase/src/styles/themes/_minimalistic.scss` (the
+// showcase's default family). Temporary until the theme palettes get a shared home.
 @use '@angular/material' as mat;
-@use 'styles/theme-colors' as theme;
+@use 'styles/themes/minimalistic' as theme;
 
 html {
   @include mat.theme(

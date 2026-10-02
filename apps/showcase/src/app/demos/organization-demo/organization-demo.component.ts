@@ -75,7 +75,7 @@ const SAMPLE_ITEMS: OrgItem[] = [
   standalone: true,
   imports: [OrganizationChart],
   templateUrl: './organization-demo.component.html',
-  styleUrls: ['./organization-demo.component.css'],
+  styleUrl: './organization-demo.component.scss',
 })
 export class OrganizationDemoComponent {
   protected readonly items = signal(SAMPLE_ITEMS);

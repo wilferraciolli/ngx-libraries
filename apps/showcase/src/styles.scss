@@ -1,17 +1,25 @@
 // Material 3 theme (see docs/ANGULAR_APP_CONVENTIONS.md "Design system: Material 3"). `mat.theme()`
 // defines the --mat-sys-* CSS variables (colour roles, type scale, shape scale, elevation, state
 // layers) that Material components — and this app's own CSS — read instead of hardcoded values.
-// The theme type is `color-scheme`, so every role resolves through `light-dark()` and follows the
-// system/browser preference: no separate dark stylesheet needed.
+//
+// Two independent axes, both switched at runtime by `ThemeService` (src/app/core/theme.service.ts):
+// - **Family** (`data-theme` on <html>): which palette. Each family's colours are scoped to its own
+//   selector below; `minimalistic` is also the default with no attribute set. Add a family by
+//   generating a palette into `styles/themes/` and adding one block here + one entry in
+//   `THEME_FAMILIES`.
+// - **Mode** (`color-scheme` on <html>): light / dark / system. The theme type is `color-scheme`, so
+//   every role resolves through `light-dark()` — forcing `color-scheme` flips the whole page, with
+//   no separate dark stylesheet per family.
 @use '@angular/material' as mat;
-@use 'styles/theme-colors' as theme;
+@use 'styles/themes/minimalistic' as minimalistic-theme;
+@use 'styles/themes/teal' as teal-theme; // `as`: bare `teal` is a CSS colour keyword
 
 html {
   @include mat.theme(
     (
       color: (
-        primary: theme.$primary-palette,
-        tertiary: theme.$tertiary-palette,
+        primary: minimalistic-theme.$primary-palette,
+        tertiary: minimalistic-theme.$tertiary-palette,
       ),
       typography: (
         plain-family: (
@@ -31,6 +39,18 @@ html {
   );
   color-scheme: light dark;
   -webkit-text-size-adjust: 100%;
+}
+
+// Colour-only overrides per non-default family — typography/density above stay shared.
+html[data-theme='teal'] {
+  @include mat.theme(
+    (
+      color: (
+        primary: teal-theme.$primary-palette,
+        tertiary: teal-theme.$tertiary-palette,
+      ),
+    )
+  );
 }
 
 * {

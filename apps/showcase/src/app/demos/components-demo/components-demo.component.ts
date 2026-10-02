@@ -6,7 +6,7 @@ import { Banner, Card, Panel, type Message } from '@wiltech-labs/ngx-components'
   standalone: true,
   imports: [Banner, Panel, Card],
   templateUrl: './components-demo.component.html',
-  styleUrls: ['./components-demo.component.css'],
+  styleUrl: './components-demo.component.scss',
 })
 export class ComponentsDemoComponent {
   protected readonly messages: Message[] = [

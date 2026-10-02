@@ -7,7 +7,7 @@ import { AiButton, AiPanel, AiSparkleIcon, AiTextBox } from '@wiltech-labs/ngx-a
   standalone: true,
   imports: [CommonModule, AiPanel, AiTextBox, AiButton, AiSparkleIcon],
   templateUrl: './ai-tools-demo.component.html',
-  styleUrls: ['./ai-tools-demo.component.css'],
+  styleUrl: './ai-tools-demo.component.scss',
 })
 export class AiToolsDemoComponent {
   prompt = signal('');

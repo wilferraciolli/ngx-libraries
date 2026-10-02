@@ -669,10 +669,10 @@ includePaths`, then `@use 'breakpoints'`/`'spacing'`/`'ui'` exactly like the loc
       `ui.state-layer`, and `ui.danger-button(filled)` — output matched the reference doc's CSS
       exactly. `theme-colors.template.scss` also compiles standalone (against the repo's own
       `@angular/material`, via `--load-path=node_modules`).
-- [ ] No showcase demo route — `apps/showcase` uses plain `.css` with no M3 theme foundation
-      (`_theme-colors.scss`/`mat.theme()`) set up, so there's nothing for these mixins to plug into
-      without first building that foundation into the demo app, which is out of scope for this
-      package. Not browser-verified beyond the Sass-compiles-cleanly check above.
+- [ ] No showcase demo route yet. The original blocker (`apps/showcase` on plain `.css` with no M3
+      theme) is gone as of 2026-10-02 — all showcase styles are `.scss` and `styles.scss` runs
+      `mat.theme()` — so a route is now unblocked, just not built. Not browser-verified beyond the
+      Sass-compiles-cleanly check above.
 - [ ] Once consumed somewhere, `ngx-modals`' `--ngx-modal-width` responsive behaviour and any other
       package's breakpoint-dependent CSS should read from this instead of assuming
       `BreakpointObserver`/`Breakpoints.XSmall` alone — see the `ngx-modals` section above, which
@@ -1403,3 +1403,35 @@ dev mode — not addressed, since this isn't deployed yet).
       until there's a concrete reason to add the first one.
 - [ ] Cloudflare Pages project not yet connected — still local-only (`docs/Storybook.md`
       "Deployment" has the build settings to use).
+
+## Showcase theme families + light/dark switcher — 2026-10-02
+
+App-local by decision (not a library yet — extract once a second real consumer proves the shape).
+
+- [x] Two palette families in `apps/showcase/src/styles/themes/`: `minimalistic` (new default,
+      generated from slate `#55606B` / warm-grey `#6E6658` / neutral `#5F5F61`) and `teal` (the
+      previous `_theme-colors.scss`, moved). `styles.scss` emits typography/density once on `html`
+      and each family's colour under `html[data-theme='<id>']`; light/dark stays on `color-scheme` + `light-dark()`, so every family gets both modes for free. Gotcha: `@use '…/teal'` needs an
+      explicit `as` — bare `teal` is a CSS colour keyword and Sass fails with "Expected digit".
+- [x] `src/app/core/theme.service.ts` (`ThemeService`, `THEME_FAMILIES`): `family` + `mode`
+      (`light`/`dark`/`system`) signals, persisted to `localStorage`, applied to `<html>`. An inline
+      script in `index.html` applies the stored choice before first paint (no light flash).
+- [x] `src/app/core/theme-switcher/`: navbar light/dark one-click toggle + palette menu (families,
+      "Match system"). Navbar moved off hardcoded `#333`/white onto `--mat-sys-*` tokens.
+- [x] Every hardcoded colour in the showcase's demo/home CSS (112 declarations, 11 files) mapped to
+      `--mat-sys-*` roles — dark mode was already broken under an OS dark preference before this,
+      the toggle just made it visible. M3 has no success/warning roles, so those use explicit
+      `light-dark()` pairs.
+- [x] Verified in headless Chrome: default load, toggle, family switch, persistence across
+      reload, "Match system"; screenshots of home/forms/api-client/modals in minimalistic-dark and
+      teal-light; no console errors. Initial bundle +40 kB raw (MatMenu/MatTooltip) — now 1.70 MB
+      against the 1.8 MB error budget.
+- [ ] `docs/ANGULAR_APP_CONVENTIONS.md` still describes one `_theme-colors.scss` per app. Update it
+      (doc first, then libraries, then apps) if multiple families become the convention.
+- [ ] Storybook `brand` toolbar global (see `docs/Storybook.md` "Theme").
+- [ ] Add more families: generate into `styles/themes/`, add a `html[data-theme]` block, add a
+      `THEME_FAMILIES` entry.
+- [x] All 14 showcase component stylesheets renamed `.css` → `.scss` (`git mv`, history kept),
+      `styleUrls: ['…css']` → `styleUrl: '…scss'`. Both `apps/showcase` and `apps/storybook`
+      `angular.json` now set `schematics["@schematics/angular:component"].style = "scss"` and
+      `inlineStyleLanguage: "scss"`, so a generated component can't reintroduce `.css`.

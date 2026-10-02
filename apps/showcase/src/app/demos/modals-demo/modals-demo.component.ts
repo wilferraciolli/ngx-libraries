@@ -17,7 +17,7 @@ type SignupResult = ModalCloseResult<ModalCloseAction, SignupModalResult | undef
   standalone: true,
   imports: [CommonModule],
   templateUrl: './modals-demo.component.html',
-  styleUrls: ['./modals-demo.component.css'],
+  styleUrl: './modals-demo.component.scss',
 })
 export class ModalsDemoComponent {
   private readonly modals = inject(ModalService);

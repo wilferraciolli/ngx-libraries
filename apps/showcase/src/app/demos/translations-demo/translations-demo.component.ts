@@ -8,7 +8,7 @@ import { RelativeTimePipe } from '@wiltech-labs/ngx-dates';
   standalone: true,
   imports: [CommonModule, TPipe, RelativeTimePipe],
   templateUrl: './translations-demo.component.html',
-  styleUrls: ['./translations-demo.component.css'],
+  styleUrl: './translations-demo.component.scss',
 })
 export class TranslationsDemoComponent {
   protected readonly translations = inject(TranslationsService);

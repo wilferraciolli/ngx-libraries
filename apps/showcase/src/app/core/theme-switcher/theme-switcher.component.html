@@ -1,0 +1,47 @@
+<div class="ThemeSwitcher">
+  <button
+    mat-icon-button
+    type="button"
+    [attr.aria-label]="theme.isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
+    [matTooltip]="theme.isDark() ? 'Light mode' : 'Dark mode'"
+    (click)="theme.toggleMode()"
+  >
+    <mat-icon>{{ theme.isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+  </button>
+
+  <button
+    mat-icon-button
+    type="button"
+    aria-label="Choose theme"
+    matTooltip="Theme"
+    [matMenuTriggerFor]="themeMenu"
+  >
+    <mat-icon>palette</mat-icon>
+  </button>
+</div>
+
+<mat-menu #themeMenu="matMenu">
+  @for (family of theme.families; track family.id) {
+    <button
+      mat-menu-item
+      type="button"
+      role="menuitemradio"
+      [attr.aria-checked]="theme.family() === family.id"
+      (click)="theme.setFamily(family.id)"
+    >
+      <mat-icon>{{ theme.family() === family.id ? 'check' : '' }}</mat-icon>
+      <span>{{ family.label }}</span>
+    </button>
+  }
+  <mat-divider />
+  <button
+    mat-menu-item
+    type="button"
+    role="menuitemcheckbox"
+    [attr.aria-checked]="theme.mode() === 'system'"
+    (click)="theme.setMode('system')"
+  >
+    <mat-icon>{{ theme.mode() === 'system' ? 'check' : 'brightness_auto' }}</mat-icon>
+    <span>Match system</span>
+  </button>
+</mat-menu>

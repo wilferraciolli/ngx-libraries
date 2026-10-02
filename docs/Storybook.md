@@ -82,19 +82,22 @@ the layout above (delete its sample stories).
 
 **Decided 2026-10-02: reuse the showcase's theme.** There is one copy, not a fork.
 `apps/storybook/src/styles.scss` runs the same `mat.theme(...)` call as the showcase and loads the
-palettes from `apps/showcase/src/styles/_theme-colors.scss`. The Storybook `angular.json` targets
-add `apps/showcase/src` to `stylePreprocessorOptions.includePaths`, so the import is just
-`@use 'styles/theme-colors' as theme;`. A colour change in the showcase shows up in Storybook with
-no extra step.
+showcase's default palette family from `apps/showcase/src/styles/themes/_minimalistic.scss`. The
+Storybook `angular.json` `build` target adds `apps/showcase/src` to
+`stylePreprocessorOptions.includePaths`, so the import is just
+`@use 'styles/themes/minimalistic' as theme;`. A colour change in the showcase shows up in
+Storybook with no extra step.
 
-This is a deliberate, temporary link between the two workspaces. The theme is going to be
-rewritten so a different theme can be picked per customer. When that lands:
+The showcase now has more than one palette family (`minimalistic`, `teal`, each with light and dark)
+and an app-local `ThemeService` that switches between them (`apps/showcase/src/app/core/`). The
+switching stays app-local for now — decided 2026-10-02, until a second real consumer proves the
+shared shape. Storybook still loads only the default family. Later:
 
 - the palettes move out of `apps/showcase` into a shared home that both apps (and real consumers)
   read from, and this `includePaths` link goes away;
-- Storybook gets a third toolbar global, `brand`, listing each customer theme. It applies that
-  theme's token set, so every story can be checked against every customer theme, in light and
-  dark.
+- Storybook gets a third toolbar global, `brand`, listing each theme family. It sets `data-theme`
+  on `<html>` the same way the showcase's `ThemeService` does, so every story can be checked
+  against every family, in light and dark.
 
 Until then, the toolbar has only `theme` (light/dark/system) and `locale`.
 
