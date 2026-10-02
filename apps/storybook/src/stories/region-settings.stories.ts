@@ -24,6 +24,7 @@ const OPTIONS: RegionSettingsFieldOptions = {
   theme: [
     { label: 'Day', value: 'light' },
     { label: 'Night', value: 'dark' },
+    { label: 'Auto', value: 'system' },
   ],
 };
 

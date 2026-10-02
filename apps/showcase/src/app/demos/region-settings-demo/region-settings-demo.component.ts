@@ -19,37 +19,87 @@ const INITIAL_SETTINGS: RegionSettingsPayload = {
   theme: 'light',
 };
 
+// Format previews, appended to each option's label by the browser's own Intl — no backend, and no
+// change to RegionSettingsFormComponent (it renders whatever label it's given). Only the name part
+// of a label needs translating; the sample itself is locale-formatted, not translated.
+// Fixed sample: 31 Dec, 14:30 — the day > 12 makes DD/MM vs MM/DD obvious.
+const SAMPLE_DATE = new Date(2026, 11, 31, 14, 30);
+const SAMPLE_NUMBER = 1234.56;
+// Currency previews can't follow the locale the user is picking in the other field (labels are
+// built once), so they use the app's own display locale.
+const PREVIEW_LOCALE = 'en-GB';
+
+function localePreview(locale: string): string {
+  const date = new Intl.DateTimeFormat(locale, { dateStyle: 'short' }).format(SAMPLE_DATE);
+  const time = new Intl.DateTimeFormat(locale, { timeStyle: 'short' }).format(SAMPLE_DATE);
+  const number = new Intl.NumberFormat(locale).format(SAMPLE_NUMBER);
+  return `${date} · ${time} · ${number}`;
+}
+
+function timezonePreview(timeZone: string): string {
+  return new Intl.DateTimeFormat(PREVIEW_LOCALE, { timeStyle: 'short', timeZone }).format(
+    new Date(),
+  );
+}
+
+function currencyPreview(currency: string): string {
+  return new Intl.NumberFormat(PREVIEW_LOCALE, { style: 'currency', currency }).format(
+    SAMPLE_NUMBER,
+  );
+}
+
+function withPreview(
+  options: { label: string; value: string }[],
+  preview: (value: string) => string,
+): { label: string; value: string }[] {
+  return options.map((option) => ({
+    ...option,
+    label: `${option.label} — ${preview(option.value)}`,
+  }));
+}
+
 const FIELD_OPTIONS: RegionSettingsFieldOptions = {
-  timezone: [
-    { label: 'London (GMT/BST)', value: 'Europe/London' },
-    { label: 'Nicosia (EET/EEST)', value: 'Asia/Nicosia' },
-    { label: 'São Paulo (BRT)', value: 'America/Sao_Paulo' },
-  ],
+  timezone: withPreview(
+    [
+      { label: 'London (GMT/BST)', value: 'Europe/London' },
+      { label: 'Nicosia (EET/EEST)', value: 'Asia/Nicosia' },
+      { label: 'São Paulo (BRT)', value: 'America/Sao_Paulo' },
+    ],
+    timezonePreview,
+  ),
   language: [
     { label: 'English (UK)', value: 'en-GB' },
     { label: 'English (US)', value: 'en-US' },
     { label: 'Greek', value: 'el-CY' },
   ],
-  locale: [
-    { label: 'English (UK)', value: 'en-GB' },
-    { label: 'English (US)', value: 'en-US' },
-    { label: 'Greek (Cyprus)', value: 'el-CY' },
-  ],
-  currency: [
-    { label: 'British Pound (£)', value: 'GBP' },
-    { label: 'Euro (€)', value: 'EUR' },
-    { label: 'US Dollar ($)', value: 'USD' },
-  ],
-  // ThemeField's values are always 'light'/'dark' (each tied to its own fixed icon) — this only
+  locale: withPreview(
+    [
+      { label: 'English (UK)', value: 'en-GB' },
+      { label: 'English (US)', value: 'en-US' },
+      { label: 'Greek (Cyprus)', value: 'el-CY' },
+    ],
+    localePreview,
+  ),
+  currency: withPreview(
+    [
+      { label: 'British Pound', value: 'GBP' },
+      { label: 'Euro', value: 'EUR' },
+      { label: 'US Dollar', value: 'USD' },
+    ],
+    currencyPreview,
+  ),
+  // ThemeField's values are always 'light'/'dark'/'system' (each tied to its own fixed icon) — this only
   // supplies the label text for each, same mechanism as the four fields above.
   theme: [
     { label: 'Day', value: 'light' },
     { label: 'Night', value: 'dark' },
+    { label: 'Auto', value: 'system' },
   ],
 };
 
 const FIELD_HINTS: RegionSettingsFieldHints = {
-  locale: 'Changes how dates are typed and shown — e.g. US: MM/DD/YYYY, UK: DD/MM/YYYY.',
+  locale:
+    'Changes how dates, times and numbers are typed and shown — each option shows an example.',
 };
 
 @Component({

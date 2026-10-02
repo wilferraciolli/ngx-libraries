@@ -185,8 +185,8 @@ TProfile>` and `RegionSettingsStore<TSettings, TPayload>` are both parameterized
   light/dark icon toggle (sun/moon) instead of a dropdown, since theme only ever has those two
   values. `RegionSettingsFieldOptions` keeps its `theme` key (settled back after a same-day detour
   where `ThemeField` briefly took a separate config/token instead of `fieldDef.options` — see that
-  package's `CLAUDE.md` for the full back-and-forth): `ThemeField`'s two values are fixed
-  (`'light'`/`'dark'`, each tied to its own icon), so `options.theme` only ever supplies each one's
+  package's `CLAUDE.md` for the full back-and-forth): `ThemeField`'s values are fixed
+  (`'light'`/`'dark'`, plus `'system'` since 2026-10-02, each tied to its own icon), so `options.theme` only ever supplies each one's
   label text, same mechanism the other four fields use for both label and value. `themeField` is
   still built through the shared `fieldDef()` helper, just with `FormFieldType.THEME` instead of the
   default `SELECT`.

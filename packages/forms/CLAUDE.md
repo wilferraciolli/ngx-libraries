@@ -52,7 +52,8 @@ src/
   browser's own language the way `ngx-dates` is — this locale also decides which typed day/month
   order `LocaleDateAdapter.parse()` accepts, so changing it changes input behaviour, not just
   wording, and an app should opt into that rather than have it happen silently.
-- **Theme field labels**: `ThemeField`'s two icon toggles read their label text from
+- **Theme field labels**: `ThemeField`'s three icon toggles (`'light'`/`'dark'`/`'system'` — the
+  third added 2026-10-02 to match `ngx-themes`' modes) read their label text from
   `fieldDef.options` — same `FieldOption[]` mechanism `RadioField`/`SelectField` already use, not a
   separate config or token. Went through two more elaborate designs first, added and then undone the
   same day (2026-10-01), each time after being asked directly to justify the shape:

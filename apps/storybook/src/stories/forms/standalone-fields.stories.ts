@@ -111,6 +111,7 @@ export const Theme: Story = {
       options: [
         { label: 'Day', value: 'light' },
         { label: 'Night', value: 'dark' },
+        { label: 'Auto', value: 'system' },
       ],
     } satisfies FieldDef,
     initialValue: 'light',

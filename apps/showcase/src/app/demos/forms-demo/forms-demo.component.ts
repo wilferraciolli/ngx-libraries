@@ -312,9 +312,10 @@ export class FormsDemoComponent {
         [
           { label: 'Day', value: 'light' },
           { label: 'Night', value: 'dark' },
+          { label: 'Auto', value: 'system' },
         ],
         {
-          hint: 'A fixed light/dark choice, shown as a sun/moon icon toggle instead of a dropdown.',
+          hint: 'A fixed light/dark/system choice, shown as a sun/moon/auto icon toggle instead of a dropdown.',
         },
       )
       .build({

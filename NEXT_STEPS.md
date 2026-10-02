@@ -1202,20 +1202,22 @@ See "New package `ngx-auth` — built 2026-09-30" above for what's built and wha
 See "New package `ngx-region-settings` — built 2026-09-30" and "`ngx-region-settings` gains
 `RegionSettingsFormComponent` — 2026-09-30" above for what's built and what's still open.
 
-- [ ] **Format preview in `RegionSettingsFormComponent`** (requested 2026-10-02, not designed yet).
-      Show the user what their choice will look like before saving: a sample **date format**,
-      **time format** and **number format** rendered with the currently selected locale (and
-      timezone/currency where relevant), updating live as the fields change. Today `hints` can only
-      describe the effect in words (Eg "changes how dates are typed and shown"). Open questions to
-      settle before building: - **Who produces the sample?** The component formatting a fixed sample value itself (`Intl` /
-      `Temporal` with the selected locale — no backend, but it must stay in step with how the
-      consuming app really formats), or the client/API sending ready-made examples per option
-      (Eg alongside each locale in the metadata — always matches the server, but couples the
-      payload shape to this UI). - **Translation.** The preview labels ("Date", "Time", "Number") need translating, like the
-      rest of the form's text — likely more keys on `NGX_REGION_SETTINGS_FORM_TEXT`. The sample
-      values themselves are locale-formatted, not translated, which may be confusing if the
-      preview's locale differs from the app's current UI language. - **Placement.** A summary block under the form vs. a per-field preview under `locale`
-      (possibly via `hints`, or `ngx-components`' `Banner`/`Card`).
+- [x] **Format preview — app-side, no component change** (requested and decided 2026-10-02). Each
+      option's label carries a sample built by the browser's `Intl`: locale shows
+      `date · time · number` (Eg `English (US) — 12/31/26 · 2:30 PM · 1,234.56`), timezone shows the current time
+      there, currency shows a formatted amount. `RegionSettingsFormComponent` already renders
+      whatever `options` labels it's given, so this needs nothing from the library. No backend, and
+      no translation beyond the name part the app already translates: the sample is locale-formatted,
+      not translated. Done in `apps/showcase`'s region-settings demo (`withPreview()` /
+      `localePreview()` / `timezonePreview()` / `currencyPreview()`), browser-checked.
+- [ ] Limits of the label approach, which would each need a component change if they matter:
+      labels are built once, so a currency sample can't follow the locale picked in the other field
+      (the demo uses the app's own locale), and the timezone time is a snapshot from page load. A
+      `valueChange` output or a preview slot would allow a live summary under the form instead.
+      Also, `Intl` shows how the _browser_ formats, so it won't match a server that formats
+      differently (Eg emails/PDFs).
+- [ ] If more than one app wants this, lift the preview helpers into the library as exported
+      functions (still no component change), Eg `withLocalePreview(options)`.
 
 ## packages/modals
 
@@ -1475,8 +1477,8 @@ earlier "keep it app-local" decision above.
 
 - [x] `ThemeService` + the switcher moved out of `apps/showcase/src/app/core/` into
       `packages/themes`. The switcher is now `ThemeSwitcher` / `<ngx-theme-switcher>`. The hardcoded
-      `THEME_FAMILIES` list and the storage keys became `provideThemes({ families, defaultFamily,
-    defaultMode, storageKeyPrefix })`. With no families it is a light/dark toggle only and the menu
+      `THEME_FAMILIES` list and the storage keys became
+      `provideThemes({ families, defaultFamily, defaultMode, storageKeyPrefix })`. With no families it is a light/dark toggle only and the menu
       shows just "Match system". The switcher's labels are overridable via `NGX_THEMES_TEXT`.
 - [x] Palettes stay in the app (`apps/showcase/src/styles/themes/` + `styles.scss` blocks), and so
       does the `index.html` pre-paint script. The showcase passes `storageKeyPrefix: 'showcase.theme'`
@@ -1489,3 +1491,23 @@ earlier "keep it app-local" decision above.
       re-implementing the attribute flip, but Storybook still only loads the minimalistic palette.
 - [ ] Translate the showcase switcher's labels via `NGX_THEMES_TEXT` + `ngx-translations` (still
       English).
+
+## `ngx-forms`' `ThemeField` gains `'system'` — 2026-10-02
+
+- [x] `ThemeField` is now a three-way toggle: `'light'` (sun), `'dark'` (moon) and `'system'`
+      (`brightness_auto`, follow the OS). This matches `ngx-themes`' `ThemeMode`, so a saved
+      region-settings `theme` can go straight into `ThemeService.setMode()`. The values and icons
+      are a fixed list in `theme-field.ts`; `options` still supplies only the label text (defaults
+      `'Light'`/`'Dark'`/`'System'`). `ngx-region-settings` needed no code change because `theme` is
+      a `string` and `ThemeField` renders it. Its docs, the showcase demos and the Storybook stories
+      now pass a third label (`Auto`).
+- [x] Fixed a pre-existing a11y bug found while testing: the toggles bound `[attr.aria-label]`,
+      which only sets an attribute on the `<mat-button-toggle>` host, so the inner `role="radio"`
+      button had no accessible name (icon-only, so screen readers announced nothing). It now binds
+      the component's `[aria-label]` input, which `MatButtonToggle` forwards to the button. Checked in
+      headless Chrome: the names are Day / Night / Auto; choosing Auto and saving emits
+      `theme: "system"`; no console errors.
+- [ ] Not wired up: saving the showcase region-settings demo doesn't apply the theme. Call
+      `ThemeService.setMode(saved.theme)` there if the demo should show the end-to-end flow.
+- [ ] A backend that validates `theme` against `light|dark` must accept `system` before a
+      consuming app offers it.

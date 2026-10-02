@@ -189,8 +189,11 @@ const allFieldsConfig = formConfig<AllFieldsSchema>('allFields')
     [
       { label: 'Day', value: 'light' },
       { label: 'Night', value: 'dark' },
+      { label: 'Auto', value: 'system' },
     ],
-    { hint: 'A fixed light/dark choice, shown as a sun/moon toggle instead of a dropdown.' },
+    {
+      hint: 'A fixed light/dark/system choice, shown as a sun/moon/auto toggle instead of a dropdown.',
+    },
   )
   .build({
     username: '',

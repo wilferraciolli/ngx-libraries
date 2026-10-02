@@ -198,24 +198,24 @@ container. `DynamicForm` adds no padding or background of its own — put it in 
 
 ## Field types
 
-| `FormFieldType`     | Builder method                 | Component              | Value                        | Material control                                        |
-| ------------------- | ------------------------------ | ---------------------- | ---------------------------- | ------------------------------------------------------- |
-| `TEXT`              | `text()`                       | `TextField`            | `string`                     | `matInput`                                              |
-| `EMAIL`             | `email()`                      | `TextField`            | `string`                     | `matInput` (`type="email"`), plus a valid-address check |
-| `PASSWORD`          | `password()`                   | `TextField`            | `string`                     | `matInput` (masked)                                     |
-| `SEARCH`            | `search()`                     | `TextField`            | `string`                     | `matInput`                                              |
-| `NUMBER`            | `number()`                     | `TextField`            | `number`                     | `matInput`                                              |
-| `TEXTAREA`          | `textarea()`                   | `TextareaField`        | `string`                     | `matInput` textarea, auto-growing                       |
-| `CODE`              | `code()`                       | `TextareaField`        | `string`                     | Monospaced textarea, Tab indents                        |
-| `CHECKBOX`          | `checkbox()`                   | `CheckboxField`        | `boolean`                    | `mat-checkbox`                                          |
-| `RADIO`             | `radio(name, label, choices)`  | `RadioField`           | option value                 | `mat-radio-group`                                       |
-| `SELECT`            | `select(name, label, choices)` | `SelectField`          | option value                 | `mat-select`                                            |
-| `CHIPS`             | `chips()`                      | `ChipsField`           | `string[]`                   | `mat-chip-grid`, one token typed at a time              |
-| `THEME`             | `theme(name, label, choices?)` | `ThemeField`           | `'light'` / `'dark'`         | `mat-button-toggle-group`, sun/moon icon pair           |
-| `RANGE`             | `range()`                      | `SliderField`          | `number`                     | `mat-slider` (`min`/`max`/`step`, default 0–100)        |
-| `BUSINESS_DATE`     | `businessDate()`               | `BusinessDateField`    | `'YYYY-MM-DD'`               | Datepicker                                              |
-| `BUSINESS_TIME`     | `businessTime()`               | `BusinessTimeField`    | `'HH:mm'`                    | Timepicker                                              |
-| `INSTANT_DATE_TIME` | `instantDateTime()`            | `InstantDateTimeField` | UTC `'YYYY-MM-DDThh:mm:ssZ'` | Datepicker + timepicker                                 |
+| `FormFieldType`     | Builder method                 | Component              | Value                             | Material control                                        |
+| ------------------- | ------------------------------ | ---------------------- | --------------------------------- | ------------------------------------------------------- |
+| `TEXT`              | `text()`                       | `TextField`            | `string`                          | `matInput`                                              |
+| `EMAIL`             | `email()`                      | `TextField`            | `string`                          | `matInput` (`type="email"`), plus a valid-address check |
+| `PASSWORD`          | `password()`                   | `TextField`            | `string`                          | `matInput` (masked)                                     |
+| `SEARCH`            | `search()`                     | `TextField`            | `string`                          | `matInput`                                              |
+| `NUMBER`            | `number()`                     | `TextField`            | `number`                          | `matInput`                                              |
+| `TEXTAREA`          | `textarea()`                   | `TextareaField`        | `string`                          | `matInput` textarea, auto-growing                       |
+| `CODE`              | `code()`                       | `TextareaField`        | `string`                          | Monospaced textarea, Tab indents                        |
+| `CHECKBOX`          | `checkbox()`                   | `CheckboxField`        | `boolean`                         | `mat-checkbox`                                          |
+| `RADIO`             | `radio(name, label, choices)`  | `RadioField`           | option value                      | `mat-radio-group`                                       |
+| `SELECT`            | `select(name, label, choices)` | `SelectField`          | option value                      | `mat-select`                                            |
+| `CHIPS`             | `chips()`                      | `ChipsField`           | `string[]`                        | `mat-chip-grid`, one token typed at a time              |
+| `THEME`             | `theme(name, label, choices?)` | `ThemeField`           | `'light'` / `'dark'` / `'system'` | `mat-button-toggle-group`, sun/moon/auto icon row       |
+| `RANGE`             | `range()`                      | `SliderField`          | `number`                          | `mat-slider` (`min`/`max`/`step`, default 0–100)        |
+| `BUSINESS_DATE`     | `businessDate()`               | `BusinessDateField`    | `'YYYY-MM-DD'`                    | Datepicker                                              |
+| `BUSINESS_TIME`     | `businessTime()`               | `BusinessTimeField`    | `'HH:mm'`                         | Timepicker                                              |
+| `INSTANT_DATE_TIME` | `instantDateTime()`            | `InstantDateTimeField` | UTC `'YYYY-MM-DDThh:mm:ssZ'`      | Datepicker + timepicker                                 |
 
 Use `hidden(name)` on the builder for a field that belongs to the model and its validation but is never shown.
 
@@ -253,16 +253,18 @@ unset and every field keeps today's default (`'en-GB'`).
 
 ### Theme field labels
 
-`ThemeField`'s two icon toggles (sun = `'light'`, moon = `'dark'`) have no visible text — their
-accessible label comes from `choices`, same `FieldOption[]` mechanism `radio()`/`select()` already
-use, not a separate config or token. The two values are always fixed (`'light'`/`'dark'`, each tied
-to its own icon), so `choices` only ever supplies each one's label text — defaults to English
-`'Light'`/`'Dark'` when omitted:
+`ThemeField`'s three icon toggles (sun = `'light'`, moon = `'dark'`, auto = `'system'`, i.e. follow
+the OS preference) have no visible text — their accessible label comes from `choices`, same
+`FieldOption[]` mechanism `radio()`/`select()` already use, not a separate config or token. The three
+values are always fixed, each tied to its own icon, so `choices` only ever supplies each one's label
+text — defaults to English `'Light'`/`'Dark'`/`'System'` when omitted (any you leave out keep their
+default):
 
 ```ts
 formConfig<MySchema>('settings').theme('colorScheme', 'Color Scheme', [
   { label: 'Day', value: 'light' },
   { label: 'Night', value: 'dark' },
+  { label: 'Auto', value: 'system' },
 ]);
 ```
 
@@ -281,7 +283,7 @@ interface FieldDef {
   min?: number; // Number and range fields
   max?: number; // Number and range fields
   step?: number; // Range fields
-  options?: FieldOption[]; // Radio and select: [{ label, value }]. Theme: label text only, value is always 'light'/'dark'
+  options?: FieldOption[]; // Radio and select: [{ label, value }]. Theme: label text only, value is always 'light'/'dark'/'system'
   orientation?: 'horizontal' | 'vertical'; // Radio: a wrapping row (default) or one option per line
   dateTimeConfig?: DateTimeConfig; // Business date/time and instant date-time
   hidden?: boolean; // Part of the model, never rendered

@@ -13,8 +13,8 @@ import { NGX_REGION_SETTINGS_FORM_TEXT } from '../config/settings-form-text.toke
 
 /** One `{label, value}` list per field, already resolved and translated by the caller — this
  *  component never decides what a value means or how it reads, only how it's laid out. For
- *  `theme`, `ngx-forms`' `ThemeField` only ever uses this to supply each of its two fixed values'
- *  (`'light'`/`'dark'`) label text — defaults to English when absent, same as the other four. */
+ *  `theme`, `ngx-forms`' `ThemeField` only ever uses this to supply each of its three fixed values'
+ *  (`'light'`/`'dark'`/`'system'`) label text — defaults to English when absent, same as the other four. */
 export type RegionSettingsFieldOptions = Partial<
   Record<keyof RegionSettingsPayload, FieldOption[]>
 >;

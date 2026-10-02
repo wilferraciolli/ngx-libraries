@@ -30,11 +30,14 @@
       <code>{{ '{value, viewValue}' }}</code> API metadata pairs, translating each label however
       that app does translation. The theme field (<code>ThemeField</code> from
       <code>ngx-forms</code>) uses the same <code>options</code> mechanism, just for label text only
-      — its two values are always fixed (<code>'light'</code>/<code>'dark'</code>), each tied to its
-      own sun/moon icon. <code>hints</code> is separate — plain per-field hint text, same as any
-      <code>ngx-forms</code> field's <code>FieldDef.hint</code> (see the Locale field above).
-      <code>(save)</code> only hands back the edited payload — saving it (here, a fake 600ms delay)
-      is entirely up to whoever owns the form.
+      — its three values are always fixed
+      (<code>'light'</code>/<code>'dark'</code>/<code>'system'</code>), each tied to its own
+      sun/moon/auto icon. <code>hints</code> is separate — plain per-field hint text, same as any
+      <code>ngx-forms</code> field's <code>FieldDef.hint</code> (see the Locale field above). The
+      examples after each timezone, locale and currency label (time, date · time · number, amount)
+      are built in this demo with the browser's <code>Intl</code> and appended to the label — the
+      component itself has no preview feature. <code>(save)</code> only hands back the edited
+      payload — saving it (here, a fake 600ms delay) is entirely up to whoever owns the form.
     </p>
   </div>
 </div>

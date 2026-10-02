@@ -8,18 +8,22 @@ import { FieldSubscript } from '../../shared/field-subscript/field-subscript';
 
 let nextId: number = 0;
 
-const DEFAULT_LIGHT_LABEL = 'Light';
-const DEFAULT_DARK_LABEL = 'Dark';
+/** The three fixed values, each always paired with the same icon. Order is the on-screen order. */
+const THEME_CHOICES = [
+  { value: 'light', icon: 'light_mode', defaultLabel: 'Light' },
+  { value: 'dark', icon: 'dark_mode', defaultLabel: 'Dark' },
+  { value: 'system', icon: 'brightness_auto', defaultLabel: 'System' },
+] as const;
 
-/** Material icon toggle group for the theme field type: a fixed choice between `'light'` and
- *  `'dark'`, shown as a sun/moon icon pair instead of a dropdown or radio list.
- *  `MatButtonToggleGroup` is a `ControlValueAccessor`, same as `MatRadioGroup`/`MatSelect`, so
- *  `[formField]` works on it directly — no hand-written value sync needed.
+/** Material icon toggle group for the theme field type: a fixed choice between `'light'`,
+ *  `'dark'` and `'system'` (follow the OS preference), shown as a sun/moon/auto icon row instead of
+ *  a dropdown or radio list. `MatButtonToggleGroup` is a `ControlValueAccessor`, same as
+ *  `MatRadioGroup`/`MatSelect`, so `[formField]` works on it directly — no hand-written value sync
+ *  needed.
  *
  *  Labels come from `fieldDef.options` — same mechanism `RadioField`/`SelectField` already use, not
- *  a separate config or token — matched by value since the two values and their icons are fixed
- *  (`'light'`/`'dark'` only, each always paired with the same sun/moon icon); `options` only ever
- *  supplies the label text for each, defaulting to English when absent. */
+ *  a separate config or token — matched by value since the three values and their icons are fixed;
+ *  `options` only ever supplies the label text for each, defaulting to English when absent. */
 @Component({
   selector: 'ngx-theme-field',
   standalone: true,
@@ -32,15 +36,14 @@ export class ThemeField {
   public readonly fieldDef = input.required<FieldDef>();
   public readonly field = input.required<FieldTree<string>>();
 
-  protected readonly lightLabel = computed(
-    () =>
-      this.fieldDef().options?.find((option) => option.value === 'light')?.label ??
-      DEFAULT_LIGHT_LABEL,
-  );
-  protected readonly darkLabel = computed(
-    () =>
-      this.fieldDef().options?.find((option) => option.value === 'dark')?.label ??
-      DEFAULT_DARK_LABEL,
+  protected readonly choices = computed(() =>
+    THEME_CHOICES.map((choice) => ({
+      value: choice.value,
+      icon: choice.icon,
+      label:
+        this.fieldDef().options?.find((option) => option.value === choice.value)?.label ??
+        choice.defaultLabel,
+    })),
   );
 
   protected readonly labelId: string = `theme-field-label-${nextId++}`;

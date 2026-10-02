@@ -85,11 +85,11 @@ export class MySettingsPage {
 
 `RegionSettingsFormComponent` renders all five region fields — no need to build this form's layout,
 dirty-check or submit wiring yourself. Four of them (timezone, language, locale, currency) render as
-`@wiltech-labs/ngx-forms` `SelectField`s; `theme` renders as its `ThemeField`, a fixed light/dark
-sun/moon icon toggle. All five use the same `options` input: for the four select-driven fields it's
-both each option's label and its bound value; `theme`'s two values are always fixed
-(`'light'`/`'dark'`, each tied to its own icon), so `options.theme` only ever supplies the label text
-— defaults to English "Light"/"Dark" when you don't set one.
+`@wiltech-labs/ngx-forms` `SelectField`s; `theme` renders as its `ThemeField`, a fixed light/dark/system
+sun/moon/auto icon toggle. All five use the same `options` input: for the four select-driven fields it's
+both each option's label and its bound value; `theme`'s three values are always fixed
+(`'light'`/`'dark'`/`'system'`, each tied to its own icon), so `options.theme` only ever supplies the
+label text — defaults to English "Light"/"Dark"/"System" when you don't set one.
 
 This component does **not** decide what any label says or, for the four select-driven fields, which
 value an option is bound to: `options` takes ready-made `FieldOption[]` (ngx-forms' own `{label,
@@ -115,7 +115,8 @@ protected readonly fieldOptions = computed<RegionSettingsFieldOptions>(() => {
     theme: [
       { label: 'Day', value: 'light' },
       { label: 'Night', value: 'dark' },
-    ], // label text only — ThemeField's values are always 'light'/'dark'
+      { label: 'Auto', value: 'system' },
+    ], // label text only — ThemeField's values are always 'light'/'dark'/'system'
   };
 });
 ```

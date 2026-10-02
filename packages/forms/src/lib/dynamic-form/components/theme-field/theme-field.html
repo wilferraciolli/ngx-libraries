@@ -9,11 +9,10 @@
   [formField]="field()"
   [attr.aria-labelledby]="labelId"
 >
-  <mat-button-toggle value="light" [attr.aria-label]="lightLabel()">
-    <mat-icon aria-hidden="true">light_mode</mat-icon>
-  </mat-button-toggle>
-  <mat-button-toggle value="dark" [attr.aria-label]="darkLabel()">
-    <mat-icon aria-hidden="true">dark_mode</mat-icon>
-  </mat-button-toggle>
+  @for (choice of choices(); track choice.value) {
+    <mat-button-toggle [value]="choice.value" [aria-label]="choice.label">
+      <mat-icon aria-hidden="true">{{ choice.icon }}</mat-icon>
+    </mat-button-toggle>
+  }
 </mat-button-toggle-group>
 <ngx-field-subscript [field]="field()" [hint]="fieldDef().hint" />
