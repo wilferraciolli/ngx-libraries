@@ -2,21 +2,21 @@
   <button
     mat-icon-button
     type="button"
-    [attr.aria-label]="theme.isDark() ? 'Switch to light mode' : 'Switch to dark mode'"
-    [matTooltip]="theme.isDark() ? 'Light mode' : 'Dark mode'"
+    [attr.aria-label]="text().toggleModeLabel(theme.isDark())"
+    [matTooltip]="text().toggleModeTooltip(theme.isDark())"
     (click)="theme.toggleMode()"
   >
-    <mat-icon>{{ theme.isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    <mat-icon aria-hidden="true">{{ theme.isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
   </button>
 
   <button
     mat-icon-button
     type="button"
-    aria-label="Choose theme"
-    matTooltip="Theme"
+    [attr.aria-label]="text().chooseTheme"
+    [matTooltip]="text().themeTooltip"
     [matMenuTriggerFor]="themeMenu"
   >
-    <mat-icon>palette</mat-icon>
+    <mat-icon aria-hidden="true">palette</mat-icon>
   </button>
 </div>
 
@@ -29,11 +29,13 @@
       [attr.aria-checked]="theme.family() === family.id"
       (click)="theme.setFamily(family.id)"
     >
-      <mat-icon>{{ theme.family() === family.id ? 'check' : '' }}</mat-icon>
+      <mat-icon aria-hidden="true">{{ theme.family() === family.id ? 'check' : '' }}</mat-icon>
       <span>{{ family.label }}</span>
     </button>
   }
-  <mat-divider />
+  @if (theme.families.length) {
+    <mat-divider />
+  }
   <button
     mat-menu-item
     type="button"
@@ -41,7 +43,9 @@
     [attr.aria-checked]="theme.mode() === 'system'"
     (click)="theme.setMode('system')"
   >
-    <mat-icon>{{ theme.mode() === 'system' ? 'check' : 'brightness_auto' }}</mat-icon>
-    <span>Match system</span>
+    <mat-icon aria-hidden="true">{{
+      theme.mode() === 'system' ? 'check' : 'brightness_auto'
+    }}</mat-icon>
+    <span>{{ text().matchSystem }}</span>
   </button>
 </mat-menu>

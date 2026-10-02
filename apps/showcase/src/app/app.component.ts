@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { ThemeSwitcherComponent } from './core/theme-switcher/theme-switcher.component';
+import { ThemeSwitcher } from '@wiltech-labs/ngx-themes';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterModule, ThemeSwitcherComponent],
+  imports: [CommonModule, RouterModule, ThemeSwitcher],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

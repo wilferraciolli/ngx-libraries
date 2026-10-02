@@ -1202,6 +1202,21 @@ See "New package `ngx-auth` — built 2026-09-30" above for what's built and wha
 See "New package `ngx-region-settings` — built 2026-09-30" and "`ngx-region-settings` gains
 `RegionSettingsFormComponent` — 2026-09-30" above for what's built and what's still open.
 
+- [ ] **Format preview in `RegionSettingsFormComponent`** (requested 2026-10-02, not designed yet).
+      Show the user what their choice will look like before saving: a sample **date format**,
+      **time format** and **number format** rendered with the currently selected locale (and
+      timezone/currency where relevant), updating live as the fields change. Today `hints` can only
+      describe the effect in words (Eg "changes how dates are typed and shown"). Open questions to
+      settle before building: - **Who produces the sample?** The component formatting a fixed sample value itself (`Intl` /
+      `Temporal` with the selected locale — no backend, but it must stay in step with how the
+      consuming app really formats), or the client/API sending ready-made examples per option
+      (Eg alongside each locale in the metadata — always matches the server, but couples the
+      payload shape to this UI). - **Translation.** The preview labels ("Date", "Time", "Number") need translating, like the
+      rest of the form's text — likely more keys on `NGX_REGION_SETTINGS_FORM_TEXT`. The sample
+      values themselves are locale-formatted, not translated, which may be confusing if the
+      preview's locale differs from the app's current UI language. - **Placement.** A summary block under the form vs. a per-field preview under `locale`
+      (possibly via `hints`, or `ngx-components`' `Banner`/`Card`).
+
 ## packages/modals
 
 See "New package `ngx-modals` — built 2026-09-30" and "Showcase M3 theme + modals/notifications
@@ -1226,6 +1241,10 @@ planned but not started.
 ## packages/calendar
 
 See "New packages `ngx-calendar` and `ngx-organization`" above.
+
+## packages/themes
+
+See "New package `ngx-themes` — extracted 2026-10-02" below.
 
 ## packages/organization
 
@@ -1429,8 +1448,8 @@ App-local by decision (not a library yet — extract once a second real consumer
 - [ ] `docs/ANGULAR_APP_CONVENTIONS.md` still describes one `_theme-colors.scss` per app. Update it
       (doc first, then libraries, then apps) if multiple families become the convention.
 - [ ] Storybook `brand` toolbar global (see `docs/Storybook.md` "Theme").
-- [ ] Add more families: generate into `styles/themes/`, add a `html[data-theme]` block, add a
-      `THEME_FAMILIES` entry.
+- [ ] Add more families: generate into `styles/themes/`, add a `html[data-theme]` block, add an
+      entry to `provideThemes()` in `src/main.ts` (was `THEME_FAMILIES` before the extraction below).
 - [x] All 14 showcase component stylesheets renamed `.css` → `.scss` (`git mv`, history kept),
       `styleUrls: ['…css']` → `styleUrl: '…scss'`. Both `apps/showcase` and `apps/storybook`
       `angular.json` now set `schematics["@schematics/angular:component"].style = "scss"` and
@@ -1448,3 +1467,25 @@ App-local by decision (not a library yet — extract once a second real consumer
       salmon, and the bright yellow does appear (tertiary tone 80). Browser-checked, no console
       errors. Playwright gotcha: `:has-text("Red & Yellow")` doesn't match the `&` — use
       `getByRole('menuitemradio', { name: 'Red & Yellow' })`.
+
+## New package `ngx-themes` — extracted 2026-10-02
+
+Asked for directly ("move the theme service to its own ngx-themes library"), which overrides the
+earlier "keep it app-local" decision above.
+
+- [x] `ThemeService` + the switcher moved out of `apps/showcase/src/app/core/` into
+      `packages/themes`. The switcher is now `ThemeSwitcher` / `<ngx-theme-switcher>`. The hardcoded
+      `THEME_FAMILIES` list and the storage keys became `provideThemes({ families, defaultFamily,
+    defaultMode, storageKeyPrefix })`. With no families it is a light/dark toggle only and the menu
+      shows just "Match system". The switcher's labels are overridable via `NGX_THEMES_TEXT`.
+- [x] Palettes stay in the app (`apps/showcase/src/styles/themes/` + `styles.scss` blocks), and so
+      does the `index.html` pre-paint script. The showcase passes `storageKeyPrefix: 'showcase.theme'`
+      so the existing keys and script didn't change.
+- [x] Package typecheck + `ng-packagr` build clean, showcase `ng build` clean. Headless Chrome:
+      dark + Magenta selected, persisted across reload, no console errors. Storybook story
+      `ngx-themes/ThemeSwitcher` (`Default`, `LightDarkOnly`).
+- [ ] Not published to npm.
+- [ ] Storybook `brand` toolbar global: it can now reuse `ThemeService.setFamily()` instead of
+      re-implementing the attribute flip, but Storybook still only loads the minimalistic palette.
+- [ ] Translate the showcase switcher's labels via `NGX_THEMES_TEXT` + `ngx-translations` (still
+      English).

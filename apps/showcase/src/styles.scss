@@ -2,11 +2,12 @@
 // defines the --mat-sys-* CSS variables (colour roles, type scale, shape scale, elevation, state
 // layers) that Material components — and this app's own CSS — read instead of hardcoded values.
 //
-// Two independent axes, both switched at runtime by `ThemeService` (src/app/core/theme.service.ts):
+// Two independent axes, both switched at runtime by `ngx-themes`' `ThemeService`
+// (families registered with `provideThemes()` in src/main.ts):
 // - **Family** (`data-theme` on <html>): which palette. Each family's colours are scoped to its own
 //   selector below; `minimalistic` is also the default with no attribute set. Add a family by
 //   generating a palette into `styles/themes/` and adding one block here + one entry in
-//   `THEME_FAMILIES`.
+//   `provideThemes()`.
 // - **Mode** (`color-scheme` on <html>): light / dark / system. The theme type is `color-scheme`, so
 //   every role resolves through `light-dark()` — forcing `color-scheme` flips the whole page, with
 //   no separate dark stylesheet per family.

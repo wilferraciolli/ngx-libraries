@@ -4,18 +4,22 @@ import { MatIcon } from '@angular/material/icon';
 import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { MatDivider } from '@angular/material/divider';
 import { MatTooltip } from '@angular/material/tooltip';
-import { ThemeService } from '../theme.service';
+
+import { NGX_THEMES_TEXT } from '../../config/themes-text.token.js';
+import { ThemeService } from '../../services/theme.service.js';
 
 /** Navbar control: one click flips light/dark; the palette menu picks the family, or hands the
- *  mode back to the OS ("Match system"). */
+ *  mode back to the OS ("Match system"). With no families configured, the menu holds only
+ *  "Match system". */
 @Component({
-  selector: 'app-theme-switcher',
+  selector: 'ngx-theme-switcher',
   standalone: true,
   imports: [MatIconButton, MatIcon, MatMenu, MatMenuItem, MatMenuTrigger, MatDivider, MatTooltip],
   templateUrl: './theme-switcher.component.html',
   styleUrl: './theme-switcher.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ThemeSwitcherComponent {
+export class ThemeSwitcher {
   protected readonly theme = inject(ThemeService);
+  protected readonly text = inject(NGX_THEMES_TEXT);
 }

@@ -28,7 +28,8 @@ ngx-libraries/
 │   ├── components/         # @wiltech-labs/ngx-components — see its own CLAUDE.md
 │   ├── calendar/           # @wiltech-labs/ngx-calendar — see its own CLAUDE.md
 │   ├── organization/       # @wiltech-labs/ngx-organization — see its own CLAUDE.md
-│   └── styles/             # @wiltech-labs/ngx-styles — see its own CLAUDE.md
+│   ├── styles/             # @wiltech-labs/ngx-styles — see its own CLAUDE.md
+│   └── themes/             # @wiltech-labs/ngx-themes — see its own CLAUDE.md
 ├── apps/
 │   ├── showcase/           # routed demo app consuming every package from source
 │   └── storybook/          # component catalogue — every package, one story per use case

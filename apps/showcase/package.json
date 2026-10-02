@@ -26,6 +26,7 @@
     "@wiltech-labs/ngx-auth": "*",
     "@wiltech-labs/ngx-calendar": "*",
     "@wiltech-labs/ngx-components": "*",
+    "@wiltech-labs/ngx-themes": "*",
     "@wiltech-labs/ngx-dates": "*",
     "@wiltech-labs/ngx-forms": "*",
     "@wiltech-labs/ngx-graphs": "*",

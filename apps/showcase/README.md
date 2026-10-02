@@ -19,6 +19,9 @@ A demo Angular application for testing and showcasing the shared libraries in th
 - **@wiltech-labs/ngx-region-settings** — `RegionSettingsFormComponent` with hardcoded initial
   values, no backend
 - **@wiltech-labs/ngx-components** — Banner, Panel and Card, no backend
+- **@wiltech-labs/ngx-themes** — the navbar's light/dark toggle and palette menu; the four palette
+  families themselves live in `src/styles/themes/` and are registered with `provideThemes()` in
+  `main.ts`
 
 `@wiltech-labs/ngx-web-sockets` is deliberately **not** wired in here — there's no Socket.IO backend
 for it to connect to yet. See that package's own `CLAUDE.md`.

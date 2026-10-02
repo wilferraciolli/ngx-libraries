@@ -11,6 +11,7 @@
       "@wiltech-labs/ngx-media": ["../../packages/media/src/public-api.ts"],
       "@wiltech-labs/ngx-ai-tools": ["../../packages/ai-tools/src/public-api.ts"],
       "@wiltech-labs/ngx-components": ["../../packages/components/src/public-api.ts"],
+      "@wiltech-labs/ngx-themes": ["../../packages/themes/src/public-api.ts"],
       "@wiltech-labs/ngx-graphs": ["../../packages/graphs/src/public-api.ts"],
       "@wiltech-labs/ngx-translations": ["../../packages/translations/src/public-api.ts"],
       "@wiltech-labs/ngx-modals": ["../../packages/modals/src/public-api.ts"],

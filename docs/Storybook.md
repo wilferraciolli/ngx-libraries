@@ -89,14 +89,14 @@ Storybook `angular.json` `build` target adds `apps/showcase/src` to
 Storybook with no extra step.
 
 The showcase now has more than one palette family (`minimalistic`, `teal`, each with light and dark)
-and an app-local `ThemeService` that switches between them (`apps/showcase/src/app/core/`). The
-switching stays app-local for now — decided 2026-10-02, until a second real consumer proves the
-shared shape. Storybook still loads only the default family. Later:
+switched by `@wiltech-labs/ngx-themes`' `ThemeService` (extracted from the showcase 2026-10-02;
+story `ngx-themes/ThemeSwitcher`). The palettes themselves stay in the showcase. Storybook still
+loads only the default family. Later:
 
 - the palettes move out of `apps/showcase` into a shared home that both apps (and real consumers)
   read from, and this `includePaths` link goes away;
 - Storybook gets a third toolbar global, `brand`, listing each theme family. It sets `data-theme`
-  on `<html>` the same way the showcase's `ThemeService` does, so every story can be checked
+  on `<html>` via `ngx-themes`' `ThemeService`, so every story can be checked
   against every family, in light and dark.
 
 Until then, the toolbar has only `theme` (light/dark/system) and `locale`.

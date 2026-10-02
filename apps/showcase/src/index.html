@@ -10,7 +10,7 @@
     <meta name="theme-color" content="#f6fafb" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#101415" media="(prefers-color-scheme: dark)" />
     <!-- Applies the stored theme before first paint, so nobody sees a light flash while Angular
-         boots. ThemeService (src/app/core/theme.service.ts) owns these keys and takes over once
+         boots. ngx-themes' ThemeService (configured in src/main.ts) owns these keys and takes over once
          the app starts; an unknown stored family just matches no selector and falls back. -->
     <script>
       try {
