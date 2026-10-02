@@ -1,8 +1,8 @@
 # @wiltech-labs/ngx-styles
 
 Shared Material 3 Sass partials: a breakpoint scale, a spacing scale, and
-design-system mixins (`page-title`, `banner`, `state-layer`, `focus-ring`,
-...) that read `--mat-sys-*` tokens. Ships raw `.scss` — no compile step,
+design-system mixins (`page-title`, `banner`, `state-layer`, `focus-ring`, `list`/`list-row`,
+`panel`, `badge`, ...) that read `--mat-sys-*` tokens. Ships raw `.scss` — no compile step,
 no `ng-packagr`, no TypeScript. See this package's `CLAUDE.md` for why.
 
 ## Setup

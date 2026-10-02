@@ -2,7 +2,7 @@ import { Injectable, Signal, computed, inject } from '@angular/core';
 import { HttpClient, httpResource } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
-import type { CollectionEnvelope, ILink, SingleEnvelope } from './envelope.js';
+import type { ApiEnvelope, CollectionEnvelope, ILink, SingleEnvelope } from './envelope.js';
 import { resolveLink } from './envelope.js';
 import { API_ORIGIN } from './api-origin.token.js';
 
@@ -11,6 +11,10 @@ export interface ApiResource<TValue> {
   readonly value: Signal<TValue>;
   readonly isLoading: Signal<boolean>;
   readonly error: Signal<unknown>;
+  /** The envelope's `_metadata` (field rules, option lists) — `{}` until a response arrives. */
+  readonly metadata: Signal<NonNullable<ApiEnvelope<unknown>['_metadata']>>;
+  /** The envelope's `_metaLinks` (collection-level actions, e.g. `createX`) — `{}` until a response arrives. */
+  readonly metaLinks: Signal<NonNullable<ApiEnvelope<unknown>['_metaLinks']>>;
   reload(): void;
 }
 
@@ -53,6 +57,18 @@ export class ApiClientService {
     payload: TPayload,
   ): Promise<TResource> {
     const res = await firstValueFrom(this.http.put<SingleEnvelope<TRoot, TResource>>(url, payload));
+    return res._data[root];
+  }
+
+  /** PATCH a partial payload and unwrap the updated resource from `_data[root]`. */
+  async patch<TRoot extends string, TResource, TPayload = unknown>(
+    root: TRoot,
+    url: string,
+    payload: TPayload,
+  ): Promise<TResource> {
+    const res = await firstValueFrom(
+      this.http.patch<SingleEnvelope<TRoot, TResource>>(url, payload),
+    );
     return res._data[root];
   }
 
@@ -102,6 +118,8 @@ export class ApiClientService {
       value: computed(() => (res.hasValue() ? res.value()._data[root] : undefined)),
       isLoading: res.isLoading,
       error: res.error,
+      metadata: computed(() => (res.hasValue() ? (res.value()._metadata ?? {}) : {})),
+      metaLinks: computed(() => (res.hasValue() ? (res.value()._metaLinks ?? {}) : {})),
       reload: () => res.reload(),
     };
   }
@@ -119,6 +137,8 @@ export class ApiClientService {
       value: computed(() => (res.hasValue() ? res.value()._data[root] : [])),
       isLoading: res.isLoading,
       error: res.error,
+      metadata: computed(() => (res.hasValue() ? (res.value()._metadata ?? {}) : {})),
+      metaLinks: computed(() => (res.hasValue() ? (res.value()._metaLinks ?? {}) : {})),
       reload: () => res.reload(),
     };
   }

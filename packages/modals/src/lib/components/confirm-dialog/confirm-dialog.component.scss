@@ -2,3 +2,13 @@
   margin: 0;
   max-width: 40ch;
 }
+
+.ConfirmDialog-confirm {
+  &.is-danger {
+    --mat-button-filled-container-color: var(--ngx-modal-danger, var(--mat-sys-error, #b3261e));
+    --mat-button-filled-label-text-color: var(
+      --ngx-modal-on-danger,
+      var(--mat-sys-on-error, #ffffff)
+    );
+  }
+}

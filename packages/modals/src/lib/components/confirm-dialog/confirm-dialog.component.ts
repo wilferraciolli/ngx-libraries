@@ -4,8 +4,13 @@ import { MatButtonModule } from '@angular/material/button';
 
 export interface ConfirmDialogData {
   message: string;
+  /** Heading above the message. Omit it and the message itself is the heading. */
+  title?: string;
   confirmLabel?: string;
-  cancelLabel?: string;
+  /** `null` hides Cancel — for an acknowledgement-only prompt, where Cancel would mean nothing. */
+  cancelLabel?: string | null;
+  /** `'danger'` (default) for destructive actions; `'primary'` for a consequential but safe one. */
+  tone?: 'primary' | 'danger';
 }
 
 /**

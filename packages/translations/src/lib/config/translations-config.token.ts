@@ -6,7 +6,8 @@ import type { Translation, TranslocoLoader } from '@jsverse/transloco';
  * inside a `computed()`, so it can read the app's own signals and will re-run when they change —
  * an async source (a profile loading after sign-in) takes effect once it resolves, the same as an
  * explicit `TranslationsService.setLocale()` call. Return `undefined` to fall through to `defaultLocale`.
- * This session's own `setLocale()` choice always wins over it.
+ * This session's own `setLocale()` choice always wins over it. Runs in the root injection context,
+ * so it may `inject()` the app's own stores directly.
  */
 export type LocaleResolver = () => string | undefined;
 
@@ -30,6 +31,7 @@ export interface NgxTranslationsConfig {
    * Fire-and-forget — called after `setLocale()` so the app can persist the choice however it
    * likes (a PATCH to the user's own profile, browser storage, both). Never awaited, never blocks
    * or reverts the session's chosen language: the switch already happened before this runs.
+   * Runs in the root injection context, so it may `inject()` the app's own stores directly.
    */
   persistLocale?: (locale: string) => void;
 }

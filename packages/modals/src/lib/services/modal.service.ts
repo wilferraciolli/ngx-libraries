@@ -53,6 +53,7 @@ export class ModalService {
         scrollStrategy: backdrop ? undefined : this.overlay.scrollStrategies.noop(),
         panelClass: backdrop ? 'ngx-modal-pane' : ['ngx-modal-pane', 'is-modeless'],
         ariaLabel: config.ariaLabel ?? config.title,
+        injector: config.injector,
         data: {
           contentComponent: component,
           contentData: config.data,

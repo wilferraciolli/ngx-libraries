@@ -158,3 +158,64 @@
     --mat-button-text-ripple-color: color-mix(in srgb, var(--mat-sys-error) 12%, transparent);
   }
 }
+
+// Grouped list surface (recipe "Grouped list"): one tonal surface, rows
+// separated by hairlines. Pair with `list-row` on each `<li>`.
+@mixin list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-radius: var(--mat-sys-corner-large);
+  background: var(--mat-sys-surface-container-low);
+  overflow: hidden;
+}
+
+@mixin list-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 72px;
+  padding: 8px 8px 8px 16px;
+
+  & + & {
+    border-top: 1px solid var(--mat-sys-outline-variant);
+  }
+}
+
+// Tonal panel for a form (recipe "Tonal panel for a short form").
+@mixin panel {
+  padding: 16px;
+  border-radius: var(--mat-sys-corner-large);
+  background: var(--mat-sys-surface-container-low);
+
+  @include bp.up(sm) {
+    padding: 24px;
+  }
+}
+
+// A small status/role badge: label-medium on a tonal container.
+@mixin badge($tone: neutral) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: var(--mat-sys-corner-small);
+  font: var(--mat-sys-label-medium);
+  letter-spacing: var(--mat-sys-label-medium-tracking);
+  white-space: nowrap;
+
+  @if $tone == primary {
+    background: var(--mat-sys-primary-container);
+    color: var(--mat-sys-on-primary-container);
+  } @else if $tone == tertiary {
+    background: var(--mat-sys-tertiary-container);
+    color: var(--mat-sys-on-tertiary-container);
+  } @else if $tone == error {
+    background: var(--mat-sys-error-container);
+    color: var(--mat-sys-on-error-container);
+  } @else {
+    background: var(--mat-sys-surface-container-highest);
+    color: var(--mat-sys-on-surface-variant);
+  }
+}

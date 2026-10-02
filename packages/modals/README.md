@@ -151,6 +151,22 @@ this.modals
   });
 ```
 
+`title` adds a heading above the message, `tone: 'primary'` drops the default danger styling for a
+consequential-but-safe action, and `cancelLabel: null` hides Cancel for an acknowledgement-only
+prompt ("You can't delete this yet").
+
+### Content that needs the opener's providers
+
+The panel opens in the CDK overlay, outside the opener's injector tree, so a content component that
+injects a feature-local store (provided on the opening component, not root) won't find it. Pass the
+opener's injector along:
+
+```ts
+private readonly injector = inject(Injector);
+
+this.modals.open(AssignProcedureModal, { title, data, injector: this.injector });
+```
+
 ## Layout
 
 ```

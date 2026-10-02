@@ -1,7 +1,7 @@
 # @wiltech-labs/ngx-api-client
 
 Shared Angular client for Wiltech HTTP APIs: `ApiClientService`
-(GET/POST/PUT/DELETE + envelope-unwrap), the response envelope, HATEOAS-style
+(GET/POST/PUT/PATCH/DELETE + envelope-unwrap), the response envelope, HATEOAS-style
 links, field metadata shapes, and the global error response shape returned
 by a Wiltech backend (e.g. `insurly-api`'s `ApiEnvelope`/`ILink` and
 `ApiError` patterns) — plus the `LinkService`/`MetadataService` and
@@ -98,7 +98,7 @@ export const appConfig: ApplicationConfig = {
 
 ## Usage
 
-`ApiClientService` is the shared GET/POST/PUT/DELETE + envelope-unwrap
+`ApiClientService` is the shared GET/POST/PUT/PATCH/DELETE + envelope-unwrap
 client — each feature still gets its own typed `*ApiService`, but it
 delegates the HTTP mechanics to this instead of hand-rolling
 `firstValueFrom(this.http.x(...))` + `_data[root]` unwrapping per method:
@@ -146,6 +146,16 @@ export class ProviderApiService {
 `resource()` is the single-resource counterpart of `collectionResource()`
 (e.g. a dashboard, or "me") — same shape, `value()` unwraps `_data[root]`
 instead of `_data[root][]`.
+
+Both also expose the envelope's sidecars as signals — `metadata()` (`_metadata`, e.g. a select's
+option list) and `metaLinks()` (`_metaLinks`, e.g. the collection's `createX` action) — each `{}`
+until a response arrives:
+
+```ts
+readonly statusOptions = computed(() =>
+  this.meta.resolveMetadataIdValues(this.listResource.metadata()['status']?.values ?? []),
+);
+```
 
 ```ts
 import { ApiEnvelope, SingleEnvelope, CollectionEnvelope, ILink, LinkService } from '@wiltech-labs/ngx-api-client';

@@ -20,7 +20,10 @@ import type { FieldDef } from '../../interfaces/field-definition';
 })
 export class TextField {
   public readonly fieldDef = input.required<FieldDef>();
-  public readonly field = input.required<FieldTree<string> | FieldTree<number>>();
+  // `number | null` for an optional number field — an emptied number input holds null.
+  public readonly field = input.required<
+    FieldTree<string> | FieldTree<number> | FieldTree<number | null>
+  >();
 
   // [formField]'s typing can't take the union, but it handles both text and number inputs at runtime.
   protected readonly formField = computed(() => this.field() as FieldTree<string>);

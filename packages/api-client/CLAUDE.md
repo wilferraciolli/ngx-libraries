@@ -26,7 +26,7 @@ src/
     │   ├── envelope.ts           # ApiEnvelope, ILink, SingleEnvelope, CollectionEnvelope, resolveLink()
     │   ├── error.ts               # ApiErrorResponse, ApiFieldViolation, fieldErrorsByField(), summarizeApiError()
     │   ├── api-origin.token.ts    # API_ORIGIN InjectionToken — consuming app provides its own origin
-    │   └── api-client.service.ts  # ApiClientService: get/post/put/delete, requireLink(), resource()/collectionResource()
+    │   └── api-client.service.ts  # ApiClientService: get/post/put/patch/delete, requireLink(), resource()/collectionResource()
     ├── links/
     │   └── link.service.ts        # LinkService: hasLink / isTemplateLink / getCreateUrlFromTemplateUrl
     └── metadata/
@@ -43,7 +43,7 @@ src/
 - One folder per concern under `src/lib/` — don't let it go flat again. A
   new concern (e.g. auth headers, pagination) gets its own folder, not a
   file dropped next to `http-client/`.
-- `ApiClientService` owns HTTP mechanics only — GET/POST/PUT/DELETE +
+- `ApiClientService` owns HTTP mechanics only — GET/POST/PUT/PATCH/DELETE +
   envelope unwrap + link-follow guard. It does **not** own URL construction
   or "reload the list after a mutation" — that orchestration stays in each
   feature's own `*ApiService` in the consuming app, per `insurly-ui`'s

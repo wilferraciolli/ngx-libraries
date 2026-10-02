@@ -1,7 +1,7 @@
 {
   "name": "@wiltech-labs/ngx-api-client",
-  "version": "1.0.0",
-  "description": "Shared Angular client for Wiltech HTTP APIs — the ApiClientService (GET/POST/PUT/DELETE + envelope-unwrap), response envelope, HATEOAS-style links, field metadata, error shapes, and the LinkService/MetadataService/convertIdToValues helpers built on them.",
+  "version": "1.0.1",
+  "description": "Shared Angular client for Wiltech HTTP APIs — the ApiClientService (GET/POST/PUT/PATCH/DELETE + envelope-unwrap), response envelope, HATEOAS-style links, field metadata, error shapes, and the LinkService/MetadataService/convertIdToValues helpers built on them.",
   "license": "Apache-2.0",
   "sideEffects": false,
   "peerDependencies": {

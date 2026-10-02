@@ -1,4 +1,12 @@
-import { Injectable, Signal, computed, inject, signal } from '@angular/core';
+import {
+  Injectable,
+  Injector,
+  Signal,
+  computed,
+  inject,
+  runInInjectionContext,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { TranslocoService } from '@jsverse/transloco';
 import { NGX_TRANSLATIONS_CONFIG } from '../config/translations-config.token';
@@ -12,6 +20,9 @@ import { NGX_TRANSLATIONS_CONFIG } from '../config/translations-config.token';
 export class TranslationsService {
   private readonly transloco = inject(TranslocoService);
   private readonly config = inject(NGX_TRANSLATIONS_CONFIG);
+  // `resolveLocale`/`persistLocale` run in this injector's context, so an app can `inject()` its
+  // own stores inside them straight from `provideTranslations()`'s plain config object.
+  private readonly injector = inject(Injector);
 
   /** This session's explicit choice, if `setLocale()` has been called; `null` until then. */
   private readonly sessionOverride = signal<string | null>(null);
@@ -22,7 +33,10 @@ export class TranslationsService {
    * loads after sign-in) flows through automatically, not just at startup.
    */
   public readonly locale: Signal<string> = computed(
-    () => this.sessionOverride() ?? this.config.resolveLocale?.() ?? this.config.defaultLocale,
+    () =>
+      this.sessionOverride() ??
+      runInInjectionContext(this.injector, () => this.config.resolveLocale?.()) ??
+      this.config.defaultLocale,
   );
 
   constructor() {
@@ -43,7 +57,7 @@ export class TranslationsService {
   public setLocale(locale: string): void {
     this.sessionOverride.set(locale);
     this.activate(locale);
-    this.config.persistLocale?.(locale);
+    runInInjectionContext(this.injector, () => this.config.persistLocale?.(locale));
   }
 
   /**

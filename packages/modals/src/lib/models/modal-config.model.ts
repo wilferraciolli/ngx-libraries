@@ -1,4 +1,4 @@
-import type { Type } from '@angular/core';
+import type { Injector, Type } from '@angular/core';
 
 export type ModalSide = 'left' | 'right';
 
@@ -24,6 +24,10 @@ export interface ModalConfig<TData = unknown> {
   /** Accessible name for the dialog surface, when `title` alone isn't descriptive enough (or
    *  there's no `title` at all). */
   ariaLabel?: string;
+  /** Injector the content component resolves its dependencies from — pass the opener's
+   *  `inject(Injector)` so the content gets the opener's component-level providers (a
+   *  feature-local store, say). Defaults to the root injector, as with `MatDialog`. */
+  injector?: Injector;
 }
 
 /** Internal — the data `ModalService.open()` hands to the shell it creates. */
