@@ -1,5 +1,5 @@
 import { httpResource } from '@angular/common/http';
-import { Injectable, computed, inject } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import {
   ApiClientService,
   ApiEnvelope,
@@ -44,6 +44,9 @@ export abstract class RegionSettingsStore<
   readonly settings = computed(() => this.resource.value()?._data[this.root]);
   readonly isLoading = computed(() => this.currentUser.loading() || this.resource.isLoading());
   readonly error = computed(() => this.resource.error());
+  private readonly savingState = signal(false);
+  /** True while `save()`/`reset()` is in flight — feed it to the form's `saving` input. */
+  readonly saving = this.savingState.asReadonly();
 
   /** The profile has loaded and handed out no link: this caller may not use this screen (e.g. a
    *  non-admin on the system settings). */
@@ -71,8 +74,13 @@ export abstract class RegionSettingsStore<
       this.settings()?.links['updateSettings'],
       'Not permitted to change these settings.',
     );
-    await this.api.put<string, TSettings, TPayload>(this.root, url, payload);
-    this.resource.reload();
+    this.savingState.set(true);
+    try {
+      await this.api.put<string, TSettings, TPayload>(this.root, url, payload);
+      this.resource.reload();
+    } finally {
+      this.savingState.set(false);
+    }
   }
 
   async reset(): Promise<void> {
@@ -80,8 +88,13 @@ export abstract class RegionSettingsStore<
       this.settings()?.links['resetSettings'],
       'Not permitted to reset these settings.',
     );
-    await this.api.delete(url);
-    this.resource.reload();
+    this.savingState.set(true);
+    try {
+      await this.api.delete(url);
+      this.resource.reload();
+    } finally {
+      this.savingState.set(false);
+    }
   }
 }
 

@@ -44,4 +44,10 @@ export class CurrentUserStore<
   link(name: string): ILink | undefined {
     return this.profile()?.links?.[name];
   }
+
+  /** Refetch `/me` and the profile — after the app changes the profile through one of its links. */
+  reload(): void {
+    this.meResource.reload();
+    this.profileResource.reload();
+  }
 }

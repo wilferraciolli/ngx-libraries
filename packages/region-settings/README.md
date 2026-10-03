@@ -41,7 +41,8 @@ export class NavBar {
 `CurrentUserStore` is root-provided — inject it anywhere. It only fetches once
 `AuthStore.isSignedIn()` is `true`, and clears itself again on sign-out. `CurrentUserStore.link(name)`
 reads any named link off the loaded profile (`userSettings`, `systemSettings`, or an app's own, e.g.
-a `notifications` link) — never build one of these URLs yourself.
+a `notifications` link) — never build one of these URLs yourself. After changing the profile through
+one of its links (an app's own `updateProfile`, say), call `CurrentUserStore.reload()` to refetch it.
 
 ### Settings screens
 
