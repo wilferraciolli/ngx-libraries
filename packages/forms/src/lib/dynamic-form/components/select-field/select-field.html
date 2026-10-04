@@ -1,6 +1,6 @@
 <mat-form-field class="SelectField" appearance="outline" subscriptSizing="dynamic">
   <mat-label>{{ fieldDef().label }}</mat-label>
-  <mat-select [formField]="field()">
+  <mat-select [formField]="formField()">
     @for (option of fieldDef().options ?? []; track option.value) {
       <mat-option [value]="option.value">{{ option.label }}</mat-option>
     }

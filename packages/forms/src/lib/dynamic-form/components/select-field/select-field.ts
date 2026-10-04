@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { FormField } from '@angular/forms/signals';
 import type { FieldTree } from '@angular/forms/signals';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -16,5 +16,11 @@ import type { FieldDef } from '../../interfaces/field-definition';
 })
 export class SelectField {
   public readonly fieldDef = input.required<FieldDef>();
-  public readonly field = input.required<FieldTree<string | number | boolean>>();
+  // `| null` for a select with no default choice — unselected holds null.
+  public readonly field = input.required<
+    FieldTree<string | number | boolean> | FieldTree<string | number | boolean | null>
+  >();
+
+  // [formField]'s typing can't take the union, but it handles a nullable value at runtime.
+  protected readonly formField = computed(() => this.field() as FieldTree<string | number | boolean>);
 }
