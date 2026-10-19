@@ -64,17 +64,29 @@ src/
 
 ## Status
 - Published to npm as `@wiliamferraciolli/ngx-api-client` (currently
-  `0.1.4`) — see the note in the root `CLAUDE.md` on why the scope is
+  `0.1.5`) — see the note in the root `CLAUDE.md` on why the scope is
   `@wiliamferraciolli`, not `@wiltech`.
-- Wired into `insurly-ui`: every `*ApiService`
-  (`ProviderApiService`/`AdminApiService`/`AccountApiService`/
-  `AdminProfileApiService`/`SystemSettingsService`/`UserSettingsService`/
-  `CarQuoteApiService`) now injects `ApiClientService` instead of
-  hand-rolling `HttpClient` calls, and all the locally-duplicated files
-  (`core/api/api-envelope.ts`, `_services/link.service.ts`,
-  `_services/metadata.service.ts`, `_helpers/convert-id-to-value.pipe.ts`,
-  `shared/response/*`) are deleted from that repo. `insurly-ui/CLAUDE.md`
-  and `docs/02-architecture.md` (in the `insurly` repo) describe this
-  pattern now.
-- No other consumer yet — the two other Angular projects that motivated
-  this package don't exist yet.
+- **Not actually wired into `insurly-ui` yet** — despite this section
+  previously saying otherwise. Checked directly (2026-09-22):
+  `ngx-api-client` isn't in `insurly-ui/package.json`, and nothing there
+  references `ApiClientService`; `provider-api.service.ts` still
+  hand-rolls `HttpClient`/`httpResource` + local `_data[root]` unwrapping,
+  the exact pattern this package exists to replace. This package was
+  ported *from* that code as a starting point, but the migration back
+  onto the published package — deleting the locally-duplicated
+  `core/api/api-envelope.ts`/`_services/link.service.ts`/etc. — was never
+  done. Don't trust this status note without checking the actual
+  `insurly-ui` source; update it here the next time that migration
+  happens for real.
+- First real consumer: `showcase` (Angular UI for `fastapi-cloudflare-d1`,
+  in the sibling `PythonTutorials` repo) — genuinely wired up via
+  `TodosStore`/`TagsStore`/`CurrentUserStore` using `ApiClientService`,
+  `LinkService`, `MetadataService`. This is what surfaced the
+  `metadata`/`metaLinks` gap on `ApiResource` (see git history on
+  `api-client.service.ts` — `resource()`/`collectionResource()` used to
+  return only `value`/`isLoading`/`error`/`reload`, silently dropping
+  `_metadata`/`_metaLinks` from the envelope with no way for a caller to
+  get them back): a metadata-driven `<select>` or a `_metaLinks` action
+  link genuinely cannot be built from either wrapper without it, forcing
+  the caller to fall back to a second, raw `httpResource` — exactly the
+  duplication this package exists to avoid.

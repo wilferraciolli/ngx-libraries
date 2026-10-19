@@ -2,13 +2,25 @@ import { Injectable, Signal, computed, inject } from '@angular/core';
 import { HttpClient, httpResource } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
-import type { CollectionEnvelope, ILink, SingleEnvelope } from './envelope.js';
+import type { ApiFieldMetadata, CollectionEnvelope, ILink, SingleEnvelope } from './envelope.js';
 import { resolveLink } from './envelope.js';
 import { API_ORIGIN } from './api-origin.token.js';
 
-/** Read-only, reloadable view over an `httpResource`-backed API resource. */
+/**
+ * Read-only, reloadable view over an `httpResource`-backed API resource.
+ *
+ * `metadata`/`metaLinks` are the envelope's sidecar data (see
+ * `ApiEnvelope`) — `undefined` while unfetched/loading/on error, same as
+ * `value` for `resource()`. A consumer that needs field metadata (e.g.
+ * `MetadataService.resolveMetadataIdValues(resource.metadata()?.['status']?.values ?? [])`
+ * for a `<select>`) or a collection-level action link (e.g.
+ * `resource.metaLinks()?.['createProvider']`) reads it from here instead
+ * of reaching past this wrapper for a second, raw `httpResource`.
+ */
 export interface ApiResource<TValue> {
   readonly value: Signal<TValue>;
+  readonly metadata: Signal<Record<string, ApiFieldMetadata> | undefined>;
+  readonly metaLinks: Signal<Record<string, ILink> | undefined>;
   readonly isLoading: Signal<boolean>;
   readonly error: Signal<unknown>;
   reload(): void;
@@ -95,6 +107,8 @@ export class ApiClientService {
     const res = httpResource<SingleEnvelope<TRoot, TResource>>(urlFn);
     return {
       value: computed(() => res.value()?._data[root]),
+      metadata: computed(() => res.value()?._metadata),
+      metaLinks: computed(() => res.value()?._metaLinks),
       isLoading: res.isLoading,
       error: res.error,
       reload: () => res.reload(),
@@ -112,6 +126,8 @@ export class ApiClientService {
     const res = httpResource<CollectionEnvelope<TRoot, TResource>>(urlFn);
     return {
       value: computed(() => res.value()?._data[root] ?? []),
+      metadata: computed(() => res.value()?._metadata),
+      metaLinks: computed(() => res.value()?._metaLinks),
       isLoading: res.isLoading,
       error: res.error,
       reload: () => res.reload(),

@@ -146,6 +146,28 @@ export class ProviderApiService {
 (e.g. a dashboard, or "me") — same shape, `value()` unwraps `_data[root]`
 instead of `_data[root][]`.
 
+Both also expose `metadata()`/`metaLinks()` — the envelope's `_metadata`/
+`_metaLinks` sidecar, `undefined` until the same response `value()`
+resolves from. Pair with `MetadataService` for select options driven by
+the API's own field metadata, or a collection-level action link (e.g.
+`createProvider`) instead of a hardcoded URL:
+
+```ts
+readonly statusOptions = computed(() =>
+  this.meta.resolveMetadataIdValues(this.listResource.metadata()?.['status']?.values ?? []),
+);
+
+async create(payload: ProviderPayload): Promise<Provider> {
+  const url = this.api.requireLink(
+    this.listResource.metaLinks()?.['createProvider'],
+    'Providers collection link not available yet.',
+  );
+  const provider = await this.api.post('provider', url, payload);
+  this.listResource.reload();
+  return provider;
+}
+```
+
 ```ts
 import { ApiEnvelope, SingleEnvelope, CollectionEnvelope, ILink, LinkService } from '@wiliamferraciolli/ngx-api-client';
 
@@ -170,12 +192,20 @@ catchError((err: HttpErrorResponse) => {
 })
 ```
 
+`MetadataService.resolveMetadataIdValues` turns one field's `_metadata`
+entry into `ValueViewValue[]` for a `<mat-select>`/`<select>` — get the
+field's `values` from an `ApiResource.metadata()` (see the
+`resource()`/`collectionResource()` example above) rather than piping
+around a raw envelope:
+
 ```ts
-import { MetadataService, IdValue } from '@wiliamferraciolli/ngx-api-client';
+import { MetadataService } from '@wiliamferraciolli/ngx-api-client';
 
 constructor(private meta: MetadataService) {}
 
-statusOptions = this.meta.resolveMetadataIdValues(metadata['status'] as IdValue[]); // -> ValueViewValue[] for a <mat-select>
+statusOptions = computed(() =>
+  this.meta.resolveMetadataIdValues(this.listResource.metadata()?.['status']?.values ?? []),
+);
 ```
 
 ```html
