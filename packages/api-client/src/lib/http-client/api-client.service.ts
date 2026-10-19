@@ -2,7 +2,7 @@ import { Injectable, Signal, computed, inject } from '@angular/core';
 import { HttpClient, httpResource } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
-import type { ApiEnvelope, CollectionEnvelope, ILink, SingleEnvelope } from './envelope.js';
+import type { ApiEnvelope, ApiMessage, CollectionEnvelope, ILink, SingleEnvelope } from './envelope.js';
 import { resolveLink } from './envelope.js';
 import { API_ORIGIN } from './api-origin.token.js';
 
@@ -15,8 +15,13 @@ export interface ApiResource<TValue> {
   readonly metadata: Signal<NonNullable<ApiEnvelope<unknown>['_metadata']>>;
   /** The envelope's `_metaLinks` (collection-level actions, e.g. `createX`) — `{}` until a response arrives. */
   readonly metaLinks: Signal<NonNullable<ApiEnvelope<unknown>['_metaLinks']>>;
+  /** The envelope's `_messages` (notices to show next to the data) — `[]` until a response arrives. */
+  readonly messages: Signal<ApiMessage[]>;
   reload(): void;
 }
+
+/** HTTP methods that send a body and answer with an envelope. */
+export type ApiWriteMethod = 'POST' | 'PUT' | 'PATCH';
 
 /**
  * Shared typed boundary for the GET/POST/PUT/DELETE + envelope-unwrap +
@@ -78,6 +83,22 @@ export class ApiClientService {
   }
 
   /**
+   * Send a write and keep the whole envelope, for screens that show the
+   * response's `_messages` or `_metadata` as well as the resource (e.g. a
+   * clock action whose reply carries a warning). Use `post` / `put` / `patch`
+   * when only `_data[root]` matters.
+   */
+  async send<TRoot extends string, TResource, TPayload = unknown>(
+    method: ApiWriteMethod,
+    url: string,
+    payload?: TPayload,
+  ): Promise<SingleEnvelope<TRoot, TResource>> {
+    return firstValueFrom(
+      this.http.request<SingleEnvelope<TRoot, TResource>>(method, url, { body: payload ?? null }),
+    );
+  }
+
+  /**
    * Resolves a link to an absolute URL, or `undefined` if it's absent (e.g.
    * a prerequisite resource hasn't loaded yet, or the caller isn't
    * permitted to see it). For a read-path URL that legitimately may not be
@@ -120,6 +141,7 @@ export class ApiClientService {
       error: res.error,
       metadata: computed(() => (res.hasValue() ? (res.value()._metadata ?? {}) : {})),
       metaLinks: computed(() => (res.hasValue() ? (res.value()._metaLinks ?? {}) : {})),
+      messages: computed(() => (res.hasValue() ? (res.value()._messages ?? []) : [])),
       reload: () => res.reload(),
     };
   }
@@ -139,6 +161,7 @@ export class ApiClientService {
       error: res.error,
       metadata: computed(() => (res.hasValue() ? (res.value()._metadata ?? {}) : {})),
       metaLinks: computed(() => (res.hasValue() ? (res.value()._metaLinks ?? {}) : {})),
+      messages: computed(() => (res.hasValue() ? (res.value()._messages ?? []) : [])),
       reload: () => res.reload(),
     };
   }

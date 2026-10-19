@@ -3,6 +3,17 @@
 Working notes on what's outstanding across the monorepo. Not published anywhere, just a
 scratchpad so we don't lose track between sessions. Update as items land or priorities shift.
 
+## `ngx-api-client` 1.0.2: `_messages` — drafted 2026-10-18, not yet published
+
+- `ApiEnvelope._messages` is typed `ApiMessage[]` (`{ type: 'INFO' | 'WARNING' | 'ERROR' | 'SUCCESS', value }`,
+  mirrors `wiltech_labs_rest.Message`) instead of `unknown`.
+- `resource()` and `collectionResource()` expose `messages()`, `[]` until a response arrives.
+- `send(method, url, payload?)` sends a POST / PUT / PATCH and returns the whole envelope, for screens
+  that show a write's `_messages` or `_metadata`.
+- Needed by Crewly's clock (the forgotten-clock-out warning arrives in `_messages`), which bypasses
+  `ApiClientService` with `httpResource` / `HttpClient` until this is on npm.
+- Typechecked against Angular 22; publish, then switch `crewly-ui`'s `TimeClockStore`.
+
 ## Housekeeping (found while looking, not yet fixed)
 
 - [x] Fresh clone on another machine: `npm install` succeeded, but building failed for

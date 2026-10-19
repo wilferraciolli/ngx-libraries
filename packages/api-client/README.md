@@ -157,6 +157,22 @@ readonly statusOptions = computed(() =>
 );
 ```
 
+`messages()` is the envelope's `_messages` as typed `ApiMessage[]` (`{ type: 'INFO' | 'WARNING' |
+'ERROR' | 'SUCCESS', value }`), `[]` until a response arrives — notices the server wants shown next
+to the data, such as a forgotten clock-out:
+
+```ts
+readonly warnings = computed(() => this.clockResource.messages().filter((m) => m.type === 'WARNING'));
+```
+
+When a write's reply carries messages or metadata the screen needs, `send()` keeps the whole
+envelope instead of unwrapping `_data[root]`:
+
+```ts
+const envelope = await this.api.send<'timeClock', TimeClock>('POST', url);
+this.messages.set(envelope._messages ?? []);
+```
+
 ```ts
 import { ApiEnvelope, SingleEnvelope, CollectionEnvelope, ILink, LinkService } from '@wiltech-labs/ngx-api-client';
 

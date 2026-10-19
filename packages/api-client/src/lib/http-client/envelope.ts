@@ -9,8 +9,20 @@ export interface ApiEnvelope<TData> {
   _data: TData;
   _metadata?: Record<string, ApiFieldMetadata>;
   _metaLinks?: Record<string, ILink>;
-  _messages?: unknown;
+  _messages?: ApiMessage[];
 }
+
+/**
+ * One `_messages` entry: something the server wants the person to read next to
+ * the data (a warning about a forgotten clock-out, a notice that figures are
+ * based on a draft law). Mirrors `wiltech_labs_rest.Message`.
+ */
+export interface ApiMessage {
+  type: ApiMessageType;
+  value: string;
+}
+
+export type ApiMessageType = 'INFO' | 'WARNING' | 'ERROR' | 'SUCCESS';
 
 export interface ApiFieldMetadata {
   readOnly?: boolean;
