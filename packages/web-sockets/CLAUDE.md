@@ -49,7 +49,7 @@ src/
   mutating `roomName` on a live one — keeps the component's lifecycle hooks the single source of
   truth for join/leave, instead of also needing an `effect()` to track "the previous room name."
 - The `Room`/`RoomAcknowledge`/`ChatMessage` interfaces model a specific server contract (originally
-  a NestJS Socket.IO gateway) — same spirit as `api-client` mirroring `insurly-api`'s error shape.
+  a NestJS Socket.IO gateway) — same spirit as `api-client` mirroring the FastAPI error shape.
   If a consumer's server uses different event names, adjust `SocketEventType`/`SocketMessageType`
   directly rather than trying to make them configurable per-call.
 - **Signal/RxJS interop, both directions.** `WebSocketService.connected` is the source of truth

@@ -8,13 +8,12 @@ repo-wide conventions.
 Ported from `insurly-ui` (`../insurly/insurly-ui` relative to this repo's
 parent) — that app's `core/api/api-envelope.ts`, `_services/link.service.ts`,
 `_services/metadata.service.ts`, `_helpers/convert-id-to-value.pipe.ts`, and
-`shared/response/*` are where this package's logic originally lived, and
-`insurly-api`'s `GlobalExceptionHandler`/`ApiError`
-(`insurly-api/src/main/java/com/wiltech/insurly/exceptions/ApiError.java`)
-is the source of truth `error.ts` mirrors. If either changes on the
-`insurly` side, this package needs updating to match — not the other way
-around, unless the change originates here deliberately (e.g. the
-`ApiClientService` addition, which doesn't exist in `insurly-ui` yet).
+`shared/response/*` are where this package's logic originally lived. The
+`wiltech-labs-*` Python packages (`py-libraries`: `wiltech_labs_rest`'s envelope,
+`wiltech_labs_core`'s `register_error_handlers`, plus FastAPI's own `422` body) are the
+source of truth `envelope.ts` and `error.ts` mirror. If they change, this package needs
+updating to match — not the other way around, unless the change originates here
+deliberately (e.g. the `ApiClientService` addition).
 
 ## Layout
 
@@ -24,7 +23,7 @@ src/
 └── lib/
     ├── http-client/      # envelope/error contracts + the client that consumes them
     │   ├── envelope.ts           # ApiEnvelope, ILink, SingleEnvelope, CollectionEnvelope, resolveLink()
-    │   ├── error.ts               # ApiErrorResponse, ApiFieldViolation, fieldErrorsByField(), summarizeApiError()
+    │   ├── error.ts               # ApiErrorResponse, ApiFieldViolation, fieldErrorsByField(), summarizeApiError(), apiErrorMessage()
     │   ├── api-origin.token.ts    # API_ORIGIN InjectionToken — consuming app provides its own origin
     │   └── api-client.service.ts  # ApiClientService: get/post/put/patch/delete, requireLink(), resource()/collectionResource()
     ├── links/
@@ -58,11 +57,10 @@ src/
   deployments (frontend and backend on different domains, like
   `insurly-ui` on Cloudflare Pages + `insurly-api` on Render) need to
   provide it — same-origin consumers need zero config.
-- `ApiErrorResponse` / `ApiFieldViolation` mirror `insurly-api`'s
-  `ApiError` / `ApiError.FieldViolation` records field-for-field — the
-  original `insurly-ui` `ErrorResponse` class did _not_ match the backend
-  (different field names, never actually wired up anywhere); this package
-  fixes that instead of carrying the mismatch forward.
+- `ApiErrorResponse` / `ApiFieldViolation` mirror the FastAPI error body:
+  `{"detail": "…"}` from `wiltech_labs_core`'s `AppError` handler, or
+  `{"detail": [{loc, msg, type}]}` for a `422`. Wiltech backends are FastAPI only
+  (no Spring), so there is no other shape to support.
 
 ## Status
 

@@ -244,8 +244,17 @@ provideAuth({                                                // ngx-auth
   failed request gives `undefined`/`[]` plus `error()`, never a throw. Render
   `error()` in a `role="alert"` banner. The `httpResource` gotcha (section 6)
   still applies to any raw `httpResource` an app writes itself.
-- Server validation errors: `fieldErrorsByField()` maps them onto form fields,
-  and `summarizeApiError()` gives the one-line banner text.
+- **Error text always comes from the package, never from the error body by
+  hand.** A failed write's banner is `apiErrorMessage(error)` (from 1.0.3): the
+  API's own words, or `null` when it never answered (network failure, a
+  non-API body), in which case show the app's own "couldn't reach the server"
+  text — e.g. `apiErrorMessage(error) ?? t('errors.network')`. To put server
+  validation errors on form fields, `fieldErrorsByField(body)`; for a
+  one-line summary of a body you already hold, `summarizeApiError(body)`.
+  Both read both shapes of a Wiltech (FastAPI) error — a business rule's
+  `{"detail": "…"}` and a `422`'s `{"detail": [{loc, msg}]}` list — so no app
+  reads `error.error.detail` itself. The package README's "Errors" section shows
+  what each shape becomes.
 - Options from API metadata: `MetadataService.resolveMetadataIdValues()` for a
   select's options, and the `convertIdToValues` pipe to display a stored id as
   its label.
@@ -2649,6 +2658,7 @@ Review checklist:
 - [ ] Motion only in response to the user or a route change; reduced motion respected.
 - [ ] Copy: sentence case, action verbs, same word through the flow.
 - [ ] Error state checked by failing the request (500), not only the happy path.
+- [ ] Error banners use `apiErrorMessage()`; nothing reads `error.error.detail` by hand.
 - [ ] Production build shows no new budget warnings; Prettier clean on touched files.
 - [ ] `npm run docs:check` passes.
 

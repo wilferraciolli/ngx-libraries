@@ -3,6 +3,19 @@
 Working notes on what's outstanding across the monorepo. Not published anywhere, just a
 scratchpad so we don't lose track between sessions. Update as items land or priorities shift.
 
+## `ngx-api-client` 1.0.3: FastAPI error bodies — drafted 2026-10-19, not yet published
+
+- `ApiErrorResponse` / `ApiFieldViolation` are now the FastAPI error body (`{ detail }`: a message
+  string, or Pydantic's `422` violation list of `loc`/`msg`), and `fieldErrorsByField()` /
+  `summarizeApiError()` read it. The Spring-style shape (`message`, `fieldErrors`) is gone: Wiltech
+  backends are FastAPI only. Technically breaking for the types, but no app used them (searched
+  `insurly-ui` and Crewly), so it stays a patch.
+- New `apiErrorMessage(error: unknown): string | null` for banners: the summarized body of an
+  `HttpErrorResponse` the API answered, `null` for a network failure or a non-API body.
+- Needed by Crewly's admin screens (employees, departments), which keep a `TEMPORARY` copy in
+  `crewly-ui/src/app/core/api/api-error.ts` until this is on npm. Typechecked here; the copy's
+  Vitest spec exercises the same logic. Publish, then delete that file and import from the package.
+
 ## `ngx-api-client` 1.0.2: `_messages` — drafted 2026-10-18, not yet published
 
 - `ApiEnvelope._messages` is typed `ApiMessage[]` (`{ type: 'INFO' | 'WARNING' | 'ERROR' | 'SUCCESS', value }`,

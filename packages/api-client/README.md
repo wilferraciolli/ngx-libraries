@@ -2,10 +2,10 @@
 
 Shared Angular client for Wiltech HTTP APIs: `ApiClientService`
 (GET/POST/PUT/PATCH/DELETE + envelope-unwrap), the response envelope, HATEOAS-style
-links, field metadata shapes, and the global error response shape returned
-by a Wiltech backend (e.g. `insurly-api`'s `ApiEnvelope`/`ILink` and
-`ApiError` patterns) — plus the `LinkService`/`MetadataService` and
-`convertIdToValues` pipe built on them.
+links, field metadata shapes, and the error body returned by a Wiltech
+backend (FastAPI on the `wiltech-labs-*` Python packages: `wiltech_labs_rest`'s
+`ApiResponse` envelope, `wiltech_labs_core`'s `{"detail": …}` errors) — plus the
+`LinkService`/`MetadataService` and `convertIdToValues` pipe built on them.
 
 Built as a real Angular library (Angular Package Format, via `ng-packagr`),
 so it links into a consuming Angular app the same way `@angular/*` packages
@@ -185,45 +185,51 @@ canDelete(provider: Provider): boolean {
 }
 ```
 
-```ts
-import {
-  ApiErrorResponse,
-  fieldErrorsByField,
-  summarizeApiError,
-} from '@wiltech-labs/ngx-api-client';
+### Errors
 
-// in an HttpClient error handler:
-catchError((err: HttpErrorResponse) => {
-  const apiError = err.error as ApiErrorResponse;
-  form.setErrors(fieldErrorsByField(apiError)); // { email: 'must be a valid email', ... }
-  toast.show(summarizeApiError(apiError));
-  return throwError(() => apiError);
-});
-```
+A failed request (`get`/`post`/`put`/`send`, or a resource's `error()`) carries the API's error
+body, `ApiErrorResponse`. A Wiltech API (FastAPI) answers with one of two shapes:
 
-```ts
-import { MetadataService, IdValue } from '@wiltech-labs/ngx-api-client';
+| Source                                                                                 | Body                                       | Example                                                                                       |
+| -------------------------------------------------------------------------------------- | ------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| A business rule (`wiltech_labs_core`'s `AppError` family: 400/403/404/409/422/429/5xx) | `{ "detail": "…" }`                        | `{"detail": "An employee with this email already exists"}`                                    |
+| Request validation (FastAPI/Pydantic, `422`)                                           | `{ "detail": [{ "loc", "msg", "type" }] }` | `{"detail": [{"loc": ["body", "email"], "msg": "Value error, Enter a valid email address"}]}` |
 
-constructor(private meta: MetadataService) {}
-
-statusOptions = this.meta.resolveMetadataIdValues(metadata['status'] as IdValue[]); // -> ValueViewValue[] for a <mat-select>
-```
-
-```html
-<!-- convertIdToValues pipe: renders a stored id as its display label -->
-{{ provider.statusId | convertIdToValues: statusOptions }}
-```
+**For a banner, use `apiErrorMessage(error)`** (from 1.0.3). It takes whatever was thrown and
+returns the API's own words, or `null` when there are none: the request never reached the server
+(status 0), or the body isn't a Wiltech error (a proxy's HTML page). On `null`, show the app's own
+"couldn't reach the server" text.
 
 ```ts
-// standalone component/pipe usage — import the pipe directly, no NgModule needed
-import { ConvertIdToStringValuePipe } from '@wiltech-labs/ngx-api-client';
+import { apiErrorMessage } from '@wiltech-labs/ngx-api-client';
 
-@Component({
-  standalone: true,
-  imports: [ConvertIdToStringValuePipe],
-  // ...
-})
+try {
+  await this.api.post('employee', url, payload);
+} catch (error) {
+  this.saveError.set(apiErrorMessage(error) ?? this.translations.t('errors.network'));
+}
 ```
+
+What each shape becomes:
+
+| Body                | `apiErrorMessage()` / `summarizeApiError()`                                                                                | `fieldErrorsByField()`                                                                      |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `{"detail": "…"}`   | the message as it is                                                                                                       | `{}`                                                                                        |
+| `{"detail": [...]}` | `email: Enter a valid email address; …` (Pydantic's `Value error, ` prefix dropped; a model-level error has no field name) | `{ email: 'Enter a valid email address' }` (nested fields joined with dots: `address.city`) |
+
+**To put validation errors on form fields, use `fieldErrorsByField(body)`** on the body of an
+`HttpErrorResponse` the API answered:
+
+```ts
+import { HttpErrorResponse } from '@angular/common/http';
+import { type ApiErrorResponse, fieldErrorsByField } from '@wiltech-labs/ngx-api-client';
+
+if (error instanceof HttpErrorResponse && error.status !== 0) {
+  const byField = fieldErrorsByField(error.error as ApiErrorResponse); // { email: '…' }
+}
+```
+
+Never read `error.error.detail` by hand: that's the duplicated code these helpers replace.
 
 ## Publishing
 
