@@ -1,0 +1,48 @@
+.navbar {
+  background-color: var(--mat-sys-surface-container);
+  color: var(--mat-sys-on-surface);
+  padding: 1rem 0;
+  box-shadow: var(--mat-sys-level1);
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navbar h1 {
+  color: var(--mat-sys-on-surface);
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.nav-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-links a {
+  color: var(--mat-sys-on-surface-variant);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.nav-links a:hover {
+  background-color: color-mix(in srgb, var(--mat-sys-on-surface) 8%, transparent);
+}
+
+.main-content {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}

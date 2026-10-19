@@ -1,0 +1,43 @@
+@if (!editing()) {
+  <div class="EventDetail">
+    <div class="EventDetail-when">
+      <span class="EventDetail-swatch" [style.background]="accent()" aria-hidden="true"></span>
+      <div class="EventDetail-when-text">
+        <p class="EventDetail-date">{{ dateText() }}</p>
+        <p class="EventDetail-time">
+          {{ timeText() }} <span class="EventDetail-zone">· {{ data().timeZone }}</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="EventDetail-section">
+      <mat-icon class="EventDetail-icon" aria-hidden="true">notes</mat-icon>
+      @if (event().description) {
+        <p class="EventDetail-description">{{ event().description }}</p>
+      } @else {
+        <p class="EventDetail-description is-empty">{{ text.noDescription }}</p>
+      }
+    </div>
+
+    @if (canEdit()) {
+      <div class="EventDetail-actions">
+        <button matButton="tonal" type="button" (click)="edit()">
+          <mat-icon aria-hidden="true">edit</mat-icon>
+          {{ text.edit }}
+        </button>
+      </div>
+    }
+  </div>
+} @else {
+  @if (rangeError()) {
+    <p class="EventDetail-error" role="alert">{{ text.endBeforeStart }}</p>
+  }
+  <ngx-dynamic-form
+    [metaInfo]="config().fields"
+    [dynamicForm]="eventForm"
+    [submitLabel]="text.save"
+    [clearLabel]="text.cancel"
+    (onFormSubmit)="save()"
+    (onFormClear)="cancelEdit()"
+  />
+}

@@ -1,0 +1,47 @@
+.demo-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.demo-container h2 {
+  color: var(--mat-sys-on-surface);
+  margin-top: 0;
+}
+
+.subtitle {
+  color: var(--mat-sys-on-surface-variant);
+  font-size: 0.95rem;
+}
+
+.form-section {
+  background: var(--mat-sys-surface-container-low);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Card has no built-in gap between instances (only Panel does, per its own component) — the app
+   adds its own spacing, same as it would for any other block-level element. */
+ngx-card {
+  display: block;
+  margin-bottom: 10px;
+}
+
+ngx-card:last-child {
+  margin-bottom: 0;
+}
+
+.info-section {
+  background: var(--mat-sys-surface-container);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.info-section h3 {
+  margin-top: 0;
+  color: var(--mat-sys-primary);
+}

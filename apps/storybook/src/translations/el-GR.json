@@ -1,0 +1,17 @@
+{
+  "common": {
+    "buttons": { "save": "Αποθήκευση", "cancel": "Ακύρωση", "delete": "Διαγραφή" }
+  },
+  "story": {
+    "greeting": "Γεια σου, {{name}}!",
+    "itemCount": "Έχεις {{count}} αντικείμενα στο καλάθι σου",
+    "welcomeBack": "Καλώς ήρθες ξανά",
+    "currentLocale": "Τρέχουσα γλώσσα",
+    "formattedDate": "Μορφοποιημένη ημερομηνία",
+    "formattedNumber": "Μορφοποιημένη τιμή",
+    "missingKeyNote": "Ένα κλειδί χωρίς μετάφραση εμφανίζεται ως το ίδιο το κλειδί"
+  },
+  "metadata": {
+    "status": { "active": "Ενεργό", "inactive": "Ανενεργό", "pending": "Σε αναμονή" }
+  }
+}

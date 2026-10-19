@@ -1,0 +1,11 @@
+<div class="AiPanel">
+  <div class="AiPanel-content">
+    @if (title()) {
+      <div class="AiPanel-header">
+        <ngx-ai-sparkle-icon size="20px" />
+        <h3 class="AiPanel-title">{{ title() }}</h3>
+      </div>
+    }
+    <ng-content />
+  </div>
+</div>

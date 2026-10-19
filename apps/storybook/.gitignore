@@ -1,0 +1,5 @@
+/storybook-static/
+/documentation.json
+/.angular/cache/
+/dist/
+node_modules/

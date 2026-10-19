@@ -1,0 +1,56 @@
+@use '../../styles/shimmer.mixins' as shimmer;
+
+:host {
+  display: block;
+}
+
+// Same surface as an M3 content card, so the skeleton sits where the card will.
+.CardLoader {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  border-radius: var(--mat-sys-corner-large, 16px);
+  background: var(--ngx-media-loader-surface, var(--mat-sys-surface-container-low, transparent));
+
+  &-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &-avatar {
+    @include shimmer.shimmer;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--mat-sys-corner-full, 50%);
+    flex-shrink: 0;
+  }
+
+  &-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &-title {
+    @include shimmer.shimmer;
+    height: 14px;
+    width: 60%;
+    border-radius: var(--mat-sys-corner-extra-small, 4px);
+  }
+
+  &-subtitle {
+    @include shimmer.shimmer;
+    height: 10px;
+    width: 40%;
+    border-radius: var(--mat-sys-corner-extra-small, 4px);
+  }
+
+  &-content {
+    display: block;
+    height: 48px;
+  }
+}

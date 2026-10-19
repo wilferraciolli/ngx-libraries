@@ -1,0 +1,271 @@
+<div class="demo-container">
+  <h2>Dynamic Forms Demo</h2>
+  <p class="subtitle">
+    Configuration-driven forms built with the DynamicForm component from @wiltech-labs/ngx-forms
+  </p>
+
+  <mat-tab-group>
+    <!-- ============ FLIGHTS TAB ============ -->
+    <mat-tab label="Flight Form">
+      <div class="tab-content">
+        <h3>Flight Booking</h3>
+        <p>
+          Demonstrates: text, instant date-time, checkbox fields with required/minLength/maxLength
+          validation.
+        </p>
+
+        <ngx-dynamic-form
+          [metaInfo]="flightFormConfig.fields"
+          [dynamicForm]="flightsForm"
+          (onFormSubmit)="handleFlightSubmit()"
+          (onFormClear)="handleClearFlightForm()"
+        />
+
+        <div class="model-section">
+          @let flightErrors = validationErrors(flightsForm);
+          <strong>Current value ({{ flightErrors.length ? 'invalid' : 'valid' }}):</strong>
+          @if (flightErrors.length) {
+            <ul class="model-errors">
+              @for (error of flightErrors; track error) {
+                <li>{{ error }}</li>
+              }
+            </ul>
+          }
+          <pre>{{ flightEntity() | json }}</pre>
+        </div>
+
+        @if (flightSubmitted(); as data) {
+          <mat-divider />
+          <div class="response-section">
+            <strong>Submitted Data:</strong>
+            <pre>{{ data | json }}</pre>
+          </div>
+        }
+      </div>
+    </mat-tab>
+
+    <!-- ============ APPOINTMENT TAB ============ -->
+    <mat-tab label="Appointment Form">
+      <div class="tab-content">
+        <h3>Book an Appointment</h3>
+        <p>
+          Demonstrates: text, a horizontal radio, business date, business time, and number fields.
+        </p>
+
+        <ngx-dynamic-form
+          [metaInfo]="appointmentFormConfig.fields"
+          [dynamicForm]="appointmentForm"
+          (onFormSubmit)="handleAppointmentSubmit()"
+          (onFormClear)="handleClearAppointmentForm()"
+        />
+
+        <div class="model-section">
+          @let appointmentErrors = validationErrors(appointmentForm);
+          <strong>Current value ({{ appointmentErrors.length ? 'invalid' : 'valid' }}):</strong>
+          @if (appointmentErrors.length) {
+            <ul class="model-errors">
+              @for (error of appointmentErrors; track error) {
+                <li>{{ error }}</li>
+              }
+            </ul>
+          }
+          <pre>{{ appointmentEntity() | json }}</pre>
+        </div>
+
+        @if (appointmentSubmitted(); as data) {
+          <mat-divider />
+          <div class="response-section">
+            <strong>Submitted Data:</strong>
+            <pre>{{ data | json }}</pre>
+          </div>
+        }
+      </div>
+    </mat-tab>
+
+    <!-- ============ ALL FIELDS TAB ============ -->
+    <mat-tab label="All Field Types">
+      <div class="tab-content">
+        <h3>Every Field Type</h3>
+        <p>
+          Demonstrates: text (with a pattern), email, password, search, business date, business
+          time, instant date-time, radio, select, checkbox, number, range, textarea, and code.
+        </p>
+
+        <ngx-dynamic-form
+          [metaInfo]="allFieldsFormConfig.fields"
+          [dynamicForm]="allFieldsForm"
+          (onFormSubmit)="handleAllFieldsSubmit()"
+          (onFormClear)="handleClearAllFieldsForm()"
+        />
+
+        <div class="model-section">
+          @let allFieldsErrors = validationErrors(allFieldsForm);
+          <strong>Current value ({{ allFieldsErrors.length ? 'invalid' : 'valid' }}):</strong>
+          @if (allFieldsErrors.length) {
+            <ul class="model-errors">
+              @for (error of allFieldsErrors; track error) {
+                <li>{{ error }}</li>
+              }
+            </ul>
+          }
+          <pre>{{ allFieldsEntity() | json }}</pre>
+        </div>
+
+        @if (allFieldsSubmitted(); as data) {
+          <mat-divider />
+          <div class="response-section">
+            <strong>Submitted Data:</strong>
+            <pre>{{ data | json }}</pre>
+          </div>
+        }
+      </div>
+    </mat-tab>
+
+    <!-- ============ DATE & TIME TAB ============ -->
+    <mat-tab label="Date & Time">
+      <div class="tab-content">
+        <h3>Date &amp; Time Fields</h3>
+        <p>
+          <strong>Instant date-time</strong> stores an exact moment as a UTC instant
+          (<code>YYYY-MM-DDThh:mm:ssZ</code>) and edits it in a timezone.
+          <strong>Business date</strong> (<code>YYYY-MM-DD</code>) and
+          <strong>business time</strong>
+          (<code>HH:mm</code>) ignore timezones entirely. All three display in the chosen locale,
+          not the browser's.
+        </p>
+
+        <div class="date-time-controls">
+          <mat-form-field>
+            <mat-label>Timezone (instant only)</mat-label>
+            <mat-select
+              [value]="selectedTimezone()"
+              (selectionChange)="selectedTimezone.set($event.value)"
+            >
+              @for (tz of timezones; track tz.id) {
+                <mat-option [value]="tz.id">{{ tz.value }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Locale (all fields)</mat-label>
+            <mat-select
+              [value]="selectedLocale()"
+              (selectionChange)="selectedLocale.set($event.value)"
+            >
+              @for (locale of locales; track locale.id) {
+                <mat-option [value]="locale.id">{{ locale.value }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <ngx-dynamic-form
+          [metaInfo]="dateTimeFields()"
+          [dynamicForm]="dateTimeForm"
+          (onFormSubmit)="handleDateTimeSubmit()"
+          (onFormClear)="handleClearDateTimeForm()"
+        />
+
+        <div class="model-section">
+          @let dateTimeErrors = validationErrors(dateTimeForm);
+          <strong>Current value ({{ dateTimeErrors.length ? 'invalid' : 'valid' }}):</strong>
+          @if (dateTimeErrors.length) {
+            <ul class="model-errors">
+              @for (error of dateTimeErrors; track error) {
+                <li>{{ error }}</li>
+              }
+            </ul>
+          }
+          <pre>{{ dateTimeEntity() | json }}</pre>
+        </div>
+
+        @if (dateTimeSubmitted(); as data) {
+          <mat-divider />
+          <div class="response-section">
+            <strong>Submitted Data:</strong>
+            <pre>{{ data | json }}</pre>
+          </div>
+        }
+
+        <mat-divider />
+        <div class="utc-info-section">
+          <h4>The appointment instant in each timezone:</h4>
+          <ul>
+            @for (tz of timezones; track tz.id) {
+              <li>{{ tz.id }}: {{ convertAppointmentToTimeZone(tz.id) }}</li>
+            }
+          </ul>
+          <p class="utc-tip">
+            Try Europe/London with 31/03/2024 01:30 (does not exist, clocks go forward) or
+            27/10/2024 01:30 (happens twice, clocks go back).
+          </p>
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- ============ STANDALONE FIELDS TAB ============ -->
+    <mat-tab label="Standalone Fields">
+      <div class="tab-content">
+        <h3>Field Components Without DynamicForm</h3>
+        <p>
+          Every field component takes a <code>[fieldDef]</code> and a <code>[field]</code>, so you
+          can place them one by one in your own layout — no Save/Clear buttons, and the model can be
+          any plain object.
+        </p>
+
+        <div class="standalone-fields">
+          <ngx-text-field [fieldDef]="newsletterFields.email" [field]="newsletterForm.email" />
+          <ngx-business-date-field
+            [fieldDef]="newsletterFields.startDate"
+            [field]="newsletterForm.startDate"
+          />
+          <ngx-select-field
+            [fieldDef]="newsletterFields.frequency"
+            [field]="newsletterForm.frequency"
+          />
+          <ngx-checkbox-field [fieldDef]="newsletterFields.agree" [field]="newsletterForm.agree" />
+        </div>
+
+        <div class="model-section">
+          @let newsletterErrors = validationErrors(newsletterForm);
+          <strong>Current value ({{ newsletterErrors.length ? 'invalid' : 'valid' }}):</strong>
+          @if (newsletterErrors.length) {
+            <ul class="model-errors">
+              @for (error of newsletterErrors; track error) {
+                <li>{{ error }}</li>
+              }
+            </ul>
+          }
+          <pre>{{ newsletterModel() | json }}</pre>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+
+  <div class="info-section">
+    <h3>About Dynamic Forms</h3>
+    <p>The DynamicForm component provides a configuration-driven approach to building forms:</p>
+    <ul>
+      <li>
+        <strong>Schema-based:</strong> Define form structure with an array of field definitions
+      </li>
+      <li>
+        <strong>Type-safe:</strong> Full TypeScript support with generics extending BaseSchema
+      </li>
+      <li>
+        <strong>Flexible:</strong> Supports text, email, password, search, radio, select, checkbox,
+        number, range, textarea, code, business date, business time, and instant date-time fields
+      </li>
+      <li>
+        <strong>Validation:</strong> Built-in required, minLength/maxLength, min/max, email, pattern
+        and date/time range rules with inline error display
+      </li>
+      <li>
+        <strong>Signals-based:</strong> Built on Angular's experimental Signals Forms API
+        (<code>@angular/forms/signals</code>)
+      </li>
+    </ul>
+    <p>This approach reduces boilerplate and makes forms more maintainable and testable.</p>
+  </div>
+</div>

@@ -1,0 +1,51 @@
+<div class="ThemeSwitcher">
+  <button
+    mat-icon-button
+    type="button"
+    [attr.aria-label]="text().toggleModeLabel(theme.isDark())"
+    [matTooltip]="text().toggleModeTooltip(theme.isDark())"
+    (click)="theme.toggleMode()"
+  >
+    <mat-icon aria-hidden="true">{{ theme.isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+  </button>
+
+  <button
+    mat-icon-button
+    type="button"
+    [attr.aria-label]="text().chooseTheme"
+    [matTooltip]="text().themeTooltip"
+    [matMenuTriggerFor]="themeMenu"
+  >
+    <mat-icon aria-hidden="true">palette</mat-icon>
+  </button>
+</div>
+
+<mat-menu #themeMenu="matMenu">
+  @for (family of theme.families; track family.id) {
+    <button
+      mat-menu-item
+      type="button"
+      role="menuitemradio"
+      [attr.aria-checked]="theme.family() === family.id"
+      (click)="theme.setFamily(family.id)"
+    >
+      <mat-icon aria-hidden="true">{{ theme.family() === family.id ? 'check' : '' }}</mat-icon>
+      <span>{{ family.label }}</span>
+    </button>
+  }
+  @if (theme.families.length) {
+    <mat-divider />
+  }
+  <button
+    mat-menu-item
+    type="button"
+    role="menuitemcheckbox"
+    [attr.aria-checked]="theme.mode() === 'system'"
+    (click)="theme.setMode('system')"
+  >
+    <mat-icon aria-hidden="true">{{
+      theme.mode() === 'system' ? 'check' : 'brightness_auto'
+    }}</mat-icon>
+    <span>{{ text().matchSystem }}</span>
+  </button>
+</mat-menu>

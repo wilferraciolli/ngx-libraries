@@ -1,0 +1,16 @@
+<form [formRoot]="settingsForm" class="RegionSettingsForm">
+  <div class="RegionSettingsForm-fields">
+    <ngx-select-field [fieldDef]="timezoneField()" [field]="settingsForm.timezone" />
+    <ngx-select-field [fieldDef]="languageField()" [field]="settingsForm.language" />
+    <ngx-select-field [fieldDef]="localeField()" [field]="settingsForm.locale" />
+    <ngx-select-field [fieldDef]="currencyField()" [field]="settingsForm.currency" />
+    <ngx-theme-field [fieldDef]="themeField()" [field]="settingsForm.theme" />
+  </div>
+
+  <div class="RegionSettingsForm-actions">
+    <ng-content select="[regionSettingsFormActions]" />
+    <button matButton="filled" type="submit" [disabled]="saving() || !changed()">
+      {{ saving() ? text().saving : text().save }}
+    </button>
+  </div>
+</form>

@@ -1,0 +1,165 @@
+// FullCalendar's Material 3 theme ("monarch") reads these. Pointing them at the app's --mat-sys-*
+// roles makes the grid follow the app theme, light and dark, with no palette stylesheet.
+:host {
+  display: block;
+  // Shorthands for the roles reused below, each with its unthemed fallback.
+  --_p: var(--mat-sys-primary, #6750a4);
+  --_on-p: var(--mat-sys-on-primary, #fff);
+  --_s: var(--mat-sys-secondary-container, #e8def8);
+  --_on-s: var(--mat-sys-on-secondary-container, #4a4458);
+  --_on: var(--mat-sys-on-surface, #1d1b20);
+  --fc-monarch-primary: var(--_p);
+  --fc-monarch-primary-foreground: var(--_on-p);
+  --fc-monarch-primary-over: color-mix(in srgb, var(--_on-p) 8%, var(--_p));
+  --fc-monarch-primary-down: color-mix(in srgb, var(--_on-p) 12%, var(--_p));
+  --fc-monarch-secondary: var(--_s);
+  --fc-monarch-secondary-foreground: var(--_on-s);
+  --fc-monarch-secondary-over: color-mix(in srgb, var(--_on-s) 8%, var(--_s));
+  --fc-monarch-secondary-down: color-mix(in srgb, var(--_on-s) 12%, var(--_s));
+  --fc-monarch-event: var(--mat-sys-primary-container, #eaddff);
+  --fc-monarch-event-contrast: var(--mat-sys-on-primary-container, #4f378b);
+  --fc-monarch-highlight: color-mix(in srgb, var(--_p) 12%, transparent);
+  --fc-monarch-now: var(--mat-sys-error, #b3261e);
+  --fc-monarch-selected: var(--_s);
+  --fc-monarch-selected-foreground: var(--_on-s);
+  --fc-monarch-outline: var(--_p);
+  --fc-monarch-popover: var(--mat-sys-surface-container-high, #ece6f0);
+  --fc-monarch-popover-foreground: var(--_on);
+  --fc-monarch-background: var(--ngx-calendar-background, var(--mat-sys-surface, #fef7ff));
+  --fc-monarch-foreground: var(--_on);
+  --fc-monarch-faint: color-mix(in srgb, var(--_on) 4%, transparent);
+  --fc-monarch-muted: color-mix(in srgb, var(--_on) 8%, transparent);
+  --fc-monarch-strong: color-mix(in srgb, var(--_on) 12%, transparent);
+  --fc-monarch-stronger: color-mix(in srgb, var(--_on) 16%, transparent);
+  --fc-monarch-strongest: color-mix(in srgb, var(--_on) 20%, transparent);
+  --fc-monarch-faint-foreground: var(--mat-sys-outline, #79747e);
+  --fc-monarch-muted-foreground: var(--mat-sys-on-surface-variant, #49454f);
+  --fc-monarch-border: var(--mat-sys-outline-variant, #cac4d0);
+  --fc-monarch-strong-border: var(--mat-sys-outline, #79747e);
+}
+
+.Calendar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--_on);
+
+  &-toolbar {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-areas: 'title title' 'nav views';
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px 16px;
+
+    @media (min-width: 840px) {
+      grid-template-columns: auto 1fr auto;
+      grid-template-areas: 'nav title views';
+    }
+  }
+
+  &-nav {
+    grid-area: nav;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &-title {
+    grid-area: title;
+    margin: 0;
+    font: var(--mat-sys-title-large);
+    letter-spacing: var(--mat-sys-title-large-tracking);
+
+    @media (min-width: 840px) {
+      font: var(--mat-sys-headline-small);
+      letter-spacing: var(--mat-sys-headline-small-tracking);
+    }
+  }
+
+  &-views {
+    grid-area: views;
+  }
+
+  &-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    &.is-split {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+  }
+
+  &-grid {
+    flex: 1 1 auto;
+    min-inline-size: 0;
+    block-size: clamp(480px, 72dvh, 860px);
+    overflow: hidden;
+    border: 1px solid var(--mat-sys-outline-variant, #cac4d0);
+    border-radius: var(--mat-sys-corner-large, 16px);
+
+    &.is-compact {
+      block-size: clamp(420px, 64dvh, 640px);
+    }
+  }
+
+  &-day {
+    @media (min-width: 1200px) {
+      flex: 0 0 320px;
+      position: sticky;
+      top: 16px;
+    }
+  }
+
+  &-chip {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    min-inline-size: 0;
+    overflow: hidden;
+    padding-inline: 2px;
+    font: var(--mat-sys-label-medium);
+    white-space: nowrap;
+
+    &.is-stacked {
+      flex-direction: column;
+      gap: 0;
+      padding-block: 2px;
+      white-space: normal;
+    }
+  }
+
+  &-chip-time {
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+    opacity: 0.8;
+  }
+
+  &-chip-title {
+    overflow: hidden;
+    font-weight: 500;
+    text-overflow: ellipsis;
+  }
+
+  &-day-number {
+    display: inline-grid;
+    place-items: center;
+    min-inline-size: 28px;
+    block-size: 28px;
+    padding-inline: 4px;
+    border-radius: var(--mat-sys-corner-full, 9999px);
+    font: var(--mat-sys-label-large);
+
+    &.is-today {
+      background: var(--_p);
+      color: var(--_on-p);
+    }
+  }
+}
+
+// FullCalendar's own elements: reached by its class names, which this package doesn't control.
+:host ::ng-deep .Calendar-selected-day {
+  background: color-mix(in srgb, var(--_p) 8%, transparent);
+}

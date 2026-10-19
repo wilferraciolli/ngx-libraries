@@ -1,0 +1,15 @@
+:host {
+  display: block;
+}
+
+.TextareaField {
+  width: 100%;
+
+  &-input {
+    &.is-code {
+      font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+      font-size: 0.875rem;
+      tab-size: 2;
+    }
+  }
+}

@@ -1,0 +1,41 @@
+:host {
+  display: block;
+}
+
+// The other party's bubble on the left in surface-container-high, the viewer's on the right in
+// primary-container; large corners with one extra-small corner on the speaker's side.
+.ChatMessageBubble {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: fit-content;
+  max-width: 75%;
+  padding: 8px 12px;
+  border-radius: var(--mat-sys-corner-large, 16px);
+  border-end-start-radius: var(--mat-sys-corner-extra-small, 4px);
+  background: var(--ngx-chat-bubble-background, var(--mat-sys-surface-container-high, #ececec));
+  color: var(--ngx-chat-bubble-color, var(--mat-sys-on-surface, #1a1a1a));
+
+  &.is-self {
+    align-items: flex-end;
+    margin-inline-start: auto;
+    border-end-start-radius: var(--mat-sys-corner-large, 16px);
+    border-end-end-radius: var(--mat-sys-corner-extra-small, 4px);
+    background: var(--ngx-chat-bubble-self-background, var(--mat-sys-primary-container, #d8e2ff));
+    color: var(--ngx-chat-bubble-self-color, var(--mat-sys-on-primary-container, #001a41));
+  }
+
+  &-author {
+    font: var(--mat-sys-label-medium, 500 0.75rem / 1rem sans-serif);
+    letter-spacing: var(--mat-sys-label-medium-tracking, 0.03125rem);
+    opacity: 0.8;
+  }
+
+  &-text {
+    font: var(--mat-sys-body-large, 400 1rem / 1.5rem sans-serif);
+    letter-spacing: var(--mat-sys-body-large-tracking, 0.03125rem);
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+  }
+}

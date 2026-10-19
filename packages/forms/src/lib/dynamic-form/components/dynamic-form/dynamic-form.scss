@@ -1,0 +1,20 @@
+@use '../../styles/field.mixins' as mix;
+
+// No padding or background of its own: the form sits in the app's surface (e.g. a tonal panel).
+.DynamicForm {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+
+  &-field {
+    @include mix.field-container;
+  }
+
+  // Right-aligned: the secondary text action, then the filled primary one.
+  &-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+}

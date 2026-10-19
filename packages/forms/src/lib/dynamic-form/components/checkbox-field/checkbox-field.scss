@@ -1,0 +1,11 @@
+:host {
+  display: block;
+}
+
+.CheckboxField {
+  // Lines the hint/error up with the label text rather than the box.
+  &-subscript {
+    padding-inline-start: 40px;
+    margin-top: -4px;
+  }
+}

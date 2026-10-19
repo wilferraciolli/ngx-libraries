@@ -1,0 +1,17 @@
+{
+  "common": {
+    "buttons": { "save": "Save", "cancel": "Cancel", "delete": "Delete" }
+  },
+  "story": {
+    "greeting": "Hello, {{name}}!",
+    "itemCount": "You have {{count}} items in your basket",
+    "welcomeBack": "Welcome back",
+    "currentLocale": "Current locale",
+    "formattedDate": "Formatted date",
+    "formattedNumber": "Formatted price",
+    "missingKeyNote": "A key with no translation renders as the key itself"
+  },
+  "metadata": {
+    "status": { "active": "Active", "inactive": "Inactive", "pending": "Pending" }
+  }
+}

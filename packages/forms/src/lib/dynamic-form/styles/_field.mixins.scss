@@ -1,0 +1,35 @@
+// Shared layout and small-text styles for the field components. The fields themselves are
+// Angular Material controls, so these only cover what sits around them — in the app's M3 tokens,
+// matching mat-form-field's own label and subscript.
+
+// Fields fill their row by default. --ngx-field-max-width caps one (DynamicForm sets it from
+// FieldDef.maxWidth).
+@mixin field-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: var(--ngx-field-max-width, none);
+}
+
+// Label above a control that has no mat-form-field of its own (radio group, slider, instant date-time).
+@mixin field-label {
+  margin-bottom: 6px;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+  letter-spacing: var(--mat-sys-body-medium-tracking);
+}
+
+@mixin field-hint {
+  margin-top: 4px;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+  letter-spacing: var(--mat-sys-body-small-tracking);
+}
+
+// How a daylight-saving gap/overlap was resolved — worth noticing, not an error.
+@mixin field-notice {
+  margin-top: 4px;
+  color: var(--mat-sys-tertiary);
+  font: var(--mat-sys-body-small);
+  letter-spacing: var(--mat-sys-body-small-tracking);
+}

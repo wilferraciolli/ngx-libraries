@@ -1,0 +1,46 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Introduction" />
+
+# ngx-libraries
+
+A catalogue of every `@wiltech-labs/ngx-*` Angular package, rendered straight from the library
+source in this repo. Each sidebar group is one package; each story under it is one use case.
+
+## How to read a story
+
+- **Canvas** shows the component on its own. **Docs** shows every use case on one page, with a
+  description and an inputs/outputs table generated from the source by Compodoc.
+- **Controls** (bottom panel) change the component's inputs live.
+- **Actions** list every output a component emitted, with its payload.
+- **Accessibility** runs axe checks on the current story.
+
+## Toolbar
+
+- **Theme**: light, dark or system. Every colour comes from the Material 3 `--mat-sys-*` tokens,
+  so the whole catalogue follows it.
+- **Locale**: English (UK) or Greek. Translations, relative dates, form date/time fields and the
+  calendar all switch live.
+
+## Packages
+
+| Group                                | What it is                                                                         |
+| ------------------------------------ | ---------------------------------------------------------------------------------- |
+| ngx-components                       | Banner, Panel, Card                                                                |
+| ngx-ai-tools                         | Gradient AI panel, text box, button and sparkle icon                               |
+| ngx-media                            | Skeleton loaders and a YouTube player                                              |
+| ngx-graphs                           | Eight chart.js chart types with a "Show data" table                                |
+| ngx-forms                            | Configuration-driven forms on Angular Signal Forms, every field type               |
+| ngx-modals                           | Right/left side-panel modal with a typed close result and an unsaved-changes guard |
+| ngx-notifications                    | Polling notification bell with a CDK overlay panel                                 |
+| ngx-translations                     | Instant language switching, the `t` pipe, locale-aware formatting                  |
+| ngx-dates                            | The `relativeTime` pipe on Temporal                                                |
+| ngx-calendar                         | Day / week / month calendar with day and event panels                              |
+| ngx-organization                     | Pan/zoom org chart with a node detail panel                                        |
+| ngx-region-settings                  | The region-settings form                                                           |
+| ngx-web-sockets                      | Chat message bubbles and a chat room (with a fake socket)                          |
+| ngx-api-client, ngx-auth, ngx-styles | Usage pages (no UI of their own)                                                   |
+
+All data in these stories is fake. Nothing here calls a real API.
+
+Each package's own `README.md` in `packages/<name>/` is the full reference.

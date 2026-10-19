@@ -1,7 +1,7 @@
-# @wiliamferraciolli/ngx-api-client
+# @wiltech-labs/ngx-api-client
 
 Shared Angular client for Wiltech HTTP APIs: `ApiClientService`
-(GET/POST/PUT/DELETE + envelope-unwrap), the response envelope, HATEOAS-style
+(GET/POST/PUT/PATCH/DELETE + envelope-unwrap), the response envelope, HATEOAS-style
 links, field metadata shapes, and the global error response shape returned
 by a Wiltech backend (e.g. `insurly-api`'s `ApiEnvelope`/`ILink` and
 `ApiError` patterns) — plus the `LinkService`/`MetadataService` and
@@ -12,8 +12,9 @@ so it links into a consuming Angular app the same way `@angular/*` packages
 do. Requires `@angular/core`/`@angular/common`/`rxjs` as peer dependencies.
 
 ### Sample payload
+
 ```json
-    
+
 {
 	"_data": {
 		"userProfile": {
@@ -34,7 +35,7 @@ do. Requires `@angular/core`/`@angular/common`/`rxjs` as peer dependencies.
 					"href": "/api/users/uuidsIds"
 				}
 			}
-		}		
+		}
 	},
 	"_metadata" :{
 	  "id": {
@@ -75,7 +76,7 @@ do. Requires `@angular/core`/`@angular/common`/`rxjs` as peer dependencies.
 ## Install
 
 ```bash
-npm install @wiliamferraciolli/ngx-api-client
+npm install @wiltech-labs/ngx-api-client
 ```
 
 `API_ORIGIN` defaults to `''` (same-origin — links resolve as relative
@@ -84,7 +85,7 @@ origin. Only provide it if they're on different origins, in
 `app.config.ts` (or equivalent):
 
 ```ts
-import { API_ORIGIN } from '@wiliamferraciolli/ngx-api-client';
+import { API_ORIGIN } from '@wiltech-labs/ngx-api-client';
 import { environment } from './environments/environment';
 
 export const appConfig: ApplicationConfig = {
@@ -97,13 +98,13 @@ export const appConfig: ApplicationConfig = {
 
 ## Usage
 
-`ApiClientService` is the shared GET/POST/PUT/DELETE + envelope-unwrap
+`ApiClientService` is the shared GET/POST/PUT/PATCH/DELETE + envelope-unwrap
 client — each feature still gets its own typed `*ApiService`, but it
 delegates the HTTP mechanics to this instead of hand-rolling
 `firstValueFrom(this.http.x(...))` + `_data[root]` unwrapping per method:
 
 ```ts
-import { ApiClientService, ApiResource } from '@wiliamferraciolli/ngx-api-client';
+import { ApiClientService, ApiResource } from '@wiltech-labs/ngx-api-client';
 
 @Injectable({ providedIn: 'root' })
 export class ProviderApiService {
@@ -146,30 +147,18 @@ export class ProviderApiService {
 (e.g. a dashboard, or "me") — same shape, `value()` unwraps `_data[root]`
 instead of `_data[root][]`.
 
-Both also expose `metadata()`/`metaLinks()` — the envelope's `_metadata`/
-`_metaLinks` sidecar, `undefined` until the same response `value()`
-resolves from. Pair with `MetadataService` for select options driven by
-the API's own field metadata, or a collection-level action link (e.g.
-`createProvider`) instead of a hardcoded URL:
+Both also expose the envelope's sidecars as signals — `metadata()` (`_metadata`, e.g. a select's
+option list) and `metaLinks()` (`_metaLinks`, e.g. the collection's `createX` action) — each `{}`
+until a response arrives:
 
 ```ts
 readonly statusOptions = computed(() =>
-  this.meta.resolveMetadataIdValues(this.listResource.metadata()?.['status']?.values ?? []),
+  this.meta.resolveMetadataIdValues(this.listResource.metadata()['status']?.values ?? []),
 );
-
-async create(payload: ProviderPayload): Promise<Provider> {
-  const url = this.api.requireLink(
-    this.listResource.metaLinks()?.['createProvider'],
-    'Providers collection link not available yet.',
-  );
-  const provider = await this.api.post('provider', url, payload);
-  this.listResource.reload();
-  return provider;
-}
 ```
 
 ```ts
-import { ApiEnvelope, SingleEnvelope, CollectionEnvelope, ILink, LinkService } from '@wiliamferraciolli/ngx-api-client';
+import { ApiEnvelope, SingleEnvelope, CollectionEnvelope, ILink, LinkService } from '@wiltech-labs/ngx-api-client';
 
 type ProviderEnvelope = SingleEnvelope<'provider', Provider>;
 
@@ -181,31 +170,27 @@ canDelete(provider: Provider): boolean {
 ```
 
 ```ts
-import { ApiErrorResponse, fieldErrorsByField, summarizeApiError } from '@wiliamferraciolli/ngx-api-client';
+import {
+  ApiErrorResponse,
+  fieldErrorsByField,
+  summarizeApiError,
+} from '@wiltech-labs/ngx-api-client';
 
 // in an HttpClient error handler:
 catchError((err: HttpErrorResponse) => {
   const apiError = err.error as ApiErrorResponse;
-  form.setErrors(fieldErrorsByField(apiError));   // { email: 'must be a valid email', ... }
+  form.setErrors(fieldErrorsByField(apiError)); // { email: 'must be a valid email', ... }
   toast.show(summarizeApiError(apiError));
   return throwError(() => apiError);
-})
+});
 ```
 
-`MetadataService.resolveMetadataIdValues` turns one field's `_metadata`
-entry into `ValueViewValue[]` for a `<mat-select>`/`<select>` — get the
-field's `values` from an `ApiResource.metadata()` (see the
-`resource()`/`collectionResource()` example above) rather than piping
-around a raw envelope:
-
 ```ts
-import { MetadataService } from '@wiliamferraciolli/ngx-api-client';
+import { MetadataService, IdValue } from '@wiltech-labs/ngx-api-client';
 
 constructor(private meta: MetadataService) {}
 
-statusOptions = computed(() =>
-  this.meta.resolveMetadataIdValues(this.listResource.metadata()?.['status']?.values ?? []),
-);
+statusOptions = this.meta.resolveMetadataIdValues(metadata['status'] as IdValue[]); // -> ValueViewValue[] for a <mat-select>
 ```
 
 ```html
@@ -215,7 +200,7 @@ statusOptions = computed(() =>
 
 ```ts
 // standalone component/pipe usage — import the pipe directly, no NgModule needed
-import { ConvertIdToStringValuePipe } from '@wiliamferraciolli/ngx-api-client';
+import { ConvertIdToStringValuePipe } from '@wiltech-labs/ngx-api-client';
 
 @Component({
   standalone: true,

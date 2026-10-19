@@ -1,0 +1,17 @@
+<mat-expansion-panel class="Panel">
+  <mat-expansion-panel-header>
+    <mat-panel-title class="Panel-title">
+      <span class="Panel-titleRow">
+        @if (icon()) {
+          <mat-icon class="Panel-icon" aria-hidden="true">{{ icon() }}</mat-icon>
+        }
+        <span class="Panel-titleText">{{ header() }}</span>
+      </span>
+      @if (subheader()) {
+        <span class="Panel-subheader">{{ subheader() }}</span>
+      }
+    </mat-panel-title>
+  </mat-expansion-panel-header>
+
+  <ng-content />
+</mat-expansion-panel>

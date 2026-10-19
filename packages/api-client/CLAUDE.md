@@ -1,4 +1,4 @@
-# @wiliamferraciolli/ngx-api-client
+# @wiltech-labs/ngx-api-client
 
 Angular library for talking to a Wiltech backend's HTTP API: the response
 envelope shape, HATEOAS-style links, field metadata, error shapes, and the
@@ -17,6 +17,7 @@ around, unless the change originates here deliberately (e.g. the
 `ApiClientService` addition, which doesn't exist in `insurly-ui` yet).
 
 ## Layout
+
 ```
 src/
 ├── public-api.ts        # barrel — the entire public surface; nothing outside this is exported
@@ -25,7 +26,7 @@ src/
     │   ├── envelope.ts           # ApiEnvelope, ILink, SingleEnvelope, CollectionEnvelope, resolveLink()
     │   ├── error.ts               # ApiErrorResponse, ApiFieldViolation, fieldErrorsByField(), summarizeApiError()
     │   ├── api-origin.token.ts    # API_ORIGIN InjectionToken — consuming app provides its own origin
-    │   └── api-client.service.ts  # ApiClientService: get/post/put/delete, requireLink(), resource()/collectionResource()
+    │   └── api-client.service.ts  # ApiClientService: get/post/put/patch/delete, requireLink(), resource()/collectionResource()
     ├── links/
     │   └── link.service.ts        # LinkService: hasLink / isTemplateLink / getCreateUrlFromTemplateUrl
     └── metadata/
@@ -35,13 +36,14 @@ src/
 ```
 
 ## Conventions
+
 - Real Angular constructs (`@Injectable`, `@Pipe`) — not framework-agnostic
   functions. Every known consumer is Angular, so idiomatic DI beats a
   generic-TS compromise (see root `CLAUDE.md`'s "Consumers" decision).
 - One folder per concern under `src/lib/` — don't let it go flat again. A
   new concern (e.g. auth headers, pagination) gets its own folder, not a
   file dropped next to `http-client/`.
-- `ApiClientService` owns HTTP mechanics only — GET/POST/PUT/DELETE +
+- `ApiClientService` owns HTTP mechanics only — GET/POST/PUT/PATCH/DELETE +
   envelope unwrap + link-follow guard. It does **not** own URL construction
   or "reload the list after a mutation" — that orchestration stays in each
   feature's own `*ApiService` in the consuming app, per `insurly-ui`'s
@@ -58,35 +60,23 @@ src/
   provide it — same-origin consumers need zero config.
 - `ApiErrorResponse` / `ApiFieldViolation` mirror `insurly-api`'s
   `ApiError` / `ApiError.FieldViolation` records field-for-field — the
-  original `insurly-ui` `ErrorResponse` class did *not* match the backend
+  original `insurly-ui` `ErrorResponse` class did _not_ match the backend
   (different field names, never actually wired up anywhere); this package
   fixes that instead of carrying the mismatch forward.
 
 ## Status
-- Published to npm as `@wiliamferraciolli/ngx-api-client` (currently
-  `0.1.5`) — see the note in the root `CLAUDE.md` on why the scope is
-  `@wiliamferraciolli`, not `@wiltech`.
-- **Not actually wired into `insurly-ui` yet** — despite this section
-  previously saying otherwise. Checked directly (2026-09-22):
-  `ngx-api-client` isn't in `insurly-ui/package.json`, and nothing there
-  references `ApiClientService`; `provider-api.service.ts` still
-  hand-rolls `HttpClient`/`httpResource` + local `_data[root]` unwrapping,
-  the exact pattern this package exists to replace. This package was
-  ported *from* that code as a starting point, but the migration back
-  onto the published package — deleting the locally-duplicated
-  `core/api/api-envelope.ts`/`_services/link.service.ts`/etc. — was never
-  done. Don't trust this status note without checking the actual
-  `insurly-ui` source; update it here the next time that migration
-  happens for real.
-- First real consumer: `showcase` (Angular UI for `fastapi-cloudflare-d1`,
-  in the sibling `PythonTutorials` repo) — genuinely wired up via
-  `TodosStore`/`TagsStore`/`CurrentUserStore` using `ApiClientService`,
-  `LinkService`, `MetadataService`. This is what surfaced the
-  `metadata`/`metaLinks` gap on `ApiResource` (see git history on
-  `api-client.service.ts` — `resource()`/`collectionResource()` used to
-  return only `value`/`isLoading`/`error`/`reload`, silently dropping
-  `_metadata`/`_metaLinks` from the envelope with no way for a caller to
-  get them back): a metadata-driven `<select>` or a `_metaLinks` action
-  link genuinely cannot be built from either wrapper without it, forcing
-  the caller to fall back to a second, raw `httpResource` — exactly the
-  duplication this package exists to avoid.
+
+- Published to npm as `@wiltech-labs/ngx-api-client` — see the note in the
+  root `CLAUDE.md` on why the scope is `@wiltech-labs`, not `@wiltech`.
+- Wired into `insurly-ui`: every `*ApiService`
+  (`ProviderApiService`/`AdminApiService`/`AccountApiService`/
+  `AdminProfileApiService`/`SystemSettingsService`/`UserSettingsService`/
+  `CarQuoteApiService`) now injects `ApiClientService` instead of
+  hand-rolling `HttpClient` calls, and all the locally-duplicated files
+  (`core/api/api-envelope.ts`, `_services/link.service.ts`,
+  `_services/metadata.service.ts`, `_helpers/convert-id-to-value.pipe.ts`,
+  `shared/response/*`) are deleted from that repo. `insurly-ui/CLAUDE.md`
+  and `docs/02-architecture.md` (in the `insurly` repo) describe this
+  pattern now.
+- No other consumer yet — the two other Angular projects that motivated
+  this package don't exist yet.

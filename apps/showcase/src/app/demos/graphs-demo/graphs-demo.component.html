@@ -1,0 +1,46 @@
+<div class="demo-container">
+  <h2>Graphs Demo</h2>
+  <p class="subtitle">All eight graph types from ngx-graphs, built on ng2-charts</p>
+
+  <div class="grid">
+    <div class="info-section">
+      <h3>BarGraph</h3>
+      <ngx-bar-graph [graphDef]="salesByQuarter" />
+    </div>
+
+    <div class="info-section">
+      <h3>LineGraph</h3>
+      <ngx-line-graph [graphDef]="websiteTraffic" />
+    </div>
+
+    <div class="info-section">
+      <h3>PieGraph</h3>
+      <ngx-pie-graph [graphDef]="marketShare" />
+    </div>
+
+    <div class="info-section">
+      <h3>DoughnutGraph</h3>
+      <ngx-doughnut-graph [graphDef]="salesChannels" />
+    </div>
+
+    <div class="info-section">
+      <h3>PolarAreaGraph</h3>
+      <ngx-polar-area-graph [graphDef]="salesByRegion" />
+    </div>
+
+    <div class="info-section">
+      <h3>RadarGraph</h3>
+      <ngx-radar-graph [graphDef]="skillsProfile" />
+    </div>
+
+    <div class="info-section">
+      <h3>BubbleGraph</h3>
+      <ngx-bubble-graph [graphDef]="clusterSizes" />
+    </div>
+
+    <div class="info-section">
+      <h3>ScatterGraph</h3>
+      <ngx-scatter-graph [graphDef]="measurements" />
+    </div>
+  </div>
+</div>

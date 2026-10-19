@@ -1,0 +1,72 @@
+<div class="DynamicForm">
+  @for (fieldDef of metaInfo(); track fieldDef.name) {
+    @let field = $any(dynamicForm())[fieldDef.name];
+
+    @if (!fieldDef.hidden) {
+      <div class="DynamicForm-field" [style.--ngx-field-max-width]="fieldDef.maxWidth">
+        @switch (fieldDef.type) {
+          @case ('text') {
+            <ngx-text-field [fieldDef]="fieldDef" [field]="field" />
+          }
+          @case ('email') {
+            <ngx-text-field [fieldDef]="fieldDef" [field]="field" />
+          }
+          @case ('password') {
+            <ngx-text-field [fieldDef]="fieldDef" [field]="field" />
+          }
+          @case ('search') {
+            <ngx-text-field [fieldDef]="fieldDef" [field]="field" />
+          }
+          @case ('number') {
+            <ngx-text-field [fieldDef]="fieldDef" [field]="field" />
+          }
+          @case ('textarea') {
+            <ngx-textarea-field [fieldDef]="fieldDef" [field]="field" />
+          }
+          @case ('code') {
+            <ngx-textarea-field [fieldDef]="fieldDef" [field]="field" />
+          }
+          @case ('checkbox') {
+            <ngx-checkbox-field [fieldDef]="fieldDef" [field]="field" />
+          }
+          @case ('radio') {
+            <ngx-radio-field [fieldDef]="fieldDef" [field]="field" />
+          }
+          @case ('select') {
+            <ngx-select-field [fieldDef]="fieldDef" [field]="field" />
+          }
+          @case ('chips') {
+            <ngx-chips-field [fieldDef]="fieldDef" [field]="field" />
+          }
+          @case ('theme') {
+            <ngx-theme-field [fieldDef]="fieldDef" [field]="field" />
+          }
+          @case ('range') {
+            <ngx-slider-field [fieldDef]="fieldDef" [field]="field" />
+          }
+          @case ('business-date') {
+            <ngx-business-date-field [fieldDef]="fieldDef" [field]="field" />
+          }
+          @case ('business-time') {
+            <ngx-business-time-field [fieldDef]="fieldDef" [field]="field" />
+          }
+          @case ('instant-date-time') {
+            <ngx-instant-date-time-field [fieldDef]="fieldDef" [field]="field" />
+          }
+        }
+      </div>
+    }
+  }
+
+  <div class="DynamicForm-actions">
+    <button matButton type="button" (click)="clearForm()">{{ clearLabel() }}</button>
+    <button
+      matButton="filled"
+      type="button"
+      [disabled]="dynamicForm()().invalid()"
+      (click)="handleSubmit()"
+    >
+      {{ submitLabel() }}
+    </button>
+  </div>
+</div>

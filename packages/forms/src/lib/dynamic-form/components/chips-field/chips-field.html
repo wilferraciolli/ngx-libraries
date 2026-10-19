@@ -1,0 +1,30 @@
+<mat-form-field class="ChipsField" appearance="outline" subscriptSizing="dynamic">
+  <mat-label>{{ fieldDef().label }}</mat-label>
+
+  <mat-chip-grid #grid [attr.aria-label]="fieldDef().label + ' entries'">
+    @for (chip of chips(); track chip) {
+      <mat-chip-row (removed)="removeChip(chip)">
+        {{ chip }}
+        <button matChipRemove [attr.aria-label]="'Remove ' + chip">
+          <mat-icon>cancel</mat-icon>
+        </button>
+      </mat-chip-row>
+    }
+  </mat-chip-grid>
+
+  <input
+    [matChipInputFor]="grid"
+    [placeholder]="'Add ' + fieldDef().label"
+    [disabled]="state().disabled()"
+    (blur)="state().markAsTouched()"
+    (matChipInputTokenEnd)="addChip($event)"
+  />
+
+  @if (fieldDef().hint) {
+    <mat-hint>{{ fieldDef().hint }}</mat-hint>
+  }
+
+  @for (error of state().errors(); track error.kind) {
+    <mat-error>{{ error.message }}</mat-error>
+  }
+</mat-form-field>

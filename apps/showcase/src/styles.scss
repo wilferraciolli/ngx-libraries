@@ -1,0 +1,130 @@
+// Material 3 theme (see docs/ANGULAR_APP_CONVENTIONS.md "Design system: Material 3"). `mat.theme()`
+// defines the --mat-sys-* CSS variables (colour roles, type scale, shape scale, elevation, state
+// layers) that Material components — and this app's own CSS — read instead of hardcoded values.
+//
+// Two independent axes, both switched at runtime by `ngx-themes`' `ThemeService`
+// (families registered with `provideThemes()` in src/main.ts):
+// - **Family** (`data-theme` on <html>): which palette. Each family's colours are scoped to its own
+//   selector below; `minimalistic` is also the default with no attribute set. Add a family by
+//   generating a palette into `styles/themes/` and adding one block here + one entry in
+//   `provideThemes()`.
+// - **Mode** (`color-scheme` on <html>): light / dark / system. The theme type is `color-scheme`, so
+//   every role resolves through `light-dark()` — forcing `color-scheme` flips the whole page, with
+//   no separate dark stylesheet per family.
+@use '@angular/material' as mat;
+@use 'styles/themes/minimalistic' as minimalistic-theme;
+@use 'styles/themes/teal' as teal-theme; // `as`: bare `teal` is a CSS colour keyword
+@use 'styles/themes/red-yellow' as red-yellow-theme;
+@use 'styles/themes/magenta' as magenta-theme; // `as`: bare `magenta` is a CSS colour keyword too
+
+html {
+  @include mat.theme(
+    (
+      color: (
+        primary: minimalistic-theme.$primary-palette,
+        tertiary: minimalistic-theme.$tertiary-palette,
+      ),
+      typography: (
+        plain-family: (
+          Roboto,
+          system-ui,
+          sans-serif,
+        ),
+        brand-family: (
+          'Roboto Flex',
+          Roboto,
+          system-ui,
+          sans-serif,
+        ),
+      ),
+      density: 0,
+    )
+  );
+  color-scheme: light dark;
+  -webkit-text-size-adjust: 100%;
+}
+
+// Colour-only overrides per non-default family — typography/density above stay shared.
+html[data-theme='teal'] {
+  @include mat.theme(
+    (
+      color: (
+        primary: teal-theme.$primary-palette,
+        tertiary: teal-theme.$tertiary-palette,
+      ),
+    )
+  );
+}
+
+// Customer brand: magenta-pink #EC1E79 (primary), #F472B0 accent (tertiary), lavender-grey
+// #E8E6F0 neutral seed (tints surfaces/backgrounds).
+html[data-theme='magenta'] {
+  @include mat.theme(
+    (
+      color: (
+        primary: magenta-theme.$primary-palette,
+        tertiary: magenta-theme.$tertiary-palette,
+      ),
+    )
+  );
+}
+
+// Red #DA291C (primary) + yellow #FFC72C (tertiary). Neutral seed left to the schematic default
+// (derived from primary). In light mode M3 darkens the yellow to tone 40 (#775A00) for contrast;
+// the bright yellow shows in dark mode and in the tertiary-container roles.
+html[data-theme='red-yellow'] {
+  @include mat.theme(
+    (
+      color: (
+        primary: red-yellow-theme.$primary-palette,
+        tertiary: red-yellow-theme.$tertiary-palette,
+      ),
+    )
+  );
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans',
+    'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--mat-sys-on-surface);
+  background-color: var(--mat-sys-surface);
+  line-height: 1.6;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+}
+
+a {
+  color: var(--mat-sys-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  font-family: inherit;
+}
+
+input,
+select,
+textarea {
+  font-family: inherit;
+}

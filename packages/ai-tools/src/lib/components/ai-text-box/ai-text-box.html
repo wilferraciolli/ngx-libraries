@@ -1,0 +1,13 @@
+<div class="AiTextBox">
+  <div class="AiTextBox-content">
+    <ngx-ai-sparkle-icon size="18px" class="AiTextBox-icon" />
+    <textarea
+      class="AiTextBox-input"
+      rows="1"
+      [attr.aria-label]="label()"
+      [placeholder]="placeholder()"
+      [value]="value()"
+      (input)="onInput($event)"
+    ></textarea>
+  </div>
+</div>

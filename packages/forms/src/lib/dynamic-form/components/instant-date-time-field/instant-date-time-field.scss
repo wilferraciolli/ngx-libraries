@@ -1,0 +1,41 @@
+@use '../../styles/field.mixins' as mix;
+
+:host {
+  display: block;
+}
+
+.InstantDateTimeField {
+  &-label {
+    @include mix.field-label;
+  }
+
+  // Mobile first: date above time, side by side once there's room.
+  &-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+
+    @media (min-width: 400px) {
+      flex-direction: row;
+    }
+  }
+
+  &-date {
+    flex: 3;
+    min-width: 0;
+  }
+
+  &-time {
+    flex: 2;
+    min-width: 0;
+  }
+
+  &-zone {
+    @include mix.field-hint;
+  }
+
+  &-notice {
+    @include mix.field-notice;
+  }
+}

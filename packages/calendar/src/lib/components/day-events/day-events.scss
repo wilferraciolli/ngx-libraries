@@ -1,0 +1,122 @@
+:host {
+  display: block;
+}
+
+.DayEvents {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 0;
+  border-radius: var(--mat-sys-corner-large, 16px);
+  background: var(--ngx-calendar-panel-background, var(--mat-sys-surface-container-low, #f7f2fa));
+  color: var(--mat-sys-on-surface, #1d1b20);
+
+  &-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 8px 0 20px;
+  }
+
+  &-heading {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding-block: 4px;
+  }
+
+  &-weekday {
+    font: var(--mat-sys-label-large);
+    letter-spacing: var(--mat-sys-label-large-tracking);
+    color: var(--mat-sys-primary, #6750a4);
+  }
+
+  &-date {
+    font: var(--mat-sys-title-large);
+    letter-spacing: var(--mat-sys-title-large-tracking);
+  }
+
+  &-close {
+    margin-inline-start: auto;
+  }
+
+  &-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &-item + &-item {
+    border-block-start: 1px solid var(--mat-sys-outline-variant, #cac4d0);
+  }
+
+  &-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    inline-size: 100%;
+    min-block-size: 64px;
+    padding: 8px 12px 8px 20px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+    transition: background-color 200ms cubic-bezier(0.2, 0, 0, 1);
+
+    &:hover {
+      background: color-mix(in srgb, var(--mat-sys-on-surface, #1d1b20) 8%, transparent);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--mat-sys-primary, #6750a4);
+      outline-offset: -2px;
+    }
+  }
+
+  &-accent {
+    flex-shrink: 0;
+    inline-size: 4px;
+    align-self: stretch;
+    border-radius: var(--mat-sys-corner-full, 9999px);
+  }
+
+  &-text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-inline-size: 0;
+  }
+
+  &-title {
+    overflow: hidden;
+    font: var(--mat-sys-body-large);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &-time {
+    font: var(--mat-sys-body-medium);
+    color: var(--mat-sys-on-surface-variant, #49454f);
+    font-variant-numeric: tabular-nums;
+  }
+
+  &-chevron {
+    flex-shrink: 0;
+    color: var(--mat-sys-on-surface-variant, #49454f);
+  }
+
+  &-empty {
+    margin: 0;
+    padding: 8px 20px 16px;
+    font: var(--mat-sys-body-medium);
+    color: var(--mat-sys-on-surface-variant, #49454f);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .DayEvents-row {
+    transition: none;
+  }
+}

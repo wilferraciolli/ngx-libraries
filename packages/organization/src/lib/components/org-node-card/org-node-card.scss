@@ -1,0 +1,176 @@
+:host {
+  display: block;
+}
+
+.OrgNodeCard {
+  // Each type owns a colour role; the icon well is the role's solid colour.
+  --_role: var(--mat-sys-secondary, #625b71);
+  --_on-role: var(--mat-sys-on-secondary, #fff);
+  display: flex;
+  flex-direction: column;
+  inline-size: 248px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--mat-sys-outline-variant, #cac4d0);
+  border-radius: var(--mat-sys-corner-large, 16px);
+  background: var(--ngx-org-card-background, var(--mat-sys-surface-container-low, #f7f2fa));
+  color: var(--mat-sys-on-surface, #1d1b20);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    background-color 200ms cubic-bezier(0.2, 0, 0, 1),
+    border-color 200ms cubic-bezier(0.2, 0, 0, 1);
+
+  &:hover {
+    border-color: var(--mat-sys-outline, #79747e);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary, #6750a4);
+    outline-offset: 3px;
+  }
+
+  // Selected: one ring drawn over the card's own border, not a second line outside it.
+  &.is-active {
+    outline: 2px solid var(--mat-sys-primary, #6750a4);
+    outline-offset: -1px;
+  }
+
+  &.is-org {
+    --_role: var(--mat-sys-primary, #6750a4);
+    --_on-role: var(--mat-sys-on-primary, #fff);
+    border-color: transparent;
+    background: var(--mat-sys-primary-container, #eaddff);
+    color: var(--mat-sys-on-primary-container, #4f378b);
+  }
+
+  &.is-entity {
+    --_role: var(--mat-sys-tertiary, #7d5260);
+    --_on-role: var(--mat-sys-on-tertiary, #fff);
+    border-color: transparent;
+    background: var(--mat-sys-tertiary-container, #ffd8e4);
+    color: var(--mat-sys-on-tertiary-container, #633b48);
+  }
+
+  &.is-department {
+    border-color: color-mix(in srgb, var(--_role) 30%, transparent);
+    background: var(--mat-sys-secondary-container, #e8def8);
+    color: var(--mat-sys-on-secondary-container, #4a4458);
+  }
+
+  &.is-job {
+    border-inline-start: 4px solid var(--mat-sys-primary, #6750a4);
+    background: var(--mat-sys-surface-container-lowest, #fff);
+  }
+
+  &.is-vacant {
+    border-style: dashed;
+    border-color: var(--mat-sys-outline, #79747e);
+    background: var(--mat-sys-surface-container-lowest, #fff);
+  }
+
+  &-header,
+  &-holder {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+  }
+
+  &-holder {
+    &.is-merged {
+      background: var(--mat-sys-surface-container-lowest, #fff);
+      color: var(--mat-sys-on-surface, #1d1b20);
+    }
+  }
+
+  &-well {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    inline-size: 40px;
+    block-size: 40px;
+    border-radius: var(--mat-sys-corner-medium, 12px);
+    background: var(--_role);
+    color: var(--_on-role);
+  }
+
+  &-badge {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    margin-inline-start: auto;
+    inline-size: 28px;
+    block-size: 28px;
+    border-radius: var(--mat-sys-corner-full, 9999px);
+    background: var(--mat-sys-primary-container, #eaddff);
+    color: var(--mat-sys-on-primary-container, #4f378b);
+
+    mat-icon {
+      font-size: 18px;
+      inline-size: 18px;
+      block-size: 18px;
+    }
+  }
+
+  &-heading {
+    display: flex;
+    flex-direction: column;
+    min-inline-size: 0;
+  }
+
+  &-name,
+  &-person {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &-name {
+    font: var(--mat-sys-title-small);
+    letter-spacing: var(--mat-sys-title-small-tracking);
+  }
+
+  &-person {
+    font: var(--mat-sys-body-medium);
+    font-weight: 500;
+
+    &.is-vacant {
+      color: var(--mat-sys-on-surface-variant, #49454f);
+      font-style: italic;
+    }
+  }
+
+  &-meta {
+    overflow: hidden;
+    font: var(--mat-sys-body-small);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    opacity: 0.8;
+  }
+
+  &-avatar {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    inline-size: 40px;
+    block-size: 40px;
+    border-radius: var(--mat-sys-corner-full, 9999px);
+    background: var(--mat-sys-primary-container, #eaddff);
+    color: var(--mat-sys-on-primary-container, #4f378b);
+    font: var(--mat-sys-label-large);
+
+    &.is-vacant {
+      border: 1px dashed var(--mat-sys-outline, #79747e);
+      background: transparent;
+      color: var(--mat-sys-on-surface-variant, #49454f);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .OrgNodeCard {
+    transition: none;
+  }
+}

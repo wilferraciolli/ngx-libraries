@@ -1,0 +1,35 @@
+.CalendarDemo {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+.CalendarDemo-title {
+  margin: 0;
+  font: var(--mat-sys-headline-medium);
+}
+
+.CalendarDemo-subtitle {
+  margin: 4px 0 24px;
+  max-width: 65ch;
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.CalendarDemo-output {
+  margin-top: 24px;
+  padding: 16px 20px;
+  border-radius: var(--mat-sys-corner-large);
+  background: var(--mat-sys-surface-container-low);
+}
+
+.CalendarDemo-output h3 {
+  margin: 0 0 8px;
+  font: var(--mat-sys-title-medium);
+}
+
+.CalendarDemo-output pre {
+  margin: 0;
+  font-size: 13px;
+  white-space: pre-wrap;
+}

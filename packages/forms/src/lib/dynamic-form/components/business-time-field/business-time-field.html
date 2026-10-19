@@ -1,0 +1,24 @@
+<mat-form-field class="BusinessTimeField" appearance="outline" subscriptSizing="dynamic">
+  <mat-label>{{ fieldDef().label }}</mat-label>
+  <input
+    matInput
+    [matTimepicker]="timepicker"
+    [matTimepickerMin]="minTime()"
+    [matTimepickerMax]="maxTime()"
+    [value]="time()"
+    [required]="state().required()"
+    [disabled]="state().disabled()"
+    (blur)="state().markAsTouched()"
+    (valueChange)="onTimeChange($event)"
+  />
+  <mat-timepicker-toggle matIconSuffix [for]="timepicker" />
+  <mat-timepicker #timepicker (closed)="state().markAsTouched()" />
+
+  @if (fieldDef().hint) {
+    <mat-hint>{{ fieldDef().hint }}</mat-hint>
+  }
+
+  @for (error of state().errors(); track error.kind) {
+    <mat-error>{{ error.message }}</mat-error>
+  }
+</mat-form-field>

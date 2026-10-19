@@ -38,5 +38,7 @@ export function summarizeApiError(response: ApiErrorResponse): string {
   if (response.fieldErrors.length === 0) {
     return response.message;
   }
-  return response.fieldErrors.map((violation) => `${violation.field}: ${violation.message}`).join('; ');
+  return response.fieldErrors
+    .map((violation) => `${violation.field}: ${violation.message}`)
+    .join('; ');
 }

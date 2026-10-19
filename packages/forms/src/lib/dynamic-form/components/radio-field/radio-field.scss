@@ -1,0 +1,24 @@
+@use '../../styles/field.mixins' as mix;
+
+:host {
+  display: block;
+}
+
+.RadioField {
+  &-label {
+    @include mix.field-label;
+    margin-bottom: 0;
+  }
+
+  &-group {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 8px;
+
+    &.is-vertical {
+      flex-direction: column;
+      flex-wrap: nowrap;
+      align-items: flex-start;
+    }
+  }
+}

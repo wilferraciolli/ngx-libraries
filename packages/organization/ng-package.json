@@ -1,0 +1,13 @@
+{
+  "$schema": "../../node_modules/ng-packagr/ng-package.schema.json",
+  "dest": "dist",
+  "lib": {
+    "entryFile": "src/public-api.ts"
+  },
+  "allowedNonPeerDependencies": [
+    "ngx-interactive-org-chart",
+    "@wiltech-labs/ngx-api-client",
+    "@wiltech-labs/ngx-auth",
+    "@wiltech-labs/ngx-modals"
+  ]
+}

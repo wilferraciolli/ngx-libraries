@@ -1,19 +1,52 @@
 # ngx-libraries
+
 Angular ngx libraries
 
 Each package under `packages/*` is a standalone Angular library, published
-independently to npm under the `@wiliamferraciolli` scope.
+independently to npm under the `@wiltech-labs` scope.
+
+## Building locally
+
+This is an npm workspaces monorepo (`packages/*` + `apps/*`), so one `npm install` at the repo
+root installs every package's dependencies:
+
+```bash
+npm install
+```
+
+To build, from the repo root:
+
+```bash
+npm run build            # every package, plus the showcase app
+npm run build:packages   # every package only — skips the showcase app, much faster
+```
+
+Both skip anything without a `build` script, and are no substitute for `cd`-ing into a single
+package when you're only working on that one (see "Publishing a package" below).
+
+## Storybook
+
+A Storybook catalogue of every package and its use cases, as a separate `apps/storybook`
+workspace, rendering straight from each package's source:
+
+```bash
+npm run storybook          # http://localhost:6006
+npm run build-storybook    # static build, apps/storybook/storybook-static/
+```
+
+Not yet deployed — hosting on Cloudflare Pages is still planned. See
+[docs/Storybook.md](docs/Storybook.md) for how it's put together and how to add a story.
 
 ## Publishing a package
 
 1. **Log in once** (per machine) — needs an npm account able to publish
-   under the `@wiliamferraciolli` scope (the first publish of a package claims it):
+   under the `@wiltech-labs` scope (the first publish of a package claims it):
    ```bash
    npm login
    ```
 2. **`cd` into the package you're releasing** (the directory name under
    `packages/`, not the npm name — e.g. `packages/api-client`, which
-   publishes as `@wiliamferraciolli/ngx-api-client`) and bump its version:
+   publishes as `@wiltech-labs/ngx-api-client`) and bump its version:
    ```bash
    cd packages/<package-dir>
    npm version patch   # or minor / major
@@ -22,6 +55,7 @@ independently to npm under the `@wiliamferraciolli` scope.
    Angular library and writes a ready-to-publish `package.json` into
    `dist/`:
    ```bash
+   npm i
    npm run build
    ```
 4. **Publish the built output**, not the source folder:

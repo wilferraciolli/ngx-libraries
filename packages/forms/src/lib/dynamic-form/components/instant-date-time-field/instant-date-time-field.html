@@ -1,0 +1,54 @@
+<div class="InstantDateTimeField-label">
+  {{ fieldDef().label }}
+  @if (state().required()) {
+    <span aria-hidden="true"> *</span>
+  }
+</div>
+
+<div class="InstantDateTimeField-row">
+  <mat-form-field class="InstantDateTimeField-date" appearance="outline" subscriptSizing="dynamic">
+    <mat-label>Date</mat-label>
+    <input
+      matInput
+      [matDatepicker]="datepicker"
+      [value]="date()"
+      [min]="minDate()"
+      [max]="maxDate()"
+      [disabled]="state().disabled()"
+      (blur)="state().markAsTouched()"
+      (dateChange)="onDateChange($event.value)"
+    />
+    <mat-datepicker-toggle matIconSuffix [for]="datepicker" />
+    <mat-datepicker #datepicker (closed)="state().markAsTouched()" />
+  </mat-form-field>
+
+  <mat-form-field class="InstantDateTimeField-time" appearance="outline" subscriptSizing="dynamic">
+    <mat-label>Time</mat-label>
+    <input
+      matInput
+      [matTimepicker]="timepicker"
+      [value]="time()"
+      [disabled]="state().disabled()"
+      (blur)="state().markAsTouched()"
+      (valueChange)="onTimeChange($event)"
+    />
+    <mat-timepicker-toggle matIconSuffix [for]="timepicker" />
+    <mat-timepicker #timepicker (closed)="state().markAsTouched()" />
+  </mat-form-field>
+</div>
+
+<div class="InstantDateTimeField-zone">
+  {{ timeZone() }}
+  @if (offset()) {
+    (UTC{{ offset() }})
+  }
+  @if (state().value()) {
+    · stored as {{ state().value() }}
+  }
+</div>
+
+@if (notice()) {
+  <div class="InstantDateTimeField-notice">{{ notice() }}</div>
+}
+
+<ngx-field-subscript [field]="field()" [hint]="fieldDef().hint" />

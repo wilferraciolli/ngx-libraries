@@ -1,0 +1,27 @@
+@use '../../styles/field.mixins' as mix;
+
+:host {
+  display: block;
+}
+
+.SliderField {
+  &-label {
+    @include mix.field-label;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0;
+  }
+
+  &-value {
+    color: var(--mat-sys-primary);
+    font: var(--mat-sys-label-large);
+    letter-spacing: var(--mat-sys-label-large-tracking);
+  }
+
+  &-slider {
+    display: block;
+    width: 100%;
+    margin: 0;
+  }
+}

@@ -1,0 +1,74 @@
+:host {
+  display: block;
+  block-size: var(--ngx-organization-chart-height, clamp(480px, 75dvh, 960px));
+}
+
+.OrganizationChart {
+  position: relative;
+  block-size: 100%;
+  overflow: hidden;
+  border: 1px solid var(--mat-sys-outline-variant, #cac4d0);
+  border-radius: var(--mat-sys-corner-large, 16px);
+  // A faint dot grid over a soft primary-to-tertiary wash: reads as a canvas you can move,
+  // without competing with the cards.
+  --_canvas: var(--ngx-organization-canvas, var(--mat-sys-surface-container-lowest, #fff));
+  background-color: var(--_canvas);
+  background-image:
+    radial-gradient(
+      color-mix(in srgb, var(--mat-sys-on-surface, #1d1b20) 12%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--mat-sys-primary-container, #eaddff) 55%, var(--_canvas)),
+      var(--_canvas) 50%,
+      color-mix(in srgb, var(--mat-sys-tertiary-container, #ffd8e4) 50%, var(--_canvas))
+    );
+  background-size:
+    20px 20px,
+    100% 100%;
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  &-canvas {
+    display: block;
+    block-size: 100%;
+  }
+
+  &-controls {
+    position: absolute;
+    inset-block-start: 12px;
+    inset-inline-end: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4px;
+    border-radius: var(--mat-sys-corner-full, 9999px);
+    background: var(--mat-sys-surface-container-high, #ece6f0);
+    color: var(--mat-sys-on-surface, #1d1b20);
+    cursor: default;
+  }
+
+  &-divider {
+    inline-size: 24px;
+    block-size: 1px;
+    margin-block: 4px;
+    background: var(--mat-sys-outline-variant, #cac4d0);
+  }
+
+  &-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    block-size: 100%;
+    margin: 0;
+    font: var(--mat-sys-body-large);
+    color: var(--mat-sys-on-surface-variant, #49454f);
+    cursor: default;
+  }
+}

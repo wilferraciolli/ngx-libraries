@@ -3,11 +3,21 @@
   "private": true,
   "description": "Wiltech shared TypeScript/Angular libraries, published individually to npm.",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "apps/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces --if-present",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "build": "npm run build:packages && for d in apps/*/; do npm run build --workspace=\"${d%/}\" --if-present || exit 1; done",
+    "build:packages": "bash scripts/build-packages.sh",
+    "storybook": "npm run storybook --workspace=ngx-storybook",
+    "build-storybook": "npm run build-storybook --workspace=ngx-storybook",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "fix-dist-file-deps": "node scripts/fix-dist-file-deps.js",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "prettier": "^3.9.9"
+  }
 }
