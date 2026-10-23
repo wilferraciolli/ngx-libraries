@@ -12,9 +12,14 @@ import {
 } from '@wiltech-labs/ngx-modals';
 import { Temporal } from 'temporal-polyfill';
 
-import { NGX_CALENDAR_TEXT, type CalendarText } from '../../config/calendar-text.token';
+import { NGX_CALENDAR_TEXT, allDayLabel, type CalendarText } from '../../config/calendar-text.token';
 import type { CalendarEvent } from '../../models/calendar-event.model';
-import { formatLongDate, formatTimeRange, toMinuteInstant } from '../../utils/calendar-time.utils';
+import {
+  formatDateSpan,
+  formatLongDate,
+  formatTimeRange,
+  toMinuteInstant,
+} from '../../utils/calendar-time.utils';
 import { eventColors } from '../../utils/event-colors.utils';
 
 /** What the calendar hands the panel when it opens an event. */
@@ -68,20 +73,26 @@ export class EventDetail implements ModalContent {
   protected readonly event = computed(() => this.data().event);
   // Read once: validation messages are built from these labels when the form is created.
   protected readonly text = inject(NGX_CALENDAR_TEXT)();
+  // All-day events open read-only: the edit form works in instants.
   protected readonly canEdit = computed(
-    () => this.data().editable && this.event().config?.editable !== false,
+    () => this.data().editable && this.event().config?.editable !== false && !this.event().allDay,
   );
   protected readonly accent = computed(() => eventColors(this.event().config).background);
-  protected readonly dateText = computed(() =>
-    formatLongDate(this.event().startDateTime, this.data().timeZone, this.data().locale),
-  );
+  protected readonly dateText = computed(() => {
+    const { event, timeZone, locale } = this.data();
+    return event.allDay
+      ? formatDateSpan(event.startDateTime, event.endDateTime, locale)
+      : formatLongDate(event.startDateTime, timeZone, locale);
+  });
   protected readonly timeText = computed(() =>
-    formatTimeRange(
-      this.event().startDateTime,
-      this.event().endDateTime,
-      this.data().timeZone,
-      this.data().locale,
-    ),
+    this.event().allDay
+      ? allDayLabel(this.text)
+      : formatTimeRange(
+          this.event().startDateTime,
+          this.event().endDateTime,
+          this.data().timeZone,
+          this.data().locale,
+        ),
   );
 
   protected readonly config = computed(() => {

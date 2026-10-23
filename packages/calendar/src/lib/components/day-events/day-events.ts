@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, input, output } from '@an
 import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 
-import type { CalendarText } from '../../config/calendar-text.token';
+import { allDayLabel, type CalendarText } from '../../config/calendar-text.token';
 import type { CalendarEvent } from '../../models/calendar-event.model';
 import { formatDayHeading, formatTimeRange } from '../../utils/calendar-time.utils';
 import { eventColors } from '../../utils/event-colors.utils';
@@ -37,7 +37,9 @@ export class DayEvents {
   protected readonly rows = computed(() =>
     this.events().map((event) => ({
       event,
-      time: formatTimeRange(event.startDateTime, event.endDateTime, this.timeZone(), this.locale()),
+      time: event.allDay
+        ? allDayLabel(this.text())
+        : formatTimeRange(event.startDateTime, event.endDateTime, this.timeZone(), this.locale()),
       accent: eventColors(event.config).background,
     })),
   );

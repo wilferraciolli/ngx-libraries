@@ -185,6 +185,27 @@ canDelete(provider: Provider): boolean {
 }
 ```
 
+### Files
+
+`download(url)` (from 1.0.4) GETs a file instead of an envelope — a CSV export, a PDF — and
+returns `{ blob, filename }`, the name taken from `Content-Disposition` when the server sends one
+(a cross-origin API must list it in `Access-Control-Expose-Headers`, or `filename` is `null`).
+`saveDownload(download, fallbackName)` then hands it to the browser; call it from the click that
+asked for the file. A failed download throws the same `HttpErrorResponse` as any other call, with
+the JSON error body parsed, so `apiErrorMessage()` works on it.
+
+```ts
+import { ApiClientService, apiErrorMessage, saveDownload } from '@wiltech-labs/ngx-api-client';
+
+async exportHours(link: ILink): Promise<void> {
+  try {
+    saveDownload(await this.api.download(this.api.requireLink(link, 'No export')), 'hours.csv');
+  } catch (error) {
+    this.error.set(apiErrorMessage(error) ?? this.translations.t('errors.network'));
+  }
+}
+```
+
 ### Errors
 
 A failed request (`get`/`post`/`put`/`send`, or a resource's `error()`) carries the API's error

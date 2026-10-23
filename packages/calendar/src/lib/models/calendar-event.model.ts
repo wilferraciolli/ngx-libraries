@@ -19,6 +19,10 @@ export interface CalendarEventConfig {
  * One event on the calendar. Start and end are UTC instants, `'YYYY-MM-DDTHH:mmZ'` (seconds are
  * accepted too). The calendar shows them in its `timeZone`.
  *
+ * An `allDay` event (leave, a public holiday, a deadline) is whole days instead: start and end are
+ * business dates, `'YYYY-MM-DD'`, both included, shown on those days whatever the `timeZone`. It sits
+ * in the all-day row of the day and week views and opens read-only.
+ *
  * `source` carries the app's own object through untouched, so a saved event can be matched back to
  * it. `CalendarEventMapper` fills it in.
  */
@@ -26,10 +30,20 @@ export interface CalendarEvent<TSource = unknown> {
   id: string;
   title: string;
   description: string;
+  /** UTC instant; for an `allDay` event, its first day, `'YYYY-MM-DD'`. */
   startDateTime: string;
+  /** UTC instant; for an `allDay` event, its last day, `'YYYY-MM-DD'` (included). */
   endDateTime: string;
+  allDay?: boolean;
   config?: CalendarEventConfig;
   source?: TSource;
 }
 
 export type CalendarView = 'day' | 'week' | 'month';
+
+/** The business dates on screen, both included, in the calendar's zone. A month view includes the
+ *  days of the neighbouring months that fill its first and last rows. */
+export interface CalendarRange {
+  start: string;
+  end: string;
+}

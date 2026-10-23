@@ -7,3 +7,4 @@ export * from './lib/stores/region-settings.store.js';
 
 export * from './lib/components/settings-form.component.js';
 export * from './lib/config/settings-form-text.token.js';
+export * from './lib/config/me-path.token.js';

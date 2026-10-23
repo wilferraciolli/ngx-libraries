@@ -17,7 +17,16 @@ export function toMinuteInstant(instant: string): string {
   return Temporal.Instant.from(instant).toString({ smallestUnit: 'minute' });
 }
 
-/** Events that overlap the business date `date` as seen in `timeZone`, earliest first. */
+/** The day after a business date: FullCalendar's all-day `end` is exclusive. */
+export function dayAfter(date: string): string {
+  return Temporal.PlainDate.from(date).add({ days: 1 }).toString();
+}
+
+/**
+ * Events on the business date `date` as seen in `timeZone`: all-day events first (in the order
+ * given), then timed ones that overlap the day, earliest first. An all-day event is on every day
+ * from its first to its last, whatever the zone.
+ */
 export function eventsOnDay<T extends CalendarEvent>(
   events: readonly T[],
   date: string,
@@ -29,8 +38,12 @@ export function eventsOnDay<T extends CalendarEvent>(
     .toZonedDateTime({ timeZone })
     .toInstant();
 
-  return events
+  const allDay = events.filter(
+    (event) => event.allDay && event.startDateTime <= date && date <= event.endDateTime,
+  );
+  const timed = events
     .filter((event) => {
+      if (event.allDay) return false;
       const start = Temporal.Instant.from(event.startDateTime);
       const end = Temporal.Instant.from(event.endDateTime);
       return (
@@ -43,6 +56,7 @@ export function eventsOnDay<T extends CalendarEvent>(
         Temporal.Instant.from(b.startDateTime),
       ),
     );
+  return [...allDay, ...timed];
 }
 
 /** `'09:00 – 10:30'` in `timeZone`, with the end's date added when it ends on a later day. */
@@ -66,6 +80,19 @@ export function formatLongDate(instant: string, timeZone: string, locale: string
   return Temporal.Instant.from(instant)
     .toZonedDateTimeISO(timeZone)
     .toLocaleString(locale, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+/** `'Monday 2 November 2026'`, or `'… – Friday 6 November 2026'` for an all-day span. */
+export function formatDateSpan(startDate: string, endDate: string, locale: string): string {
+  const long: Intl.DateTimeFormatOptions = {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  };
+  const start = Temporal.PlainDate.from(startDate).toLocaleString(locale, long);
+  if (startDate === endDate) return start;
+  return `${start} – ${Temporal.PlainDate.from(endDate).toLocaleString(locale, long)}`;
 }
 
 /** Weekday and date parts of a business date, for the day panel's two-line heading. */

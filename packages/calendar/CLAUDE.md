@@ -34,6 +34,22 @@ src/lib/
   selection that scrolls out of range is dropped. "+N more" opens it instead of FullCalendar's
   popover (`moreLinkClick` returns the current view, which suppresses the popover).
 - **Saving only emits** `eventSave` (instants normalised to minute precision); the app owns the data.
+- **All-day events, 1.0.1 (2026-10-23).** Asked for by Crewly's leave calendar. `allDay?: boolean`
+  on `CalendarEvent`, with `startDateTime`/`endDateTime` then holding inclusive business dates,
+  instead of a discriminated union with `startDate`/`endDate`: the union would have broken every
+  consumer that reads `event.startDateTime` (a breaking change for what is meant to be a patch),
+  and FullCalendar itself reads date-or-datetime strings plus an `allDay` flag. Mapped to
+  FullCalendar with an exclusive `end` (`dayAfter`). The all-day row (`allDaySlot`) shows only when
+  an all-day event is passed, so timed-only calendars look as before. `CalendarText.allDay` is
+  optional (`allDayLabel()` falls back to the default) so existing text overrides still compile;
+  it also sets FullCalendar's `allDayText`. All-day events open read-only: the edit form is built on
+  instants. Compact chips keep the title for all-day events, which have no time to show. Checked in
+  `apps/showcase` with headless Chrome: month (spanning a week break), week (all-day row) and phone
+  width.
+- **`rangeChange`, 1.0.2 (2026-10-23).** Crewly's leave calendar loads absences per visible range
+  from an API that caps the window, and nothing told the app what was on screen. Emitted from
+  FullCalendar's `datesSet` (first render, prev/next/today, view change) with the *active* range
+  (a month view's leading and trailing days included) and an inclusive end.
 - **Gotchas found while building**:
   - `FullCalendarComponent.getApi()` is null until FullCalendar's own view init; the view-sync
     effect skips until then (the first view comes from `initialView`).

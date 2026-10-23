@@ -25,7 +25,8 @@ src/
     │   ├── envelope.ts           # ApiEnvelope, ILink, SingleEnvelope, CollectionEnvelope, resolveLink()
     │   ├── error.ts               # ApiErrorResponse, ApiFieldViolation, fieldErrorsByField(), summarizeApiError(), apiErrorMessage()
     │   ├── api-origin.token.ts    # API_ORIGIN InjectionToken — consuming app provides its own origin
-    │   └── api-client.service.ts  # ApiClientService: get/post/put/patch/delete, requireLink(), resource()/collectionResource()
+    │   ├── api-client.service.ts  # ApiClientService: get/post/put/patch/delete/send/download, requireLink(), resource()/collectionResource()
+    │   └── save-download.ts       # saveDownload(): hand a downloaded file to the browser
     ├── links/
     │   └── link.service.ts        # LinkService: hasLink / isTemplateLink / getCreateUrlFromTemplateUrl
     └── metadata/

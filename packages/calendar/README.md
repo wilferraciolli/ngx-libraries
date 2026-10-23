@@ -11,6 +11,8 @@ and styled from the app's Material 3 tokens (light and dark, no palette file).
 - **Event panel:** clicking an event opens it in an [`ngx-modals`](../modals) side panel: date,
   time, zone and description. **Edit** swaps in an [`ngx-forms`](../forms) form; **Save** emits
   `eventSave`. The calendar never changes `events` itself; the owner of the data applies the change.
+- **All-day events** (leave, holidays, deadlines) span their days in month view and sit in an
+  all-day row in day and week views; the row appears only when there is one. They open read-only.
 
 ## Install
 
@@ -73,6 +75,7 @@ export class ScheduleComponent {
 | `firstDay`  | `0`–`6`                            | the locale's    | 0 = Sunday.                                           |
 | `eventSave` | output `CalendarEvent`             |                 | The edited event, start/end as `'YYYY-MM-DDTHH:mmZ'`. |
 | `daySelect` | output `string`                    |                 | The day the user picked, `'YYYY-MM-DD'`.              |
+| `rangeChange` | output `CalendarRange`           |                 | `{ start, end }` dates on screen (both included), on first render and after each move. Since 1.0.2. |
 
 ### Events
 
@@ -81,8 +84,9 @@ interface CalendarEvent<TSource = unknown> {
   id: string;
   title: string;
   description: string;
-  startDateTime: string; // UTC, 'YYYY-MM-DDTHH:mmZ'
-  endDateTime: string; // UTC, 'YYYY-MM-DDTHH:mmZ'
+  startDateTime: string; // UTC, 'YYYY-MM-DDTHH:mmZ'; all-day: first day, 'YYYY-MM-DD'
+  endDateTime: string; // UTC, 'YYYY-MM-DDTHH:mmZ'; all-day: last day (included)
+  allDay?: boolean; // whole days, shown on those dates whatever the timeZone (since 1.0.1)
   config?: CalendarEventConfig;
   source?: TSource; // the app's own object, carried through untouched
 }
@@ -94,6 +98,34 @@ interface CalendarEventConfig {
   className?: string;
   editable?: boolean; // false hides Edit for this event
 }
+```
+
+### All-day events
+
+Set `allDay: true` and give dates instead of instants, both ends included:
+
+```ts
+{
+  id: 'leave-42',
+  title: 'Eleni: annual leave',
+  description: '',
+  startDateTime: '2026-11-02',
+  endDateTime: '2026-11-06',
+  allDay: true,
+  config: { color: 'secondary' },
+}
+```
+
+The mapper takes an `allDay` reader too: `allDay: (leave) => true`. All-day events have no time to
+edit, so their panel has no Edit action; the day list and panel show "All day"
+(`NGX_CALENDAR_TEXT`'s optional `allDay`, which also labels the all-day row).
+
+### Loading events for what's on screen
+
+Fetch by `rangeChange` when the events come from an API that answers a date range:
+
+```html
+<ngx-calendar [events]="events()" (rangeChange)="store.load($event.start, $event.end)" />
 ```
 
 ### Mapping the app's own data
@@ -137,7 +169,8 @@ The grid reads FullCalendar's monarch (Material 3) theme variables, which this p
 
 ## Status
 
-`0.1.0`, not yet published. Consumed only by `apps/showcase` (`/calendar`).
+`1.0.1` (all-day events) is on npm; `1.0.2` (`rangeChange`) is built, not yet published. Consumed by `apps/showcase` (`/calendar`) and Crewly's
+"Who's away" view.
 
 ## Publishing
 

@@ -44,6 +44,15 @@ reads any named link off the loaded profile (`userSettings`, `systemSettings`, o
 a `notifications` link) — never build one of these URLs yourself. After changing the profile through
 one of its links (an app's own `updateProfile`, say), call `CurrentUserStore.reload()` to refetch it.
 
+The `/me` request goes to `API_ORIGIN` + `/api/me`. If your API serves it elsewhere (Eg under an area
+prefix, so a reverse proxy can route `/api/<area>/*` to different services), provide the path:
+
+```ts
+import { NGX_ME_PATH } from '@wiltech-labs/ngx-region-settings';
+
+providers: [{ provide: NGX_ME_PATH, useValue: '/api/platform/me' }];
+```
+
 ### Settings screens
 
 ```ts

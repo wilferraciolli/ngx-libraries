@@ -2,6 +2,7 @@ export * from './lib/http-client/envelope.js';
 export * from './lib/http-client/error.js';
 export * from './lib/http-client/api-origin.token.js';
 export * from './lib/http-client/api-client.service.js';
+export * from './lib/http-client/save-download.js';
 
 export * from './lib/links/link.service.js';
 

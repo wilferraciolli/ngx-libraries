@@ -19,6 +19,9 @@ export interface CalendarText {
   endLabel: string;
   noDescription: string;
   endBeforeStart: string;
+  /** Where an all-day event would show its time. Optional so existing overrides still compile;
+   *  the default is used when it's missing. */
+  allDay?: string;
 }
 
 export const DEFAULT_CALENDAR_TEXT: CalendarText = {
@@ -40,7 +43,13 @@ export const DEFAULT_CALENDAR_TEXT: CalendarText = {
   endLabel: 'Ends',
   noDescription: 'No description.',
   endBeforeStart: 'The end must be after the start.',
+  allDay: 'All day',
 };
+
+/** The all-day label, falling back to English when an app's text override predates it. */
+export function allDayLabel(text: CalendarText): string {
+  return text.allDay ?? DEFAULT_CALENDAR_TEXT.allDay ?? 'All day';
+}
 
 /**
  * Same resolver pattern as `ngx-region-settings`' `NGX_REGION_SETTINGS_FORM_TEXT`: override it

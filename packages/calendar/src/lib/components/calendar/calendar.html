@@ -62,8 +62,13 @@
             class="Calendar-chip"
             [class.is-stacked]="arg.view.type !== 'dayGridMonth' && !arg.isShort"
           >
-            <span class="Calendar-chip-time">{{ chipTime(arg.timeText, arg.event.start) }}</span>
-            @if (!compact()) {
+            @if (!arg.event.allDay) {
+              <span class="Calendar-chip-time">{{
+                chipTime(arg.timeText, arg.event.start, arg.event.allDay)
+              }}</span>
+            }
+            <!-- An all-day chip has no time to fall back on, so it keeps its title when compact. -->
+            @if (!compact() || arg.event.allDay) {
               <span class="Calendar-chip-title">{{ arg.event.title }}</span>
             }
           </span>

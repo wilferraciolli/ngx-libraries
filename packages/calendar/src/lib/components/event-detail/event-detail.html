@@ -5,7 +5,10 @@
       <div class="EventDetail-when-text">
         <p class="EventDetail-date">{{ dateText() }}</p>
         <p class="EventDetail-time">
-          {{ timeText() }} <span class="EventDetail-zone">· {{ data().timeZone }}</span>
+          {{ timeText() }}
+          @if (!event().allDay) {
+            <span class="EventDetail-zone">· {{ data().timeZone }}</span>
+          }
         </p>
       </div>
     </div>

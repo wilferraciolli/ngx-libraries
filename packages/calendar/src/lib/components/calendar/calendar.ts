@@ -31,9 +31,9 @@ import { map } from 'rxjs';
 import { Temporal } from 'temporal-polyfill';
 
 import { NGX_CALENDAR_LOCALE } from '../../config/calendar-locale.token';
-import { NGX_CALENDAR_TEXT } from '../../config/calendar-text.token';
-import type { CalendarEvent, CalendarView } from '../../models/calendar-event.model';
-import { eventsOnDay, todayIn, userTimeZone } from '../../utils/calendar-time.utils';
+import { NGX_CALENDAR_TEXT, allDayLabel } from '../../config/calendar-text.token';
+import type { CalendarEvent, CalendarRange, CalendarView } from '../../models/calendar-event.model';
+import { dayAfter, eventsOnDay, todayIn, userTimeZone } from '../../utils/calendar-time.utils';
 import { eventColors } from '../../utils/event-colors.utils';
 import { DayEvents } from '../day-events/day-events';
 import {
@@ -65,6 +65,8 @@ function cellDate(date: Date, timeZone: string): string {
  *   picks another day) are listed below the calendar.
  * - Clicking an event opens it in an `ngx-modals` side panel. When `editable`, the panel's Edit
  *   form saves through `eventSave`; the calendar never changes `events` itself.
+ * - All-day events (`allDay`) span their days in month view and sit in the all-day row of the day
+ *   and week views, which appears only when there is one. They open read-only.
  */
 @Component({
   selector: 'ngx-calendar',
@@ -96,6 +98,9 @@ export class Calendar {
   public readonly eventSave = output<CalendarEvent>();
   /** A day the user picked, `'YYYY-MM-DD'`. */
   public readonly daySelect = output<string>();
+  /** The dates on screen, on first render and after every move or view change: load the events
+   *  for them. */
+  public readonly rangeChange = output<CalendarRange>();
 
   private readonly modals = inject(ModalService);
   private readonly resolveLocale = inject(NGX_CALENDAR_LOCALE);
@@ -134,11 +139,14 @@ export class Calendar {
   protected readonly calendarEvents = computed<EventInput[]>(() =>
     this.events().map((event) => {
       const colors = eventColors(event.config);
+      // FullCalendar's all-day `end` is exclusive; ours is the last day.
+      const span = event.allDay
+        ? { allDay: true, start: event.startDateTime, end: dayAfter(event.endDateTime) }
+        : { start: event.startDateTime, end: event.endDateTime };
       return {
         id: event.id,
         title: event.title,
-        start: event.startDateTime,
-        end: event.endDateTime,
+        ...span,
         color: colors.background,
         contrastColor: colors.text,
         className: event.config?.className,
@@ -158,7 +166,9 @@ export class Calendar {
       firstDay: this.firstDay(),
       height: '100%',
       nowIndicator: true,
-      allDaySlot: false,
+      // The all-day row costs a band of the time grid: show it only when something needs it.
+      allDaySlot: this.events().some((event) => event.allDay),
+      allDayText: allDayLabel(this.text()),
       dayMaxEvents: true,
       eventDisplay: 'block',
       scrollTime: '07:30:00',
@@ -167,6 +177,11 @@ export class Calendar {
         cellDate(info.date, timeZone) === selected ? 'Calendar-selected-day' : '',
       datesSet: (info) => {
         this.title.set(info.view.title);
+        // `activeEnd` is exclusive; the range we hand out includes its last day.
+        const lastShown = Temporal.PlainDate.from(cellDate(info.view.activeEnd, timeZone))
+          .subtract({ days: 1 })
+          .toString();
+        this.rangeChange.emit({ start: cellDate(info.view.activeStart, timeZone), end: lastShown });
         this.syncSelection(
           info.view.type,
           cellDate(info.view.currentStart, timeZone),
@@ -199,8 +214,10 @@ export class Calendar {
     });
   }
 
-  /** Chip time: the full range, or only the start where a narrow column can't fit a range. */
-  protected chipTime(timeText: string, start: Date | null): string {
+  /** Chip time: the full range, or only the start where a narrow column can't fit a range.
+   *  All-day chips have none. */
+  protected chipTime(timeText: string, start: Date | null, allDay: boolean): string {
+    if (allDay) return '';
     if (!this.compact() || !start) return timeText;
     return Temporal.Instant.fromEpochMilliseconds(start.getTime())
       .toZonedDateTimeISO(this.timeZone())

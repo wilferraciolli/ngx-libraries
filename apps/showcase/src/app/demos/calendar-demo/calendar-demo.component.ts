@@ -1,6 +1,11 @@
 import { JsonPipe } from '@angular/common';
 import { Component, signal } from '@angular/core';
-import { Calendar, type CalendarEvent, type CalendarView } from '@wiltech-labs/ngx-calendar';
+import {
+  Calendar,
+  type CalendarEvent,
+  type CalendarRange,
+  type CalendarView,
+} from '@wiltech-labs/ngx-calendar';
 import { Temporal } from 'temporal-polyfill';
 
 const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -15,7 +20,30 @@ function at(days: number, time: string): string {
     .toString({ smallestUnit: 'minute' });
 }
 
+/** A business date `days` from today, `'YYYY-MM-DD'`, for all-day events. */
+function day(days: number): string {
+  return today.add({ days }).toString();
+}
+
 const SAMPLE_EVENTS: CalendarEvent[] = [
+  {
+    id: 'leave-1',
+    title: 'Priya: annual leave',
+    description: 'Back on the Monday after.',
+    startDateTime: day(1),
+    endDateTime: day(3),
+    allDay: true,
+    config: { color: 'secondary' },
+  },
+  {
+    id: 'holiday-1',
+    title: 'Public holiday',
+    description: '',
+    startDateTime: day(8),
+    endDateTime: day(8),
+    allDay: true,
+    config: { color: 'neutral' },
+  },
   {
     id: '1',
     title: 'Team stand-up',
@@ -115,6 +143,8 @@ export class CalendarDemoComponent {
   protected readonly events = signal<CalendarEvent[]>(SAMPLE_EVENTS);
   protected readonly view = signal<CalendarView>('month');
   protected readonly lastSaved = signal<CalendarEvent | null>(null);
+  /** What `rangeChange` last reported: the app would load events for it. */
+  protected readonly range = signal<CalendarRange | null>(null);
 
   /** The calendar only emits; the owner of the data applies the change. */
   protected onEventSave(saved: CalendarEvent): void {

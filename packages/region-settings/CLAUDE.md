@@ -146,8 +146,14 @@ TProfile>` and `RegionSettingsStore<TSettings, TPayload>` are both parameterized
   `SystemSettingsStore`) provides its own instance, same as the reference. `CurrentUserStore` is
   root-provided — it's app-wide state every route may need, not just settings screens.
 - The one hand-built URL in the whole package: `CurrentUserStore`'s `/me` fetch, built from
-  `API_ORIGIN` (from `ngx-api-client`) + the literal path `/api/me`. Every other request follows a
-  HATEOAS link the API itself handed out — never a URL this package or an app constructs.
+  `API_ORIGIN` (from `ngx-api-client`) + `NGX_ME_PATH` (default `/api/me`). Every other request
+  follows a HATEOAS link the API itself handed out — never a URL this package or an app constructs.
+  - **`NGX_ME_PATH` added 2026-10-23 (1.0.11).** Crewly moved every route under an area prefix
+    (`/api/platform/me`, `/api/people/...`, `/api/time/...`) so a reverse proxy can later send each
+    area to its own service; the literal `/api/me` was the only thing that couldn't follow. A plain
+    `InjectionToken<string>` with a root factory, not a resolver function like the text tokens: the
+    path is fixed per app, never per locale or per request. Kept as a path, not a full URL, so
+    `API_ORIGIN` stays the one place the origin is set.
 
 ## Status
 

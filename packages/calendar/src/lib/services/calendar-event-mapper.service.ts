@@ -7,10 +7,12 @@ export interface CalendarEventMapping<TSource> {
   id: (item: TSource) => string;
   title: (item: TSource) => string;
   description?: (item: TSource) => string | null | undefined;
-  /** UTC instant, `'YYYY-MM-DDTHH:mmZ'`. */
+  /** UTC instant, `'YYYY-MM-DDTHH:mmZ'`; the first day, `'YYYY-MM-DD'`, for an all-day item. */
   startDateTime: (item: TSource) => string;
-  /** UTC instant, `'YYYY-MM-DDTHH:mmZ'`. */
+  /** UTC instant, `'YYYY-MM-DDTHH:mmZ'`; the last day (included) for an all-day item. */
   endDateTime: (item: TSource) => string;
+  /** Whole days rather than a time span (see `CalendarEvent.allDay`). */
+  allDay?: (item: TSource) => boolean;
   config?: (item: TSource) => CalendarEventConfig | undefined;
 }
 
@@ -42,6 +44,7 @@ export class CalendarEventMapper {
       description: mapping.description?.(item) ?? '',
       startDateTime: mapping.startDateTime(item),
       endDateTime: mapping.endDateTime(item),
+      ...(mapping.allDay ? { allDay: mapping.allDay(item) } : {}),
       config: mapping.config?.(item),
       source: item,
     }));

@@ -1,8 +1,14 @@
 import { Injectable, Signal, computed, inject } from '@angular/core';
-import { HttpClient, httpResource } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, httpResource } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
-import type { ApiEnvelope, ApiMessage, CollectionEnvelope, ILink, SingleEnvelope } from './envelope.js';
+import type {
+  ApiEnvelope,
+  ApiMessage,
+  CollectionEnvelope,
+  ILink,
+  SingleEnvelope,
+} from './envelope.js';
 import { resolveLink } from './envelope.js';
 import { API_ORIGIN } from './api-origin.token.js';
 
@@ -18,6 +24,26 @@ export interface ApiResource<TValue> {
   /** The envelope's `_messages` (notices to show next to the data) — `[]` until a response arrives. */
   readonly messages: Signal<ApiMessage[]>;
   reload(): void;
+}
+
+/** A file the API sent: its bytes and the name the server suggested, if it said one. */
+export interface ApiDownload {
+  blob: Blob;
+  /** From `Content-Disposition`; null when absent or not exposed to a cross-origin caller. */
+  filename: string | null;
+}
+
+/** `attachment; filename="x.csv"` (or RFC 5987 `filename*=UTF-8''x.csv`) → `x.csv`. */
+export function filenameFromDisposition(header: string | null): string | null {
+  if (!header) {
+    return null;
+  }
+  const extended = /filename\*\s*=\s*(?:UTF-8'')?([^;]+)/i.exec(header);
+  if (extended) {
+    return decodeURIComponent(extended[1].trim().replace(/^"|"$/g, ''));
+  }
+  const plain = /filename\s*=\s*"?([^";]+)"?/i.exec(header);
+  return plain ? plain[1].trim() : null;
 }
 
 /** HTTP methods that send a body and answer with an envelope. */
@@ -96,6 +122,42 @@ export class ApiClientService {
     return firstValueFrom(
       this.http.request<SingleEnvelope<TRoot, TResource>>(method, url, { body: payload ?? null }),
     );
+  }
+
+  /**
+   * GET a file (a CSV export, a PDF) rather than an envelope. A failed request
+   * still throws an `HttpErrorResponse` whose `error` is the parsed JSON body,
+   * as for every other call, so `apiErrorMessage()` reads it (a `blob`
+   * request would otherwise hand back the error body as a `Blob`).
+   */
+  async download(url: string): Promise<ApiDownload> {
+    try {
+      const res = await firstValueFrom(
+        this.http.get(url, { observe: 'response', responseType: 'blob' }),
+      );
+      return {
+        blob: res.body ?? new Blob(),
+        filename: filenameFromDisposition(res.headers.get('Content-Disposition')),
+      };
+    } catch (error) {
+      if (error instanceof HttpErrorResponse && error.error instanceof Blob) {
+        const text = await error.error.text();
+        let body: unknown = text;
+        try {
+          body = JSON.parse(text);
+        } catch {
+          // Not JSON (a proxy's HTML page): keep the text.
+        }
+        throw new HttpErrorResponse({
+          error: body,
+          headers: error.headers,
+          status: error.status,
+          statusText: error.statusText,
+          url: error.url ?? undefined,
+        });
+      }
+      throw error;
+    }
   }
 
   /**

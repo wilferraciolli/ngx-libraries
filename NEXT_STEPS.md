@@ -3,7 +3,45 @@
 Working notes on what's outstanding across the monorepo. Not published anywhere, just a
 scratchpad so we don't lose track between sessions. Update as items land or priorities shift.
 
-## `ngx-api-client` 1.0.3: FastAPI error bodies — drafted 2026-10-19, not yet published
+## `ngx-calendar` 1.0.1: all-day events — published 2026-10-23
+
+Crewly switched over the same day: it provides `NGX_ME_PATH` (its `/api/me` alias is gone), uses
+`ApiClientService.download()` / `saveDownload()` (its `download.ts` copy is gone), and draws
+"Who's away" with all-day events.
+
+- `CalendarEvent.allDay` (dates instead of instants, both ends included), `CalendarEventMapping.allDay`,
+  an all-day row in day/week views when needed, read-only panel, optional `CalendarText.allDay`.
+  Backward compatible: timed-only calendars render as before.
+- Needed by Crewly's "Who's away" calendar (`/leave/team`), which stays a list until this is on
+  npm. Dependencies (`ngx-forms` ^1.0.5, `ngx-modals` ^1.0.2) are already published, so it can go
+  out on its own.
+- Typechecked, built, and checked in the showcase with headless Chrome (month, week, phone width).
+  The showcase demo has two all-day events.
+
+## `ngx-region-settings` 1.0.11: `NGX_ME_PATH` — published 2026-10-23
+
+- `CurrentUserStore` takes its `/me` path from the new `NGX_ME_PATH` token (default `/api/me`, so
+  existing apps are unchanged) instead of the literal `/api/me`.
+- Needed by Crewly, whose API now serves every route under an area prefix (`/api/platform/me`) so
+  a reverse proxy can route areas to separate services. Until this is on npm, crewly-api keeps a
+  `TEMPORARY` `/api/me` alias (`compat_me_router`). Publish, then in crewly-ui provide
+  `{ provide: NGX_ME_PATH, useValue: '/api/platform/me' }` and delete the alias.
+- Typechecked and built here; no spec in this package yet (the store has none).
+- **Publish order:** the built `dist/package.json` depends on `@wiltech-labs/ngx-api-client ^1.0.4`
+  (`fix-dist-file-deps.js` reads the sibling's current, unpublished version), so publish
+  `ngx-api-client` 1.0.4 first.
+
+## `ngx-api-client` 1.0.4: file downloads — published 2026-10-23
+
+- `ApiClientService.download(url)` → `{ blob, filename }` (`filenameFromDisposition()` reads
+  `Content-Disposition`, plain or RFC 5987). A failed download rethrows the `HttpErrorResponse`
+  with its JSON body parsed, so `apiErrorMessage()` reads it.
+- `saveDownload(download, fallbackName)` hands the file to the browser.
+- Needed by Crewly's approved-hours export (CSV), which keeps a `TEMPORARY` copy in
+  `crewly-ui/src/app/core/api/download.ts` until this is on npm. Typechecked here; the copy's
+  Vitest spec exercises it. Publish, then delete that file and import from the package.
+
+## `ngx-api-client` 1.0.3: FastAPI error bodies — published
 
 - `ApiErrorResponse` / `ApiFieldViolation` are now the FastAPI error body (`{ detail }`: a message
   string, or Pydantic's `422` violation list of `loc`/`msg`), and `fieldErrorsByField()` /
@@ -16,7 +54,7 @@ scratchpad so we don't lose track between sessions. Update as items land or prio
   `crewly-ui/src/app/core/api/api-error.ts` until this is on npm. Typechecked here; the copy's
   Vitest spec exercises the same logic. Publish, then delete that file and import from the package.
 
-## `ngx-api-client` 1.0.2: `_messages` — drafted 2026-10-18, not yet published
+## `ngx-api-client` 1.0.2: `_messages` — published
 
 - `ApiEnvelope._messages` is typed `ApiMessage[]` (`{ type: 'INFO' | 'WARNING' | 'ERROR' | 'SUCCESS', value }`,
   mirrors `wiltech_labs_rest.Message`) instead of `unknown`.

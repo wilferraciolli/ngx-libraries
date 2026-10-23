@@ -2,6 +2,7 @@ import { Injectable, Signal, computed, inject } from '@angular/core';
 import { API_ORIGIN, ApiClientService, ILink } from '@wiltech-labs/ngx-api-client';
 import { AuthStore } from '@wiltech-labs/ngx-auth';
 
+import { NGX_ME_PATH } from '../config/me-path.token.js';
 import type { Identifiable } from '../models/identifiable.model.js';
 import type { Me, UserProfile } from '../models/current-user.model.js';
 
@@ -21,10 +22,11 @@ export class CurrentUserStore<
   private readonly api = inject(ApiClientService);
   private readonly auth = inject(AuthStore);
   private readonly apiOrigin = inject(API_ORIGIN);
+  private readonly mePath = inject(NGX_ME_PATH);
 
   // The only hand-built URL — everything else is a link handed out from here.
   private readonly meResource = this.api.resource<'me', TMe>('me', () =>
-    this.auth.isSignedIn() ? `${this.apiOrigin}/api/me` : undefined,
+    this.auth.isSignedIn() ? `${this.apiOrigin}${this.mePath}` : undefined,
   );
 
   readonly me: Signal<TMe | undefined> = this.meResource.value;
