@@ -50,6 +50,18 @@ src/lib/
   from an API that caps the window, and nothing told the app what was on screen. Emitted from
   FullCalendar's `datesSet` (first render, prev/next/today, view change) with the *active* range
   (a month view's leading and trailing days included) and an inclusive end.
+- **`holidays`, 1.0.3 (2026-10-23).** Asked for so a public holiday is unmistakable in Crewly's
+  leave calendar. Its own input, not a flag on `CalendarEvent`: a holiday isn't something a person
+  does, can't be opened or edited, and its shape is `wiltech-labs-holidays`' item (`date`, `name`,
+  `category`) so apps pass the API's list straight in. Each holiday is two FullCalendar events of
+  ours (ids prefixed `holiday:`): a `display: 'background'` one that shades the day, or the whole
+  column in the time grid, and an all-day chip titled "Public holiday · <name>" ("Holiday · <name>"
+  for other categories) that `eventOrder` (`holidayOrder` first) puts ahead of the day's events.
+  Colours go through the events' own `color` / `contrastColor` (tertiary container; the shading at
+  70% of it) rather than new CSS, because `calendar.scss` is at its style budget. Clicking a chip
+  selects the day instead of opening a panel; the day panel lists the day's holidays first, in a
+  tinted block. Built with `forEach`, not `flatMap`: ng-packagr's `lib` setting lacks it. Checked
+  in `apps/showcase` with headless Chrome (month, week, phone).
 - **Gotchas found while building**:
   - `FullCalendarComponent.getApi()` is null until FullCalendar's own view init; the view-sync
     effect skips until then (the first view comes from `initialView`).

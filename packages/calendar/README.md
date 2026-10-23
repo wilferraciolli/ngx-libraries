@@ -11,8 +11,11 @@ and styled from the app's Material 3 tokens (light and dark, no palette file).
 - **Event panel:** clicking an event opens it in an [`ngx-modals`](../modals) side panel: date,
   time, zone and description. **Edit** swaps in an [`ngx-forms`](../forms) form; **Save** emits
   `eventSave`. The calendar never changes `events` itself; the owner of the data applies the change.
-- **All-day events** (leave, holidays, deadlines) span their days in month view and sit in an
-  all-day row in day and week views; the row appears only when there is one. They open read-only.
+- **All-day events** (leave, deadlines) span their days in month view and sit in an all-day row in
+  day and week views; the row appears only when there is one. They open read-only.
+- **Holidays** (`holidays`) shade their day (the whole column in day and week views) and carry a
+  chip, "Public holiday · Green Monday", ahead of the day's events; the day panel lists them first.
+  They can't be opened; clicking one selects the day.
 
 ## Install
 
@@ -69,6 +72,7 @@ export class ScheduleComponent {
 | Name        | Type                               | Default         | Notes                                                 |
 | ----------- | ---------------------------------- | --------------- | ----------------------------------------------------- |
 | `events`    | `CalendarEvent[]`                  | `[]`            |                                                       |
+| `holidays`  | `CalendarHoliday[]`                | `[]`            | Public holidays and closure days. Since 1.0.3.        |
 | `view`      | `'day' \| 'week' \| 'month'` model | `'month'`       | Two-way: `[(view)]`.                                  |
 | `timeZone`  | IANA zone                          | the user's zone | Events are UTC; they're shown in this zone.           |
 | `editable`  | `boolean`                          | `true`          | Shows the panel's Edit action.                        |
@@ -120,6 +124,25 @@ The mapper takes an `allDay` reader too: `allDay: (leave) => true`. All-day even
 edit, so their panel has no Edit action; the day list and panel show "All day"
 (`NGX_CALENDAR_TEXT`'s optional `allDay`, which also labels the all-day row).
 
+### Holidays
+
+Pass the items an API using [`wiltech-labs-holidays`](https://github.com/wilferraciolli/py-libraries/tree/main/packages/holidays)
+sends, as they are (`date`, `name`, `category`; other fields are ignored):
+
+```html
+<ngx-calendar [events]="events()" [holidays]="store.publicHolidays()" />
+```
+
+```ts
+interface CalendarHoliday {
+  date: string; // 'YYYY-MM-DD'
+  name: string;
+  category?: string; // 'public' (default): "Public holiday"; anything else: "Holiday"
+}
+```
+
+The labels are `NGX_CALENDAR_TEXT`'s optional `publicHoliday` and `holiday`.
+
 ### Loading events for what's on screen
 
 Fetch by `rangeChange` when the events come from an API that answers a date range:
@@ -169,8 +192,8 @@ The grid reads FullCalendar's monarch (Material 3) theme variables, which this p
 
 ## Status
 
-`1.0.1` (all-day events) is on npm; `1.0.2` (`rangeChange`) is built, not yet published.
-Consumed by `apps/showcase` (`/calendar`); Crewly's "Who's away" calendar waits for 1.0.2.
+`1.0.2` (all-day events, `rangeChange`) is on npm; `1.0.3` (`holidays`) is built, not yet
+published. Consumed by `apps/showcase` (`/calendar`) and Crewly's "Who's away" page.
 
 ## Publishing
 

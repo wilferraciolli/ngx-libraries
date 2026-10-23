@@ -7,6 +7,7 @@
 
   <ngx-calendar
     [events]="events()"
+    [holidays]="holidays()"
     [(view)]="view"
     (eventSave)="onEventSave($event)"
     (rangeChange)="range.set($event)"

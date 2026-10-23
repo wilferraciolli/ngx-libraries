@@ -1,6 +1,6 @@
 {
   "name": "@wiltech-labs/ngx-calendar",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Shared Angular calendar — day/week/month views on FullCalendar, Material 3 styled, with a day panel and an event detail/edit side panel.",
   "license": "Apache-2.0",
   "sideEffects": false,

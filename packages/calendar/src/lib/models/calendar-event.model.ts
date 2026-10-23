@@ -41,6 +41,19 @@ export interface CalendarEvent<TSource = unknown> {
 
 export type CalendarView = 'day' | 'week' | 'month';
 
+/**
+ * A public holiday (or a closure day): drawn as a shaded day with a labelled chip, "Public
+ * holiday · Green Monday", and listed first in the day panel. Not an event: it can't be opened or
+ * edited. The shape `wiltech-labs-holidays` (Python) sends; extra fields are ignored.
+ */
+export interface CalendarHoliday {
+  /** Business date, `'YYYY-MM-DD'`. */
+  date: string;
+  name: string;
+  /** `'public'` (the default) is labelled "Public holiday"; any other category "Holiday". */
+  category?: string;
+}
+
 /** The business dates on screen, both included, in the calendar's zone. A month view includes the
  *  days of the neighbouring months that fill its first and last rows. */
 export interface CalendarRange {

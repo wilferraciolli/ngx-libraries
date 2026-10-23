@@ -31,8 +31,13 @@ import { map } from 'rxjs';
 import { Temporal } from 'temporal-polyfill';
 
 import { NGX_CALENDAR_LOCALE } from '../../config/calendar-locale.token';
-import { NGX_CALENDAR_TEXT, allDayLabel } from '../../config/calendar-text.token';
-import type { CalendarEvent, CalendarRange, CalendarView } from '../../models/calendar-event.model';
+import { NGX_CALENDAR_TEXT, allDayLabel, holidayLabel } from '../../config/calendar-text.token';
+import type {
+  CalendarEvent,
+  CalendarHoliday,
+  CalendarRange,
+  CalendarView,
+} from '../../models/calendar-event.model';
 import { dayAfter, eventsOnDay, todayIn, userTimeZone } from '../../utils/calendar-time.utils';
 import { eventColors } from '../../utils/event-colors.utils';
 import { DayEvents } from '../day-events/day-events';
@@ -41,6 +46,9 @@ import {
   type EventDetailData,
   type EventDetailResult,
 } from '../event-detail/event-detail';
+
+/** Holiday chips and shading are events of ours with this id prefix; they never open the panel. */
+const HOLIDAY_ID = 'holiday:';
 
 const FULL_CALENDAR_VIEWS: Record<CalendarView, string> = {
   day: 'timeGridDay',
@@ -67,6 +75,8 @@ function cellDate(date: Date, timeZone: string): string {
  *   form saves through `eventSave`; the calendar never changes `events` itself.
  * - All-day events (`allDay`) span their days in month view and sit in the all-day row of the day
  *   and week views, which appears only when there is one. They open read-only.
+ * - Holidays (`holidays`) shade their day and carry a chip, "Public holiday · Green Monday", before
+ *   the day's events; the day panel lists them first. Clicking one selects the day.
  */
 @Component({
   selector: 'ngx-calendar',
@@ -86,6 +96,8 @@ function cellDate(date: Date, timeZone: string): string {
 })
 export class Calendar {
   public readonly events = input<readonly CalendarEvent[]>([]);
+  /** Public holidays and closure days, e.g. straight from `wiltech-labs-holidays`. Since 1.0.3. */
+  public readonly holidays = input<readonly CalendarHoliday[]>([]);
   public readonly view = model<CalendarView>('month');
   /** IANA zone the calendar is drawn in. Default: the user's own zone. */
   public readonly timeZone = input<string>(userTimeZone());
@@ -135,9 +147,14 @@ export class Calendar {
     const date = this.panelDate();
     return date ? eventsOnDay(this.events(), date, this.timeZone()) : [];
   });
+  protected readonly panelHolidays = computed(() => {
+    const date = this.panelDate();
+    return date ? this.holidays().filter((holiday) => holiday.date === date) : [];
+  });
 
-  protected readonly calendarEvents = computed<EventInput[]>(() =>
-    this.events().map((event) => {
+  protected readonly calendarEvents = computed<EventInput[]>(() => [
+    ...this.holidayEvents(),
+    ...this.events().map((event) => {
       const colors = eventColors(event.config);
       // FullCalendar's all-day `end` is exclusive; ours is the last day.
       const span = event.allDay
@@ -150,9 +167,35 @@ export class Calendar {
         color: colors.background,
         contrastColor: colors.text,
         className: event.config?.className,
+        holidayOrder: 1,
       };
     }),
-  );
+  ]);
+
+  /** Each holiday as a shaded day plus a labelled chip that sorts before the day's events. */
+  private holidayEvents(): EventInput[] {
+    const text = this.text();
+    const chip = eventColors({ color: 'tertiary' });
+    const shade = `color-mix(in srgb, ${chip.background} 70%, transparent)`;
+    const inputs: EventInput[] = [];
+    this.holidays().forEach((holiday, index) => {
+      const day = { allDay: true, start: holiday.date, end: dayAfter(holiday.date) };
+      inputs.push(
+        { ...day, id: `${HOLIDAY_ID}bg:${index}`, display: 'background', color: shade },
+        {
+          ...day,
+          id: `${HOLIDAY_ID}${index}`,
+          title: `${holidayLabel(text, holiday.category)} · ${holiday.name}`,
+          color: chip.background,
+          contrastColor: chip.text,
+          className: 'Calendar-holiday',
+          holidayOrder: 0,
+          editable: false,
+        },
+      );
+    });
+    return inputs;
+  }
 
   protected readonly options = computed<CalendarOptions>(() => {
     const selected = this.selectedDate();
@@ -167,7 +210,8 @@ export class Calendar {
       height: '100%',
       nowIndicator: true,
       // The all-day row costs a band of the time grid: show it only when something needs it.
-      allDaySlot: this.events().some((event) => event.allDay),
+      allDaySlot: this.holidays().length > 0 || this.events().some((event) => event.allDay),
+      eventOrder: 'holidayOrder,start,-duration,title',
       allDayText: allDayLabel(this.text()),
       dayMaxEvents: true,
       eventDisplay: 'block',
@@ -197,6 +241,10 @@ export class Calendar {
       },
       eventClick: (info) => {
         info.jsEvent.preventDefault();
+        if (info.event.id.startsWith(HOLIDAY_ID)) {
+          if (info.event.start) this.selectDate(cellDate(info.event.start, timeZone));
+          return;
+        }
         this.openEvent(info.event.id);
       },
     };

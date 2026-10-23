@@ -22,6 +22,10 @@ export interface CalendarText {
   /** Where an all-day event would show its time. Optional so existing overrides still compile;
    *  the default is used when it's missing. */
   allDay?: string;
+  /** Label of a `'public'` holiday (since 1.0.3; optional like `allDay`). */
+  publicHoliday?: string;
+  /** Label of a holiday of any other category, e.g. a company closure day (since 1.0.3). */
+  holiday?: string;
 }
 
 export const DEFAULT_CALENDAR_TEXT: CalendarText = {
@@ -44,7 +48,17 @@ export const DEFAULT_CALENDAR_TEXT: CalendarText = {
   noDescription: 'No description.',
   endBeforeStart: 'The end must be after the start.',
   allDay: 'All day',
+  publicHoliday: 'Public holiday',
+  holiday: 'Holiday',
 };
+
+/** "Public holiday" for a public holiday, "Holiday" for anything else; English when an app's text
+ *  override predates them. */
+export function holidayLabel(text: CalendarText, category?: string): string {
+  return !category || category === 'public'
+    ? (text.publicHoliday ?? DEFAULT_CALENDAR_TEXT.publicHoliday ?? 'Public holiday')
+    : (text.holiday ?? DEFAULT_CALENDAR_TEXT.holiday ?? 'Holiday');
+}
 
 /** The all-day label, falling back to English when an app's text override predates it. */
 export function allDayLabel(text: CalendarText): string {

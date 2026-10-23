@@ -40,6 +40,30 @@
     margin-inline-start: auto;
   }
 
+  // Holidays come first, as a tinted block that can't be opened.
+  &-holidays {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    padding: 0 12px;
+    list-style: none;
+  }
+
+  &-holiday {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 12px;
+    border-radius: var(--mat-sys-corner-medium, 12px);
+    background: var(--mat-sys-tertiary-container, #ffd8e4);
+    color: var(--mat-sys-on-tertiary-container, #31111d);
+  }
+
+  &-holiday-label {
+    font: var(--mat-sys-label-medium);
+    letter-spacing: var(--mat-sys-label-medium-tracking);
+  }
+
   &-list {
     margin: 0;
     padding: 0;

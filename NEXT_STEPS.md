@@ -3,7 +3,17 @@
 Working notes on what's outstanding across the monorepo. Not published anywhere, just a
 scratchpad so we don't lose track between sessions. Update as items land or priorities shift.
 
-## `ngx-calendar` 1.0.2: `rangeChange` — built 2026-10-23, not yet published
+## `ngx-calendar` 1.0.3: `holidays` — built 2026-10-23, not yet published
+
+- New input `holidays: CalendarHoliday[]` (`date`, `name`, `category`): each one shades its day and
+  gets a chip "Public holiday · <name>" ahead of the day's events, and is listed first in the day
+  panel. Optional `CalendarText.publicHoliday` / `holiday` labels. Backward compatible.
+- The item shape is `wiltech-labs-holidays`' (py-libraries, new, not yet published), so an API's
+  list goes straight in. Needed by Crewly's "Who's away" calendar, which shows its public holidays
+  as labelled all-day events with 1.0.2 until this is out.
+- Typechecked, built, checked in the showcase with headless Chrome (month, week, phone).
+
+## `ngx-calendar` 1.0.2: `rangeChange` — published 2026-10-23
 
 - New output `rangeChange: CalendarRange` (`{ start, end }`, both included): the dates on screen,
   on first render and after every move or view change, from FullCalendar's `datesSet`
@@ -16,8 +26,8 @@ scratchpad so we don't lose track between sessions. Update as items land or prio
 ## `ngx-calendar` 1.0.1: all-day events — published 2026-10-23
 
 Crewly switched over the same day: it provides `NGX_ME_PATH` (its `/api/me` alias is gone), uses
-`ApiClientService.download()` / `saveDownload()` (its `download.ts` copy is gone). Its "Who's
-away" calendar waits for 1.0.2 (`rangeChange`, above).
+`ApiClientService.download()` / `saveDownload()` (its `download.ts` copy is gone), and on 1.0.2
+its "Who's away" page shows leave as all-day events, loading what the calendar shows.
 
 - `CalendarEvent.allDay` (dates instead of instants, both ends included), `CalendarEventMapping.allDay`,
   an all-day row in day/week views when needed, read-only panel, optional `CalendarText.allDay`.

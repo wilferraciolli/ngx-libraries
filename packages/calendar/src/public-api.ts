@@ -6,6 +6,7 @@ export type {
   CalendarEvent,
   CalendarEventColor,
   CalendarEventConfig,
+  CalendarHoliday,
   CalendarRange,
   CalendarView,
 } from './lib/models/calendar-event.model';

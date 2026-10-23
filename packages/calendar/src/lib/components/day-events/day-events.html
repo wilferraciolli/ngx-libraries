@@ -18,6 +18,17 @@
     }
   </header>
 
+  @if (holidayRows().length) {
+    <ul class="DayEvents-holidays">
+      @for (row of holidayRows(); track $index) {
+        <li class="DayEvents-holiday">
+          <span class="DayEvents-holiday-label">{{ row.label }}</span>
+          <span class="DayEvents-title">{{ row.holiday.name }}</span>
+        </li>
+      }
+    </ul>
+  }
+
   @if (rows().length) {
     <ul class="DayEvents-list" aria-live="polite">
       @for (row of rows(); track row.event.id) {
@@ -37,7 +48,7 @@
         </li>
       }
     </ul>
-  } @else {
+  } @else if (!holidayRows().length) {
     <p class="DayEvents-empty" role="status">{{ text().noEvents }}</p>
   }
 </section>

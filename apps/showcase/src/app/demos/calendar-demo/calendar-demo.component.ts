@@ -3,6 +3,7 @@ import { Component, signal } from '@angular/core';
 import {
   Calendar,
   type CalendarEvent,
+  type CalendarHoliday,
   type CalendarRange,
   type CalendarView,
 } from '@wiltech-labs/ngx-calendar';
@@ -35,15 +36,7 @@ const SAMPLE_EVENTS: CalendarEvent[] = [
     allDay: true,
     config: { color: 'secondary' },
   },
-  {
-    id: 'holiday-1',
-    title: 'Public holiday',
-    description: '',
-    startDateTime: day(8),
-    endDateTime: day(8),
-    allDay: true,
-    config: { color: 'neutral' },
-  },
+
   {
     id: '1',
     title: 'Team stand-up',
@@ -132,6 +125,12 @@ const SAMPLE_EVENTS: CalendarEvent[] = [
   },
 ];
 
+/** What an API using wiltech-labs-holidays sends, as it sends it. */
+const SAMPLE_HOLIDAYS: CalendarHoliday[] = [
+  { date: day(1), name: 'Founders Day', category: 'public' },
+  { date: day(11), name: 'Office closed', category: 'company' },
+];
+
 @Component({
   selector: 'app-calendar-demo',
   standalone: true,
@@ -141,6 +140,7 @@ const SAMPLE_EVENTS: CalendarEvent[] = [
 })
 export class CalendarDemoComponent {
   protected readonly events = signal<CalendarEvent[]>(SAMPLE_EVENTS);
+  protected readonly holidays = signal<CalendarHoliday[]>(SAMPLE_HOLIDAYS);
   protected readonly view = signal<CalendarView>('month');
   protected readonly lastSaved = signal<CalendarEvent | null>(null);
   /** What `rangeChange` last reported: the app would load events for it. */

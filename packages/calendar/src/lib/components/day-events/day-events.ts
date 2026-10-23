@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, computed, input, output } from '@an
 import { MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 
-import { allDayLabel, type CalendarText } from '../../config/calendar-text.token';
-import type { CalendarEvent } from '../../models/calendar-event.model';
+import { allDayLabel, holidayLabel, type CalendarText } from '../../config/calendar-text.token';
+import type { CalendarEvent, CalendarHoliday } from '../../models/calendar-event.model';
 import { formatDayHeading, formatTimeRange } from '../../utils/calendar-time.utils';
 import { eventColors } from '../../utils/event-colors.utils';
 
@@ -24,6 +24,8 @@ export class DayEvents {
   public readonly date = input.required<string>();
   /** That day's events, earliest first. */
   public readonly events = input.required<readonly CalendarEvent[]>();
+  /** That day's holidays, listed first and labelled, not openable. */
+  public readonly holidays = input<readonly CalendarHoliday[]>([]);
   public readonly timeZone = input.required<string>();
   public readonly locale = input.required<string>();
   public readonly text = input.required<CalendarText>();
@@ -34,6 +36,12 @@ export class DayEvents {
   public readonly closed = output<void>();
 
   protected readonly heading = computed(() => formatDayHeading(this.date(), this.locale()));
+  protected readonly holidayRows = computed(() =>
+    this.holidays().map((holiday) => ({
+      holiday,
+      label: holidayLabel(this.text(), holiday.category),
+    })),
+  );
   protected readonly rows = computed(() =>
     this.events().map((event) => ({
       event,
