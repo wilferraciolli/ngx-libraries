@@ -3,11 +3,21 @@
 Working notes on what's outstanding across the monorepo. Not published anywhere, just a
 scratchpad so we don't lose track between sessions. Update as items land or priorities shift.
 
+## `ngx-calendar` 1.0.2: `rangeChange` — built 2026-10-23, not yet published
+
+- New output `rangeChange: CalendarRange` (`{ start, end }`, both included): the dates on screen,
+  on first render and after every move or view change, from FullCalendar's `datesSet`
+  (`activeStart`/`activeEnd`, so a month view's leading and trailing days are included).
+- Needed by Crewly's "Who's away" calendar, which loads absences per visible range from an API
+  that caps the window at 93 days. Backward compatible; no new dependencies.
+- Typechecked, built, and checked in the showcase (it prints the reported range under the
+  calendar): October 2026's month view reports 2026-09-27 to 2026-11-07.
+
 ## `ngx-calendar` 1.0.1: all-day events — published 2026-10-23
 
 Crewly switched over the same day: it provides `NGX_ME_PATH` (its `/api/me` alias is gone), uses
-`ApiClientService.download()` / `saveDownload()` (its `download.ts` copy is gone), and draws
-"Who's away" with all-day events.
+`ApiClientService.download()` / `saveDownload()` (its `download.ts` copy is gone). Its "Who's
+away" calendar waits for 1.0.2 (`rangeChange`, above).
 
 - `CalendarEvent.allDay` (dates instead of instants, both ends included), `CalendarEventMapping.allDay`,
   an all-day row in day/week views when needed, read-only panel, optional `CalendarText.allDay`.

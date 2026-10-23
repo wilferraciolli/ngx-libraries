@@ -169,8 +169,8 @@ The grid reads FullCalendar's monarch (Material 3) theme variables, which this p
 
 ## Status
 
-`1.0.1` (all-day events) is on npm; `1.0.2` (`rangeChange`) is built, not yet published. Consumed by `apps/showcase` (`/calendar`) and Crewly's
-"Who's away" view.
+`1.0.1` (all-day events) is on npm; `1.0.2` (`rangeChange`) is built, not yet published.
+Consumed by `apps/showcase` (`/calendar`); Crewly's "Who's away" calendar waits for 1.0.2.
 
 ## Publishing
 

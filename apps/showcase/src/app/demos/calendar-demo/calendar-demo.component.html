@@ -5,7 +5,15 @@
     its agenda, click an event to open it, then Edit and Save.
   </p>
 
-  <ngx-calendar [events]="events()" [(view)]="view" (eventSave)="onEventSave($event)" />
+  <ngx-calendar
+    [events]="events()"
+    [(view)]="view"
+    (eventSave)="onEventSave($event)"
+    (rangeChange)="range.set($event)"
+  />
+  @if (range(); as shown) {
+    <p class="CalendarDemo-subtitle">On screen: {{ shown.start }} to {{ shown.end }}</p>
+  }
 
   @if (lastSaved(); as saved) {
     <section class="CalendarDemo-output">
