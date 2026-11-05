@@ -6,7 +6,11 @@ export { provideTranslations } from './lib/providers/provide-translations';
 
 // Config
 export { NGX_TRANSLATIONS_CONFIG } from './lib/config/translations-config.token';
-export type { LocaleResolver, NgxTranslationsConfig } from './lib/config/translations-config.token';
+export type {
+  LazyTranslation,
+  LocaleResolver,
+  NgxTranslationsConfig,
+} from './lib/config/translations-config.token';
 
 // Service
 export { TranslationsService } from './lib/services/translations.service';

@@ -48,6 +48,21 @@ trip for a small, finite set of locales:
 
 A key is `"<namespace>.<...path>"`, e.g. `'common.buttons.save'`.
 
+### A locale few users pick: load it when it's first used
+
+Give it as a function that imports it, and the bundler splits it out of the first download:
+
+```ts
+provideTranslations({
+  locales: ['en-GB', 'el-GR'],
+  defaultLocale: 'en-GB',
+  dictionaries: { 'en-GB': en, 'el-GR': () => import('./el-GR').then((m) => m.EL_GR) },
+}),
+```
+
+Until it arrives, keys show the default locale's text. To avoid even that for someone who starts in
+it, import it in an app initializer when you know they will (e.g. from a stored preference).
+
 ### Many locales, or translations served by the backend
 
 Provide a `loader` instead of `dictionaries` — a class implementing Transloco's `TranslocoLoader`

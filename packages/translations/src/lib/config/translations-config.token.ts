@@ -11,6 +11,13 @@ import type { Translation, TranslocoLoader } from '@jsverse/transloco';
  */
 export type LocaleResolver = () => string | undefined;
 
+/**
+ * A dictionary loaded the first time its locale is used, e.g.
+ * `() => import('./el-GR').then((m) => m.EL_GR)`: the bundler splits it out, so a locale few users
+ * pick doesn't weigh on everyone's first download.
+ */
+export type LazyTranslation = () => Promise<Translation>;
+
 export interface NgxTranslationsConfig {
   /** Every locale the app supports, e.g. `['en-GB', 'el-GR']`. Becomes Transloco's `availableLangs`. */
   locales: string[];
@@ -19,10 +26,11 @@ export interface NgxTranslationsConfig {
   /**
    * Bundled at build time — one dictionary per locale, each merging every translation namespace
    * ahead of time (e.g. `{ 'en-GB': { common: {...}, forms: {...} }, 'el-GR': {...} }`). The right
-   * default for a small, finite set of locales: no network round trip, no loading state. Omit when
-   * providing `loader` instead.
+   * default for a small, finite set of locales: no network round trip, no loading state. A locale
+   * can be a {@link LazyTranslation} instead, split out of the first download and loaded when first
+   * used (keys show their fallback locale's text until it arrives). Omit when providing `loader`.
    */
-  dictionaries?: Record<string, Translation>;
+  dictionaries?: Record<string, Translation | LazyTranslation>;
   /** For many locales, or translations served by the backend, in place of `dictionaries`. */
   loader?: Type<TranslocoLoader>;
   /** See {@link LocaleResolver}. */
