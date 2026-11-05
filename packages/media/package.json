@@ -1,7 +1,7 @@
 {
   "name": "@wiltech-labs/ngx-media",
-  "version": "1.0.0",
-  "description": "Shared Angular media components — skeleton loaders and a YouTube player.",
+  "version": "1.0.1",
+  "description": "Shared Angular media components — skeleton loaders, a YouTube player and a file picker.",
   "license": "Apache-2.0",
   "sideEffects": false,
   "peerDependencies": {

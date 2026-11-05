@@ -101,6 +101,38 @@ export class VideoComponent {}
 
 `[autoplay]` defaults to `false`. The player fills its container's width at a 16:9 aspect ratio.
 
+## `FilePicker`
+
+One file, by button or dropped on the zone. It checks `accept` and `maxBytes` before reading
+anything; you read the file and upload it.
+
+```ts
+import { FilePicker, readAsBase64, type PickedFile } from '@wiltech-labs/ngx-media';
+
+@Component({
+  imports: [FilePicker],
+  template: `
+    <ngx-file-picker
+      accept="application/pdf,image/*"
+      [maxBytes]="10 * 1024 * 1024"
+      label="Choose a file"
+      hint="or drop it here · PDF or photo, up to 10 MB"
+      (picked)="upload($event)"
+      (rejected)="tooBig.set($event.reason === 'size')"
+    />
+  `,
+})
+export class UploadPage {
+  async upload(picked: PickedFile) {
+    const content_base64 = await readAsBase64(picked.file);
+    // POST { file_name: picked.name, content_type: picked.type, content_base64 }
+  }
+}
+```
+
+`pickedText` (default `{name} · {size}`) shows the file chosen; `clear()` forgets it. Also
+exported: `acceptsFile(file, accept)` and `formatFileSize(bytes, locale?)`.
+
 ## Layout
 
 ```

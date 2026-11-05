@@ -1,0 +1,26 @@
+<div
+  class="ngx-file-picker"
+  [class.is-dragging]="dragging()"
+  [class.is-disabled]="disabled()"
+  (dragover)="dragOver($event)"
+  (dragleave)="dragging.set(false)"
+  (drop)="dropped($event)"
+>
+  <input
+    #fileInput
+    class="ngx-file-picker-input"
+    type="file"
+    tabindex="-1"
+    aria-hidden="true"
+    [accept]="accept()"
+    [disabled]="disabled()"
+    (change)="chosen($event)"
+  />
+  <button class="ngx-file-picker-button" type="button" [disabled]="disabled()" (click)="open()">
+    {{ label() }}
+  </button>
+  @if (hint()) {
+    <span class="ngx-file-picker-hint">{{ hint() }}</span>
+  }
+  <span class="ngx-file-picker-picked" role="status">{{ currentText() }}</span>
+</div>

@@ -14,9 +14,13 @@ src/
     │   │   ├── card-loader/      # CardLoader — avatar + title/subtitle header, YouTube-card-style
     │   │   └── content-loader/   # ContentLoader — fills its container with N shimmer lines
     │   └── styles/                # Shared shimmer animation mixin
-    └── youtube/
+    ├── youtube/
+    │   └── components/
+    │       └── youtube-player/    # YoutubePlayer — embeds a video by id
+    └── files/
+        ├── file-read.ts           # readAsBase64, acceptsFile, formatFileSize, PickedFile
         └── components/
-            └── youtube-player/    # YoutubePlayer — embeds a video by id
+            └── file-picker/       # FilePicker — one file by button or drop, checked before read
 ```
 
 ## Conventions
@@ -32,6 +36,9 @@ src/
 - Loaders are decorative: `aria-hidden` on the host; the consumer marks its region `aria-busy`.
 - `CardLoader` composes `ContentLoader` for its body instead of duplicating the shimmer-line
   markup — keep reusing `ContentLoader` for any new "block of placeholder lines" need.
+- `FilePicker` checks `accept` and `maxBytes` before reading anything and emits the `File`; reading
+  it (`readAsBase64`) and uploading are the consumer's. Every string is an input (`label`, `hint`,
+  `pickedText` with `{name}`/`{size}`), so the package still has no UI text of its own.
 - `YoutubePlayer` uses `youtube-nocookie.com` (YouTube's privacy-enhanced embed domain) and
   `DomSanitizer.bypassSecurityTrustResourceUrl` on a URL built from the caller-supplied video id —
   do not accept a raw URL/iframe src from the caller, only the id, so there's nothing to sanitize

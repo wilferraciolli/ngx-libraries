@@ -1,0 +1,70 @@
+// A dashed drop zone with one tonal button, coloured from M3 tokens with plain fallbacks (no
+// Material dependency). Override with --ngx-file-picker-* on the host.
+:host {
+  display: block;
+}
+
+.ngx-file-picker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 16px;
+  border: 1px dashed var(--ngx-file-picker-border, var(--mat-sys-outline, #79747e));
+  border-radius: var(--ngx-file-picker-radius, var(--mat-sys-corner-medium, 12px));
+  background: var(--ngx-file-picker-surface, transparent);
+  color: var(--mat-sys-on-surface, inherit);
+
+  &.is-dragging {
+    border-style: solid;
+    border-color: var(--mat-sys-primary, #6750a4);
+    background: var(--mat-sys-primary-container, rgba(103, 80, 164, 0.08));
+  }
+
+  &.is-disabled {
+    opacity: 0.6;
+  }
+}
+
+.ngx-file-picker-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.ngx-file-picker-button {
+  min-height: 40px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 20px;
+  background: var(--mat-sys-secondary-container, #e8def8);
+  color: var(--mat-sys-on-secondary-container, #1d192b);
+  font: var(--mat-sys-label-large, 500 14px / 20px sans-serif);
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary, #6750a4);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+.ngx-file-picker-hint {
+  color: var(--mat-sys-on-surface-variant, #49454f);
+  font: var(--mat-sys-body-medium, 14px / 20px sans-serif);
+}
+
+.ngx-file-picker-picked {
+  flex-basis: 100%;
+  font: var(--mat-sys-title-small, 500 14px / 20px sans-serif);
+  overflow-wrap: anywhere;
+
+  &:empty {
+    display: none;
+  }
+}
