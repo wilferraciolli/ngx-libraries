@@ -3,14 +3,43 @@
 Working notes on what's outstanding across the monorepo. Not published anywhere, just a
 scratchpad so we don't lose track between sessions. Update as items land or priorities shift.
 
-## `ngx-calendar` 1.0.3: `holidays` — built 2026-10-23, not yet published
+## `ngx-auth` 1.0.1: start without Clerk — built 2026-10-31, not yet published
+
+- `AuthStore.init()` no longer rejects when Clerk can't load (offline, a Clerk outage): the app
+  renders signed out instead of not at all, and the new `AuthStore.isLoaded` signal stays `false`.
+- New optional `NgxAuthConfig.loadTimeoutMs`: start-up waits that long for Clerk, then renders
+  signed out; Clerk keeps loading and the state follows. Omitted, start-up waits as before.
+- Needed by Crewly's kiosk (01·1d), a tablet that must open with no connection, which keeps a
+  `TEMPORARY` subclass in `crewly-ui/src/app/core/kiosk/` until this is on npm. Backward
+  compatible; no new dependencies.
+- Typechecked and built; no spec yet (the package has no test setup).
+
+## `ngx-translations` 1.0.3: lazy dictionaries — built 2026-10-31, not yet published
+
+- `dictionaries` accepts a `LazyTranslation` (`() => import(...)`) per locale: split out of the
+  first download and loaded when first used; new exported type `LazyTranslation`. Backward
+  compatible.
+- Needed by Crewly (its Greek dictionary, 150 KB, pushed the first download past the 3 MB budget),
+  which keeps a `TEMPORARY` loader in `crewly-ui/src/app/core/translations/` until this is on npm.
+- Typechecked; no spec yet for the loader.
+
+## `ngx-media` 1.0.1: `FilePicker` — built 2026-10-24, not yet published
+
+- New `ngx-file-picker`: one file by button or drop zone, `accept` and `maxBytes` checked before
+  it is read, `picked` / `rejected` (`type` | `size`) outputs, every string an input. Helpers
+  `readAsBase64` (for APIs that take files in JSON), `acceptsFile`, `formatFileSize`.
+- Needed by Crewly's documents (02·2d), which keeps a `TEMPORARY` copy in
+  `crewly-ui/src/app/core/files/` until this is on npm. Backward compatible; no new dependencies.
+- Typechecked and built; not yet in the showcase.
+
+## `ngx-calendar` 1.0.3: `holidays` — published 2026-10-23
 
 - New input `holidays: CalendarHoliday[]` (`date`, `name`, `category`): each one shades its day and
   gets a chip "Public holiday · <name>" ahead of the day's events, and is listed first in the day
   panel. Optional `CalendarText.publicHoliday` / `holiday` labels. Backward compatible.
-- The item shape is `wiltech-labs-holidays`' (py-libraries, new, not yet published), so an API's
-  list goes straight in. Needed by Crewly's "Who's away" calendar, which shows its public holidays
-  as labelled all-day events with 1.0.2 until this is out.
+- The item shape is `wiltech-labs-holidays`' (py-libraries, published 1.0.0), so an API's list goes
+  straight in. Crewly's "Who's away" calendar switched the same day (`[holidays]="store.holidays()"`,
+  its stand-in all-day events are gone).
 - Typechecked, built, checked in the showcase with headless Chrome (month, week, phone).
 
 ## `ngx-calendar` 1.0.2: `rangeChange` — published 2026-10-23

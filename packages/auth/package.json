@@ -1,6 +1,6 @@
 {
   "name": "@wiltech-labs/ngx-auth",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Shared Angular authentication — a Clerk-backed AuthStore, an authGuard, and an authInterceptor that scopes the bearer token to your own API origin.",
   "license": "Apache-2.0",
   "sideEffects": false,

@@ -14,7 +14,8 @@ interface AuthState {
  * App-wide "who is signed in" state, backed by Clerk — inject it anywhere, the same way an app
  * injects its own `CurrentUserStore`. `init()` must run once, from `provideAuth()`'s
  * `provideAppInitializer`, before the app renders, so `authGuard`/`authInterceptor` never race a
- * not-yet-loaded Clerk instance.
+ * not-yet-loaded Clerk instance. When Clerk can't load (offline, an outage) the app still renders,
+ * signed out, with `isLoaded` false.
  */
 @Injectable({ providedIn: 'root' })
 export class AuthStore {
@@ -22,15 +23,44 @@ export class AuthStore {
   private clerk: Clerk | null = null;
 
   private readonly state = signal<AuthState>({ user: undefined, session: undefined });
+  private readonly loaded = signal(false);
 
   public readonly user: Signal<ClerkUser> = computed(() => this.state().user);
   public readonly session: Signal<ClerkSession> = computed(() => this.state().session);
   public readonly isSignedIn: Signal<boolean> = computed(() => this.state().session != null);
+  /**
+   * Whether Clerk has loaded. False while it loads (past `loadTimeoutMs`), and for good when it
+   * couldn't: the app then runs signed out, `signIn()` does nothing, and `getToken()` gives `null`.
+   */
+  public readonly isLoaded: Signal<boolean> = this.loaded.asReadonly();
 
-  /** Loads the Clerk SDK and starts tracking session changes. Call once, at startup. */
+  /**
+   * Loads the Clerk SDK and starts tracking session changes. Call once, at startup. Never rejects: a
+   * Clerk that can't load leaves the app signed out rather than not rendering at all. With
+   * `NgxAuthConfig.loadTimeoutMs` it returns after that long even if Clerk hasn't finished, and the
+   * state follows once it has.
+   */
   public async init(): Promise<void> {
+    const loading = this.load();
+    const { loadTimeoutMs } = this.config;
+    if (loadTimeoutMs === undefined) {
+      await loading;
+      return;
+    }
+    await Promise.race([
+      loading,
+      new Promise<void>((resolve) => setTimeout(resolve, loadTimeoutMs)),
+    ]);
+  }
+
+  private async load(): Promise<void> {
     const instance = new Clerk(this.config.clerkPublishableKey);
-    await instance.load();
+    try {
+      await instance.load();
+    } catch (error) {
+      console.error('Clerk could not load: the app runs signed out.', error);
+      return;
+    }
     this.clerk = instance;
 
     // Clerk's documented pattern for non-React ("headless") integrations — exposes the instance as
@@ -38,6 +68,7 @@ export class AuthStore {
     (window as unknown as { Clerk: Clerk }).Clerk = instance;
 
     this.state.set({ user: instance.user, session: instance.session });
+    this.loaded.set(true);
     instance.addListener(({ user, session }) => {
       this.state.set({ user, session });
     });

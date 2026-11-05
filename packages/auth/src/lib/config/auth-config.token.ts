@@ -21,6 +21,13 @@ export interface NgxAuthConfig {
   jwtTemplate?: string;
   /** Where `authGuard` sends a signed-out visitor. Defaults to `'/'`. */
   redirectTo?: string;
+  /**
+   * How long start-up waits for Clerk, in milliseconds, before the app renders signed out — for a
+   * page that must open without the sign-in service (offline, or during a Clerk outage), such as a
+   * shared kiosk. Clerk keeps loading, and `user`/`session`/`isLoaded` follow once it has. Omit to
+   * wait for as long as it takes, as before.
+   */
+  loadTimeoutMs?: number;
 }
 
 export const NGX_AUTH_CONFIG = new InjectionToken<NgxAuthConfig>('NGX_AUTH_CONFIG');

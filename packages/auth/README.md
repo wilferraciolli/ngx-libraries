@@ -35,7 +35,9 @@ export const appConfig: ApplicationConfig = {
 ```
 
 `provideAuth()` loads Clerk and starts tracking the session before the app renders (via
-`provideAppInitializer`) — nothing else to wire up for that part. `authInterceptor` is registered
+`provideAppInitializer`) — nothing else to wire up for that part. If Clerk can't load (no
+connection, a Clerk outage) the app still renders, signed out, and `AuthStore.isLoaded()` stays
+`false`; set `loadTimeoutMs` so start-up doesn't wait on a load that hangs (see below). `authInterceptor` is registered
 separately, in your own `provideHttpClient(withInterceptors([...]))` call, since Angular only wants
 one `provideHttpClient()` call per app.
 
@@ -47,6 +49,7 @@ interface NgxAuthConfig {
   apiOrigin: string; // required — see "Why apiOrigin is required" below
   jwtTemplate?: string; // Clerk Dashboard -> Configure -> JWT Templates
   redirectTo?: string; // where authGuard sends a signed-out visitor; defaults to '/'
+  loadTimeoutMs?: number; // how long start-up waits for Clerk; omit to wait as long as it takes
 }
 ```
 
@@ -57,6 +60,23 @@ interface NgxAuthConfig {
 (`'anything'.startsWith('')` is always `true`), which would leak your Clerk session token to any
 third-party call an app makes (an image host, an unrelated API, a CDN, ...). Stating your own API's
 origin explicitly is the whole point of the check.
+
+#### `loadTimeoutMs`
+
+For a page that has to open without the sign-in service: a shared kiosk tablet, an offline-first
+page served by a service worker. Start-up waits this long for Clerk, then renders signed out; Clerk
+keeps loading, and `user`, `session`, `isSignedIn` and `isLoaded` follow when it has. Omitted, the
+app waits for Clerk however long it takes (a failed load still renders the app, signed out). Set it
+only where rendering signed out for a moment is acceptable: `authGuard` sends a signed-in visitor
+to `redirectTo` if it runs before Clerk catches up.
+
+```ts
+provideAuth({
+  clerkPublishableKey: environment.clerkPublishableKey,
+  apiOrigin: environment.apiUrl,
+  loadTimeoutMs: location.pathname.startsWith('/kiosk') ? 3000 : undefined,
+});
+```
 
 #### `jwtTemplate`
 

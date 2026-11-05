@@ -10,7 +10,8 @@ import { AuthStore } from '../services/auth.store';
 /**
  * Sets up Clerk-backed auth for the app: register once in `app.config.ts`. Runs `AuthStore.init()`
  * via `provideAppInitializer` — before the app renders, never from a component constructor — so
- * `authGuard`/`authInterceptor` never race a not-yet-loaded Clerk instance.
+ * `authGuard`/`authInterceptor` never race a not-yet-loaded Clerk instance. A Clerk that can't load
+ * doesn't stop the app rendering (signed out); `loadTimeoutMs` caps how long start-up waits for it.
  *
  * `authInterceptor` is *not* registered here — add it to the app's own
  * `provideHttpClient(withInterceptors([authInterceptor, ...]))` call alongside any other
