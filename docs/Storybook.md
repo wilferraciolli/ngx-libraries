@@ -27,7 +27,9 @@ time, with inputs you can change live. Keeping the two apart means:
 ```
 apps/storybook/                    # npm workspace "ngx-storybook" (private, never published)
 ├── .storybook/
-│   ├── main.ts                    # framework @storybook/angular, stories glob, addons
+│   ├── main.ts                    # framework @storybook/angular, stories glob, addons,
+│   │                              # staticDirs serving ngx-styles' logo set (favicon + brand image)
+│   ├── manager.ts                 # sidebar branding: Wiltech Labs logo, light/dark from the OS
 │   ├── preview.ts                 # global providers, decorators, toolbar globals (theme, locale)
 │   ├── preview-head.html          # Roboto + Material Symbols fonts (same as the showcase index.html)
 │   └── tsconfig.json              # extends ../tsconfig.json, includes ../src/**/*.stories.ts

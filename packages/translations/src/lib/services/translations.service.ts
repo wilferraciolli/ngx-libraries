@@ -9,7 +9,8 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { TranslocoService } from '@jsverse/transloco';
-import { NGX_TRANSLATIONS_CONFIG } from '../config/translations-config.token';
+import { firstValueFrom } from 'rxjs';
+import { NGX_TRANSLATIONS_CONFIG, type TranslationArea } from '../config/translations-config.token';
 
 /**
  * App-wide translation and locale state (like `AuthStore`/`CurrentUserStore` — inject it anywhere).
@@ -26,6 +27,17 @@ export class TranslationsService {
 
   /** This session's explicit choice, if `setLocale()` has been called; `null` until then. */
   private readonly sessionOverride = signal<string | null>(null);
+
+  /**
+   * Bumped whenever strings arrive (a lazy locale, an area). `t()` reads it, so a `computed()` that
+   * ran before they arrived runs again instead of keeping the fallback text or the bare key.
+   */
+  private readonly revision = signal(0);
+
+  /** Every area opened this session: a language switch loads each one in the new locale. */
+  private readonly areas = new Set<TranslationArea>();
+  /** One load per area and locale; a failed one is forgotten, so the next visit tries again. */
+  private readonly areaLoads = new Map<TranslationArea, Map<string, Promise<void>>>();
 
   /**
    * Resolution order: this session's override, then the app's `resolveLocale`, then
@@ -69,11 +81,63 @@ export class TranslationsService {
    * brief window where a not-yet-loaded locale's keys render as themselves until it resolves.
    */
   private activate(locale: string): void {
+    const areas = [...this.areas].map((area) => this.loadAreaIn(area, locale));
     this.transloco.load(locale).subscribe(() => {
-      if (this.transloco.getActiveLang() !== locale) {
-        this.transloco.setActiveLang(locale);
-      }
+      void Promise.all(areas).then(() => {
+        // A quicker switch since may have moved on; activating this one would undo it.
+        if (this.locale() !== locale) {
+          return;
+        }
+        if (this.transloco.getActiveLang() !== locale) {
+          this.transloco.setActiveLang(locale);
+        }
+        this.revision.update((n) => n + 1);
+      });
     });
+  }
+
+  /**
+   * Loads `area`'s strings for the current locale, and from then on for any locale switched to.
+   * What `translationArea()` calls from a route; call it directly only for strings needed outside
+   * a route (a dialog opened from another area, say). Never rejects: strings that can't load
+   * (offline) are logged and leave their keys showing, rather than blocking the page.
+   */
+  public loadArea(area: TranslationArea): Promise<void> {
+    this.areas.add(area);
+    return this.loadAreaIn(area, this.locale());
+  }
+
+  private loadAreaIn(area: TranslationArea, locale: string): Promise<void> {
+    let byLocale = this.areaLoads.get(area);
+    if (!byLocale) {
+      byLocale = new Map<string, Promise<void>>();
+      this.areaLoads.set(area, byLocale);
+    }
+    const started = byLocale.get(locale);
+    if (started) {
+      return started;
+    }
+    const dictionary = area[locale];
+    if (!dictionary) {
+      return Promise.resolve();
+    }
+    const loads = byLocale;
+    const loading = Promise.all([dictionary(), firstValueFrom(this.transloco.load(locale))]).then(
+      ([translation]) => {
+        // Merged once the locale's own dictionary is in, so the area joins it, not the reverse.
+        this.transloco.setTranslation(translation, locale, {
+          merge: true,
+          emitChange: this.transloco.getActiveLang() === locale,
+        });
+        this.revision.update((n) => n + 1);
+      },
+      (error: unknown) => {
+        loads.delete(locale);
+        console.error(`Translations for ${locale} could not load: their keys show instead.`, error);
+      },
+    );
+    loads.set(locale, loading);
+    return loading;
   }
 
   /**
@@ -87,6 +151,7 @@ export class TranslationsService {
    * would tell `computed()` this call has anything to recompute.
    */
   public t(key: string, params?: Record<string, string | number>): string {
+    this.revision();
     return this.transloco.translate(key, params, this.locale());
   }
 

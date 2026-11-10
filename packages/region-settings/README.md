@@ -16,6 +16,17 @@ This package also depends directly on `@wiltech-labs/ngx-api-client`, `@wiltech-
 `@wiltech-labs/ngx-forms` — install all three alongside it and wire `provideAuth()`/`API_ORIGIN` as
 their own READMEs describe.
 
+### Two entry points
+
+- `@wiltech-labs/ngx-region-settings/core`: the stores, models and `NGX_ME_PATH`. No `ngx-forms`.
+- `@wiltech-labs/ngx-region-settings`: everything in `/core`, plus `RegionSettingsFormComponent`.
+
+Import from `/core` in code that runs at start-up (an app shell reading `CurrentUserStore`, an
+`app.config.ts` providing `NGX_ME_PATH`). A static import of the main entry point makes `ngx-forms`
+reachable from the app's main chunk, and the bundler then puts every `ngx-forms` field the app uses
+anywhere (with its Material controls, about 600 kB) in that chunk. Lazy-loaded pages can import from
+either; both give the same classes.
+
 ## Usage
 
 ### Current user
@@ -191,11 +202,17 @@ export class OrgSettingsStore extends RegionSettingsStore<
 ## Layout
 
 ```
-src/
-├── public-api.ts        # barrel — the entire public surface; nothing outside this is exported
+core/                    # @wiltech-labs/ngx-region-settings/core (no ngx-forms)
+├── ng-package.json
+└── src/
+    ├── public-api.ts
+    └── lib/
+        ├── models/         # Identifiable, Me/UserProfile, RegionSettings/RegionSettingsPayload
+        ├── stores/         # CurrentUserStore, RegionSettingsStore + UserSettingsStore/SystemSettingsStore
+        └── config/         # NGX_ME_PATH
+src/                     # @wiltech-labs/ngx-region-settings (re-exports /core)
+├── public-api.ts
 └── lib/
-    ├── models/             # Identifiable, Me/UserProfile, RegionSettings/RegionSettingsPayload
-    ├── stores/             # CurrentUserStore, RegionSettingsStore + UserSettingsStore/SystemSettingsStore
     ├── config/             # NGX_REGION_SETTINGS_FORM_TEXT
     └── components/         # RegionSettingsFormComponent
 ```

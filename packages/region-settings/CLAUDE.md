@@ -13,19 +13,35 @@ here) takes a real dependency on two siblings instead of an app-pluggable resolv
 ## Layout
 
 ```
+core/                    # secondary entry point @wiltech-labs/ngx-region-settings/core
+├── ng-package.json
+└── src/
+    ├── public-api.ts    # barrel for /core: no ngx-forms import anywhere under here
+    └── lib/
+        ├── models/         # Identifiable (shared generic constraint), Me/UserProfile,
+        │                   # RegionSettings/RegionSettingsPayload — all default types, overridable
+        │                   # via generics
+        ├── stores/
+        │   ├── current-user.store.ts    # CurrentUserStore<TMe, TProfile> (providedIn: 'root')
+        │   └── region-settings.store.ts # RegionSettingsStore<TSettings, TPayload> (abstract) +
+        │                                 # UserSettingsStore / SystemSettingsStore
+        └── config/me-path.token.ts      # NGX_ME_PATH
 src/
-├── public-api.ts        # barrel — the entire public surface; nothing outside this is exported
+├── public-api.ts        # main barrel: re-exports /core, then adds the form
 └── lib/
-    ├── models/             # Identifiable (shared generic constraint), Me/UserProfile,
-    │                       # RegionSettings/RegionSettingsPayload — all default types, overridable
-    │                       # via generics
-    ├── stores/
-    │   ├── current-user.store.ts    # CurrentUserStore<TMe, TProfile> (providedIn: 'root')
-    │   └── region-settings.store.ts # RegionSettingsStore<TSettings, TPayload> (abstract) +
-    │                                 # UserSettingsStore / SystemSettingsStore
+    ├── config/settings-form-text.token.ts # NGX_REGION_SETTINGS_FORM_TEXT
     └── components/
         └── settings-form.component.ts # RegionSettingsFormComponent — ready-made form UI
 ```
+
+**Why two entry points (decided 2026-11-10, 1.0.12).** With one FESM file, an app that imported
+`CurrentUserStore` at start-up made `ngx-forms` statically reachable from its main chunk, and the
+app's bundler then put every `ngx-forms` field used by any lazy page (with Material's datepicker,
+chips, slider and so on, about 600 kB) in main. Anything under `core/` must never import
+`ngx-forms`, `@angular/forms` or a Material component. Code under `src/` imports `/core` by its
+package name (`@wiltech-labs/ngx-region-settings/core`), never by a relative path, or ng-packagr
+inlines a second copy of the stores. The `paths` entry in `tsconfig.json` (and in the showcase's and
+storybook's) is only for typechecking against source.
 
 ## Conventions
 

@@ -63,6 +63,34 @@ provideTranslations({
 Until it arrives, keys show the default locale's text. To avoid even that for someone who starts in
 it, import it in an app initializer when you know they will (e.g. from a stored preference).
 
+### A large app: load each area's strings with its pages
+
+Keep only the shell's strings in `dictionaries`, and give each area of the app (its time pages,
+its leave pages) a `TranslationArea`: a lazy dictionary per locale. A componentless parent route
+over the area's pages resolves it, so the strings arrive before the first of those pages renders
+and stay out of the first download:
+
+```ts
+import { type TranslationArea, translationArea } from '@wiltech-labs/ngx-translations';
+
+export const TIME_STRINGS: TranslationArea = {
+  'en-GB': () => import('./translations/en-GB').then((m) => m.TIME_EN_GB),
+  'el-GR': () => import('./translations/el-GR').then((m) => m.TIME_EL_GR),
+};
+
+export const TIME_ROUTES: Route = {
+  path: '',
+  resolve: { areaStrings: translationArea(TIME_STRINGS) },
+  children: [/* the area's pages, at their own paths */],
+};
+```
+
+An area's keys merge into its locale's dictionary as they are, so give each area its own
+top-level sections; a section that pages of more than one area use belongs in `dictionaries`. A
+language switch loads every area opened so far in the new locale before switching. Strings that
+can't load (offline) are logged, and their keys show; the page still opens.
+`TranslationsService.loadArea(area)` does the same outside a route.
+
 ### Many locales, or translations served by the backend
 
 Provide a `loader` instead of `dictionaries` — a class implementing Transloco's `TranslocoLoader`
@@ -181,7 +209,8 @@ src/
 └── lib/
     ├── config/            # NgxTranslationsConfig, LocaleResolver, NGX_TRANSLATIONS_CONFIG token
     ├── providers/         # provideTranslations(), BundledTranslationsLoader (the default loader)
-    ├── services/          # TranslationsService — locale, setLocale(), t(), formatDate()/formatNumber()
+    ├── services/          # TranslationsService — locale, setLocale(), loadArea(), t(), formatDate()/formatNumber()
+    ├── routing/           # translationArea() — a route resolver for one area's strings
     └── pipes/             # TPipe ('t')
 ```
 

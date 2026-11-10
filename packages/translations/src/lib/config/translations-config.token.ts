@@ -18,6 +18,17 @@ export type LocaleResolver = () => string | undefined;
  */
 export type LazyTranslation = () => Promise<Translation>;
 
+/**
+ * One area of an app's strings (its time pages, its leave pages, ...), per locale, each split out of
+ * the first download, e.g. `{ 'en-GB': () => import('./time/en-GB').then((m) => m.TIME_EN_GB) }`.
+ * The area's routes load it with `translationArea()`, the first time someone opens one of them, in
+ * the locale they're using; a later language switch loads that locale's too. Its keys are merged
+ * into the locale's dictionary as they are, so keep each area's top-level keys its own. Give every
+ * locale the app supports: a locale left out shows its fallback locale's text only when that one is
+ * loaded too.
+ */
+export type TranslationArea = Readonly<Record<string, LazyTranslation>>;
+
 export interface NgxTranslationsConfig {
   /** Every locale the app supports, e.g. `['en-GB', 'el-GR']`. Becomes Transloco's `availableLangs`. */
   locales: string[];

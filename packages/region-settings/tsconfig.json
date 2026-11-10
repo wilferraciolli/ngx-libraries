@@ -3,6 +3,9 @@
   "compilerOptions": {
     "experimentalDecorators": true,
     "useDefineForClassFields": false,
-    "declaration": true
+    "declaration": true,
+    "paths": {
+      "@wiltech-labs/ngx-region-settings/core": ["./core/src/public-api.ts"]
+    }
   }
 }

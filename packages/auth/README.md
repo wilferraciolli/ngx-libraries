@@ -41,6 +41,11 @@ connection, a Clerk outage) the app still renders, signed out, and `AuthStore.is
 separately, in your own `provideHttpClient(withInterceptors([...]))` call, since Angular only wants
 one `provideHttpClient()` call per app.
 
+The Clerk SDK is loaded with a dynamic `import()`, so your bundler puts it in a chunk of its own
+rather than in the app's main chunk (it is well over a megabyte). Start-up still waits for it, as
+above; it just no longer counts against the app's initial bundle budget, and the main chunk parses
+sooner.
+
 ### Config
 
 ```ts

@@ -3,6 +3,40 @@
 Working notes on what's outstanding across the monorepo. Not published anywhere, just a
 scratchpad so we don't lose track between sessions. Update as items land or priorities shift.
 
+## Smaller start-up for apps: `ngx-auth` 1.0.2, `ngx-region-settings` 1.0.12, `ngx-translations` 1.0.4 — built 2026-11-10, not yet published
+
+Found in Crewly, whose first download was 2.90 MB against a 2.5 MB budget; 731 kB with all three.
+
+- **`ngx-auth` 1.0.2:** `AuthStore` imports `@clerk/clerk-js` dynamically, inside `load()`; the
+  top of the file has only `import type`. The SDK (about 1.8 MB) is now its own chunk instead of
+  part of every app's main chunk. Start-up still waits for it as before; a chunk that can't load
+  lands in the same catch as a Clerk that can't load (signed out). No API change.
+- **`ngx-region-settings` 1.0.12:** a secondary entry point, `@wiltech-labs/ngx-region-settings/core`,
+  with the stores, models and `NGX_ME_PATH` and no `ngx-forms`. The main entry point re-exports
+  `/core` and adds the settings form, so existing imports keep working. Code that runs at start-up
+  should import `/core`: a static import of the main entry made the bundler put every `ngx-forms`
+  field an app uses (with Material's datepicker, chips, slider...) in its main chunk. The showcase
+  and storybook tsconfigs map `/core` to source; the showcase typechecks.
+- **`ngx-translations` 1.0.4:** `TranslationArea` (lazy dictionaries per locale for one area of an
+  app), `translationArea()` (a route resolver for it) and `TranslationsService.loadArea()`. A
+  language switch loads every opened area in the new locale first. `t()` now also re-runs inside
+  a `computed()` when strings arrive late (a lazy locale or an area), instead of keeping fallback
+  text. Backward compatible.
+- **Publish order:** `ngx-forms` 1.0.6 (already pending), then `ngx-auth` 1.0.2, then
+  `ngx-region-settings` 1.0.12, whose `dist/package.json` asks for `ngx-auth ^1.0.2` and
+  `ngx-forms ^1.0.6`, then `ngx-translations` 1.0.4.
+- Each typechecked and built. No package here has specs for these classes.
+
+## `ngx-forms` 1.0.6: `--ngx-form-gap` — built 2026-11-07, not yet published
+
+- `DynamicForm`'s space between fields (and above its actions row) reads the new CSS custom
+  property `--ngx-form-gap`, default `16px` as before. README has a new "Styling" section listing
+  it with `--ngx-field-max-width`. Backward compatible; no new dependencies.
+- Needed by Crewly, whose spacing rule is now 20px between things that belong together. It sets
+  `--ngx-form-gap: var(--app-space-group)` and keeps a `TEMPORARY` override of the gap in
+  `crewly-ui/src/styles.scss` until this is on npm.
+- Typechecked and built.
+
 ## `ngx-auth` 1.0.1: start without Clerk — built 2026-10-31, not yet published
 
 - `AuthStore.init()` no longer rejects when Clerk can't load (offline, a Clerk outage): the app

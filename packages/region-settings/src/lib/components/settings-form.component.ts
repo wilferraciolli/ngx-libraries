@@ -1,7 +1,7 @@
 import { Component, computed, inject, input, linkedSignal, output } from '@angular/core';
 import { form, FormRoot } from '@angular/forms/signals';
 import { MatButtonModule } from '@angular/material/button';
-import { RegionSettingsPayload } from '../models/region-settings.model';
+import type { RegionSettingsPayload } from '@wiltech-labs/ngx-region-settings/core';
 import {
   SelectField,
   ThemeField,

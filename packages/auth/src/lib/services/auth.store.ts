@@ -1,5 +1,5 @@
 import { Injectable, Signal, computed, inject, signal } from '@angular/core';
-import { Clerk } from '@clerk/clerk-js';
+import type { Clerk } from '@clerk/clerk-js';
 import { NGX_AUTH_CONFIG } from '../config/auth-config.token';
 
 type ClerkUser = Clerk['user'];
@@ -54,8 +54,12 @@ export class AuthStore {
   }
 
   private async load(): Promise<void> {
-    const instance = new Clerk(this.config.clerkPublishableKey);
+    let instance: Clerk;
     try {
+      // Imported here, not at the top of the file: the Clerk SDK is most of an app's startup code,
+      // and a dynamic import lets the app's bundler split it out of the main chunk.
+      const { Clerk: ClerkSdk } = await import('@clerk/clerk-js');
+      instance = new ClerkSdk(this.config.clerkPublishableKey);
       await instance.load();
     } catch (error) {
       console.error('Clerk could not load: the app runs signed out.', error);

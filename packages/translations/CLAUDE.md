@@ -22,7 +22,8 @@ src/
     ├── config/            # NgxTranslationsConfig, LocaleResolver, NGX_TRANSLATIONS_CONFIG token
     ├── providers/         # provideTranslations() — wraps provideTransloco()
     │                       # BundledTranslationsLoader — the default loader, reads NgxTranslationsConfig.dictionaries
-    ├── services/          # TranslationsService — locale, setLocale(), t(), formatDate()/formatNumber()
+    ├── services/          # TranslationsService — locale, setLocale(), loadArea(), t(), formatDate()/formatNumber()
+    ├── routing/           # translationArea() — resolver loading one TranslationArea before its pages
     └── pipes/             # TPipe ('t')
 ```
 
@@ -63,6 +64,14 @@ useFallbackTranslation: true, allowEmpty: false }` in `provideTranslations()`) �
   locale set — matches `resource-management-ui`'s own reasoning (no network round trip, no
   asset-path complexity). `BundledTranslationsLoader` is what wires them into Transloco's loader contract.
   An app with many locales, or translations served by its backend, passes its own `loader` instead.
+- **Areas (1.0.4, 2026-11-10).** A `TranslationArea` is merged into its locale with Transloco's
+  `setTranslation(..., { merge: true })` once that locale's own dictionary has loaded, never
+  before, so the area joins the dictionary rather than the dictionary landing on top of it.
+  `activate()` loads every area opened so far before `setActiveLang()`, and skips the switch if
+  `locale()` has moved on meanwhile. `t()` reads a private `revision` signal bumped whenever
+  strings arrive, so a `computed()` that ran on fallback text runs again (this also covers a
+  lazy locale's own dictionary). `translationArea()` returns a plain `() => Promise<void>`
+  rather than the router's `ResolveFn`, so the package still has no `@angular/router` peer.
 - Date/number formatting is this package's own, via `Intl` read against `locale()` directly — not
   `LOCALE_ID`/Material's `DateAdapter`, which are fixed at bootstrap and can't react to a runtime
   switch. `ngx-forms`' `dateTimeConfig.locale` and a future `ngx-dates`' `relativeTime` pipe should

@@ -69,6 +69,48 @@ for a genuinely different brand." That's also why the file has no leading
 underscore (a Sass partial's naming convention): it isn't part of this
 package's `@use` surface.
 
+## Logo
+
+`src/logo/` holds the Wiltech Labs logo: a solid lab flask whose gold liquid dips into a W.
+It uses the house seeds, teal `#0A7E8C` (primary) and gold from the tertiary palette. The files
+ship with the package, so an app takes what it needs from
+`node_modules/@wiltech-labs/ngx-styles/src/logo/`.
+
+| File                                                      | Use                                                                                           |
+| --------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `logo.svg`, `logo.png`                                    | Mark and wordmark, for light backgrounds. The wordmark is outlined, so no font is needed.     |
+| `logo-dark.svg`, `logo-dark.png`                          | The same lockup for dark backgrounds.                                                         |
+| `logo-mark.svg`, `logo-mark.png`                          | Mark only, on a transparent background. The W cut and bubbles are real transparency.          |
+| `logo-mark-dark.svg`, `logo-mark-dark.png`                | Mark only, for dark backgrounds.                                                              |
+| `logo-icon.svg`, `logo-icon-512.png`, `logo-icon-192.png` | App-icon tile (teal rounded square), e.g. for PWA manifest icons.                             |
+| `apple-touch-icon.png`                                    | 180 px full-bleed square. iOS rounds the corners itself and turns transparency black.         |
+| `favicon.ico`                                             | 16, 32 and 48 px. The 16 and 32 px frames are redrawn on a 16 px grid instead of scaled down. |
+| `favicon.svg`                                             | The same 16 px grid drawing, for browsers that use an SVG favicon.                            |
+
+To use it as a dev app's favicon without copying files, serve them from `node_modules` in
+`angular.json`:
+
+```json
+"assets": [
+  {
+    "glob": "{favicon.ico,favicon.svg,apple-touch-icon.png}",
+    "input": "node_modules/@wiltech-labs/ngx-styles/src/logo",
+    "output": "/"
+  }
+]
+```
+
+Then in `index.html`:
+
+```html
+<link rel="icon" href="favicon.ico" sizes="32x32" />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+```
+
+Every file in `src/logo/` is generated. To change the logo, edit `scripts/build-logo.js` at the
+repo root and run `npm run build:logo`, not the SVGs by hand.
+
 ## Why no `ng-packagr`
 
 Every other package in this monorepo builds with `ng-packagr` (Angular
@@ -86,7 +128,7 @@ npm publish
 ```
 
 No build step — `files: ["src"]` in `package.json` is what gets published,
-directly from source.
+directly from source. That includes `src/logo/`.
 
 ## Status
 

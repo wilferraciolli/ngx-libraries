@@ -11,8 +11,8 @@ if the mixins change).
 Root `CLAUDE.md`'s "New package checklist" assumes `ng-packagr` (a
 `ng-package.json`, a `tsconfig.json`, a `src/public-api.ts`). None of that
 applies here: this package has no TypeScript, no Angular decorators,
-nothing for Ivy to compile. It's four `.scss` files, published as static
-source. `package.json` has no `main`/`types`/`build` script — the root
+nothing for Ivy to compile. It's four `.scss` files plus the `src/logo/`
+brand assets, published as static source. `package.json` has no `main`/`types`/`build` script — the root
 `build`/`build:packages`/`typecheck` scripts skip it via `--if-present`,
 and that's correct, not a gap.
 
@@ -33,6 +33,22 @@ and that's correct, not a gap.
   `src/styles/_theme-colors.scss` and regenerated via
   `ng generate @angular/material:theme-color`, not shared verbatim like the
   other three files. See README's "`_theme-colors.scss`" section.
+- `src/logo/` — the Wiltech Labs logo (solid flask, gold liquid dipping into a W), added
+  2026-11-07 after comparing ten concepts. It comes in lockup, mark, app-icon tile, favicon `.ico`/`.svg` and
+  `apple-touch-icon` forms, light and dark. Colours are the house seeds: teal `#0A7E8C`,
+  liquid gold `#AD8D3A` (tertiary 60) on light and `#E7C269` (tertiary 80) on dark and on the
+  tile. The wordmark is Sora 600 ("Wiltech") over JetBrains Mono 500 ("LABS", tracked 0.46em),
+  both OFL, outlined to paths so no font ships. The 16/32 px favicon frames and `favicon.svg`
+  are a separate drawing on a 16 px grid (`viewBox="0 0 16 16"`); the full-size flask blurs
+  below 48 px. If the mark changes, redraw that small version too, don't scale the big one down.
+  These are brand assets, not per-app data. Unlike `theme-colors.template.scss`, apps use them
+  as they are.
+  **Every file there is generated** by `scripts/build-logo.js` (`npm run build:logo` from the
+  repo root). Change the geometry or colours in that script and rerun it; never hand-edit the
+  output, since the next run overwrites it. The script also copies `favicon.ico`/`favicon.svg`/
+  `apple-touch-icon.png` into `apps/showcase/src/`. Angular refuses asset inputs outside an app's
+  own workspace root, so the showcase can't point here directly. Storybook can, and does, via
+  `staticDirs` in `apps/storybook/.storybook/main.ts`.
 
 ## The `--app-duration-short`/`--app-ease-standard` coupling
 

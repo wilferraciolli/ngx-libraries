@@ -333,6 +333,21 @@ formConfig<SignUp>('signUp')
 A string `pattern` is wrapped as `^(?:…)$`, like HTML's `pattern` attribute, and can be stored in
 JSON config. Pass a `RegExp` instead when you want a partial match or flags.
 
+## Styling
+
+Two CSS custom properties, set on any ancestor of the form (or app-wide on `:root`):
+
+| Property | Default | What it does |
+|---|---|---|
+| `--ngx-form-gap` | `16px` | The space between a `DynamicForm`'s fields, and above its actions row |
+| `--ngx-field-max-width` | `none` | Caps a field's width; `DynamicForm` sets it per field from `FieldDef.maxWidth` |
+
+```scss
+:root {
+  --ngx-form-gap: 20px;
+}
+```
+
 ## Other exports
 
 - `toSchema(fields)` — field definitions to Signals Forms rules

@@ -47,6 +47,10 @@ src/
   constructor** — so `authGuard`/`authInterceptor` never race a not-yet-loaded Clerk instance. This
   package enforces that by doing it itself inside `provideAuth()`; an app never calls
   `AuthStore.init()` directly.
+- **`@clerk/clerk-js` is imported dynamically, inside `AuthStore.load()`**; the top of the file
+  has only `import type`. A static import put the whole SDK (about 1.8 MB) in every consuming app's
+  main chunk, over Angular's initial-bundle budget (decided 2026-11-10, 1.0.2). Keep any new use of
+  the SDK's runtime values behind that same dynamic import; types are free.
 - **`init()` sets `window.Clerk` to the loaded instance** — Clerk's own documented pattern for
   non-React ("headless") integrations, read by tooling that expects it there (e.g. `@clerk/testing`'s
   Playwright helpers). Every prior integration this was generalized from did this identically; kept

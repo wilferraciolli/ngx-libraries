@@ -1,10 +1,11 @@
 @use '../../styles/field.mixins' as mix;
 
 // No padding or background of its own: the form sits in the app's surface (e.g. a tonal panel).
+// --ngx-form-gap (set by the app on any ancestor) spaces the fields and the actions row.
 .DynamicForm {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--ngx-form-gap, 16px);
   width: 100%;
 
   &-field {

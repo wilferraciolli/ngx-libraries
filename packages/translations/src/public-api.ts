@@ -10,7 +10,11 @@ export type {
   LazyTranslation,
   LocaleResolver,
   NgxTranslationsConfig,
+  TranslationArea,
 } from './lib/config/translations-config.token';
+
+// Routing
+export { translationArea } from './lib/routing/translation-area';
 
 // Service
 export { TranslationsService } from './lib/services/translations.service';
