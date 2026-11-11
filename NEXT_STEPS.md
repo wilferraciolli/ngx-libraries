@@ -3,6 +3,23 @@
 Working notes on what's outstanding across the monorepo. Not published anywhere, just a
 scratchpad so we don't lose track between sessions. Update as items land or priorities shift.
 
+## `ngx-auth` 1.0.3: render before Clerk, smaller Clerk — built 2026-11-11, not yet published
+
+- New optional `NgxAuthConfig.waitAtStartup` (default `true`, as before). With `false` the app
+  renders at once; `authGuard` and `authInterceptor` now wait on the new `AuthStore.whenReady()`
+  (one cached promise, capped by `loadTimeoutMs` if set) instead of reading a session that may not
+  have loaded. New `AuthStore.isSettled` signal: loading is over, either way, for unguarded pages
+  that must not flash their signed-out version.
+- New optional `NgxAuthConfig.sdkBuild: 'standard' | 'no-rhc'` (default `'standard'`). `'no-rhc'`
+  loads `@clerk/clerk-js/no-rhc`: 334 kB against 573 kB compressed (Clerk 6.39), without Turnstile
+  and Stripe, which apps signing in on Clerk's hosted pages don't use.
+- Needed by Crewly, whose clock page stayed blank on a phone until the 590 kB (compressed) Clerk
+  chunk had downloaded (audit, 2026-11-11). Crewly sets both through a `TEMPORARY` widened config in
+  `crewly-ui/src/app/app.config.ts`; 1.0.2 ignores the two keys, so nothing there waits on this.
+- Backward compatible: with neither key set, start-up and the guard behave as in 1.0.2 (the guard
+  now awaits a promise that has already resolved). Typechecked and built; no spec (the package has
+  no test setup).
+
 ## `ngx-forms` 1.0.7: `--ngx-form-columns` — built 2026-11-11, not yet published
 
 - `DynamicForm` is a grid, and the new CSS custom property `--ngx-form-columns` (default `1`)

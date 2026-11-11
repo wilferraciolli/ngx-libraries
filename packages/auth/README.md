@@ -37,14 +37,15 @@ export const appConfig: ApplicationConfig = {
 `provideAuth()` loads Clerk and starts tracking the session before the app renders (via
 `provideAppInitializer`) — nothing else to wire up for that part. If Clerk can't load (no
 connection, a Clerk outage) the app still renders, signed out, and `AuthStore.isLoaded()` stays
-`false`; set `loadTimeoutMs` so start-up doesn't wait on a load that hangs (see below). `authInterceptor` is registered
+`false`; set `loadTimeoutMs` so start-up doesn't wait on a load that hangs, or `waitAtStartup: false`
+so it doesn't wait at all (see below). `authInterceptor` is registered
 separately, in your own `provideHttpClient(withInterceptors([...]))` call, since Angular only wants
 one `provideHttpClient()` call per app.
 
 The Clerk SDK is loaded with a dynamic `import()`, so your bundler puts it in a chunk of its own
-rather than in the app's main chunk (it is well over a megabyte). Start-up still waits for it, as
-above; it just no longer counts against the app's initial bundle budget, and the main chunk parses
-sooner.
+rather than in the app's main chunk (it is well over a megabyte). By default start-up still waits
+for it, as above; `waitAtStartup: false` lets the app render first, and `sdkBuild: 'no-rhc'` loads
+a build about 40% smaller (both below).
 
 ### Config
 
@@ -54,7 +55,9 @@ interface NgxAuthConfig {
   apiOrigin: string; // required — see "Why apiOrigin is required" below
   jwtTemplate?: string; // Clerk Dashboard -> Configure -> JWT Templates
   redirectTo?: string; // where authGuard sends a signed-out visitor; defaults to '/'
-  loadTimeoutMs?: number; // how long start-up waits for Clerk; omit to wait as long as it takes
+  loadTimeoutMs?: number; // how long anything waits for Clerk; omit to wait as long as it takes
+  waitAtStartup?: boolean; // false: render at once; the guard and interceptor wait instead
+  sdkBuild?: 'standard' | 'no-rhc'; // 'no-rhc': Clerk's build without remotely hosted code
 }
 ```
 
@@ -82,6 +85,37 @@ provideAuth({
   loadTimeoutMs: location.pathname.startsWith('/kiosk') ? 3000 : undefined,
 });
 ```
+
+#### `waitAtStartup`
+
+On a slow connection the Clerk SDK can take seconds to download, and by default nothing renders
+until it has. Set `waitAtStartup: false` and the app renders at once instead. Nothing races Clerk:
+`authGuard` waits for `AuthStore.whenReady()` before it decides, and `authInterceptor` waits for it
+before it asks for the token, so a guarded route opens once Clerk has loaded and an API call goes out
+with its token. `loadTimeoutMs`, if set, still caps both waits.
+
+An unguarded page that has a signed-out version (a home page with a sign-in button) must wait for
+`AuthStore.isSettled()`, or a signed-in visitor sees that version first:
+
+```html
+@if (!auth.isSettled()) {
+<app-loading />
+} @else if (auth.isSignedIn()) {
+<!-- signed in -->
+} @else {
+<!-- signed out -->
+}
+```
+
+#### `sdkBuild`
+
+`'no-rhc'` loads `@clerk/clerk-js/no-rhc`, Clerk's build without remotely hosted code (made for
+browser extensions, whose stores forbid it). It is about 40% smaller: 334 kB against 573 kB
+compressed, in Clerk 6.39. It leaves out what Clerk would otherwise fetch from its own servers, such
+as the Turnstile bot check and Stripe. Those matter only to an app that runs Clerk's sign-up or
+billing flows in its own pages. An app that signs in through `AuthStore.signIn()`, a redirect to
+Clerk's hosted pages where Clerk runs its own checks, loses nothing. Leave it at `'standard'` if you
+aren't sure.
 
 #### `jwtTemplate`
 

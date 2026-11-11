@@ -43,10 +43,16 @@ src/
   uses `clerk.redirectToSignIn()` instead — a full-page redirect to Clerk's hosted Account Portal,
   the one sign-in entry point that doesn't depend on the missing bundle, and it behaves identically
   in a real browser and in Playwright.
-- **`init()` must run from `provideAuth()`'s `provideAppInitializer`, never a component
-  constructor** — so `authGuard`/`authInterceptor` never race a not-yet-loaded Clerk instance. This
-  package enforces that by doing it itself inside `provideAuth()`; an app never calls
-  `AuthStore.init()` directly.
+- **Loading starts from `provideAuth()`'s `provideAppInitializer`, never a component
+  constructor**, and an app never calls `AuthStore.init()` directly. **`authGuard` and
+  `authInterceptor` both wait on `AuthStore.whenReady()`** (one cached promise) before reading the
+  session, so neither races a not-yet-loaded Clerk instance even when start-up doesn't wait
+  (`waitAtStartup: false`, decided 2026-11-11, 1.0.3: on a phone the SDK download kept Crewly's clock
+  page blank for seconds). Any new code that reads the session must wait on it too.
+- **`sdkBuild: 'no-rhc'` is opt-in, never the default.** The no-rhc build drops Clerk's remotely
+  hosted code (Turnstile, Stripe), harmless for apps that sign in through the hosted pages but not
+  for one that later runs Clerk's own sign-up flow in-app. Both SDK builds are literal `import()`s
+  in `AuthStore.importSdk()` so the bundler splits each; don't merge them into one variable path.
 - **`@clerk/clerk-js` is imported dynamically, inside `AuthStore.load()`**; the top of the file
   has only `import type`. A static import put the whole SDK (about 1.8 MB) in every consuming app's
   main chunk, over Angular's initial-bundle budget (decided 2026-11-10, 1.0.2). Keep any new use of

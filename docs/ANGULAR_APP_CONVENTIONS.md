@@ -825,7 +825,7 @@ budget (see gotchas).
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <!-- Material Symbols is the M3 icon set; display=block keeps the ligature name from flashing as text. -->
 <link
-  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block"
+  href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&display=block"
   rel="stylesheet"
 />
 <!-- M3 type: Roboto Flex for the brand roles (display, headline, title), Roboto for body and labels. -->
@@ -837,6 +837,13 @@ budget (see gotchas).
 
 (The `theme-color` values are neutral tone 98 / 6 of the house palette — recompute
 them if you change the seeds.)
+
+**Ask Material Symbols only for the axes you vary.** Each range multiplies the font: every
+axis at its full range (`20..48,100..700,0..1,-50..200`) is a 4.0 MB download, which
+`display=block` keeps every icon invisible behind. `styles.scss` fixes weight 400, grade 0 and
+optical size 24 and varies only fill (outlined, filled), so the request is `24,400,0..1,0`:
+0.46 MB (measured 2026-11-11, in Crewly). Widen an axis only when a style actually sets other
+values of it.
 
 `src/app/app.config.ts` — add to `providers`:
 

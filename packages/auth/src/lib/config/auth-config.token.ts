@@ -28,6 +28,23 @@ export interface NgxAuthConfig {
    * wait for as long as it takes, as before.
    */
   loadTimeoutMs?: number;
+  /**
+   * Whether the app waits for Clerk before it first renders. Defaults to `true`, as before. Set
+   * `false` and the app renders at once while Clerk loads: `authGuard` and `authInterceptor` wait
+   * for it themselves, so a guarded route opens, and an API call carries its token, only once Clerk
+   * has loaded or given up. An unguarded page should show a loading state while `isSettled` is
+   * false, or a signed-in visitor sees the signed-out version of it first.
+   */
+  waitAtStartup?: boolean;
+  /**
+   * Which build of the Clerk SDK to load. `'standard'` (the default) is `@clerk/clerk-js`.
+   * `'no-rhc'` is `@clerk/clerk-js/no-rhc`, built without remotely hosted code: about 40% smaller
+   * (334 kB against 573 kB compressed, 6.39). It leaves out the code Clerk would load from its own
+   * servers, among it the Turnstile bot check and Stripe, which only matter to an app that runs
+   * Clerk's sign-up or billing in its own pages. An app that signs in through `signIn()` (Clerk's
+   * hosted pages, where Clerk runs its own checks) loses nothing.
+   */
+  sdkBuild?: 'standard' | 'no-rhc';
 }
 
 export const NGX_AUTH_CONFIG = new InjectionToken<NgxAuthConfig>('NGX_AUTH_CONFIG');

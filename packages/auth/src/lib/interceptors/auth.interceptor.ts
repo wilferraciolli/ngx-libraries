@@ -10,6 +10,9 @@ import { AuthStore } from '../services/auth.store';
  * image host, an unrelated API, ...). A signed-out visitor's request still goes through, with no
  * header added — this interceptor doesn't gate access (`authGuard` does that at the route level),
  * so an app with guest-accessible API calls isn't forced through sign-in just by adding it.
+ *
+ * Waits for `AuthStore.whenReady()` first, so a request made while Clerk is still loading carries
+ * the token once it can, instead of going out without one.
  */
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const { apiOrigin } = inject(NGX_AUTH_CONFIG);
@@ -18,7 +21,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   }
 
   const auth = inject(AuthStore);
-  return from(auth.getToken()).pipe(
+  return from(auth.whenReady().then(() => auth.getToken())).pipe(
     switchMap((token) =>
       next(token ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : req),
     ),
