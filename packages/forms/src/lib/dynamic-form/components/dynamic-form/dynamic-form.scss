@@ -2,9 +2,12 @@
 
 // No padding or background of its own: the form sits in the app's surface (e.g. a tonal panel).
 // --ngx-form-gap (set by the app on any ancestor) spaces the fields and the actions row.
+// --ngx-form-columns lays the fields out in that many equal columns, in their own order, row by
+// row; one by default. The app sets it per form and per window size (a media or container query),
+// so a phone keeps one column.
 .DynamicForm {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(var(--ngx-form-columns, 1), minmax(0, 1fr));
   gap: var(--ngx-form-gap, 16px);
   width: 100%;
 
@@ -12,8 +15,9 @@
     @include mix.field-container;
   }
 
-  // Right-aligned: the secondary text action, then the filled primary one.
+  // Right-aligned under every column: the secondary text action, then the filled primary one.
   &-actions {
+    grid-column: 1 / -1;
     display: flex;
     justify-content: flex-end;
     gap: 8px;

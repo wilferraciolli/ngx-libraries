@@ -3,7 +3,17 @@
 Working notes on what's outstanding across the monorepo. Not published anywhere, just a
 scratchpad so we don't lose track between sessions. Update as items land or priorities shift.
 
-## Smaller start-up for apps: `ngx-auth` 1.0.2, `ngx-region-settings` 1.0.12, `ngx-translations` 1.0.4 — built 2026-11-10, not yet published
+## `ngx-forms` 1.0.7: `--ngx-form-columns` — built 2026-11-11, not yet published
+
+- `DynamicForm` is a grid, and the new CSS custom property `--ngx-form-columns` (default `1`)
+  sets how many equal columns its fields flow into; the actions row spans them all. With the
+  default nothing changes: one column, the same gap, a `maxWidth` field still starts at the left.
+- Needed by Crewly, whose long forms (Your details: 15 personal fields, three emergency contacts)
+  were one 850px-wide column on a desktop. Crewly sets the property per form and window size; on
+  1.0.6 the property is ignored and the forms stay one column, so nothing there waits on this.
+- Typechecked and built. README "Styling" lists it.
+
+## Smaller start-up for apps: `ngx-auth` 1.0.2, `ngx-region-settings` 1.0.12, `ngx-translations` 1.0.4 — published 2026-11-11
 
 Found in Crewly, whose first download was 2.90 MB against a 2.5 MB budget; 731 kB with all three.
 
@@ -22,22 +32,20 @@ Found in Crewly, whose first download was 2.90 MB against a 2.5 MB budget; 731 k
   language switch loads every opened area in the new locale first. `t()` now also re-runs inside
   a `computed()` when strings arrive late (a lazy locale or an area), instead of keeping fallback
   text. Backward compatible.
-- **Publish order:** `ngx-forms` 1.0.6 (already pending), then `ngx-auth` 1.0.2, then
-  `ngx-region-settings` 1.0.12, whose `dist/package.json` asks for `ngx-auth ^1.0.2` and
-  `ngx-forms ^1.0.6`, then `ngx-translations` 1.0.4.
+- Crewly runs on all three from npm (its lockfile updated 2026-11-11).
 - Each typechecked and built. No package here has specs for these classes.
 
-## `ngx-forms` 1.0.6: `--ngx-form-gap` — built 2026-11-07, not yet published
+## `ngx-forms` 1.0.6: `--ngx-form-gap` — published 2026-11-11
 
 - `DynamicForm`'s space between fields (and above its actions row) reads the new CSS custom
   property `--ngx-form-gap`, default `16px` as before. README has a new "Styling" section listing
   it with `--ngx-field-max-width`. Backward compatible; no new dependencies.
 - Needed by Crewly, whose spacing rule is now 20px between things that belong together. It sets
-  `--ngx-form-gap: var(--app-space-group)` and keeps a `TEMPORARY` override of the gap in
-  `crewly-ui/src/styles.scss` until this is on npm.
+  `--ngx-form-gap: var(--app-space-group)`; its `TEMPORARY` override in `crewly-ui/src/styles.scss`
+  was removed on the upgrade.
 - Typechecked and built.
 
-## `ngx-auth` 1.0.1: start without Clerk — built 2026-10-31, not yet published
+## `ngx-auth` 1.0.1: start without Clerk — published
 
 - `AuthStore.init()` no longer rejects when Clerk can't load (offline, a Clerk outage): the app
   renders signed out instead of not at all, and the new `AuthStore.isLoaded` signal stays `false`.
@@ -48,7 +56,7 @@ Found in Crewly, whose first download was 2.90 MB against a 2.5 MB budget; 731 k
   compatible; no new dependencies.
 - Typechecked and built; no spec yet (the package has no test setup).
 
-## `ngx-translations` 1.0.3: lazy dictionaries — built 2026-10-31, not yet published
+## `ngx-translations` 1.0.3: lazy dictionaries — published
 
 - `dictionaries` accepts a `LazyTranslation` (`() => import(...)`) per locale: split out of the
   first download and loaded when first used; new exported type `LazyTranslation`. Backward

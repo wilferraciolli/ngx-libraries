@@ -335,18 +335,29 @@ JSON config. Pass a `RegExp` instead when you want a partial match or flags.
 
 ## Styling
 
-Two CSS custom properties, set on any ancestor of the form (or app-wide on `:root`):
+Three CSS custom properties, set on any ancestor of the form (or app-wide on `:root`):
 
 | Property | Default | What it does |
 |---|---|---|
 | `--ngx-form-gap` | `16px` | The space between a `DynamicForm`'s fields, and above its actions row |
+| `--ngx-form-columns` | `1` | How many equal columns a `DynamicForm`'s fields flow into, row by row in their own order; the actions row spans them all |
 | `--ngx-field-max-width` | `none` | Caps a field's width; `DynamicForm` sets it per field from `FieldDef.maxWidth` |
 
 ```scss
 :root {
   --ngx-form-gap: 20px;
 }
+
+// A long form in two columns once there is room; one column on a phone.
+.ProfilePage-form {
+  @media (min-width: 600px) {
+    --ngx-form-columns: 2;
+  }
+}
 ```
+
+Order the fields so each row reads as a group (first name and surname, postcode and city). A field
+with `maxWidth` keeps it inside its column.
 
 ## Other exports
 
