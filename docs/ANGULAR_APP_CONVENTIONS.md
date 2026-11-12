@@ -79,9 +79,18 @@ the brief: it wins over a skill's generic aesthetic defaults.
   never `Date` arithmetic (see "Dates and times").
 - Before building a loader, form field, chart, chat, AI surface or
   websocket client, check "Shared libraries" — reach for the package, not
-  a local copy.
+  a local copy. When a package almost fits, change the package, don't work
+  around it in the app (see "When a library is missing something").
 - Vitest for tests. Prefer testing signal-based store behavior directly
   (it's plain TypeScript) over over-mocking component internals.
+- Explicit types wherever a type can be written, even when TypeScript would
+  infer it: fields (`name: string = 'Name'`,
+  `private readonly api: ApiClientService = inject(ApiClientService)`,
+  `readonly saving: WritableSignal<boolean> = signal(false)`,
+  `readonly rows: Signal<Row[]> = computed(...)`, `input`/`output` as
+  `InputSignal<T>`/`OutputEmitterRef<T>`), constants, callback parameters,
+  every function's return type, and local `const`s. Leave one out only when
+  the type genuinely can't be named.
 - Prettier for formatting (100 col, single quotes, Angular parser for
   `*.html` in `.prettierrc`) — run it rather than hand-formatting.
 - `.editorconfig`: 2-space indent everywhere, single quotes in `*.ts`.
@@ -116,6 +125,23 @@ src/app/
 └── app.routes.ts
 ```
 
+When the API is split into areas (as Crewly's is, in its `docs/API_AREAS.md`), the UI follows the same
+split: `src/app/areas/<area>/` in place of `features/`, one feature folder per module inside
+it (a feature named like its area sits at the area's root). Each area has `<area>.routes.ts`,
+its pages as the children of one parent route with an empty path, so URLs don't change, and
+`<area>.strings.ts`, the area's own dictionaries in `<area>/translations/`. The parent route
+resolves `translationArea(<AREA>_STRINGS)` (`ngx-translations`), so an area's strings load
+with its first page instead of in the first download. A section of strings stays in the app's
+shell dictionary when pages of more than one area use it. An area imports another only
+through that area's `public.ts` (components another area's page shows, API shapes it reads),
+and `core/`/`shared/` import no area; a spec reading the sources keeps both true. A helper
+several areas need goes in `core/`. Navigation groupings (an apps menu) are a separate layer
+and don't move code between areas.
+
+Code that runs at start-up imports `ngx-region-settings` from its `/core` entry point. The main
+entry point carries the settings form, which pulls every `ngx-forms` field and Material control
+into the main chunk.
+
 ## Shared libraries (`@wiltech-labs/ngx-*`)
 
 Recurring building blocks — API client, forms, loaders, charts, AI surfaces,
@@ -127,16 +153,39 @@ the SCSS naming rule), so using one never reopens a design decision.
 Each package's `README.md` is its API reference. This section covers _when_
 to use which package and the rules for using it in an app.
 
+### When a library is missing something
+
+Don't build a local copy or a workaround that bypasses the package (for example
+calling `HttpClient` because `ApiClientService` doesn't expose something).
+Propose the change in the library instead:
+
+1. Make the change in `ngx-libraries` (`packages/<name>`), with its README and
+   a `NEXT_STEPS.md` entry, and type-check or test it there. Pull the
+   library repo first: work on its latest `main`.
+2. Bump the **patch** version unless the owner asks for another bump. Leave it
+   uncommitted for the owner to review, commit and publish to npm (publish from
+   the package's `dist/` after `npm run build`; a new version can take a while
+   to show on the registry).
+3. Until the new version is on npm, the app may keep a workaround only if it is
+   marked `TEMPORARY`, names the package version that replaces it, and is
+   removed as soon as that version is published.
+4. Apps depend on published versions only, never a path or git source.
+
+The same applies to anything reusable an app is about to write that no package
+covers yet: propose it as a new package or an addition to an existing one.
+
 ### What to use for what
 
 | Need                                          | Package               | Use                                                                                                                                                    | Replaces in an app                                                                                   |
 | --------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
 | Talk to the backend API                       | `ngx-api-client`      | `ApiClientService`, `LinkService`, `MetadataService`, `convertIdToValues` pipe, `ApiErrorResponse` helpers                                             | Hand-rolled `HttpClient` calls, `_data[root]` unwrapping, local envelope/link/metadata/error helpers |
+| Downloading a file from the API               | `ngx-api-client`      | `ApiClientService.download()`, `saveDownload()`                                                                                                        | App-local blob requests and `Content-Disposition` parsing                                            |
 | Forms                                         | `ngx-forms`           | `formConfig<T>()`, `DynamicForm`, the `*Field` components, `toSchema()`                                                                                | Hand-written `mat-form-field` markup, template-level validators, a `forms` SCSS partial              |
 | Date and time input                           | `ngx-forms`           | `BusinessDateField`, `BusinessTimeField`, `InstantDateTimeField`, `ZonedDateTimeService`                                                               | Raw `matDatepicker` bound to `Date` values                                                           |
 | Relative times ("5 hours ago")                | `ngx-dates`           | `relativeTime` pipe, `RelativeTimeService`                                                                                                             | An app-local pipe                                                                                    |
 | Loading states                                | `ngx-media`           | `ContentLoader`, `CardLoader`                                                                                                                          | "Loading…" text, spinners for content, `ngx-skeleton-loader`                                         |
 | Embedded video                                | `ngx-media`           | `YoutubePlayer`                                                                                                                                        | Hand-built `<iframe>` embeds                                                                         |
+| Choosing a file to upload                     | `ngx-media`           | `FilePicker` (`<ngx-file-picker>`), `readAsBase64`, `formatFileSize`                                                                                   | A bare `<input type="file">`, app-local size and type checks                                         |
 | Charts                                        | `ngx-graphs`          | `graphConfig()` + `BarGraph`/`LineGraph`/`PieGraph`/`DoughnutGraph`/`PolarAreaGraph`/`RadarGraph`; `pointGraphConfig()` + `BubbleGraph`/`ScatterGraph` | App-local chart wrappers, direct `ng2-charts` use, hand-drawn charts                                 |
 | AI interaction surfaces                       | `ngx-ai-tools`        | `AiTextBox`, `AiButton`, `AiPanel`, `AiSparkleIcon`                                                                                                    | Ad hoc gradient styling                                                                              |
 | Realtime / websockets                         | `ngx-web-sockets`     | `provideWebSocket()`, `WebSocketService`, `ChatRoom`, `ChatMessageBubble`                                                                              | `ngx-socket-io`, hand-rolled socket services                                                         |
@@ -178,6 +227,8 @@ provideTranslations({ locales: [...], defaultLocale: '...', dictionaries: {...} 
 provideAuth({                                                // ngx-auth
   clerkPublishableKey: environment.clerkPublishableKey,
   apiOrigin: environment.apiOrigin,
+  waitAtStartup: false,                                      // from 1.0.3: render before Clerk loads
+  sdkBuild: 'no-rhc',                                        // from 1.0.3: Clerk's smaller build
 }),
 ```
 
@@ -205,6 +256,8 @@ provideAuth({                                                // ngx-auth
   call, not registered by `provideAuth()` itself — Angular only wants one `provideHttpClient()` call
   per app. `clerkPublishableKey`/`apiOrigin` live in the environment files, same as `apiOrigin`/
   `socketUrl` above.
+- `waitAtStartup: false` and `sdkBuild: 'no-rhc'` are the house setting from `ngx-auth` 1.0.3 (see
+  "`ngx-auth`" below). Older versions ignore both, and start-up then waits for the full Clerk SDK.
 - `ngx-region-settings` needs no `app.config.ts` provider at all — `CurrentUserStore` is
   `providedIn: 'root'` already, and `UserSettingsStore`/`SystemSettingsStore` are feature-local
   (each settings page adds one to its own component `providers: []`, not app-wide). See
@@ -244,6 +297,11 @@ provideAuth({                                                // ngx-auth
   failed request gives `undefined`/`[]` plus `error()`, never a throw. Render
   `error()` in a `role="alert"` banner. The `httpResource` gotcha (section 6)
   still applies to any raw `httpResource` an app writes itself.
+- The envelope's `_messages` (notices the server wants shown next to the data)
+  are `resource().messages()` / `collectionResource().messages()`, typed
+  `ApiMessage[]`. When a write's reply carries messages or metadata the screen
+  needs, use `api.send('POST' | 'PUT' | 'PATCH', url, payload)`, which keeps the
+  whole envelope, instead of `post`/`put`/`patch` (from 1.0.2).
 - **Error text always comes from the package, never from the error body by
   hand.** A failed write's banner is `apiErrorMessage(error)` (from 1.0.3): the
   API's own words, or `null` when it never answered (network failure, a
@@ -255,6 +313,11 @@ provideAuth({                                                // ngx-auth
   `{"detail": "…"}` and a `422`'s `{"detail": [{loc, msg}]}` list — so no app
   reads `error.error.detail` itself. The package README's "Errors" section shows
   what each shape becomes.
+- **File downloads** (an export, a generated document) go through
+  `api.download(url)`, which returns `{ blob, filename }` with the name read from
+  `Content-Disposition`, then `saveDownload(download, fallbackName)` (from 1.0.4).
+  A failed download rethrows with its JSON body parsed, so `apiErrorMessage()`
+  reads it like any other error. No app-local `HttpClient` blob call.
 - Options from API metadata: `MetadataService.resolveMetadataIdValues()` for a
   select's options, and the `convertIdToValues` pipe to display a stored id as
   its label.
@@ -310,6 +373,10 @@ provideAuth({                                                // ngx-auth
   being filled, and announce the result or error with the usual `role="status"`
   / `role="alert"`.
 - `YoutubePlayer` takes a video id, never a URL or embed code.
+- `<ngx-file-picker>` (from 1.0.1) picks one file by button or drop zone. It checks `accept` and
+  `maxBytes` before reading the file and emits `picked` or `rejected` (`type` | `size`); every
+  string is an input. `readAsBase64` is for APIs that take files in JSON, and `formatFileSize` for
+  showing a limit.
 
 **`ngx-ai-tools`**
 
@@ -391,8 +458,22 @@ provideAuth({                                                // ngx-auth
 
 - Packages up the shape this doc's own "Authentication (Clerk)" section above describes — an app
   using `ngx-auth` doesn't hand-roll that `AuthStore`/guard/interceptor itself, it imports them.
-  `provideAuth({ clerkPublishableKey, apiOrigin })` runs `AuthStore.init()` via
-  `provideAppInitializer` (never from a component constructor — see "Setup" above).
+  `provideAuth({ clerkPublishableKey, apiOrigin })` starts Clerk from `provideAppInitializer`
+  (never from a component constructor — see "Setup" above). The SDK is a lazy chunk of its own.
+- **Don't make the first screen wait for Clerk** (from 1.0.3). By default start-up waits for the
+  SDK, which on a slow phone connection is seconds of blank page. `waitAtStartup: false` renders at
+  once. `authGuard` and `authInterceptor` both `await AuthStore.whenReady()`, so a guarded route still
+  opens only once sign-in has resolved, and no API call goes out without its token.
+- With `waitAtStartup: false`, an unguarded page with a signed-out version (a home page or a top bar
+  with a **Sign in** button) waits for `AuthStore.isSettled()`, which is true once Clerk has loaded or
+  failed. Show a loader until then, or a signed-in visitor sees **Sign in** flash first:
+  `@if (!auth.isSettled()) { <ngx-content-loader /> } @else if (auth.isSignedIn()) { … }`.
+- `sdkBuild: 'no-rhc'` loads Clerk's build without remotely hosted code: 822 KB raw against
+  1.5 MB (measured 2026-11-11). It leaves out Clerk's captcha and Stripe billing, which an app on
+  Clerk's hosted pages (the only sign-in this doc allows) never uses. Keep `'standard'` only if an app
+  needs Clerk's bot protection on a sign-up the app itself hosts.
+- `loadTimeoutMs` caps every wait for Clerk (start-up, the guard, the interceptor) for a page that
+  must open without the sign-in service, such as a kiosk.
 - `AuthStore.user`/`.session`/`.isSignedIn`/`.getToken()`/`.signIn()`/`.signOut()` — the same shape
   the "`AuthStore` shape" section above describes, just imported instead of hand-rolled. `signIn()`
   still redirects to Clerk's hosted Account Portal; never a `mount*` call — see the section above
@@ -409,6 +490,9 @@ provideAuth({                                                // ngx-auth
   `AuthStore.isSignedIn()` from `ngx-auth` — a sign-out clears the chain, a sign-in refetches it, no
   manual `ensureLoaded()`/`reset()` calls. `inject(CurrentUserStore)` anywhere; `.me()`/`.profile()`/
   `.loading()`/`.error()` signals, `.link(name)` for any other link the profile hands out.
+- The `/me` path is the `NGX_ME_PATH` token (from 1.0.11, default `/api/me`). An API that serves
+  its routes under area prefixes provides its own, e.g.
+  `{ provide: NGX_ME_PATH, useValue: '/api/platform/me' }`.
 - `UserSettingsStore`/`SystemSettingsStore` (feature-local — add one to the settings page's own
   component `providers: []`, not app-wide): follow `userSettings`/`systemSettings` off the current
   user's profile. `.settings()`/`.isLoading()`/`.error()`/`.notAvailable()` (profile loaded, no link
@@ -451,6 +535,11 @@ provideAuth({                                                // ngx-auth
   package maps the theme to `--mat-sys-*` itself.
 - Events are instants (`startDateTime`/`endDateTime`, UTC `'YYYY-MM-DDTHH:mmZ'`), shown in the
   calendar's `timeZone` (default the user's). Map your own objects with `CalendarEventMapper`.
+- A whole-day event (leave, a training day) sets `allDay` and carries dates, both ends included,
+  not instants (from 1.0.1). Public holidays go in the `holidays` input as the API's
+  `CalendarHoliday[]` (`wiltech-labs-holidays`' shape), not as fake events (from 1.0.3).
+- Load only what's on screen: `rangeChange` emits the visible `{ start, end }` dates on first
+  render and after every move or view change (from 1.0.2).
 - The calendar only emits `eventSave`; apply the change to your own data.
 - `NGX_CALENDAR_LOCALE` / `NGX_CALENDAR_TEXT` are resolver tokens; wire them to `ngx-translations`.
 
@@ -590,7 +679,10 @@ truth for "who is signed in":
   to keep it in sync going forward. Call `init()` once via
   `provideAppInitializer` in `app.config.ts` — **not** from the root
   component's constructor — so route guards and the HTTP auth
-  interceptor never race a not-yet-loaded Clerk instance.
+  interceptor never race a not-yet-loaded Clerk instance. (`ngx-auth`
+  1.0.3 keeps that guarantee without blocking start-up: the load is one
+  shared promise, `whenReady()`, which the guard and the interceptor
+  await.)
 - `getToken()` returns `(await clerk?.session?.getToken()) ?? null`, for
   the HTTP interceptor to attach as `Authorization: Bearer …`.
 - `signIn()` calls `redirectToSignIn({ redirectUrl: window.location.href })`.
@@ -741,8 +833,36 @@ budget (see gotchas).
 
 #### Spacing, touch and layout
 
-- 4px grid (`spacing.space(n)`); 8px inside a group, 16px between blocks, 24px
-  between sections. Page gutter 16px on compact, 24px from medium up.
+- Two spaces between components, as Sass tokens in `src/styles/_space.scss`
+  (`@use 'space';`): `space.$group` (20px) between things that belong together (a
+  form's fields, the cards of a list, the blocks of a panel, a section heading and its
+  content) and `space.$section` (40px) between things that don't (a page's header, its
+  panels, its lists). A page root and every panel holding more than one block are flex
+  columns with one of the two as their `gap`; nothing adds margins on top. Compile-time
+  values keep component CSS inside its budget; `styles.scss` also emits them as
+  `--app-space-group`/`--app-space-section`, and `ngx-forms` spaces fields by
+  `--ngx-form-gap`, set to the group space.
+- Controls belong with the block they act on: a filter, a date range, a period or week
+  picker, the page's create button, tabs. Give a page-level control row the global
+  `App-controls-above` class (or `App-controls-below` when it follows its block, like
+  an empty state's next step), and it sits a group's space from that block instead of
+  the section's.
+- A page's header has no padding above or below it: the shell's gutter is the space over the
+  title, and the page's `gap` the space under it, so titles sit at one height on every page.
+- Group before you space: a page is a few groups a section apart (a record's state with its
+  actions, its numbers, its list), each a flex column with the group space inside. Seven blocks
+  all a section apart read as seven unrelated things.
+- A list row's actions sit under its text on a phone and on the row's own line from `md` up
+  (`flex-flow: row wrap`, with a reason form or an error taking a full line beneath).
+- A long form flows into columns once there is room: set `--ngx-form-columns` (`ngx-forms`
+  1.0.7+) on the `<ngx-dynamic-form>` from a breakpoint up, and order the fields so each row
+  reads as a group (first name and surname; a contact's name, relationship and phone).
+- Render nothing rather than an empty element in a stack: an empty list or component
+  still takes a `gap` on each side and doubles the space (`@if (rows().length > 0)`
+  around the `<ul>`).
+- Inside a component (a title and its line, an icon and its label, a badge beside a
+  name) spacing stays tight on the 4px grid (`spacing.space(n)`, 2–8px). Buttons side
+  by side are 8px apart. Page gutter 16px on compact, 24px from medium up.
 - Touch targets ≥ 48px (icon buttons are 48; list rows ≥ 56, two-line rows 72).
 - Window size classes = the `bp` breakpoints: compact < `sm` (600), medium ≥ `sm`,
   expanded ≥ `md` (840), large ≥ `lg` (1200).
@@ -842,8 +962,7 @@ them if you change the seeds.)
 axis at its full range (`20..48,100..700,0..1,-50..200`) is a 4.0 MB download, which
 `display=block` keeps every icon invisible behind. `styles.scss` fixes weight 400, grade 0 and
 optical size 24 and varies only fill (outlined, filled), so the request is `24,400,0..1,0`:
-0.46 MB (measured 2026-11-11, in Crewly). Widen an axis only when a style actually sets other
-values of it.
+0.46 MB (measured 2026-11-11). Widen an axis only when a style actually sets other values of it.
 
 `src/app/app.config.ts` — add to `providers`:
 
@@ -1496,6 +1615,18 @@ sticks; the drawer slides in over a 32% scrim with a focus trap.
 Destinations are declared **once** and read by the rail, the drawer and the Home
 tiles — add a destination here and it appears everywhere. The Home tile for a
 destination whose API link is missing shows "Not found" instead of a dead link.
+
+**When destinations outgrow the rail (roughly ten or more), group them into apps.**
+Each destination names its `app`, or none for the few above every app (Home, an
+approvals inbox). An **Apps menu** in the top app bar (an icon button opening a
+`mat-menu`, beside the account menu) lists the apps the user has a page in, each with
+a one-line lead, the current one marked like the rail's current destination. The rail
+and drawer show the destinations above every app, a hairline, then the current app's
+pages, or on Home the apps themselves; the bar names the app beside the brand from
+medium windows up ("AppName Leave"), the drawer's title on compact ones; Home has a
+card per app. The current app is derived from the URL (the longest destination path the
+URL is on or under), never stored, so deep links and the back button land in the
+right app and no URL changes when a page moves to another app.
 
 **`src/app/shared/destinations.ts`** — the shape, then an example list (declare your own):
 

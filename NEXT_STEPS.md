@@ -3,7 +3,7 @@
 Working notes on what's outstanding across the monorepo. Not published anywhere, just a
 scratchpad so we don't lose track between sessions. Update as items land or priorities shift.
 
-## `ngx-auth` 1.0.3: render before Clerk, smaller Clerk — built 2026-11-11, not yet published
+## `ngx-auth` 1.0.3: render before Clerk, smaller Clerk — published 2026-11-11
 
 - New optional `NgxAuthConfig.waitAtStartup` (default `true`, as before). With `false` the app
   renders at once; `authGuard` and `authInterceptor` now wait on the new `AuthStore.whenReady()`
@@ -14,20 +14,23 @@ scratchpad so we don't lose track between sessions. Update as items land or prio
   loads `@clerk/clerk-js/no-rhc`: 334 kB against 573 kB compressed (Clerk 6.39), without Turnstile
   and Stripe, which apps signing in on Clerk's hosted pages don't use.
 - Needed by Crewly, whose clock page stayed blank on a phone until the 590 kB (compressed) Clerk
-  chunk had downloaded (audit, 2026-11-11). Crewly sets both through a `TEMPORARY` widened config in
-  `crewly-ui/src/app/app.config.ts`; 1.0.2 ignores the two keys, so nothing there waits on this.
+  chunk had downloaded (audit, 2026-11-11). Crewly switched the same day: it sets both keys and
+  reads `isSettled()` on Home and in the top bar; its `TEMPORARY` widened config and
+  `core/auth/auth-settled.ts` are gone. Measured on a throttled connection: first draw 13.5 s → 4.8 s.
+- The app's build still emits both Clerk chunks (each build is its own dynamic `import()`), but a
+  browser downloads only the one `sdkBuild` names.
 - Backward compatible: with neither key set, start-up and the guard behave as in 1.0.2 (the guard
   now awaits a promise that has already resolved). Typechecked and built; no spec (the package has
   no test setup).
 
-## `ngx-forms` 1.0.7: `--ngx-form-columns` — built 2026-11-11, not yet published
+## `ngx-forms` 1.0.7: `--ngx-form-columns` — published 2026-11-11
 
 - `DynamicForm` is a grid, and the new CSS custom property `--ngx-form-columns` (default `1`)
   sets how many equal columns its fields flow into; the actions row spans them all. With the
   default nothing changes: one column, the same gap, a `maxWidth` field still starts at the left.
 - Needed by Crewly, whose long forms (Your details: 15 personal fields, three emergency contacts)
-  were one 850px-wide column on a desktop. Crewly sets the property per form and window size; on
-  1.0.6 the property is ignored and the forms stay one column, so nothing there waits on this.
+  were one 850px-wide column on a desktop. Crewly sets the property per form and window size and
+  depends on `^1.0.7` since 2026-11-11.
 - Typechecked and built. README "Styling" lists it.
 
 ## Smaller start-up for apps: `ngx-auth` 1.0.2, `ngx-region-settings` 1.0.12, `ngx-translations` 1.0.4 — published 2026-11-11
