@@ -1,0 +1,19 @@
+<ngx-ai-panel [title]="heading()">
+  <div class="AiGenerate">
+    <ngx-ai-text-box [(value)]="prompt" [label]="label()" [placeholder]="placeholder()" />
+
+    <div class="AiGenerate-actions">
+      <ngx-ai-button
+        [label]="generating() ? generatingLabel() : buttonLabel()"
+        [disabled]="!canGenerate()"
+        (clicked)="generate()"
+      />
+    </div>
+
+    <p class="AiGenerate-status" role="status">{{ generating() ? generatingLabel() : '' }}</p>
+
+    @if (hasError()) {
+      <p class="AiGenerate-error" role="alert">{{ errorMessage() }}</p>
+    }
+  </div>
+</ngx-ai-panel>

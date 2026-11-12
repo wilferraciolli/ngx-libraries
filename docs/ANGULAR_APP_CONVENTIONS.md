@@ -187,7 +187,7 @@ covers yet: propose it as a new package or an addition to an existing one.
 | Embedded video                                | `ngx-media`           | `YoutubePlayer`                                                                                                                                        | Hand-built `<iframe>` embeds                                                                         |
 | Choosing a file to upload                     | `ngx-media`           | `FilePicker` (`<ngx-file-picker>`), `readAsBase64`, `formatFileSize`                                                                                   | A bare `<input type="file">`, app-local size and type checks                                         |
 | Charts                                        | `ngx-graphs`          | `graphConfig()` + `BarGraph`/`LineGraph`/`PieGraph`/`DoughnutGraph`/`PolarAreaGraph`/`RadarGraph`; `pointGraphConfig()` + `BubbleGraph`/`ScatterGraph` | App-local chart wrappers, direct `ng2-charts` use, hand-drawn charts                                 |
-| AI interaction surfaces                       | `ngx-ai-tools`        | `AiTextBox`, `AiButton`, `AiPanel`, `AiSparkleIcon`                                                                                                    | Ad hoc gradient styling                                                                              |
+| AI interaction surfaces                       | `ngx-ai-tools`        | `AiTextBox`, `AiButton`, `AiPanel`, `AiSparkleIcon`, `AiGenerate` + `provideAiGenerator()`                                                             | Ad hoc gradient styling                                                                              |
 | Realtime / websockets                         | `ngx-web-sockets`     | `provideWebSocket()`, `WebSocketService`, `ChatRoom`, `ChatMessageBubble`                                                                              | `ngx-socket-io`, hand-rolled socket services                                                         |
 | Translations                                  | `ngx-translations`    | `provideTranslations()`, `TranslationsService`, the `t` pipe                                                                                           | An app-local translation store (see `ngx-translations` below), raw Transloco use                     |
 | Clerk sign-in state, guard, HTTP token        | `ngx-auth`            | `provideAuth()`, `AuthStore`, `authGuard`, `authInterceptor`                                                                                           | The hand-rolled `AuthStore`/`signalStore` this doc's own "Authentication (Clerk)" section describes  |
@@ -391,6 +391,10 @@ provideAuth({                                                // ngx-auth
 - `AiButton` counts as the view's filled button (rule 4). Don't put a second
   filled button beside it.
 - `AiTextBox` needs a `label` (its accessible name); the placeholder isn't one.
+- Generating content from a prompt: `AiGenerate`, with the app's generator wired once via
+  `provideAiGenerator(() => ...)`. The generator calls the app's own backend, which holds the AI
+  provider's key; never call a provider from the browser. `AiGenerate` emits `{ title, body }`; put
+  it into `ngx-forms` fields (or wherever) yourself.
 - The border's rotation is the one sanctioned ambient animation (see Motion).
 
 **`ngx-web-sockets`**

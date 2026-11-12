@@ -65,6 +65,104 @@ A gradient-filled button for triggering an AI action.
 <ngx-ai-button label="Generate" [disabled]="loading()" (clicked)="generate()" />
 ```
 
+## `AiGenerate`
+
+A prompt box and **Generate** button in an `AiPanel`. It sends the prompt to your app's
+`AiGenerator` and emits the `{ title, body }` it returns. Where that content goes (form fields, a
+preview, a clipboard copy) is up to you.
+
+### 1. Provide a generator
+
+The library never calls an AI provider itself. Your generator calls **your backend**, which holds
+the provider's API key (Groq, Cloudflare Workers AI, ...) and the system prompt. Keys must never
+ship in the browser bundle.
+
+```ts
+// app.config.ts
+import { inject } from '@angular/core';
+import { ApiClientService } from '@wiltech-labs/ngx-api-client';
+import { provideAiGenerator } from '@wiltech-labs/ngx-ai-tools';
+import type { AiGenerateResult } from '@wiltech-labs/ngx-ai-tools';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideAiGenerator(() => {
+      const api: ApiClientService = inject(ApiClientService);
+      return {
+        generate: (request) => api.post<'post', AiGenerateResult>('post', '/ai/generate', request),
+      };
+    }),
+  ],
+};
+```
+
+The contract:
+
+```ts
+interface AiGenerateRequest {
+  prompt: string;
+}
+interface AiGenerateResult {
+  title: string;
+  body: string;
+}
+interface AiGenerator {
+  generate(request: AiGenerateRequest, signal: AbortSignal): Promise<AiGenerateResult>;
+}
+```
+
+`signal` aborts if the component is destroyed mid-request; pass it on to `fetch` where you can.
+`provideAiGenerator()` returns a normal provider, so it also works in one component's `providers`.
+
+**Backend tip:** use the provider's JSON mode (Groq `response_format: { type: 'json_object' }`,
+Workers AI JSON mode) so the title and body come back reliably split, and keep tone/length rules
+("LinkedIn post, under 3,000 characters, no markdown") in the backend's system prompt.
+
+### 2. Use it
+
+```ts
+import { Component, signal } from '@angular/core';
+import { form } from '@angular/forms/signals';
+import { AiGenerate } from '@wiltech-labs/ngx-ai-tools';
+import type { AiGenerateResult } from '@wiltech-labs/ngx-ai-tools';
+import { FormFieldType, TextField, TextareaField, toSchema } from '@wiltech-labs/ngx-forms';
+
+@Component({
+  selector: 'app-post-composer',
+  imports: [AiGenerate, TextField, TextareaField],
+  template: `
+    <ngx-ai-generate heading="Write a post" (generated)="onGenerated($event)" />
+    <ngx-text-field [fieldDef]="fields.title" [field]="postForm.title" />
+    <ngx-textarea-field [fieldDef]="fields.body" [field]="postForm.body" />
+  `,
+})
+export class PostComposerComponent {
+  fields = {
+    title: { name: 'title', type: FormFieldType.TEXT, label: 'Title' },
+    body: { name: 'body', type: FormFieldType.TEXTAREA, label: 'Post' },
+  };
+  model = signal({ title: '', body: '' });
+  postForm = form(this.model, toSchema(Object.values(this.fields)));
+
+  onGenerated(result: AiGenerateResult): void {
+    this.model.set(result);
+  }
+}
+```
+
+| Input             | Default                                       |
+| ----------------- | --------------------------------------------- |
+| `heading`         | `'Generate with AI'`                          |
+| `label`           | `'Describe what to write'` (accessible name)  |
+| `placeholder`     | `'Tell the AI what to write about…'`          |
+| `buttonLabel`     | `'Generate'`                                  |
+| `generatingLabel` | `'Generating…'`                               |
+| `errorMessage`    | `'Something went wrong. Please try again.'`   |
+| `[(prompt)]`      | `''` (two-way, to prefill or keep the prompt) |
+
+Outputs: `generated` (`AiGenerateResult`), `failed` (the rejection reason, for logging; the
+message is shown either way).
+
 ## `AiSparkleIcon`
 
 The 4-pointed "sparkle"/diamond glyph used to mark AI features, usable on its own.
@@ -107,14 +205,15 @@ the view's one filled button.
 src/
 ├── public-api.ts        # barrel — the entire public surface; nothing outside this is exported
 └── lib/
-    ├── components/       # AiSparkleIcon, AiPanel, AiTextBox, AiButton
+    ├── components/       # AiSparkleIcon, AiPanel, AiTextBox, AiButton, AiGenerate
+    ├── generation/       # AiGenerator, NGX_AI_GENERATOR, provideAiGenerator()
     └── shared/styles/     # Shared animated gradient-border mixin
 ```
 
 ## Status
 
-Not yet published to npm — under development. Component look-and-feel only for now; an AI request
-service layer is planned but not started.
+`1.0.0` is published (the four look-and-feel components). `1.1.0` adds `AiGenerate` and the
+`AiGenerator` contract; not yet published.
 
 ## Publishing
 

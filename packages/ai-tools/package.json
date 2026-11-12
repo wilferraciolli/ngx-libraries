@@ -1,7 +1,7 @@
 {
   "name": "@wiltech-labs/ngx-ai-tools",
-  "version": "1.0.0",
-  "description": "Shared Angular AI-flavoured components — gradient panels, text boxes and buttons.",
+  "version": "1.0.1",
+  "description": "Shared Angular AI-flavoured components — gradient panels, text boxes, buttons and a pluggable prompt-to-content generator.",
   "license": "Apache-2.0",
   "sideEffects": false,
   "peerDependencies": {

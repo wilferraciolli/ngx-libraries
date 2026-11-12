@@ -26,3 +26,15 @@
   margin-top: 0;
   color: var(--mat-sys-primary);
 }
+
+.PostComposer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 640px;
+
+  &-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+}

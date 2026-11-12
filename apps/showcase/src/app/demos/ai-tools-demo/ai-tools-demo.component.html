@@ -31,4 +31,30 @@
       }
     </div>
   </div>
+
+  <div class="info-section">
+    <h3>AiGenerate — post composer</h3>
+    <p class="subtitle">
+      Uses a fake generator (no backend). Include the word "fail" in the prompt to see the error.
+    </p>
+    <div class="PostComposer">
+      <ngx-ai-generate
+        heading="Write a post"
+        placeholder="E.g. Why Wiltech Labs Payroll saves small businesses time"
+        (generated)="onGenerated($event)"
+      />
+      <ngx-text-field [fieldDef]="postFields.title" [field]="postForm.title" />
+      <ngx-textarea-field [fieldDef]="postFields.body" [field]="postForm.body" />
+      <div class="PostComposer-actions">
+        <button
+          mat-stroked-button
+          type="button"
+          [disabled]="!postModel().body"
+          (click)="copyPost()"
+        >
+          {{ copied() ? 'Copied' : 'Copy post' }}
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

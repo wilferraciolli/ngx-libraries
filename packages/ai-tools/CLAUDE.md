@@ -13,7 +13,9 @@ src/
     │   ├── ai-sparkle-icon/   # AiSparkleIcon — the 4-pointed "sparkle"/diamond AI glyph
     │   ├── ai-panel/          # AiPanel — animated-gradient-border container
     │   ├── ai-text-box/       # AiTextBox — animated-gradient-border text input
-    │   └── ai-button/         # AiButton — gradient-filled action button
+    │   ├── ai-button/         # AiButton — gradient-filled action button
+    │   └── ai-generate/       # AiGenerate — prompt + Generate button, emits { title, body }
+    ├── generation/            # AiGenerator contract, NGX_AI_GENERATOR, provideAiGenerator()
     └── shared/styles/          # Shared animated gradient-border mixin
 ```
 
@@ -41,11 +43,34 @@ src/
 - `AiSparkleIcon` fills with the gradient by default; pass `[monochrome]="true"` when placing it on
   a background that's already gradient-colored (e.g. inside `AiButton`) so it uses `currentColor`
   instead of fighting the background for contrast.
+- **AI requests go through the app, never straight to a provider (2026-11-12).** `AiGenerate`
+  calls whatever `AiGenerator` the app provides (`provideAiGenerator(() => ...)`); the library
+  knows nothing about Groq, Workers AI or keys. The app's generator calls its own backend, which
+  holds the provider key and the system prompt (brand voice, length, "no markdown"), so either can
+  change without republishing this package. Same app-pluggable-token pattern as `NGX_DATES_LOCALE`.
+- `AiGenerator.generate()` returns a `Promise`, not an `Observable` — matches `ApiClientService`
+  (whose methods are all `Promise`s), so an implementation is one `api.post(...)` line, and this
+  package needs no `rxjs` peer dependency. Cancellation is an `AbortSignal`, aborted when
+  `AiGenerate` is destroyed; a result or error arriving after that is dropped.
+- The result is structured `{ title, body }`, not one string: the prompt is an instruction, not a
+  headline, so the backend should use the provider's JSON mode and return both. The prompt stays
+  in `AiGenerate` (two-way `prompt` model) so the user can tweak and regenerate.
+- `AiGenerate` only emits; it doesn't own the fields the content lands in. The showcase/Storybook
+  composer feeds it into `ngx-forms`' `TextField` + `TextareaField` — composed in the app, so this
+  package still has no sibling `ngx-*` dependency (root `CLAUDE.md`, "Inter-package deps").
+  Plain-text textarea, not a rich editor, on purpose: social posts are plain text anyway.
+- Every string on `AiGenerate` is an input with an English default (same as `AiTextBox`), no text
+  token. While running, the button shows `generatingLabel` and a visually-hidden `role="status"`
+  announces it; a rejection shows `errorMessage` in a `role="alert"` and emits `failed`.
+- No streaming yet — one request, one response. Adding it later means a new optional method on
+  `AiGenerator`, not a breaking change.
 
 ## Status
 
-- New package, initial component set only (`AiSparkleIcon`, `AiPanel`, `AiTextBox`, `AiButton`).
-  Services (e.g. an actual AI request layer) are intentionally not started yet.
-- Not yet published to npm — under development.
-- No consumers yet.
+- `1.0.0` published: `AiSparkleIcon`, `AiPanel`, `AiTextBox`, `AiButton`.
+- `1.1.0` (not yet published): `AiGenerate` + `AiGenerator`/`NGX_AI_GENERATOR`/
+  `provideAiGenerator()`. Demoed in `apps/showcase` (`/ai-tools`, post composer with a fake
+  generator) and Storybook (`ngx-ai-tools/AiGenerate`).
+- No consumers yet outside this monorepo. No backend endpoint exists yet either — each app builds
+  its own (e.g. a Cloudflare Worker: `POST /ai/generate { prompt }` → `{ title, body }`).
 - Package name (`ai-tools`) is provisional — revisit if a better name comes up.

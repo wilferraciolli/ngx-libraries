@@ -1,0 +1,34 @@
+:host {
+  display: block;
+}
+
+.AiGenerate {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  &-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  // Screen-reader only: the button's own label already shows the state visually.
+  &-status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  &-error {
+    margin: 0;
+    color: var(--ngx-ai-error, var(--mat-sys-error, #b3261e));
+    font: var(--mat-sys-body-medium, 400 0.875rem / 1.25rem sans-serif);
+    letter-spacing: var(--mat-sys-body-medium-tracking, 0.015625rem);
+  }
+}

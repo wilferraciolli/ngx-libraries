@@ -3,6 +3,24 @@
 Working notes on what's outstanding across the monorepo. Not published anywhere, just a
 scratchpad so we don't lose track between sessions. Update as items land or priorities shift.
 
+## `ngx-ai-tools` 1.1.0: `AiGenerate` + pluggable generator — built 2026-11-12, not published
+
+- First piece of a reusable "write a post with AI" flow, for producing social/article content
+  from the apps. New `AiGenerate` (`<ngx-ai-generate>`): prompt box + Generate button in an
+  `AiPanel`, emits `generated: { title, body }`, shows a loading label and an error message.
+- The AI call is the app's: `provideAiGenerator(() => ...)` supplies an `AiGenerator`
+  (`generate(request, signal): Promise<{ title, body }>`), normally one `ApiClientService.post`
+  to the app's backend, which holds the Groq/Workers AI key. The library has no provider code.
+- Content lands in plain `ngx-forms` `TextField` + `TextareaField`, composed in the app (no
+  package dependency). No rich editor for now: social posts are plain text.
+- Demoed in the showcase (`/ai-tools`, fake generator; "fail" in the prompt shows the error) and
+  Storybook (`ngx-ai-tools/AiGenerate`, incl. "With post fields"). Typechecked, package and
+  showcase built; not yet clicked through in a browser.
+- [ ] Backend endpoint (e.g. Cloudflare Worker `POST /ai/generate`, JSON mode, system prompt).
+- [ ] Publish 1.1.0 and adopt in a real app.
+- [ ] Later: copy / share-intent buttons, per-platform length counter, optional `tone`/`platform`
+      on the request, streaming, posting to social platforms from the backend.
+
 ## `ngx-auth` 1.0.3: render before Clerk, smaller Clerk — published 2026-11-11
 
 - New optional `NgxAuthConfig.waitAtStartup` (default `true`, as before). With `false` the app
