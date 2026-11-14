@@ -24,6 +24,9 @@
           <span class="OrgNodeDetail-holder-text">
             <span class="OrgNodeDetail-person">{{ person.name }}</span>
             <span class="OrgNodeDetail-job">{{ job.name }}</span>
+            @if (dates(); as dates) {
+              <span class="OrgNodeDetail-dates">{{ dates }}</span>
+            }
           </span>
         } @else {
           <span class="OrgNodeDetail-avatar is-vacant" aria-hidden="true">

@@ -20,11 +20,16 @@ src/lib/
 
 ## Decisions
 
-- **The API owns the structure rules** (one ORG; entities under the org or a department, at most one
-  per reporting line, never holding jobs; departments with exactly one reporting job; jobs under
-  departments; one occupancy per job, many jobs per person). The chart lays out what it's given and
-  never validates.
-- **Read-only for now.** `OrgItem.links` is carried through for the CRUD actions that come next.
+- **The API owns the structure rules** (one ORG; entities under the org or a department, never
+  inside another entity, never holding jobs; departments under the org, an entity or a department
+  at any depth, with at most one reporting job; jobs under departments only). The chart lays out
+  what it's given and never validates. `wiltech-labs-organization` (py-libraries) is the Python
+  side: the same rules, and this package's item shape.
+- **People are not nodes** (the user, 2026-11-15): an occupancy is a person holding a job for a
+  date range. Since 1.0.1 it travels on the job (`OrgItem.occupancies`, with `startDate`/
+  `endDate`); 1.0.0's `OCCUPANCY` items are still read (deprecated), a job's own list wins.
+- **Read-only.** `OrgItem.links` is carried through for the app to offer as actions (Crewly reads
+  them on `nodeSelect`).
 - **Department + reporting job = one card.** `buildOrgTree` absorbs the reporting job into its
   department and lifts the jobs filed under that job onto the department card.
 - **Depends on `ngx-api-client`, `ngx-auth`, `ngx-modals`** (all sanctioned) via `file:../x/dist`.

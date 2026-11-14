@@ -14,12 +14,12 @@ const meta: Meta<OrganizationChart> = {
   parameters: {
     docs: {
       description: {
-        component: `Org, entities, departments and jobs on a pan/zoom canvas, Material 3 styled. \`items\` is a flat, API-shaped array — each item points at its \`parentId\`, and an \`OCCUPANCY\` points at the \`JOB\` it fills; \`buildOrgTree()\` turns that into the drawn tree internally.
+        component: `Org, entities, departments and jobs on a pan/zoom canvas, Material 3 styled. \`items\` is a flat, API-shaped array — each item points at its \`parentId\`, and each \`JOB\` carries the people holding it in \`occupancies\` (people are not nodes); \`buildOrgTree()\` turns that into the drawn tree internally.
 
-- Exactly one \`ORG\` (\`parentId: null\`); \`ORG_ENTITY\` and \`DEPARTMENT\` nest under it or each other; \`JOB\`s sit under a department; \`OCCUPANCY\` sits under the job it fills and can repeat for the same \`personId\` across several jobs.
+- Exactly one \`ORG\` (\`parentId: null\`); \`ORG_ENTITY\` under the org or a department, never inside another entity; \`DEPARTMENT\` under the org, an entity or a department, to any depth; \`JOB\`s under a department only. The same \`personId\` can hold several jobs.
 - A \`DEPARTMENT\`'s head job (\`reportingJobId\`) draws merged into the department's own card.
 - Clicking a card emits \`nodeSelect\` — typically opened in an \`ngx-modals\` detail panel (modeless, \`backdrop: false\`), as shown in the real app wiring; these stories just log it to Actions.
-- A vacant job (no \`OCCUPANCY\`) still draws its card, empty.
+- A vacant job (no \`occupancies\`) still draws its card, empty.
 
 These are the same \`OrgItem[]\` arrays an app's own \`OrgChartStore\` would load from the API — the component itself never calls the API; that's the store's job (feature-local, see the package README).`,
       },
@@ -58,7 +58,7 @@ export const LargerOrg: Story = {
 export const VacantJobs: Story = {
   name: 'Vacant jobs',
   parameters: {
-    docs: { description: { story: 'Jobs with no `OCCUPANCY` still draw a card, empty.' } },
+    docs: { description: { story: 'Jobs with no `occupancies` still draw a card, empty.' } },
   },
   args: { items: VACANT_JOBS_ITEMS },
 };

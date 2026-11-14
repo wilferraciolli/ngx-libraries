@@ -8,6 +8,9 @@ export interface OrganizationText {
   head: string;
   reportsTo: string;
   occupiedBy: string;
+  /** Before the day someone started in a job they still hold: "Since 1 Mar 2026". Optional so
+   *  1.0.0 overrides still compile; falls back to the English default. */
+  since?: string;
   jobs: string;
   departments: string;
   zoomIn: string;
@@ -28,6 +31,7 @@ export const DEFAULT_ORGANIZATION_TEXT: OrganizationText = {
   head: 'Head',
   reportsTo: 'Reports to',
   occupiedBy: 'Held by',
+  since: 'Since',
   jobs: 'Jobs',
   departments: 'Departments',
   zoomIn: 'Zoom in',

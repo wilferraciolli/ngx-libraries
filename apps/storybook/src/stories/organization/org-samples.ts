@@ -1,4 +1,4 @@
-import type { OrgItem } from '@wiltech-labs/ngx-organization';
+import type { OrgItem, OrgOccupancy } from '@wiltech-labs/ngx-organization';
 
 function department(id: string, name: string, parentId: string, head: string): OrgItem[] {
   return [
@@ -11,13 +11,32 @@ function job(id: string, name: string, parentId: string): OrgItem {
   return { id, type: 'JOB', name, parentId };
 }
 
-function occupancy(jobId: string, personId: string, name: string): OrgItem {
-  return { id: `occ-${jobId}`, type: 'OCCUPANCY', name, parentId: jobId, personId };
+/** A person in a job, put on the job's `occupancies` by `withOccupancies`. */
+interface Holder {
+  holderOf: string;
+  occupancy: OrgOccupancy;
 }
 
-/** A flat API-style response: every item points at its parent, occupancies point at their job.
+function occupancy(jobId: string, personId: string, name: string): Holder {
+  return { holderOf: jobId, occupancy: { id: `occ-${jobId}`, personId, name, startDate: '2024-01-01' } };
+}
+
+/** Each job with the people holding it, the way the API sends them: people are not nodes. */
+function withOccupancies(entries: (OrgItem | Holder)[]): OrgItem[] {
+  const held = new Map<string, OrgOccupancy[]>();
+  for (const entry of entries) {
+    if ('holderOf' in entry) {
+      held.set(entry.holderOf, [...(held.get(entry.holderOf) ?? []), entry.occupancy]);
+    }
+  }
+  return entries
+    .filter((entry): entry is OrgItem => !('holderOf' in entry))
+    .map((item) => (item.type === 'JOB' ? { ...item, occupancies: held.get(item.id) ?? [] } : item));
+}
+
+/** A flat API-style response: every item points at its parent; each job carries the people holding it.
  *  Two people hold more than one job — Ada Lovelace heads both Board and Web. */
-export const SAMPLE_ITEMS: OrgItem[] = [
+export const SAMPLE_ITEMS: OrgItem[] = withOccupancies([
   {
     id: 'org',
     type: 'ORG',
@@ -48,10 +67,10 @@ export const SAMPLE_ITEMS: OrgItem[] = [
   ...department('finance', 'Finance', 'board', 'Chief Financial Officer'),
   occupancy('finance-head', 'p-katherine', 'Katherine Johnson'),
   job('accountant', 'Management Accountant', 'finance'),
-];
+]);
 
 /** A small org — one entity, two departments, a handful of jobs. */
-export const SMALL_ORG_ITEMS: OrgItem[] = [
+export const SMALL_ORG_ITEMS: OrgItem[] = withOccupancies([
   { id: 'org', type: 'ORG', name: 'Acme Ltd', parentId: null },
   ...department('eng', 'Engineering', 'org', 'VP Engineering'),
   occupancy('eng-head', 'p-1', 'Jordan Blake'),
@@ -59,10 +78,10 @@ export const SMALL_ORG_ITEMS: OrgItem[] = [
   occupancy('dev-1', 'p-2', 'Sam Okafor'),
   ...department('sales', 'Sales', 'org', 'VP Sales'),
   occupancy('sales-head', 'p-3', 'Priya Patel'),
-];
+]);
 
 /** Jobs with no occupancy at all — the vacant case. */
-export const VACANT_JOBS_ITEMS: OrgItem[] = [
+export const VACANT_JOBS_ITEMS: OrgItem[] = withOccupancies([
   { id: 'org', type: 'ORG', name: 'Acme Ltd', parentId: null },
   ...department('eng', 'Engineering', 'org', 'VP Engineering'),
   // The head role itself is vacant — no occupancy for eng-head.
@@ -70,10 +89,10 @@ export const VACANT_JOBS_ITEMS: OrgItem[] = [
   occupancy('dev-1', 'p-2', 'Sam Okafor'),
   job('dev-2', 'Software Engineer', 'eng'),
   job('dev-3', 'Software Engineer', 'eng'),
-];
+]);
 
 /** A deeper reporting line: entity → department → department → department → job. */
-export const DEEP_TREE_ITEMS: OrgItem[] = [
+export const DEEP_TREE_ITEMS: OrgItem[] = withOccupancies([
   { id: 'org', type: 'ORG', name: 'Globex Corporation', parentId: null },
   { id: 'emea', type: 'ORG_ENTITY', name: 'Globex EMEA', parentId: 'org' },
   ...department('product', 'Product', 'emea', 'Chief Product Officer'),
@@ -84,4 +103,4 @@ export const DEEP_TREE_ITEMS: OrgItem[] = [
   occupancy('infra-head', 'p-3', 'Diego Ruiz'),
   job('infra-eng', 'Infrastructure Engineer', 'infra'),
   occupancy('infra-eng', 'p-4', 'Yuki Tanaka'),
-];
+]);

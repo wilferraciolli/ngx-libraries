@@ -1,7 +1,7 @@
 import type { OrgChartNode } from 'ngx-interactive-org-chart';
 
 import type { OrgCard } from '../models/org-chart-node.model';
-import type { OrgItem } from '../models/org-item.model';
+import type { OrgItem, OrgOccupancy } from '../models/org-item.model';
 
 /** Jobs first (they report to the card above), then entities and departments. */
 const ORDER: Record<string, number> = { JOB: 0, ORG_ENTITY: 1, DEPARTMENT: 2 };
@@ -9,7 +9,8 @@ const ORDER: Record<string, number> = { JOB: 0, ORG_ENTITY: 1, DEPARTMENT: 2 };
 /**
  * Turns the API's flat item list into the nested tree the chart draws. Each department absorbs its
  * reporting job; jobs filed under that reporting job are shown under the department card, since the
- * two are one card. Occupancies are attached to their job. Returns `null` without an `ORG`.
+ * two are one card. Each job shows the first of its `occupancies` (or, from a 1.0.0 response, the
+ * first `OCCUPANCY` item under it). Returns `null` without an `ORG`.
  *
  * Cards deeper than `expandedDepth` levels below the organization start collapsed.
  */
@@ -21,15 +22,23 @@ export function buildOrgTree(
   if (!root) return null;
 
   const childrenOf = new Map<string, OrgItem[]>();
-  const occupancyOf = new Map<string, OrgItem>();
+  const occupancyOf = new Map<string, OrgOccupancy>();
   const byId = new Map(items.map((item) => [item.id, item]));
   const reportingJobIds = new Set<string>();
 
   for (const item of items) {
     if (item.type === 'DEPARTMENT' && item.reportingJobId) reportingJobIds.add(item.reportingJobId);
+    const held = item.type === 'JOB' ? item.occupancies?.[0] : undefined;
+    if (held) occupancyOf.set(item.id, held);
     if (item.parentId === null) continue;
     if (item.type === 'OCCUPANCY') {
-      if (!occupancyOf.has(item.parentId)) occupancyOf.set(item.parentId, item);
+      if (!occupancyOf.has(item.parentId)) {
+        occupancyOf.set(item.parentId, {
+          id: item.id,
+          personId: item.personId ?? item.id,
+          name: item.name,
+        });
+      }
       continue;
     }
     const siblings = childrenOf.get(item.parentId) ?? [];

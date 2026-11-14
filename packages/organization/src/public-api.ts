@@ -2,7 +2,12 @@
 
 export { OrganizationChart } from './lib/components/organization-chart/organization-chart';
 
-export type { OrgItem, OrgItemType, OrgNodeType } from './lib/models/org-item.model';
+export type {
+  OrgItem,
+  OrgItemType,
+  OrgNodeType,
+  OrgOccupancy,
+} from './lib/models/org-item.model';
 export type { OrgCard } from './lib/models/org-chart-node.model';
 
 export { OrgChartStore } from './lib/stores/org-chart.store';

@@ -1,7 +1,7 @@
 {
   "name": "@wiltech-labs/ngx-organization",
-  "version": "1.0.0",
-  "description": "Shared Angular org chart — organization, org entities, departments and jobs on a pan/zoom canvas, Material 3 styled, with a node detail side panel.",
+  "version": "1.0.1",
+  "description": "Shared Angular org chart — organization, org entities, departments and jobs on a pan/zoom canvas, themed from the app's Material tokens, with a node detail side panel.",
   "license": "Apache-2.0",
   "sideEffects": false,
   "dependencies": {

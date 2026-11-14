@@ -3,6 +3,7 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  Injector,
   afterNextRender,
   computed,
   inject,
@@ -126,6 +127,9 @@ export class OrganizationChart {
   public readonly nodeSelect = output<OrgItem>();
 
   private readonly modals = inject(ModalService);
+  /** The panel is created with the chart's injector, so what the page provides (a translated
+   *  NGX_ORGANIZATION_TEXT, say) reaches it too. */
+  private readonly injector = inject(Injector);
   private readonly resolveText = inject(NGX_ORGANIZATION_TEXT);
   private readonly chart = viewChild(NgxInteractiveOrgChart);
 
@@ -204,6 +208,7 @@ export class OrganizationChart {
       backdrop: false,
       minimizable: true,
       data: card,
+      injector: this.injector,
     });
     this.panel = panel;
     panel.afterOpened().subscribe(() => this.keepClearOfPanel(card.item.id, panel.id));
