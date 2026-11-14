@@ -22,9 +22,10 @@ and that's correct, not a gap.
   mixins.
 - `src/_spacing.scss` — 4px-unit `space()` function, responsive padding
   steps.
-- `src/_ui.scss` — M3 mixins (`page-title`, `section-title`,
-  `supporting-text`, `banner`, `state-layer`, `focus-ring`, `fab-position`,
-  `empty-state`, `filled-icon-button`, `danger-button`). Everything reads
+- `src/_ui.scss` — mixins in the house look, Ink & Signal (`page-title`,
+  `section-title`, `supporting-text`, `banner`, `state-layer`, `focus-ring`,
+  `fab-position`, `empty-state`, `filled-icon-button`, `danger-button`, `list`,
+  `list-row`, `panel`, `badge`, `badge-tone`). Everything reads
   `--mat-sys-*` tokens (emitted by the consuming app's own `mat.theme()`
   call) — never a hardcoded colour/type/shape value.
 - `src/theme-colors.template.scss` — **not** `@use`-able from

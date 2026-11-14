@@ -3,6 +3,46 @@
 Working notes on what's outstanding across the monorepo. Not published anywhere, just a
 scratchpad so we don't lose track between sessions. Update as items land or priorities shift.
 
+## `ngx-organization` 1.0.1: people hold jobs for a time, not as nodes — built 2026-11-15, not published
+
+- The user's rules (2026-11-15): one organization at the top; org entities under it or under a
+  department, never inside another entity; departments under the org, an entity or a department
+  to any depth; jobs under departments only. "People and occupancies are not organisation nodes":
+  a person occupies a job for a date range.
+- `OrgItem.occupancies` (on a `JOB`): `OrgOccupancy` `{ id, personId, name, startDate, endDate,
+  links }`, the people holding it on the chart's date (the API picks it). The card shows the
+  first; the panel adds "Since 1 Mar 2026" or "1 Mar – 31 Aug 2026" (`NGX_ORGANIZATION_TEXT.since`,
+  optional so 1.0.0 overrides compile; dates in the page's `lang`).
+- The detail panel opens with the chart's injector (`ngx-modals`' `injector`), so a page-level
+  `NGX_ORGANIZATION_TEXT` (a translation) reaches it; in 1.0.0 the panel stayed English.
+- 1.0.0's `OCCUPANCY` items are still read (deprecated); a job's own `occupancies` win.
+  `OrgCard.occupancy` is now an `OrgOccupancy`.
+- Docs: the rules table in the README and `OrgItem`'s doc comment ("at most one reporting job",
+  not "exactly one"). Showcase and Storybook samples send the new shape.
+- Python side: new `wiltech-labs-organization` 1.0.0 (py-libraries), the same rules and this shape.
+- Needed by Crewly's org chart (Admin → Org chart), which installs 1.0.1 from a local build
+  (`npm i --no-save`) until it's on npm.
+- [ ] Publish 1.0.1; Crewly: `npm i @wiltech-labs/ngx-organization@^1.0.1` to record it.
+
+## `ngx-styles` 1.0.2: the `ui` mixins in the Ink & Signal look — published 2026-11-15
+
+- 1.0.2 was already bumped (the logo, unpublished); these ride along in it.
+- `panel` and `list`: a white surface (`surface-container-lowest`) with a 1px
+  `outline-variant` hairline, instead of the tonal `surface-container-low` fill. In the house
+  stylesheet those are `--surface` and `--line`; an app still on stock M3 gets the same shapes in
+  its own palette.
+- `focus-ring`: 2px `--mat-sys-primary`, 2px away (was 3px secondary), matching the house
+  stylesheet's global `:focus-visible`.
+- `page-title`: headline-medium on phones, headline-large from `sm` (was small/medium), the
+  conventions' page-title size.
+- `badge`: a pill (`corner-full`); neutral is `surface-container-high` with `on-surface` text.
+  New `badge-tone($tone)` sets the colours alone, so a badge's status variants stop re-emitting
+  the whole shape (Crewly's stylesheets went back under the 4 kB budget with it).
+- Needed by Crewly's move to Ink & Signal (2026-11-14), which carries a `TEMPORARY` copy in
+  `crewly-ui/src/styles/_ui.scss` (first on its Sass include path).
+- [x] Published 1.0.2 (2026-11-15); Crewly depends on `^1.0.2` and its copy is deleted.
+- [ ] Mention `badge-tone` in the conventions' "Shared SCSS mixins" when that doc is next edited.
+
 ## `ngx-ai-tools` 1.1.0: `AiGenerate` + pluggable generator — built 2026-11-12, not published
 
 - First piece of a reusable "write a post with AI" flow, for producing social/article content

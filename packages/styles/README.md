@@ -1,8 +1,10 @@
 # @wiltech-labs/ngx-styles
 
-Shared Material 3 Sass partials: a breakpoint scale, a spacing scale, and
-design-system mixins (`page-title`, `banner`, `state-layer`, `focus-ring`, `list`/`list-row`,
-`panel`, `badge`, ...) that read `--mat-sys-*` tokens. Ships raw `.scss` — no compile step,
+Shared Sass partials for the Wiltech house look (Ink & Signal): a breakpoint scale, a spacing
+scale, and design-system mixins (`page-title`, `banner`, `state-layer`, `focus-ring`,
+`list`/`list-row`, `panel`, `badge`/`badge-tone`, ...) that read `--mat-sys-*` tokens. Panels and
+lists are white surfaces with a hairline outline, badges are pills, the focus ring is 2px in the
+primary colour. Ships raw `.scss` — no compile step,
 no `ng-packagr`, no TypeScript. See this package's `CLAUDE.md` for why.
 
 ## Setup

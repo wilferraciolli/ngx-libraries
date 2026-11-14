@@ -5,11 +5,11 @@ of project-specific names/paths. Copy this file into another Angular app
 and adjust the concrete mixin/store names to that app's domain.
 
 Assumes: Angular (standalone components, no NgModules), Signals API,
-Angular Material + CDK (Material 3 theme), Vitest, Prettier, SCSS.
+Angular Material + CDK (for controls, themed to the house look), Vitest, Prettier, SCSS.
 
-**Starting a new app?** Read "Design system: Material 3" — it is a complete
-starter kit (palette, shared partials, shell, screen recipes) that makes every
-app look and behave the same.
+**Starting a new app?** Read "Design system: Ink & Signal": one stylesheet and two
+fonts give it the house look, and the `impeccable` skill and `frontend-design` plugin
+design its screens from there.
 
 ## Design tooling
 
@@ -51,8 +51,9 @@ commands) — generate those from this project's own code rather than
 copying another project's, since they capture _this_ app's product intent
 and existing visual language.
 
-Whichever design skill you use, the "Design system: Material 3" section below is
-the brief: it wins over a skill's generic aesthetic defaults.
+These two lead the design of a screen. "Design system: Ink & Signal" below gives them the
+house look to start from and a floor to keep (accessibility, spacing, tokens, minimal copy);
+it does not overrule a direction they set, or the app's own `DESIGN.md`.
 
 ## Core rules
 
@@ -147,8 +148,8 @@ into the main chunk.
 Recurring building blocks — API client, forms, loaders, charts, AI surfaces,
 websockets — are published as standalone Angular libraries on npm under the
 `@wiltech-labs` scope. Apps install them instead of keeping local copies. The
-libraries are built to this document's rules (standalone, signals, M3 tokens,
-the SCSS naming rule), so using one never reopens a design decision.
+libraries are built to this document's rules (standalone, signals, theme tokens,
+the SCSS naming rule), so they take on the app's look and theme with no configuration.
 
 Each package's `README.md` is its API reference. This section covers _when_
 to use which package and the rules for using it in an app.
@@ -198,7 +199,7 @@ covers yet: propose it as a new package or an addition to an existing one.
 | Expandable section / static card              | `ngx-components`      | `Panel` (`mat-expansion-panel`), `Card` (`mat-card`)                                                                                                   | Hand-written `mat-expansion-panel`/`mat-card` header markup per app                                  |
 | Day / week / month calendar                   | `ngx-calendar`        | `Calendar`, `CalendarEvent`, `CalendarEventMapper`                                                                                                     | Direct FullCalendar / angular-calendar use, an app-local agenda list                                 |
 | Org chart                                     | `ngx-organization`    | `OrganizationChart`, `OrgItem`, `OrgChartStore`                                                                                                        | Hand-drawn org trees, direct org-chart library use                                                   |
-| Shared Sass (breakpoints, spacing, M3 mixins) | `ngx-styles`          | `@use 'breakpoints'`/`'spacing'`/`'ui'` from `stylePreprocessorOptions.includePaths`                                                                   | A `src/styles/_breakpoints.scss`/`_spacing.scss`/`_ui.scss` copy-pasted per app                      |
+| Shared Sass (breakpoints, spacing, UI mixins) | `ngx-styles`          | `@use 'breakpoints'`/`'spacing'`/`'ui'` from `stylePreprocessorOptions.includePaths`                                                                   | A `src/styles/_breakpoints.scss`/`_spacing.scss`/`_ui.scss` copy-pasted per app                      |
 
 ### Setup
 
@@ -238,8 +239,8 @@ provideAuth({                                                // ngx-auth
   "Environment config"); never hardcode them.
 - `provideCharts` comes from `ng2-charts`, so add `ng2-charts` as a direct
   dependency of the app. Don't rely on it arriving through `ngx-graphs`.
-- `ngx-forms` fields are Angular Material components and take the house M3 theme
-  from "Design system: Material 3". Skip the prebuilt-theme import in the
+- `ngx-forms` fields are Angular Material components and take the app's theme
+  from "Design system: Ink & Signal". Skip the prebuilt-theme import in the
   package README; that's for apps without their own theme.
 - `ngx-translations` needs at least `locales`/`defaultLocale` plus `dictionaries` or a
   `loader` — see "`ngx-translations`" below.
@@ -272,11 +273,10 @@ provideAuth({                                                // ngx-auth
 - **Material-based packages** (`ngx-forms`) inherit the app theme directly.
 - **Material-free packages** (`ngx-media`, `ngx-ai-tools`, `ngx-graphs`,
   `ngx-web-sockets`) read `--ngx-*` custom properties that default to the
-  matching `--mat-sys-*` role. In an M3 app they are correct in light and dark
-  with no configuration. Set an `--ngx-*` variable only for a genuine one-off,
+  matching `--mat-sys-*` role, which the house stylesheet points at the brand tokens. They
+  follow the app's look and every theme with no configuration. Set an `--ngx-*` variable only for a genuine one-off,
   and only to a token (`--ngx-chat-bubble-self-background: var(--mat-sys-tertiary-container);`),
-  never a hex value. Rule 1 ("tokens, never values") applies to these variables
-  too.
+  never a hex value: a theme has to be able to change it.
 - **Library class names follow "Component SCSS class naming"**
   (`.CardLoader-header`, `.ChatMessageBubble.is-self`). Don't restyle a library
   component's internals from an app stylesheet. If you need to, an input or an
@@ -336,7 +336,7 @@ provideAuth({                                                // ngx-auth
 - The fields already use `appearance="outline"` and `subscriptSizing="dynamic"`
   and render their own label, hint and errors. Don't wrap them in another
   `mat-form-field`.
-- Short forms still sit in the tonal panel recipe (section 5). The panel is the
+- The surface a form sits on (a white panel with a hairline, a step card) is the
   app's; the fields are the library's.
 - Date/time fields display and parse in `dateTimeConfig.locale`, falling back to
   `NGX_FORMS_LOCALE` when a field doesn't set one — provide it in `app.config.ts`
@@ -346,11 +346,11 @@ provideAuth({                                                // ngx-auth
 
 **`ngx-graphs`**
 
-- Decide the form first (the "Insights / charts" recipe: KPI row, chart per
-  metric, small multiples), then pick the component.
+- Decide the form first (a few key numbers, a chart per metric, small multiples),
+  then pick the component.
 - Describe data with `graphConfig()` or `pointGraphConfig()`. Don't pass chart.js
   options or colours from the app. The library applies the chart recipe as its
-  defaults: marks in `--app-chart-1`, grid and text from M3 tokens, no legend
+  defaults: marks in `--app-chart-1`, grid and text from the theme's tokens, no legend
   for a single series, an `aria-label` summary and a table view. A canvas can't
   read CSS variables, so the library resolves the tokens at render time and
   redraws when the colour scheme changes.
@@ -386,10 +386,10 @@ provideAuth({                                                // ngx-auth
   - **AI interaction surfaces**, where the user asks the AI something or reads
     its answer, use this package: `AiTextBox` for the prompt, `AiButton` to run
     it, `AiPanel` around the result, and `AiSparkleIcon` to mark it. The
-    gradient's stops default to M3 tokens, so it follows the theme and dark
-    mode.
-- `AiButton` counts as the view's filled button (rule 4). Don't put a second
-  filled button beside it.
+    gradient's stops default to the theme's tokens, so it follows the brand colours and
+    every theme.
+- `AiButton` counts as the view's primary button. Don't put a second filled button
+  beside it.
 - `AiTextBox` needs a `label` (its accessible name); the placeholder isn't one.
 - Generating content from a prompt: `AiGenerate`, with the app's generator wired once via
   `provideAiGenerator(() => ...)`. The generator calls the app's own backend, which holds the AI
@@ -403,7 +403,7 @@ provideAuth({                                                // ngx-auth
   on it; never create a second connection per feature.
 - `connected` is a signal. Event streams are `Observable`s; subscribe with
   `takeUntilDestroyed()`.
-- `ChatRoom` implements the "Chat / composer" recipe. It fills the height it's
+- `ChatRoom` is the chat thread and its composer. It fills the height it's
   given (`--ngx-chat-height`, 400px by default; `100%` inside a fixed-height
   shell). To switch rooms, render a fresh instance behind `@if`; don't change
   `roomName` on a live one.
@@ -577,13 +577,12 @@ provideAuth({                                                // ngx-auth
 - Not a component/service package — pure Sass, no `ng-packagr` build, no `app.config.ts` provider.
   Add `node_modules/@wiltech-labs/ngx-styles/src` to `angular.json`'s
   `stylePreprocessorOptions.includePaths`, then `@use 'breakpoints'`/`'spacing'`/`'ui'` from any
-  stylesheet — same partials this doc's own Foundations section embeds, just resolved from
-  `node_modules` instead of a local `src/styles` copy.
-- `theme-colors.template.scss` is a starting seed to copy into your own
-  `src/styles/_theme-colors.scss` and regenerate (`ng generate @angular/material:theme-color`), not
-  a shared partial — a brand palette is per-app, unlike the breakpoint/spacing/mixin logic.
+  stylesheet, resolved from `node_modules` instead of a local `src/styles` copy.
+- `theme-colors.template.scss` belongs to the earlier Material 3 look (a generated palette). A
+  new app doesn't need it: its colours are the brand tokens in `styles.scss` ("Design system:
+  Ink & Signal", sections 3 and 4).
 - `ui.state-layer` reads `--app-duration-short`/`--app-ease-standard` — set these yourself in your
-  own `styles.scss` `:root` (see the Foundations `styles.scss` embed above); the package doesn't
+  own `styles.scss` `:root` (the house `styles.scss` in "Design system: Ink & Signal" does); the package doesn't
   define them since they're app-owned motion constants, not `--mat-sys-*` tokens.
 
 ### Migrating an existing app
@@ -653,7 +652,24 @@ means, not by what the picker looks like:
 
 ## Authentication (Clerk)
 
-Clerk is the auth provider. One gotcha hits every new app that reaches for
+Clerk is the auth provider, and **every app reuses one Clerk instance and one JWT template**, so a
+new app needs nothing new in Clerk and one account signs in everywhere:
+
+| | Value |
+| --- | --- |
+| Instance | `one-python-4861.clerk.accounts.dev` |
+| Publishable key (`environment.clerkPublishableKey`) | `pk_test_b25lLXB5dGhvbi00ODYxLmNsZXJrLmFjY291bnRzLmRldiQ` |
+| JWT template (`environment.clerkJwtTemplate`) = the API's `CLERK_AUDIENCE` | `wiltech-dev-api` |
+| JWKS the API verifies against (`CLERK_JWKS_URL`) | `https://one-python-4861.clerk.accounts.dev/.well-known/jwks.json` |
+
+The template carries `name` and `email`. An app that needs another claim (roles,
+`email_verified`) adds it to the shared template, since the other apps ignore claims they don't
+read, and treats it as optional in code. Because any account on the instance gets a valid token
+for any app, an app that must not be open to all of them checks who the caller is (a list of
+allowed addresses, a role, a membership), never just "signed in". Add each deployed UI's address
+to the instance's allowed origins. The publishable key is public: it belongs in the bundle.
+
+One gotcha hits every new app that reaches for
 `@clerk/clerk-js`'s embedded UI:
 
 - **Never call `clerk.mountSignIn()` / `mountUserButton()` / any other
@@ -731,736 +747,257 @@ mounted/embedded sign-in widget on a route — see above.
 - These files hold non-secret config only (base URLs, feature flags) — no
   API keys or credentials, since they ship in the client bundle.
 
-## Design system: Material 3
+## Design system: Ink & Signal
 
-Every app built from these conventions looks and behaves the same: the
-[Material 3](https://m3.material.io) (M3) design language, implemented with
-Angular Material's M3 theme, a house palette, one adaptive shell and a small set
-of shared SCSS mixins. **This section is a complete starter kit** — the
-guidelines, the full source of every shared partial, the shell, recipes for the
-common screens, and the gotchas. Copy the files, follow the rules, and a new app
-comes out consistent with no design decisions left to make.
+The house look is **Ink & Signal**, first built in insurly: warm paper, near-black ink, hairlines
+instead of shadows, one interaction colour and one accent, Space Grotesk headings over Inter. It
+replaced a stock Material 3 look (Roboto, tonal surfaces, generated palettes) in November 2026,
+because every app built from that came out looking like a settings screen.
 
-Where this section and a generic "make it distinctive" instinct disagree, this
-section wins: M3 is the brief. Spend originality on content, copy and one
-memorable moment per screen, not on new colours, radii or components.
+This section is deliberately short. It gives a new app a **starting look** (one stylesheet and two
+fonts), says how **themes** work, and sets a **floor** that every screen meets. It does not decide
+the design of your screens: that is the job of the app's own `PRODUCT.md` and `DESIGN.md`, worked
+out with the `impeccable` skill and the `frontend-design` plugin (see "Design tooling").
 
-The source of truth is the working app (`src/styles.scss`, `src/styles/_ui.scss`,
-`src/app/shared/…`); the code blocks below are copies, each wrapped in
-`<!-- embed: path -->` markers. After changing one of those files run
-`npm run docs:sync` and commit the doc with it; `npm run docs:check` fails when
-the doc has drifted (run it before committing). When you copy this file into a
-new app, copy `scripts/sync-conventions.mjs` and the two npm scripts with it.
+### 1. Who decides what
 
-### 1. The rules
+In this order, the first that speaks wins:
 
-1. **Tokens, never values.** Colour, type, shape, elevation and state layers come
-   from the `--mat-sys-*` variables emitted by `mat.theme()`. No hex codes, no
-   raw pixel radii (`--mat-sys-corner-*`), no ad hoc shadows, no `rgba()` greys.
-   (Two exceptions: categorical data colours such as a tag dot, and overlays that
-   sit on top of photos/video.)
-2. **Roles carry meaning; use pairs.** Always pair a container with its `on-`
-   colour (`surface-container-low` + `on-surface`, `primary-container` +
-   `on-primary-container`). That is what makes light and dark both work. Don't
-   spend a role on decoration.
-3. **Depth is tonal.** Separate surfaces by picking a `surface-container-*` step,
-   not by adding a shadow. Built-in shadows (FAB, menus, dialogs, the modal
-   drawer at `level1`) are the only ones.
-4. **One filled button per view.** Filled = the primary action; tonal = the
-   secondary; text = the tertiary; outlined = a neutral alternative (rare).
-   A page's _create_ action is a FAB. Rarely-used actions go in an overflow menu.
-5. **Lists are one grouped surface** with a hairline between rows — never a
-   stack of identical bordered cards.
-6. **Navigation is adaptive** (see section 4): modal drawer on compact windows,
-   rail from medium up. Destinations are declared once.
-7. **Mobile first, then widen.** Base styles are the phone; `bp.up()` layers on
-   the rest. Content is capped at `--app-page-max-width`.
-8. **Motion answers the user or marks a route change.** Nothing animates on its
-   own. Everything respects `prefers-reduced-motion`.
+1. **The app's `PRODUCT.md` and `DESIGN.md`.** An app that has its own brand colour, typeface,
+   layout or signature component uses it. Record it in `DESIGN.md` so the next screen matches.
+2. **The design direction for the surface**, from `/impeccable` (`shape`, new work, `critique`,
+   `polish`...) or the `frontend-design` plugin. Let them make the screen distinctive: an
+   unexpected layout, a signature component, one authored moment of motion. Nothing in this
+   section is a reason to turn that down.
+3. **The house look below**, as the default when nothing above says otherwise. A new app that
+   only changes the brand colour still looks like part of the family.
+4. **The floor** (section 6) always applies, whatever the look: accessibility, spacing, tokens,
+   responsiveness, minimal copy, the shared libraries.
 
-#### Colour roles — what goes where
+"Looks like the rest of the family" is a default, not a goal. A screen that is clearer or better
+looking than the house look, and meets the floor, is right.
 
-| Role                                               | Use                                                                                                                                                                                                               |
-| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `surface`                                          | Page background, top app bar, rail                                                                                                                                                                                |
-| `surface-container-low`                            | Grouped lists, tonal panels (forms), tiles, feed cards, modal drawer                                                                                                                                              |
-| `surface-container`                                | Top app bar once scrolled; code/tool output; nested lists inside a panel                                                                                                                                          |
-| `surface-container-high`                           | The other party's chat bubble                                                                                                                                                                                     |
-| `on-surface`                                       | Primary text and icons                                                                                                                                                                                            |
-| `on-surface-variant`                               | Secondary text, inactive icons, meta lines, supporting copy                                                                                                                                                       |
-| `outline`                                          | Field and chip borders, footer version marker                                                                                                                                                                     |
-| `outline-variant`                                  | Hairlines between list rows, tab underline, dividers                                                                                                                                                              |
-| `primary`                                          | Filled buttons, links, the selected check, active tab indicator                                                                                                                                                   |
-| `primary-container` / `on-primary-container`       | Avatars, icon wells, the user's chat bubble                                                                                                                                                                       |
-| `secondary-container` / `on-secondary-container`   | Selected nav indicator, secondary avatars                                                                                                                                                                         |
-| `tertiary-container` / `on-tertiary-container`     | The one semantic accent (in this house style: static AI markers such as nav destinations and badges, and "Owner" badges). AI _interaction_ surfaces use `ngx-ai-tools`, whose gradient is built from these tokens |
-| `error` / `error-container` / `on-error-container` | Failures, banners, overdue, destructive actions                                                                                                                                                                   |
-| `--app-chart-1` (app token, not M3)                | Chart marks only: bars, lines, dots. Never text. `ngx-graphs` reads it, so every chart picks it up                                                                                                                |
-| `scrim`                                            | Modal scrim at 32%                                                                                                                                                                                                |
+### 2. The look
 
-#### Type — which token for which job
+- **Warm neutrals.** The page is warm paper, text is a warm near-black, secondary text a warm
+  grey. No cool grey, no pure black.
+- **Lifted surfaces are white**, on the paper: cards, fields, menus. That contrast, not a tonal
+  step, is what separates content from page.
+- **Hairlines, not shadows.** Structure is a 1px sand line. One soft shadow is spent on the
+  surface the person is working on, and nowhere else.
+- **Two signals.** The brand colour means "you can act here": links, the primary button, focus,
+  the selected option. The accent has one meaning per app (in insurly, "this is done") and
+  covers very little of a screen.
+- **Space Grotesk at 600 with tight tracking** for headings, labels and any number read as
+  information; **Inter** for everything read in sentences.
+- **Soft rectangles.** 14px on cards, 10px on controls, a full pill on stand-alone buttons.
+- **Chrome is hand-built**, on the brand tokens: the bar, navigation, landing and hero areas,
+  signature components. **Angular Material is for controls**: fields, selects, buttons, chips,
+  menus, dialogs, progress. It is themed to match, never restyled from inside a component.
+- **Light by default.** Dark is a theme an app chooses to offer (section 4), not a requirement.
 
-Use `font: var(--mat-sys-…)` (which sets size, weight and line-height together)
-plus the matching `letter-spacing: var(--mat-sys-…-tracking)`. The mixins below
-wrap the common ones.
+What made the old look dated, so you can spot it coming back: thin 400-weight headings in a
+default face, pale tonal containers generated from a palette, grey-on-grey surfaces with no
+white, a hint under every field and a subtitle under every title.
 
-| Job                                   | Token                                                          |
-| ------------------------------------- | -------------------------------------------------------------- |
-| Hero headline                         | `headline-large` compact, `display-small` from medium up       |
-| Page title (`h1`)                     | `ui.page-title` = `headline-small` → `headline-medium`         |
-| Section / tile / panel title          | `title-large` (`ui.section-title`); denser rows `title-medium` |
-| Body text, list primary line          | `body-large` (default on `body`)                               |
-| Supporting text, list secondary line  | `body-medium`, `on-surface-variant` (`ui.supporting-text`)     |
-| Meta, timestamps, captions            | `body-small` or `label-large` at weight 400                    |
-| Buttons, tabs, chips, links-as-labels | `label-large`                                                  |
-| Rail captions, badges                 | `label-medium` / `label-small`                                 |
+### 3. Foundations
 
-Brand face (Roboto Flex) is used automatically for display/headline/title; plain
-face (Roboto) for body/label. Keep running text to ~65 characters
-(`max-width: 65ch`), sentence case everywhere, never ALL CAPS labels.
+Angular 22, SCSS, standalone; `npm i @angular/material @angular/cdk @wiltech-labs/ngx-styles`.
 
-#### Shape — which corner for which surface
+**`angular.json`** → `build.options`:
 
-| Token                | px   | Use                                                                          |
-| -------------------- | ---- | ---------------------------------------------------------------------------- |
-| `corner-extra-small` | 4    | Text fields (built in), focus-ring radius, the small corner of a chat bubble |
-| `corner-small`       | 8    | Chips, suggestion chips, badges, small hover backgrounds                     |
-| `corner-medium`      | 12   | Banners, code blocks, the media picker, small icon wells                     |
-| `corner-large`       | 16   | Lists, tonal panels, tiles, feed cards, chat bubbles, FAB, drawer end        |
-| `corner-extra-large` | 28   | Dialogs (built in), large empty-state icon wells                             |
-| `corner-full`        | pill | Buttons (built in), avatars, the rail indicator, nav rows                    |
+```json
+"styles": ["src/styles.scss"],
+"stylePreprocessorOptions": {
+  "includePaths": ["src/styles", "node_modules/@wiltech-labs/ngx-styles/src"]
+}
+```
 
-Prefer logical corner properties for asymmetric radii
-(`border-radius: var(--mat-sys-corner-large); border-end-end-radius: var(--mat-sys-corner-extra-small);`)
-— shorter than a four-value shorthand, which matters for the component style
-budget (see gotchas).
-
-#### Spacing, touch and layout
-
-- Two spaces between components, as Sass tokens in `src/styles/_space.scss`
-  (`@use 'space';`): `space.$group` (20px) between things that belong together (a
-  form's fields, the cards of a list, the blocks of a panel, a section heading and its
-  content) and `space.$section` (40px) between things that don't (a page's header, its
-  panels, its lists). A page root and every panel holding more than one block are flex
-  columns with one of the two as their `gap`; nothing adds margins on top. Compile-time
-  values keep component CSS inside its budget; `styles.scss` also emits them as
-  `--app-space-group`/`--app-space-section`, and `ngx-forms` spaces fields by
-  `--ngx-form-gap`, set to the group space.
-- Controls belong with the block they act on: a filter, a date range, a period or week
-  picker, the page's create button, tabs. Give a page-level control row the global
-  `App-controls-above` class (or `App-controls-below` when it follows its block, like
-  an empty state's next step), and it sits a group's space from that block instead of
-  the section's.
-- A page's header has no padding above or below it: the shell's gutter is the space over the
-  title, and the page's `gap` the space under it, so titles sit at one height on every page.
-- Group before you space: a page is a few groups a section apart (a record's state with its
-  actions, its numbers, its list), each a flex column with the group space inside. Seven blocks
-  all a section apart read as seven unrelated things.
-- A list row's actions sit under its text on a phone and on the row's own line from `md` up
-  (`flex-flow: row wrap`, with a reason form or an error taking a full line beneath).
-- A long form flows into columns once there is room: set `--ngx-form-columns` (`ngx-forms`
-  1.0.7+) on the `<ngx-dynamic-form>` from a breakpoint up, and order the fields so each row
-  reads as a group (first name and surname; a contact's name, relationship and phone).
-- Render nothing rather than an empty element in a stack: an empty list or component
-  still takes a `gap` on each side and doubles the space (`@if (rows().length > 0)`
-  around the `<ul>`).
-- Inside a component (a title and its line, an icon and its label, a badge beside a
-  name) spacing stays tight on the 4px grid (`spacing.space(n)`, 2–8px). Buttons side
-  by side are 8px apart. Page gutter 16px on compact, 24px from medium up.
-- Touch targets ≥ 48px (icon buttons are 48; list rows ≥ 56, two-line rows 72).
-- Window size classes = the `bp` breakpoints: compact < `sm` (600), medium ≥ `sm`,
-  expanded ≥ `md` (840), large ≥ `lg` (1200).
-
-#### Motion
-
-- Easing tokens: `--app-ease-standard` (on-screen movement), `--app-ease-decelerate`
-  (things entering), `--app-ease-accelerate` (things leaving).
-- Durations: `--app-duration-short` 200ms (state changes, exits),
-  `--app-duration-medium` 300ms (entrances, the drawer).
-- Route change = **fade through** (view transitions): old screen 90ms out, new one
-  210ms in with a slight scale. Persistent chrome (app bar, rail) carries its own
-  `view-transition-name` so only the content region moves.
-- The global `prefers-reduced-motion` rule in `styles.scss` neutralises all of it.
-- One deliberate exception to "nothing animates on its own": the rotating gradient
-  border on `ngx-ai-tools` surfaces, which marks AI at work. It also stops under
-  reduced motion. Don't add others.
-
-#### Accessibility floor
-
-- Visible keyboard focus on everything interactive: Material components draw
-  their own; custom elements use `ui.focus-ring`.
-- Current destination: `routerLinkActive` + `ariaCurrentWhenActive="page"`.
-- Icon-only buttons need `aria-label` **and** `title`. `<mat-icon>` is
-  `aria-hidden` by default — never put meaning only in an icon.
-- Errors `role="alert"`; progress/results `role="status"`; live lists
-  `aria-live="polite"`.
-- Modal drawer: `role="dialog" aria-modal="true"`, focus trapped and restored,
-  Escape closes it, scrim click closes it.
-- Landmarks: `header` (app bar), `nav aria-label="Main"`, `main`, `section`
-  with a heading or `aria-label`.
-- Colour contrast comes free from using role pairs — another reason not to invent
-  colours.
-
-#### Copy
-
-- Sentence case. Buttons name the action: **Save**, **New todo**, **Delete** —
-  not Submit/OK. The same word runs through the flow (Delete → confirm "Delete").
-- Empty states say what to do next ("No todos here yet. Use New todo to add
-  one."). Errors say what happened and what to try, in the interface's voice, and
-  don't apologise.
-- No unnecessary eyebrow labels above headings; no `→` appended to links.
-
-### 2. Set up a new app
-
-1. Angular 22 app, SCSS, standalone. `npm i @angular/material @angular/cdk`.
-   In Claude Code, install the design plugin if this machine doesn't have it yet:
-   `/plugin install frontend-design@claude-plugins-official` (see "Design tooling").
-2. In `angular.json` → `build.options`: `"stylePreprocessorOptions": { "includePaths": ["src/styles"] }`
-   and `"styles": ["src/styles.scss"]`.
-3. Create `src/styles/_theme-colors.scss` — paste the generated palette below, or
-   regenerate it with
-   `ng generate @angular/material:theme-color --primary-color="#0A7E8C" --tertiary-color="#8A6D1C" --include-high-contrast=false --directory=src/styles/ --is-scss=true`
-   (mind the **trailing slash** on `--directory`: without it the file lands as
-   `src/styles_theme-colors.scss`; and the schematic refuses to overwrite an
-   existing file). **Keep the house seeds for a consistent family of apps;**
-   change them only for a genuinely different brand.
-4. Add `_breakpoints.scss`, `_spacing.scss`, `_ui.scss`, then `styles.scss`
-   (all below).
-5. Replace the `<head>` fonts in `src/index.html` (below).
-6. Add the three providers to `app.config.ts` (below), plus the providers of any
-   `@wiltech-labs/ngx-*` package the app uses (see "Shared libraries" → Setup).
-7. Add the shell: `shared/destinations.ts`, `shared/nav-menu`, `shared/nav-bar`,
-   `shared/profile-menu`, and `app.ts/html/scss` (section 4). Replace `AppName`,
-   the destination list, and — if you don't have Clerk/`CurrentUserStore` — the
-   two places that read the signed-in state and the admin link.
-8. Build screens from the recipes (section 5). Run the review checklist
-   (section 7) before merging a screen.
-
-### 3. Foundations — copy these files
-
-`src/index.html` `<head>`:
+**`src/index.html`** `<head>`:
 
 ```html
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<!-- Browser chrome follows the app's surface colour (neutral tone 98 light / 6 dark). -->
-<meta name="theme-color" content="#f6fafb" media="(prefers-color-scheme: light)" />
-<meta name="theme-color" content="#101415" media="(prefers-color-scheme: dark)" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<!-- Material Symbols is the M3 icon set; display=block keeps the ligature name from flashing as text. -->
+<link
+  href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
+  rel="stylesheet"
+/>
+<!-- Icons: Material Symbols, outlined; only the fill axis varies. display=block keeps the
+     ligature name from flashing as text. -->
 <link
   href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&display=block"
   rel="stylesheet"
 />
-<!-- M3 type: Roboto Flex for the brand roles (display, headline, title), Roboto for body and labels. -->
-<link
-  href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Flex:opsz,wght@8..144,400..700&display=swap"
-  rel="stylesheet"
-/>
 ```
 
-(The `theme-color` values are neutral tone 98 / 6 of the house palette — recompute
-them if you change the seeds.)
+and in `app.config.ts`:
+`{ provide: MAT_ICON_DEFAULT_OPTIONS, useValue: { fontSet: 'material-symbols-outlined' } }`.
 
-**Ask Material Symbols only for the axes you vary.** Each range multiplies the font: every
-axis at its full range (`20..48,100..700,0..1,-50..200`) is a 4.0 MB download, which
-`display=block` keeps every icon invisible behind. `styles.scss` fixes weight 400, grade 0 and
-optical size 24 and varies only fill (outlined, filled), so the request is `24,400,0..1,0`:
-0.46 MB (measured 2026-11-11). Widen an axis only when a style actually sets other values of it.
-
-`src/app/app.config.ts` — add to `providers`:
-
-```ts
-import { MAT_ICON_DEFAULT_OPTIONS } from '@angular/material/icon';
-import { provideRouter, withComponentInputBinding, withViewTransitions } from '@angular/router';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-
-// withViewTransitions: route changes cross-fade (M3 "fade through").
-provideRouter(routes, withComponentInputBinding(), withViewTransitions()),
-// Every <mat-icon> is a Material Symbols Outlined glyph.
-{ provide: MAT_ICON_DEFAULT_OPTIONS, useValue: { fontSet: 'material-symbols-outlined' } },
-// Material's components need an animations driver.
-provideAnimationsAsync(),
-```
-
-**`src/styles/_theme-colors.scss`**
-
-<!-- embed: src/styles/_theme-colors.scss -->
+**`src/styles/_space.scss`** (the two spaces between components, section 6):
 
 ```scss
-// This file was generated by running 'ng generate @angular/material:theme-color'.
-// Proceed with caution if making changes to this file.
+// Things that belong together: a form's fields, the cards of a list, the blocks of a panel.
+$group: 20px;
 
-@use 'sass:map';
-@use '@angular/material' as mat;
-
-// Note: Color palettes are generated from primary: #0A7E8C, tertiary: #8A6D1C
-$_palettes: (
-  primary: (
-    0: #000000,
-    10: #001f24,
-    20: #00363d,
-    25: #00424a,
-    30: #004f58,
-    35: #005b66,
-    40: #006874,
-    50: #178391,
-    60: #3e9dac,
-    70: #5db8c7,
-    80: #7ad4e3,
-    90: #99f0ff,
-    95: #d1f8ff,
-    98: #edfcff,
-    99: #f6feff,
-    100: #ffffff,
-  ),
-  secondary: (
-    0: #000000,
-    10: #001f24,
-    20: #14353a,
-    25: #204045,
-    30: #2c4c51,
-    35: #38575d,
-    40: #446369,
-    50: #5d7c82,
-    60: #76969c,
-    70: #90b1b7,
-    80: #abccd3,
-    90: #c7e8ef,
-    95: #d5f7fd,
-    98: #edfcff,
-    99: #f6feff,
-    100: #ffffff,
-  ),
-  tertiary: (
-    0: #000000,
-    10: #251a00,
-    20: #3e2e00,
-    25: #4c3900,
-    30: #594400,
-    35: #684f00,
-    40: #765b06,
-    50: #917322,
-    60: #ad8d3a,
-    70: #c9a751,
-    80: #e7c269,
-    90: #ffdf96,
-    95: #ffefd1,
-    98: #fff8f1,
-    99: #fffbff,
-    100: #ffffff,
-  ),
-  neutral: (
-    0: #000000,
-    10: #181c1d,
-    20: #2d3132,
-    25: #383c3d,
-    30: #434748,
-    35: #4f5354,
-    40: #5b5f60,
-    50: #737879,
-    60: #8d9192,
-    70: #a8acad,
-    80: #c3c7c8,
-    90: #dfe3e4,
-    95: #eef1f2,
-    98: #f6fafb,
-    99: #f9fdfe,
-    100: #ffffff,
-    4: #0a0f10,
-    6: #101415,
-    12: #1c2021,
-    17: #262b2c,
-    22: #313636,
-    24: #353a3b,
-    87: #d7dbdb,
-    92: #e5e9e9,
-    94: #ebeeef,
-    96: #f1f4f5,
-  ),
-  neutral-variant: (
-    0: #000000,
-    10: #131d1f,
-    20: #283234,
-    25: #333d3f,
-    30: #3e494b,
-    35: #4a5456,
-    40: #566062,
-    50: #6e797b,
-    60: #889395,
-    70: #a2adaf,
-    80: #bdc8cb,
-    90: #d9e4e7,
-    95: #e8f3f5,
-    98: #f0fbfe,
-    99: #f6feff,
-    100: #ffffff,
-  ),
-  error: (
-    0: #000000,
-    10: #410002,
-    20: #690005,
-    25: #7e0007,
-    30: #93000a,
-    35: #a80710,
-    40: #ba1a1a,
-    50: #de3730,
-    60: #ff5449,
-    70: #ff897d,
-    80: #ffb4ab,
-    90: #ffdad6,
-    95: #ffedea,
-    98: #fff8f7,
-    99: #fffbff,
-    100: #ffffff,
-  ),
-);
-
-$_rest: (
-  secondary: map.get($_palettes, secondary),
-  neutral: map.get($_palettes, neutral),
-  neutral-variant: map.get($_palettes, neutral-variant),
-  error: map.get($_palettes, error),
-);
-
-$primary-palette: map.merge(map.get($_palettes, primary), $_rest);
-$tertiary-palette: map.merge(map.get($_palettes, tertiary), $_rest);
+// Things that don't: a page's header, its panels, its lists.
+$section: 40px;
 ```
 
-<!-- /embed -->
-
-**`src/styles/_breakpoints.scss`**
-
-<!-- embed: src/styles/_breakpoints.scss -->
+**`src/styles.scss`**. This is the whole look. It was checked on a real app in light and with the
+dark block switched on: Material controls, `ngx-forms` fields, `ngx-components` cards and
+`ngx-ai-tools` panels all follow it with no change to any component.
 
 ```scss
-// Shared breakpoint scale — Material 3's window size classes: compact is
-// everything below `sm` (phones; navigation is a modal drawer), medium
-// starts at `sm` (tablets; a navigation rail), expanded at `md`, large at
-// `lg`. Ported from insurly-ui's src/styles/_breakpoints.scss — see
-// docs/frontend-conventions.md.
-@use 'sass:map';
-@use 'sass:meta';
-
-$breakpoints: (
-  sm: 600px,
-  md: 840px,
-  lg: 1200px,
-);
-
-// Accepts a key of $breakpoints or a raw length.
-@function -width($bp) {
-  @if meta.type-of($bp) == 'number' {
-    @return $bp;
-  }
-  @if not map.has-key($breakpoints, $bp) {
-    @error 'Unknown breakpoint `#{$bp}`. Expected one of #{map.keys($breakpoints)} or a length.';
-  }
-  @return map.get($breakpoints, $bp);
-}
-
-// Viewports at least as wide as $bp.
-@mixin up($bp) {
-  @media (min-width: -width($bp)) {
-    @content;
-  }
-}
-
-// Viewports narrower than $bp.
-@mixin down($bp) {
-  @media (max-width: -width($bp) - 1px) {
-    @content;
-  }
-}
-```
-
-<!-- /embed -->
-
-**`src/styles/_spacing.scss`**
-
-<!-- embed: src/styles/_spacing.scss -->
-
-```scss
-// Shared spacing scale. `@use 'spacing';` from any stylesheet (src/styles
-// is on the Sass include path). 4px base unit — `spacing.space(2)` is 8px,
-// `spacing.space(4)` is 16px, and so on — keeps paddings/gaps/margins on a
-// consistent grid instead of ad hoc pixel values. Ported from insurly-ui's
-// src/styles/_spacing.scss — see docs/frontend-conventions.md.
-@use 'sass:math';
-@use 'sass:meta';
-
-$unit: 4px;
-
-// Accepts a unitless multiplier (steps of $unit) or a raw length, so an
-// off-scale value can still be passed through the same call site.
-@function space($n) {
-  @if meta.type-of($n) != 'number' {
-    @error '`space()` expects a unitless multiplier or a length, got #{meta.type-of($n)}.';
-  }
-  @if math.is-unitless($n) {
-    @return $n * $unit;
-  }
-  @return $n;
-}
-
-// Named responsive padding steps. Pair with `breakpoints.up(md)` /
-// `breakpoints.up(lg)` to step a container's padding up as the viewport
-// grows — mobile is the base value, tablet and desktop layer on top of it.
-$padding-mobile: 10px;
-$padding-tablet: 15px;
-$padding-desktop: 20px;
-
-// A generous, one-off spacing value for gaps/margins that want more room
-// than the padding scale above (e.g. a wide gap between nav items).
-$spacing-large: 30px;
-```
-
-<!-- /embed -->
-
-**`src/styles/_ui.scss`**
-
-<!-- embed: src/styles/_ui.scss -->
-
-```scss
-// Material 3 building blocks shared by component stylesheets. `@use 'ui';`
-// from any stylesheet (src/styles is on the Sass include path) and
-// `@include ui.page-title;` etc. on the component's own namespaced class —
-// see docs/frontend-conventions.md, "Design system: Material 3".
+// The Wiltech house look ("Ink & Signal", first built in insurly): warm paper, near-black ink,
+// hairlines instead of shadows, one interaction colour and one accent, Space Grotesk over Inter.
 //
-// Everything reads --mat-sys-* tokens (colour roles, type scale, shape
-// scale, elevation) emitted by `mat.theme()` in styles.scss; never a hex
-// value, so light/dark and any future re-seeding come for free.
-@use 'breakpoints' as bp;
-
-// Page title: headline-small on phones, headline-medium from medium up.
-@mixin page-title {
-  margin: 0;
-  font: var(--mat-sys-headline-small);
-  letter-spacing: var(--mat-sys-headline-small-tracking);
-
-  @include bp.up(sm) {
-    font: var(--mat-sys-headline-medium);
-    letter-spacing: var(--mat-sys-headline-medium-tracking);
-  }
-}
-
-@mixin section-title {
-  margin: 0;
-  font: var(--mat-sys-title-large);
-  letter-spacing: var(--mat-sys-title-large-tracking);
-}
-
-// Secondary copy: body-medium in on-surface-variant.
-@mixin supporting-text {
-  margin: 0;
-  font: var(--mat-sys-body-medium);
-  letter-spacing: var(--mat-sys-body-medium-tracking);
-  color: var(--mat-sys-on-surface-variant);
-}
-
-// A page-level message: errors sit in an error-container, notices in a
-// secondary-container. Same shape/padding either way so they stack neatly.
-@mixin banner($tone: error) {
-  margin: 0;
-  padding: 12px 16px;
-  border-radius: var(--mat-sys-corner-medium);
-  font: var(--mat-sys-body-medium);
-  letter-spacing: var(--mat-sys-body-medium-tracking);
-  overflow-wrap: anywhere;
-
-  @if $tone == error {
-    background: var(--mat-sys-error-container);
-    color: var(--mat-sys-on-error-container);
-  } @else {
-    background: var(--mat-sys-secondary-container);
-    color: var(--mat-sys-on-secondary-container);
-  }
-}
-
-// M3 state layer for a custom interactive surface: an overlay in the
-// content colour at 8% on hover and 10% on focus/press. The element
-// clips it to its own shape via `border-radius: inherit`.
-@mixin state-layer($color: currentColor) {
-  position: relative;
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: $color;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity var(--app-duration-short) var(--app-ease-standard);
-  }
-
-  &:hover::before {
-    opacity: 0.08;
-  }
-
-  &:focus-visible::before,
-  &:active::before {
-    opacity: 0.1;
-  }
-}
-
-// The M3 focus ring for custom interactive elements (3px secondary,
-// offset 2px) — Material's own components draw theirs.
-@mixin focus-ring {
-  &:focus-visible {
-    outline: 3px solid var(--mat-sys-secondary);
-    outline-offset: 2px;
-  }
-}
-
-// A floating action button parked bottom-right, above the safe area.
-@mixin fab-position {
-  position: fixed;
-  right: max(16px, env(safe-area-inset-right));
-  bottom: max(16px, env(safe-area-inset-bottom));
-  z-index: 5;
-
-  @include bp.up(sm) {
-    right: 24px;
-    bottom: 24px;
-  }
-}
-
-// Centred icon + one line of guidance, for an empty list or pane.
-@mixin empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 48px 16px;
-  text-align: center;
-  font: var(--mat-sys-body-large);
-  color: var(--mat-sys-on-surface-variant);
-}
-
-// An M3 *filled* icon button (primary container, on-primary glyph) — the
-// Material icon button has no filled appearance, so re-token it. Use on a
-// `matIconButton` for the one decisive action in a row, e.g. send.
-@mixin filled-icon-button {
-  --mat-icon-button-icon-color: var(--mat-sys-on-primary);
-  --mat-icon-button-state-layer-color: var(--mat-sys-on-primary);
-  --mat-icon-button-disabled-icon-color: color-mix(
-    in srgb,
-    var(--mat-sys-on-surface) 38%,
-    transparent
-  );
-  background: var(--mat-sys-primary);
-
-  &[disabled] {
-    background: color-mix(in srgb, var(--mat-sys-on-surface) 12%, transparent);
-  }
-}
-
-// Destructive actions use the error role. Material's buttons read their
-// colours from component tokens, so a plain `color:` doesn't reliably
-// win — set the tokens instead. `text` is for a text button (Delete,
-// Remove); `filled` for the confirming button in a dialog.
-@mixin danger-button($appearance: text) {
-  @if $appearance == filled {
-    --mat-button-filled-container-color: var(--mat-sys-error);
-    --mat-button-filled-label-text-color: var(--mat-sys-on-error);
-    --mat-button-filled-state-layer-color: var(--mat-sys-on-error);
-    --mat-button-filled-ripple-color: color-mix(in srgb, var(--mat-sys-on-error) 12%, transparent);
-  } @else {
-    --mat-button-text-label-text-color: var(--mat-sys-error);
-    --mat-button-text-state-layer-color: var(--mat-sys-error);
-    --mat-button-text-ripple-color: color-mix(in srgb, var(--mat-sys-error) 12%, transparent);
-  }
-}
-```
-
-<!-- /embed -->
-
-**`src/styles.scss`**
-
-<!-- embed: src/styles.scss -->
-
-```scss
-// Material 3 theme. `mat.theme()` defines the --mat-sys-* CSS variables
-// (colour roles, type scale, shape scale, elevation, state layers) that
-// Material components read; components in this app reference those same
-// tokens through the mixins in src/styles/_ui.scss instead of hardcoding
-// values, so changing the palette here restyles the whole app.
-//
-// The palettes come from `ng generate @angular/material:theme-color`
-// (src/styles/_theme-colors.scss): a petrol-teal seed (#0A7E8C) for
-// primary, ochre (#8A6D1C) for tertiary. Tertiary is spent on meaning —
-// the AI destinations and "owner"/highlight badges — not decoration.
-// The theme type is `color-scheme`, so every role resolves through
-// `light-dark()` and follows the system setting.
+// How it is put together:
+//   1. `mat.theme()` gives Angular Material (and the `@wiltech-labs/ngx-*` packages, which read
+//      the same variables) a complete set of `--mat-sys-*` tokens.
+//   2. The brand tokens below are the theme. Components read them, or the `--mat-sys-*` tokens.
+//   3. The `--mat-sys-*` tokens that carry the look are pointed at the brand tokens, so Material
+//      controls match, and a theme is only a different block of brand tokens (see the end).
 @use '@angular/material' as mat;
 @use 'breakpoints' as bp;
-@use 'theme-colors' as theme;
+@use 'space';
 
 html {
+  color-scheme: light;
+
   @include mat.theme(
     (
       color: (
-        primary: theme.$primary-palette,
-        tertiary: theme.$tertiary-palette,
+        primary: mat.$violet-palette,
+        tertiary: mat.$orange-palette,
       ),
-      // M3 pairs a brand face for display/headline/title with a plain
-      // face for body/label. Roboto Flex is Roboto's variable sibling —
-      // its optical-size axis keeps large headlines crisp.
       typography: (
-          plain-family: (
-            Roboto,
-            system-ui,
-            sans-serif,
-          ),
-          brand-family: (
-            'Roboto Flex',
-            Roboto,
-            system-ui,
-            sans-serif,
-          ),
+        plain-family: (
+          Inter,
+          system-ui,
+          sans-serif,
         ),
+        brand-family: (
+          'Space Grotesk',
+          Inter,
+          system-ui,
+          sans-serif,
+        ),
+        regular-weight: 400,
+        medium-weight: 500,
+        bold-weight: 600,
+      ),
       density: 0,
     )
   );
-  color-scheme: light dark;
+
   -webkit-text-size-adjust: 100%;
+  accent-color: var(--brand);
+  caret-color: var(--brand);
+  scrollbar-color: var(--line-strong) transparent;
 }
 
 :root {
-  // Shared page-layout constants — see `.App-page` below and
-  // docs/frontend-conventions.md's "Layout: mobile-first, max width,
-  // centered" section. Content never stretches edge-to-edge on a wide
-  // monitor; the footer and page content line up on the same gutter
-  // instead of each picking its own number. M3 margins: 16 on compact
-  // windows, 24 from medium up.
-  --app-page-max-width: 900px;
-  // The whole shell (app bar contents, rail and page) sits in one centred
-  // column no wider than this, so on a big monitor the menu and the account
-  // button don't drift to opposite edges of the screen. Backgrounds still
-  // run edge to edge.
+  // ---- The theme: brand tokens ------------------------------------------------------------
+  // Neutrals are warm, never a cool grey or pure black.
+  --ink: #17171c; // text and headings
+  --ink-soft: #37373f; // lead paragraphs
+  --muted: #66646d; // hints, captions, metadata
+  --paper: #f7f5f1; // the page
+  --paper-sunk: #efece4; // recessed fills
+  --surface: #ffffff; // lifted surfaces: cards, fields, menus
+  --line: #e7e3da; // hairlines and card outlines
+  --line-strong: #d8d3c8; // borders of things you can press
+
+  // Two signals. The brand colour means "you can act here"; the accent is spent on one meaning
+  // per app (in insurly: "this is done").
+  --brand: #4f46e5;
+  --brand-strong: #4338ca; // hover and pressed
+  --brand-tint: #edecfd; // selected and current
+  --on-brand: #ffffff;
+  --accent: #ff6a3d;
+  --accent-tint: #ffe9e1;
+
+  --radius: 14px; // cards and containers
+  --radius-sm: 10px; // controls
+  --radius-pill: 999px; // stand-alone buttons
+  // Flat with a hairline at rest; the soft shadow is for the one surface being worked on.
+  --shadow-sm: 0 1px 2px rgb(23 23 28 / 6%);
+  --shadow-md: 0 1px 2px rgb(23 23 28 / 6%), 0 14px 34px -18px rgb(23 23 28 / 28%);
+
+  --font-brand: 'Space Grotesk', Inter, system-ui, sans-serif;
+  --font-body: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  // ---- Layout and motion ------------------------------------------------------------------
+  --app-page-max-width: 1120px;
   --app-shell-max-width: 1280px;
   --app-gutter: 16px;
   --app-bar-height: 64px;
-  --app-rail-width: 80px;
+  --app-space-group: #{space.$group};
+  --app-space-section: #{space.$section};
+  --ngx-form-gap: var(--app-space-group);
 
-  // M3 motion: emphasized easing for things that move on screen, plus
-  // the two durations most transitions use.
   --app-ease-standard: cubic-bezier(0.2, 0, 0, 1);
-  --app-ease-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --app-ease-decelerate: cubic-bezier(0.16, 1, 0.3, 1);
   --app-ease-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
-  --app-duration-short: 200ms;
-  --app-duration-medium: 300ms;
-
-  // Chart marks. M3's tonal steps are too muted for a data mark (they read
-  // grey next to the grid), so charts get one validated teal per mode, near
-  // the brand seed: >= 3:1 on surface-container-low, in the lightness band,
-  // above the chroma floor (dataviz validator). Text never wears it.
-  --app-chart-1: light-dark(#00897b, #12a3a8);
+  --app-duration-short: 150ms;
+  --app-duration-medium: 280ms;
 
   @include bp.up(sm) {
     --app-gutter: 24px;
   }
+
+  // ---- Angular Material, pointed at the brand tokens --------------------------------------
+  --mat-sys-primary: var(--brand);
+  --mat-sys-on-primary: var(--on-brand);
+  --mat-sys-primary-container: var(--brand-tint);
+  --mat-sys-on-primary-container: var(--ink);
+  --mat-sys-secondary-container: var(--brand-tint);
+  --mat-sys-on-secondary-container: var(--ink);
+  --mat-sys-tertiary: var(--accent);
+  --mat-sys-tertiary-container: var(--accent-tint);
+  --mat-sys-on-tertiary-container: var(--ink);
+
+  --mat-sys-background: var(--paper);
+  --mat-sys-surface: var(--surface);
+  --mat-sys-surface-container-lowest: var(--surface);
+  --mat-sys-surface-container-low: color-mix(in srgb, var(--paper) 60%, var(--surface));
+  --mat-sys-surface-container: var(--paper);
+  --mat-sys-surface-container-high: var(--paper-sunk);
+  --mat-sys-surface-container-highest: color-mix(in srgb, var(--paper-sunk) 92%, var(--ink));
+  --mat-sys-on-surface: var(--ink);
+  --mat-sys-on-surface-variant: var(--muted);
+  --mat-sys-outline: var(--line-strong);
+  --mat-sys-outline-variant: var(--line);
+
+  --mat-sys-corner-extra-small: 8px;
+  --mat-sys-corner-small: var(--radius-sm);
+  --mat-sys-corner-medium: 12px;
+  --mat-sys-corner-large: var(--radius);
+  --mat-sys-corner-extra-large: 20px;
+
+  // ngx-components' Banner: an info message on the brand tint (its default is a fixed light blue).
+  --ngx-components-banner-info-background: var(--brand-tint);
+  --ngx-components-banner-info-text: var(--ink);
+
+  // Headings: the brand face at 600 with tight tracking, wherever a type token is used.
+  --mat-sys-display-large: 600 clamp(2.5rem, 5vw + 1rem, 3.75rem) / 1.05 var(--font-brand);
+  --mat-sys-display-medium: 600 clamp(2rem, 4vw + 1rem, 3.25rem) / 1.1 var(--font-brand);
+  --mat-sys-display-small: 600 clamp(1.75rem, 3vw + 1rem, 2.5rem) / 1.1 var(--font-brand);
+  --mat-sys-headline-large: 600 clamp(1.5rem, 2.4vw + 1rem, 1.95rem) / 1.15 var(--font-brand);
+  --mat-sys-headline-medium: 600 1.625rem / 1.2 var(--font-brand);
+  --mat-sys-headline-small: 600 1.375rem / 1.2 var(--font-brand);
+  --mat-sys-title-large: 600 1.25rem / 1.25 var(--font-brand);
+  --mat-sys-title-medium: 600 1rem / 1.3 var(--font-brand);
+  --mat-sys-title-small: 600 0.875rem / 1.3 var(--font-brand);
+  --mat-sys-display-large-tracking: -0.03em;
+  --mat-sys-display-medium-tracking: -0.02em;
+  --mat-sys-display-small-tracking: -0.02em;
+  --mat-sys-headline-large-tracking: -0.02em;
+  --mat-sys-headline-medium-tracking: -0.02em;
+  --mat-sys-headline-small-tracking: -0.02em;
+  --mat-sys-title-large-tracking: -0.01em;
+  --mat-sys-title-medium-tracking: -0.01em;
+  --mat-sys-title-small-tracking: -0.01em;
 }
 
 *,
@@ -1472,22 +1009,39 @@ html {
 body {
   margin: 0;
   min-height: 100dvh;
-  font: var(--mat-sys-body-large);
-  letter-spacing: var(--mat-sys-body-large-tracking);
-  color: var(--mat-sys-on-surface);
-  background: var(--mat-sys-surface);
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 0.9375rem / 1.55 var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  color: var(--mat-sys-primary);
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-brand);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
 }
 
-// Material Symbols Outlined (loaded in index.html) is the app's icon font:
-// `MAT_ICON_DEFAULT_OPTIONS` in app.config.ts points every <mat-icon> at
-// this class. The FILL axis is how M3 marks a selected state — add
-// `is-filled` to swap outlined for filled, and it animates.
+a {
+  color: var(--brand);
+  text-underline-offset: 0.2em;
+}
+
+::selection {
+  background: var(--brand-tint);
+  color: var(--ink);
+}
+
+// Hand-built interactive elements: a 2px brand outline, 2px away.
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
 .material-symbols-outlined {
   font-family: 'Material Symbols Outlined';
   font-weight: normal;
@@ -1505,7 +1059,6 @@ a {
     'wght' 400,
     'GRAD' 0,
     'opsz' 24;
-  transition: font-variation-settings var(--app-duration-short) var(--app-ease-standard);
 
   &.is-filled {
     font-variation-settings:
@@ -1516,11 +1069,6 @@ a {
   }
 }
 
-// Shared page-layout helpers. Apply `.App-page` to a route's top-level
-// container alongside its own component class (`<div class="TodosList
-// App-page">`) instead of that component defining its own
-// `max-width`/`margin: 0 auto`/`padding` — one shared constant beats a
-// different ad hoc pixel value per page.
 .App-page {
   max-width: var(--app-page-max-width);
   margin: 0 auto;
@@ -1531,7 +1079,6 @@ a {
   flex: 1 1 auto;
 }
 
-// Screen-reader-only text.
 .App-visually-hidden {
   position: absolute;
   width: 1px;
@@ -1543,29 +1090,10 @@ a {
   white-space: nowrap;
 }
 
-// Route changes cross-fade through the M3 "fade through" pattern: the old
-// screen leaves quickly, the new one settles in with a slight scale. The
-// app bar and rail carry their own `view-transition-name`, so only the
-// content region moves.
-@keyframes app-fade-out {
-  to {
-    opacity: 0;
-  }
-}
-
-@keyframes app-fade-in {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-}
-
-::view-transition-old(root) {
-  animation: 90ms var(--app-ease-accelerate) both app-fade-out;
-}
-
-::view-transition-new(root) {
-  animation: 210ms var(--app-ease-decelerate) 90ms both app-fade-in;
+// Numbers that are read as information line up digit for digit.
+.App-numeric {
+  font-family: var(--font-brand);
+  font-variant-numeric: tabular-nums;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1577,1232 +1105,286 @@ a {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-
-  ::view-transition-group(*),
-  ::view-transition-old(*),
-  ::view-transition-new(*) {
-    animation: none !important;
-  }
 }
+
+// ---- Themes -------------------------------------------------------------------------------
+// A theme is a block of brand tokens. Everything above follows it, Material included.
+// `@wiltech-labs/ngx-themes` sets `data-theme` on <html> and remembers the choice.
+//
+// html[data-theme='forest'] {
+//   --brand: #1f7a4d;
+//   --brand-strong: #17603c;
+//   --brand-tint: #e3f3ea;
+//   --accent: #c2410c;
+//   --accent-tint: #fdeadd;
+// }
+//
+// Dark is an app's decision, not a default. An app that offers it redefines the neutrals too:
+//
+// html[data-theme='dark'] {
+//   color-scheme: dark;
+//   --ink: #f3f1ec;
+//   --ink-soft: #d9d6cf;
+//   --muted: #a3a09a;
+//   --paper: #141416;
+//   --paper-sunk: #0e0e10;
+//   --surface: #1c1c20;
+//   --line: #2c2c31;
+//   --line-strong: #3d3d44;
+//   --brand: #8b85f5;
+//   --brand-strong: #a5a0f8;
+//   --brand-tint: #26244a;
+//   --on-brand: #14141a;
+//   --accent-tint: #44241a;
+// }
 ```
 
-<!-- /embed -->
-
-What the `_ui` mixins are for:
-
-| Mixin                                           | Use                                                                                                                                       |
-| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `ui.page-title`                                 | The `h1` of a page (responsive headline)                                                                                                  |
-| `ui.section-title`                              | A panel, tile or section heading (`title-large`)                                                                                          |
-| `ui.supporting-text`                            | Secondary copy: `body-medium` in `on-surface-variant`                                                                                     |
-| `ui.banner(error \| info)`                      | A page-level message in an error/secondary container; put it on the component's own `-error` class and set `role="alert"` in the template |
-| `ui.state-layer($color)`                        | Hover 8% / focus-press 10% overlay for a custom interactive surface (list row, tile, chip)                                                |
-| `ui.focus-ring`                                 | 3px secondary outline, 2px offset, for custom interactive elements                                                                        |
-| `ui.fab-position`                               | Fixed bottom-right, above the safe area (pair with `<a matFab extended>`)                                                                 |
-| `ui.empty-state`                                | Centred icon + one line of guidance for an empty list or pane                                                                             |
-| `ui.filled-icon-button`                         | Re-tokens a `matIconButton` as an M3 _filled_ icon button (send, etc.)                                                                    |
-| `ui.danger-button` / `ui.danger-button(filled)` | Error-role text button (Delete, Remove) / filled confirming button in a dialog                                                            |
-
-Include them on the component's **own namespaced class**
-(`&-title { @include ui.page-title; }`) — never `@extend`, never a global class.
-Global helpers in `styles.scss` stay `.App-…`.
-
-### 4. The adaptive shell
-
-Signed-in users get **destinations as a navigation rail** on medium windows and up
-(≥ 600px) and as a **modal navigation drawer**, opened from the top app bar, on
-compact ones. Signed-out visitors have nowhere to go, so they get just the bar
-(with Sign in) and the public home page. The bar sits on `surface` and takes a
-`surface-container` tint once the page scrolls. The rail sits _under_ the bar and
-sticks; the drawer slides in over a 32% scrim with a focus trap.
-
-Destinations are declared **once** and read by the rail, the drawer and the Home
-tiles — add a destination here and it appears everywhere. The Home tile for a
-destination whose API link is missing shows "Not found" instead of a dead link.
-
-**When destinations outgrow the rail (roughly ten or more), group them into apps.**
-Each destination names its `app`, or none for the few above every app (Home, an
-approvals inbox). An **Apps menu** in the top app bar (an icon button opening a
-`mat-menu`, beside the account menu) lists the apps the user has a page in, each with
-a one-line lead, the current one marked like the rail's current destination. The rail
-and drawer show the destinations above every app, a hairline, then the current app's
-pages, or on Home the apps themselves; the bar names the app beside the brand from
-medium windows up ("AppName Leave"), the drawer's title on compact ones; Home has a
-card per app. The current app is derived from the URL (the longest destination path the
-URL is on or under), never stored, so deep links and the back button land in the
-right app and no URL changes when a page moves to another app.
-
-**`src/app/shared/destinations.ts`** — the shape, then an example list (declare your own):
-
-<!-- embed: src/app/shared/destinations.ts until="export const DESTINATIONS" -->
-
-```ts
-// The app's top-level destinations, in navigation order. NavMenu (rail and
-// drawer) and the Home cards both read this list, so a destination is
-// named, iconed and worded once.
-export interface Destination {
-  path: string;
-  /** Short name in the navigation. */
-  label: string;
-  icon: string;
-  /** Heading on the Home card. */
-  title: string;
-  /** One line on the Home card saying what the destination is for. */
-  lead: string;
-  /** Tertiary marks the AI destinations; everything else is primary. */
-  tone: 'primary' | 'tertiary';
-  /**
-   * The link name on the user profile that must exist for the destination
-   * to work (see CurrentUserStore.link); omit for Home, which needs none.
-   */
-  linkName?: string;
-  /** Only shown to callers whose profile carries the `admin` link. */
-  adminOnly?: boolean;
-  /** Left off the Home cards (it is the page they sit on). */
-  homeCard?: false;
-}
-```
-
-<!-- /embed -->
-
-```ts
-export const DESTINATIONS: readonly Destination[] = [
-  {
-    path: '/',
-    label: 'Home',
-    icon: 'home',
-    title: 'Home',
-    lead: '',
-    tone: 'primary',
-    homeCard: false,
-  },
-  {
-    path: '/todos',
-    label: 'Todos',
-    icon: 'checklist',
-    title: 'Todos',
-    lead: 'Create, update and tag your todos.',
-    tone: 'primary',
-    linkName: 'todos',
-  },
-  {
-    path: '/ask',
-    label: 'Ask',
-    icon: 'question_answer',
-    title: 'Ask your data',
-    lead: 'Ask about your todos and chats in plain English.',
-    tone: 'tertiary',
-    linkName: 'aiAssistant',
-  },
-  {
-    path: '/admin',
-    label: 'Admin',
-    icon: 'admin_panel_settings',
-    title: 'Admin',
-    lead: 'Maintenance tools.',
-    tone: 'primary',
-    adminOnly: true,
-  },
-];
-```
-
-**`src/app/shared/nav-menu/nav-menu.ts`**
-
-<!-- embed: src/app/shared/nav-menu/nav-menu.ts -->
-
-```ts
-import { Component, computed, inject, input, output } from '@angular/core';
-import { MatIconModule } from '@angular/material/icon';
-import { RouterLink, RouterLinkActive } from '@angular/router';
-
-import { CurrentUserStore } from '../../core/user/current-user.store';
-import { DESTINATIONS } from '../destinations';
-
-// The app's destinations as a Material 3 navigation rail (icon over label,
-// for medium windows and up) or as the rows of a navigation drawer (icon
-// beside label, inside the modal drawer on compact windows). Same list,
-// same active state; the shell decides which shape to mount.
-@Component({
-  selector: 'app-nav-menu',
-  imports: [RouterLink, RouterLinkActive, MatIconModule],
-  templateUrl: './nav-menu.html',
-  styleUrl: './nav-menu.scss',
-})
-export class NavMenu {
-  readonly variant = input<'rail' | 'drawer'>('rail');
-  /** Emits after a destination is chosen, so a modal drawer can close. */
-  readonly navigated = output<void>();
-
-  private readonly currentUser = inject(CurrentUserStore);
-
-  protected readonly destinations = computed(() =>
-    DESTINATIONS.filter(
-      (destination) => !destination.adminOnly || !!this.currentUser.link('admin'),
-    ),
-  );
-}
-```
-
-<!-- /embed -->
-
-**`src/app/shared/nav-menu/nav-menu.html`**
-
-<!-- embed: src/app/shared/nav-menu/nav-menu.html -->
-
-```html
-<nav
-  class="NavMenu"
-  [class.is-rail]="variant() === 'rail'"
-  [class.is-drawer]="variant() === 'drawer'"
-  aria-label="Main"
->
-  @for (destination of destinations(); track destination.path) {
-  <a
-    class="NavMenu-item"
-    [routerLink]="destination.path"
-    routerLinkActive="is-active"
-    ariaCurrentWhenActive="page"
-    [routerLinkActiveOptions]="{ exact: destination.path === '/' }"
-    (click)="navigated.emit()"
-  >
-    <span class="NavMenu-indicator">
-      <mat-icon class="NavMenu-icon">{{ destination.icon }}</mat-icon>
-    </span>
-    <span class="NavMenu-label">{{ destination.label }}</span>
-  </a>
-  }
-</nav>
-```
-
-<!-- /embed -->
-
-**`src/app/shared/nav-menu/nav-menu.scss`**
-
-<!-- embed: src/app/shared/nav-menu/nav-menu.scss -->
-
-```scss
-// Material 3 navigation, in two shapes that share one list:
-//   .is-rail   — 56x32 active pill with the label beneath (medium windows up)
-//   .is-drawer — full-width 56px rows, icon beside label (modal drawer)
-// The selected destination gets a secondary-container indicator and a
-// filled icon; the rest sit in on-surface-variant.
-.NavMenu {
-  display: flex;
-  flex-direction: column;
-
-  &.is-rail {
-    gap: 12px;
-    padding: 12px 0 24px;
-  }
-
-  &.is-drawer {
-    padding: 0 12px 12px;
-  }
-
-  &-item {
-    display: flex;
-    text-decoration: none;
-    color: var(--mat-sys-on-surface-variant);
-    outline: none;
-    -webkit-tap-highlight-color: transparent;
-
-    &.is-active {
-      color: var(--mat-sys-on-surface);
-    }
-  }
-
-  &-indicator {
-    position: relative;
-    display: grid;
-    place-items: center;
-    transition: background-color var(--app-duration-short) var(--app-ease-standard);
-
-    &::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      background: var(--mat-sys-on-surface);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity var(--app-duration-short) var(--app-ease-standard);
-    }
-  }
-
-  &-label {
-    min-width: 0;
-  }
-}
-
-// The state layer sits on the whole row's hit area, so hovering the label
-// lights the indicator too.
-.NavMenu-item:hover .NavMenu-indicator::before {
-  opacity: 0.08;
-}
-
-.NavMenu-item:focus-visible .NavMenu-indicator::before,
-.NavMenu-item:active .NavMenu-indicator::before {
-  opacity: 0.1;
-}
-
-.NavMenu-item:focus-visible .NavMenu-indicator {
-  outline: 3px solid var(--mat-sys-secondary);
-  outline-offset: 2px;
-}
-
-.NavMenu-item.is-active .NavMenu-indicator {
-  background: var(--mat-sys-secondary-container);
-  color: var(--mat-sys-on-secondary-container);
-}
-
-.NavMenu-item.is-active .NavMenu-icon {
-  font-variation-settings:
-    'FILL' 1,
-    'wght' 400,
-    'GRAD' 0,
-    'opsz' 24;
-}
-
-// Rail: icon pill over a label-medium caption (bold when selected).
-.NavMenu.is-rail .NavMenu-item {
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  font: var(--mat-sys-label-medium);
-  letter-spacing: var(--mat-sys-label-medium-tracking);
-}
-
-.NavMenu.is-rail .NavMenu-item.is-active {
-  font-weight: 700;
-}
-
-.NavMenu.is-rail .NavMenu-indicator {
-  width: 56px;
-  height: 32px;
-  border-radius: var(--mat-sys-corner-full);
-}
-
-.NavMenu.is-rail .NavMenu-label {
-  text-align: center;
-}
-
-// Drawer: the row itself is the indicator, so the pill background moves
-// from the icon wrapper up to the row.
-.NavMenu.is-drawer .NavMenu-item {
-  flex-direction: row;
-  align-items: center;
-  gap: 12px;
-  height: 56px;
-  padding: 0 16px;
-  border-radius: var(--mat-sys-corner-full);
-  font: var(--mat-sys-label-large);
-  letter-spacing: var(--mat-sys-label-large-tracking);
-  background: transparent;
-  transition: background-color var(--app-duration-short) var(--app-ease-standard);
-}
-
-.NavMenu.is-drawer .NavMenu-item.is-active {
-  background: var(--mat-sys-secondary-container);
-  color: var(--mat-sys-on-secondary-container);
-}
-
-.NavMenu.is-drawer .NavMenu-item:hover {
-  background: color-mix(in srgb, var(--mat-sys-on-surface) 8%, transparent);
-}
-
-.NavMenu.is-drawer .NavMenu-item.is-active:hover {
-  background: color-mix(
-    in srgb,
-    var(--mat-sys-on-secondary-container) 8%,
-    var(--mat-sys-secondary-container)
-  );
-}
-
-.NavMenu.is-drawer .NavMenu-item:focus-visible {
-  outline: 3px solid var(--mat-sys-secondary);
-  outline-offset: 2px;
-}
-
-.NavMenu.is-drawer .NavMenu-indicator,
-.NavMenu.is-drawer .NavMenu-item.is-active .NavMenu-indicator {
-  background: transparent;
-  color: inherit;
-}
-
-.NavMenu.is-drawer .NavMenu-indicator::before {
-  display: none;
-}
-
-.NavMenu.is-drawer .NavMenu-item:focus-visible .NavMenu-indicator {
-  outline: none;
-}
-```
-
-<!-- /embed -->
-
-**`src/app/shared/nav-bar/nav-bar.ts`**
-
-<!-- embed: src/app/shared/nav-bar/nav-bar.ts -->
-
-```ts
-import { Component, inject, input, output, signal } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { RouterLink } from '@angular/router';
-
-import { AuthStore } from '../../core/auth/auth.store';
-import { ProfileMenu } from '../profile-menu/profile-menu';
-
-// App-wide top app bar, mounted once in app.html — the one place a
-// signed-out visitor finds "Sign in" and a signed-in one finds the account
-// menu, instead of every page rolling its own header. Destinations live in
-// the navigation rail / drawer (NavMenu); on compact windows this bar
-// carries the button that opens the drawer.
-@Component({
-  selector: 'app-nav-bar',
-  imports: [RouterLink, MatButtonModule, MatIconModule, ProfileMenu],
-  templateUrl: './nav-bar.html',
-  styleUrl: './nav-bar.scss',
-  host: { '(window:scroll)': 'onScroll()' },
-})
-export class NavBar {
-  protected readonly auth = inject(AuthStore);
-
-  /** Show the navigation-drawer button (signed in, compact window). */
-  readonly showMenuButton = input(false);
-  readonly menuRequested = output<void>();
-
-  // M3 top app bars sit on the page surface and pick up a tonal container
-  // once content scrolls beneath them.
-  protected readonly scrolled = signal(false);
-
-  protected onScroll(): void {
-    this.scrolled.set(window.scrollY > 0);
-  }
-
-  protected signIn(): void {
-    void this.auth.signIn();
-  }
-}
-```
-
-<!-- /embed -->
-
-**`src/app/shared/nav-bar/nav-bar.html`**
-
-<!-- embed: src/app/shared/nav-bar/nav-bar.html -->
-
-```html
-<header class="NavBar" [class.is-scrolled]="scrolled()">
-  <div class="NavBar-inner">
-    @if (showMenuButton()) {
-    <button
-      matIconButton
-      type="button"
-      class="NavBar-menu"
-      aria-label="Open navigation menu"
-      (click)="menuRequested.emit()"
-    >
-      <mat-icon>menu</mat-icon>
-    </button>
-    }
-
-    <a class="NavBar-brand" routerLink="/">AppName</a>
-    <span class="App-spacer"></span>
-
-    @if (auth.isSignedIn()) {
-    <app-profile-menu />
-    } @else {
-    <button matButton="tonal" type="button" (click)="signIn()">Sign in</button>
-    }
-  </div>
-</header>
-```
-
-<!-- /embed -->
-
-**`src/app/shared/nav-bar/nav-bar.scss`**
-
-<!-- embed: src/app/shared/nav-bar/nav-bar.scss -->
-
-```scss
-@use 'ui';
-
-// The host is what sticks: a sticky element only stays put inside its
-// parent's box, and a sticky <header> inside a host of its own height would
-// scroll away with the page.
-:host {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  display: block;
-}
-
-// Small top app bar: 64px, on the page surface, tonal once scrolled. The
-// surface spans the window; its contents line up with the shell column.
-.NavBar {
-  height: var(--app-bar-height);
-  background: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
-  view-transition-name: app-bar;
-  transition: background-color var(--app-duration-short) var(--app-ease-standard);
-
-  &.is-scrolled {
-    background: var(--mat-sys-surface-container);
-  }
-
-  &-inner {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    height: 100%;
-    max-width: var(--app-shell-max-width);
-    margin: 0 auto;
-    padding: 0 16px 0 var(--app-gutter);
-  }
-
-  // The drawer button takes the place of the left gutter's first 8px.
-  &-menu {
-    margin-left: -12px;
-  }
-
-  &-brand {
-    color: var(--mat-sys-on-surface);
-    text-decoration: none;
-    font: var(--mat-sys-title-large);
-    letter-spacing: var(--mat-sys-title-large-tracking);
-    padding: 4px 8px;
-    margin-left: -8px;
-    border-radius: var(--mat-sys-corner-small);
-
-    @include ui.focus-ring;
-  }
-}
-```
-
-<!-- /embed -->
-
-**`src/app/shared/profile-menu/profile-menu.ts`**
-
-<!-- embed: src/app/shared/profile-menu/profile-menu.ts -->
-
-```ts
-import { Component, computed, inject } from '@angular/core';
-import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
-import { RouterLink } from '@angular/router';
-
-import { AuthStore } from '../../core/auth/auth.store';
-import { CurrentUserStore } from '../../core/user/current-user.store';
-
-// Only mounted by NavBar once `auth.isSignedIn()` is true — this component
-// doesn't need its own signed-out branch. Just the account's own actions:
-// the app's destinations live in the navigation rail / drawer.
-@Component({
-  selector: 'app-profile-menu',
-  imports: [RouterLink, MatIconModule, MatMenuModule],
-  templateUrl: './profile-menu.html',
-  styleUrl: './profile-menu.scss',
-})
-export class ProfileMenu {
-  protected readonly auth = inject(AuthStore);
-  protected readonly currentUser = inject(CurrentUserStore);
-
-  // The avatar shows the first letter of the profile name; until /me has
-  // loaded it falls back to a generic account icon.
-  protected readonly initial = computed(() => this.currentUser.me()?.name?.trim().charAt(0) ?? '');
-
-  protected async signOut(): Promise<void> {
-    await this.auth.signOut();
-  }
-}
-```
-
-<!-- /embed -->
-
-**`src/app/shared/profile-menu/profile-menu.html`**
-
-<!-- embed: src/app/shared/profile-menu/profile-menu.html -->
-
-```html
-<button
-  class="ProfileMenu-trigger"
-  type="button"
-  [matMenuTriggerFor]="menu"
-  aria-label="Account menu"
-  aria-haspopup="menu"
-  title="Account menu"
->
-  @if (initial(); as letter) {
-  <span class="ProfileMenu-avatar" aria-hidden="true">{{ letter }}</span>
-  } @else {
-  <mat-icon class="ProfileMenu-avatar-icon">account_circle</mat-icon>
-  }
-</button>
-
-<mat-menu #menu="matMenu" xPosition="before">
-  @if (currentUser.me(); as me) {
-  <div class="ProfileMenu-header">
-    <span class="ProfileMenu-name">{{ me.name }}</span>
-    @if (me.email) {
-    <span class="ProfileMenu-email">{{ me.email }}</span>
-    }
-  </div>
-  }
-  <a mat-menu-item routerLink="/profile">
-    <mat-icon>person</mat-icon>
-    <span>Profile</span>
-  </a>
-  <button mat-menu-item type="button" (click)="signOut()">
-    <mat-icon>logout</mat-icon>
-    <span>Sign out</span>
-  </button>
-</mat-menu>
-```
-
-<!-- /embed -->
-
-**`src/app/shared/profile-menu/profile-menu.scss`**
-
-<!-- embed: src/app/shared/profile-menu/profile-menu.scss -->
-
-```scss
-@use 'ui';
-
-// The account button is an avatar: the user's initial on a
-// primary-container disc, 40px (48px touch target via the padding).
-.ProfileMenu {
-  &-trigger {
-    display: grid;
-    place-items: center;
-    width: 48px;
-    height: 48px;
-    padding: 0;
-    border: 0;
-    border-radius: var(--mat-sys-corner-full);
-    background: transparent;
-    color: var(--mat-sys-on-surface-variant);
-    cursor: pointer;
-
-    @include ui.state-layer(var(--mat-sys-on-surface));
-    @include ui.focus-ring;
-  }
-
-  &-avatar {
-    display: grid;
-    place-items: center;
-    width: 40px;
-    height: 40px;
-    border-radius: var(--mat-sys-corner-full);
-    background: var(--mat-sys-primary-container);
-    color: var(--mat-sys-on-primary-container);
-    font: var(--mat-sys-title-medium);
-    text-transform: uppercase;
-  }
-
-  &-avatar-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 40px;
-  }
-
-  // Who is signed in, at the top of the menu: not a menu item, so it
-  // doesn't take part in keyboard navigation.
-  &-header {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    padding: 12px 16px;
-    margin-bottom: 4px;
-    border-bottom: 1px solid var(--mat-sys-outline-variant);
-    min-width: 12rem;
-  }
-
-  &-name {
-    font: var(--mat-sys-title-small);
-    letter-spacing: var(--mat-sys-title-small-tracking);
-    color: var(--mat-sys-on-surface);
-  }
-
-  &-email {
-    font: var(--mat-sys-body-small);
-    letter-spacing: var(--mat-sys-body-small-tracking);
-    color: var(--mat-sys-on-surface-variant);
-    overflow-wrap: anywhere;
-  }
-}
-```
-
-<!-- /embed -->
-
-**`src/app/app.ts`**
-
-<!-- embed: src/app/app.ts -->
-
-```ts
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { A11yModule } from '@angular/cdk/a11y';
-import { Component, computed, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { RouterOutlet } from '@angular/router';
-import { map } from 'rxjs';
-
-import { environment } from '../environments/environment';
-import { AuthStore } from './core/auth/auth.store';
-import { NavBar } from './shared/nav-bar/nav-bar';
-import { NavMenu } from './shared/nav-menu/nav-menu';
-
-// The Material 3 adaptive shell. Signed-in visitors get destinations as a
-// navigation rail on medium windows and up (>= 600px) and as a modal
-// navigation drawer, opened from the top app bar, on compact ones. A
-// signed-out visitor has nowhere to navigate to, so the shell is just the
-// bar and the page.
-@Component({
-  selector: 'app-root',
-  imports: [RouterOutlet, A11yModule, NavBar, NavMenu],
-  templateUrl: './app.html',
-  styleUrl: './app.scss',
-})
-export class App {
-  protected readonly version = environment.version;
-  protected readonly auth = inject(AuthStore);
-
-  // Breakpoints.XSmall is (max-width: 599.98px) — the M3 compact window class.
-  protected readonly compact = toSignal(
-    inject(BreakpointObserver)
-      .observe(Breakpoints.XSmall)
-      .pipe(map((state) => state.matches)),
-    { requireSync: true },
-  );
-
-  protected readonly showRail = computed(() => this.auth.isSignedIn() && !this.compact());
-  protected readonly showMenuButton = computed(() => this.auth.isSignedIn() && this.compact());
-
-  protected readonly menuOpen = signal(false);
-
-  protected openMenu(): void {
-    this.menuOpen.set(true);
-  }
-
-  protected closeMenu(): void {
-    this.menuOpen.set(false);
-  }
-}
-```
-
-<!-- /embed -->
-
-**`src/app/app.html`**
-
-<!-- embed: src/app/app.html -->
-
-```html
-<div class="AppShell">
-  <app-nav-bar [showMenuButton]="showMenuButton()" (menuRequested)="openMenu()" />
-
-  <div class="AppShell-body">
-    @if (showRail()) {
-    <aside class="AppShell-rail">
-      <app-nav-menu variant="rail" />
-    </aside>
-    }
-
-    <div class="AppShell-main">
-      <router-outlet />
-      <footer class="AppShell-footer">v{{ version }}</footer>
-    </div>
-  </div>
-
-  @if (showMenuButton() && menuOpen()) {
-  <div
-    class="AppShell-scrim"
-    aria-hidden="true"
-    animate.enter="AppShell-scrim-enter"
-    animate.leave="AppShell-scrim-leave"
-    (click)="closeMenu()"
-  ></div>
-  <aside
-    class="AppShell-drawer"
-    role="dialog"
-    aria-modal="true"
-    aria-label="Navigation"
-    cdkTrapFocus
-    [cdkTrapFocusAutoCapture]="true"
-    animate.enter="AppShell-drawer-enter"
-    animate.leave="AppShell-drawer-leave"
-    (keydown.escape)="closeMenu()"
-  >
-    <p class="AppShell-drawer-title">AppName</p>
-    <app-nav-menu variant="drawer" (navigated)="closeMenu()" />
-  </aside>
-  }
-</div>
-```
-
-<!-- /embed -->
-
-**`src/app/app.scss`**
-
-<!-- embed: src/app/app.scss -->
-
-```scss
-// Bar on top; below it the navigation rail (medium windows up) beside the
-// routed page. The page column stretches so a page's own empty space sits
-// above the footer, not below it.
-.AppShell {
-  display: flex;
-  flex-direction: column;
-  min-height: 100dvh;
-
-  // The rail and the page share one centred column (--app-shell-max-width).
-  &-body {
-    flex: 1 1 auto;
-    display: flex;
-    width: 100%;
-    max-width: var(--app-shell-max-width);
-    min-width: 0;
-    margin: 0 auto;
-  }
-
-  // Sticks under the app bar and scrolls on its own if the window is short.
-  &-rail {
-    position: sticky;
-    top: var(--app-bar-height);
-    align-self: flex-start;
-    flex: none;
-    width: var(--app-rail-width);
-    height: calc(100dvh - var(--app-bar-height));
-    overflow-y: auto;
-    background: var(--mat-sys-surface);
-    view-transition-name: app-rail;
-  }
-
-  &-main {
-    flex: 1 1 auto;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-  }
-
-  // Discrete build-version marker — useful for confirming which deploy is
-  // live without giving an otherwise chrome-less app a header just for it.
-  &-footer {
-    margin-top: auto;
-    padding: 12px var(--app-gutter);
-    font: var(--mat-sys-label-small);
-    letter-spacing: var(--mat-sys-label-small-tracking);
-    color: var(--mat-sys-outline);
-    text-align: left;
-  }
-
-  // Modal navigation drawer (compact windows): a scrim over the page and a
-  // surface-container-low panel sliding in from the start edge.
-  &-scrim {
-    position: fixed;
-    inset: 0;
-    z-index: 20;
-    background: color-mix(in srgb, var(--mat-sys-scrim) 32%, transparent);
-  }
-
-  &-drawer {
-    position: fixed;
-    inset: 0 auto 0 0;
-    z-index: 21;
-    display: flex;
-    flex-direction: column;
-    width: min(360px, calc(100vw - 56px));
-    overflow-y: auto;
-    background: var(--mat-sys-surface-container-low);
-    color: var(--mat-sys-on-surface);
-    border-radius: 0 var(--mat-sys-corner-large) var(--mat-sys-corner-large) 0;
-    box-shadow: var(--mat-sys-level1);
-    overscroll-behavior: contain;
-  }
-
-  &-drawer-title {
-    margin: 0;
-    padding: 20px 28px 12px;
-    font: var(--mat-sys-title-large);
-    letter-spacing: var(--mat-sys-title-large-tracking);
-    color: var(--mat-sys-on-surface-variant);
-  }
-
-  &-scrim-enter {
-    animation: app-scrim-in var(--app-duration-medium) var(--app-ease-standard);
-  }
-
-  &-scrim-leave {
-    animation: app-scrim-out var(--app-duration-short) var(--app-ease-standard) forwards;
-  }
-
-  &-drawer-enter {
-    animation: app-drawer-in var(--app-duration-medium) var(--app-ease-decelerate);
-  }
-
-  &-drawer-leave {
-    animation: app-drawer-out var(--app-duration-short) var(--app-ease-accelerate) forwards;
-  }
-}
-
-@keyframes app-scrim-in {
-  from {
-    opacity: 0;
-  }
-}
-
-@keyframes app-scrim-out {
-  to {
-    opacity: 0;
-  }
-}
-
-@keyframes app-drawer-in {
-  from {
-    transform: translateX(-100%);
-  }
-}
-
-@keyframes app-drawer-out {
-  to {
-    transform: translateX(-100%);
-  }
-}
-```
-
-<!-- /embed -->
-
-Shell notes:
-
-- `NavMenu` reads `CurrentUserStore.link('admin')` for `adminOnly` destinations and
-  `App` reads `AuthStore.isSignedIn()`. Swap those two reads for your app's
-  role/auth check; nothing else in the shell knows about them.
-- The footer is a discreet build-version marker (`environment.version`); drop it
-  if you don't want one.
-- The `AppShell-*` and `NavMenu-*` state classes (`is-active`, `is-rail`,
-  `is-drawer`) follow the naming rule above; the compound selectors are top-level
-  blocks with the full class name.
-
-### 5. Screen recipes
-
-Each recipe is the M3 answer to a recurring need. Class names are examples — use
-your component's own namespace.
-
-**Page skeleton.** A route's top-level element carries `.App-page` beside its own
-class; the title is the page's only `h1`.
-
-```html
-<div class="TodosList App-page">
-  <header class="TodosList-header">
-    <h1 class="TodosList-title">My todos</h1>
-  </header>
-  <!-- filter, list, empty/error states -->
-  <a matFab extended class="TodosList-fab" routerLink="/todos/new">
-    <mat-icon>add</mat-icon>
-    New todo
-  </a>
-</div>
-```
-
-```scss
-@use 'ui';
-.TodosList {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 16px;
-  &-title {
-    @include ui.page-title;
-  }
-  &-fab {
-    @include ui.fab-position;
-  }
-}
-```
-
-**Grouped list** (todos, groups, members, admin tools, tags). One surface, hairlines
-between rows, a 72px two-line row, leading control/avatar, trailing actions.
-Leave clearance for the FAB (`margin-bottom: 72px`) on FAB pages.
-
-```scss
-&-items {
-  align-self: stretch;
-  margin: 0 0 72px;
-  padding: 0;
-  list-style: none;
-  border-radius: var(--mat-sys-corner-large);
-  background: var(--mat-sys-surface-container-low);
-  overflow: hidden;
-}
-&-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  min-height: 72px;
-  padding: 8px 8px 8px 4px;
-  & + & {
-    border-top: 1px solid var(--mat-sys-outline-variant);
-  }
-}
-```
-
-A row that is itself a link uses `@include ui.state-layer(var(--mat-sys-on-surface));`
-plus a focus outline with a negative offset (`outline-offset: -3px`) so it isn't
-clipped by the list's `overflow: hidden`. A list of _actionable state_ (todos)
-uses a leading toggle icon button (`radio_button_unchecked` → `check_circle` with
-`is-filled`), strikes the title through and dims the row when done, and shows an
-overdue due-date in `error`.
-
-**Avatar.** A 40px disc with the initial: `display: grid; place-items: center;
-width: 40px; height: 40px; border-radius: var(--mat-sys-corner-full);
-background: var(--mat-sys-primary-container); color: var(--mat-sys-on-primary-container);
-font: var(--mat-sys-title-medium); text-transform: uppercase;`. Use
-`secondary-container` for a person inside another entity's list (members).
-
-**Tonal panel for a short form** (create group, add tag, post composer). Not a
-card, not a dialog — an inline panel that opens above the list.
-
-```scss
-&-form {
-  padding: 16px;
-  border-radius: var(--mat-sys-corner-large);
-  background: var(--mat-sys-surface-container-low);
-}
-```
-
-Fields are `ngx-forms` field components, or a whole `DynamicForm` (see "Shared
-libraries"). They already render `mat-form-field appearance="outline"
-subscriptSizing="dynamic"`. Actions right-aligned: text **Cancel**, filled
-**Save**.
-
-**Empty state.** `@include ui.empty-state;` with a 48px primary icon, a
-`title-large` heading and one `body-medium` line saying what to do next. Keep the
-class name your spec looks for (`.TodosList-empty`).
-
-**Loading state.** A skeleton shaped like the content arriving, from `ngx-media`:
-`ContentLoader` for a text block, and `CardLoader` repeated for a list of cards.
-The region being filled carries `aria-busy="true"`. Never bare "Loading…" text,
-and no spinner for content.
-
-**Error / notice banner.**
-
-```scss
-&-error {
-  @include ui.banner(error);
-} // <p class="X-error" role="alert">…</p>
-```
-
-**Filter → segmented button; sections → tabs.** A handful of exclusive filters
-(`All / New / Active / Closed`) is a `mat-button-toggle-group` (M3 segmented
-button; shows a check on the selected one). Switching _sections of one page_
-(Posts / Members / Followers) is M3 primary tabs:
-
-```html
-<nav mat-tab-nav-bar aria-label="Sections" [tabPanel]="panel">
-  <a mat-tab-link [active]="section() === 'posts'" (click)="section.set('posts')">Posts</a>
-  <a mat-tab-link [active]="section() === 'members'" (click)="section.set('members')"
-    >Members (24)</a
-  >
-</nav>
-<mat-tab-nav-panel #panel> <!-- the section's content --> </mat-tab-nav-panel>
-```
-
-**Overflow menu** for rarely-used and destructive actions, beside at most one
-primary and one secondary visible button:
-
-```html
-<button
-  matIconButton
-  type="button"
-  aria-label="More group actions"
-  title="More"
-  [matMenuTriggerFor]="more"
->
-  <mat-icon>more_vert</mat-icon>
-</button>
-<mat-menu #more="matMenu" xPosition="before">
-  <button mat-menu-item type="button" (click)="edit()">
-    <mat-icon>edit</mat-icon><span>Edit group</span>
-  </button>
-  <button mat-menu-item type="button" class="X-danger" (click)="remove()">
-    <mat-icon>delete</mat-icon><span>Delete group</span>
-  </button>
-</mat-menu>
-```
-
-```scss
-&-danger {
-  --mat-menu-item-label-text-color: var(--mat-sys-error);
-  --mat-menu-item-icon-color: var(--mat-sys-error);
-}
-```
-
-**Confirmation dialog.** `MatDialog` + a shared `ConfirmDialog`. A destructive
-confirm button gets `ui.danger-button(filled)`; the cancel is a text button. Title
-and confirm label use the same verb (Delete todo → **Delete**).
-
-**Home tile** (a destination on the landing page). A whole-surface link, one
-`title-large` line and one supporting line; icon in a 48px `primary-container`
-well (`tertiary-container` for the accent role). Compact: a row (icon beside
-text, `display: grid; grid-template-columns: auto 1fr`); from `sm`: a tall column
-tile. Unavailable destinations render the same shape without the link and with
-the error colour.
-
-**Chat / composer.** A realtime room is `ChatRoom` from `ngx-web-sockets`, which
-implements this recipe; build by hand only a thread that isn't socket-based.
-Bubbles: the user's in `primary-container` (right), the
-other party's in `surface-container-high` (left); large corners with one
-`extra-small` corner on the speaker's side. Composer: outlined field + a filled
-icon button (`ui.filled-icon-button`, `aria-label="Send message"`), pinned at the
-bottom of the thread (`position: sticky; bottom: 0` on a page that scrolls, or a
-fixed-height shell whose message list scrolls). Suggestion chips: 32px, 1px
-`outline`, `corner-small`, `label-large`, `ui.state-layer`.
-
-**Content card** (a feed post; anything whose item has a title, a description
-and maybe media). An M3 filled card: `surface-container-low`, `corner-large`,
-padding 16 (20/24 from `sm`). Top to bottom: a **byline** (40px avatar, author in
-`title-small`, then context and a relative time in `body-small`), the **title** in
-`title-large` (an `h2`), the **description** in `body-medium`
-`on-surface-variant` clamped to three lines, **media** full-width at 16:9
-(`object-fit: cover`, `corner-medium`; video via `ngx-media`'s `YoutubePlayer`),
-then a row of text-button **actions**.
-The whole card opens the item: the title link carries a stretched `::after`
-(`position: absolute; inset: 0`), the card tints on
-`:has(.X-title:hover)` and shows the focus ring on `:has(.X-title:focus-visible)`,
-and everything else interactive inside (links in the byline, the action row's
-buttons, media players, credit links) is `position: relative; z-index: 1` so it
-stays its own target. Don't nest interactive elements inside the title link.
-The detail page uses the same surface for the item itself, with its discussion
-below it. Times read relative (`relativeTime` pipe, see "Dates and times": "5
-hours ago", "yesterday", then "Sep 12") inside `<time datetime>` with the full
-timestamp in `title`.
-A toggle button with `aria-pressed` keeps a stable name ("Like (12)"), never
-one that flips between Like and Unlike.
-
-**Insights / charts.** Charts are `ngx-graphs` components. The styling rules
-below are what that library applies by default, so an app supplies data, not
-chart options. Decide the
-form before the colour: a handful of headline numbers is a **KPI row** of stat
-tiles (label, value in `headline-medium`, a delta "vs previous N days" with a
-`trending_up/down/flat` icon — direction is never colour alone); change over time
-is a **column chart per metric**. Measures on different scales (likes vs groups)
-get **small multiples**, never two y-axes. A single series has no legend — its
-title names it. Marks: columns ≤ 24px wide with a 2px gap, 4px rounded top and
-square at the baseline, hairline `outline-variant` grid with clean ticks
-(1/2/5×10ⁿ), the peak labelled and nothing else, text in text tokens. Marks wear
-`--app-chart-1` (M3 tonal steps read grey as data marks; this token was run
-through a palette validator for contrast ≥ 3:1, lightness band and chroma in both
-modes — re-validate if you change it). Every chart is interactive: hover and
-arrow keys show a tooltip (value first, date second) and it has an `aria-label`
-summary; every number is also in a table view (`<details>` "Show data"). Not yet in
-`ngx-graphs`: the peak label and arrow-key tooltips — until they land, the table view
-is the keyboard route to the values.
-Filters (a period segmented button) sit in one row above everything they scope;
-switching keeps the previous numbers on screen dimmed until the new ones arrive
-(`linkedSignal` over the resource). Set a graph's height with `--ngx-graph-height`;
-it sizes itself to the width.
-
-**Expandable detail** (`<details>`): a 32px `label-large` summary with a chevron
-icon that rotates 180° when open; the revealed block on `surface-container`,
-`corner-medium`.
-
-**Hero** (public landing only): `headline-large` → `display-small`, left-aligned,
-max ~20ch, one supporting line at `max-width: 52ch`, one filled button. Nothing
-else competes with it.
-
-### 6. Gotchas (each one cost time)
-
-- **`matIconButton` has no filled appearance** — use `ui.filled-icon-button`.
-  `matButton` does: `"filled" | "tonal" | "outlined" | "elevated"` (text is the
-  default).
-- **Button colours come from component tokens.** A plain `color: var(--mat-sys-error)`
-  on a `matButton` doesn't reliably win — set the tokens (`ui.danger-button`).
-  Menu items likewise: `--mat-menu-item-label-text-color` / `-icon-color`.
-- **`mat-card appearance="filled"`** defaults to `surface-container-highest`;
-  override `--mat-card-filled-container-color` to `surface-container-low` to match
-  lists and panels.
-- **`mat-tab-nav-bar` requires `[tabPanel]`** (a `mat-tab-nav-panel`). `mat-tab-link`
-  on an `<a>` without `href` works: Enter/Space trigger the click.
-- **A routed component's host element is the flex item**, not the root `div` inside
-  it. If its content must scroll inside a fixed-height shell, give the host
-  `:host { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }`
-  or the inner `flex`/`min-height: 0` never applies and the page overflows.
-- **`white-space: pre-wrap` shows the template's leading space.** For user text use
-  `pre-line`, or keep the interpolation tight (`<p>{{ text }}</p>`).
-- **Component style budget** (4 kB warning per stylesheet): prefer logical corner
-  properties over four-value `border-radius`, delete dead rules, and lean on the
-  shared mixins instead of repeating long declarations.
-- **Icons:** use Material Symbols names — never the legacy `favorite_border` /
-  `chat_bubble_outline` aliases; show a filled state with `is-filled`. The font
-  link needs `display=block`.
-- **`animate.enter` / `animate.leave`** (Angular's CSS animation hooks) drive the
-  drawer and scrim; the classes must run `@keyframes`. Use `@if` for the element so
-  `cdkTrapFocus` + `[cdkTrapFocusAutoCapture]="true"` capture on open and restore
-  focus on close.
-- **`view-transition-name` on persistent chrome** (app bar, rail) or the whole page
-  cross-fades including them.
-- **Unit tests run without `matchMedia`**, so `BreakpointObserver` never reports
-  compact: a signed-in `App` test gets the rail. Stub the auth store with a
-  provider (`{ provide: AuthStore, useValue: { isSignedIn: () => true } }`);
-  `patchState` isn't available on a signalStore's public type.
-- **A failed `httpResource` throws from `value()`.** Any `computed()` that reads
-  `resource.value()` blows up once the request fails, so the page sticks on
-  "Loading…" instead of showing its error. Read through a guard —
-  `data = computed(() => (res.hasValue() ? res.value() : undefined))` — and derive
-  everything else from `data()`. Test it: flush a 500 and assert the store reads
-  empty with an error message. `ngx-api-client`'s `resource()` /
-  `collectionResource()` already do this; the guard is only needed on a raw
-  `httpResource`.
-- **Put `position: sticky` on the component's host, not an element inside it.**
-  A sticky element only stays put within its parent's box; a sticky `<header>`
-  inside an `<app-nav-bar>` host of the same height scrolls away with the page.
-  `:host { position: sticky; top: 0; display: block; }`. Verify it by scrolling
-  and checking the element's `getBoundingClientRect().top` is still 0 — a colour
-  check alone won't catch it.
-- **Screenshot full pages at the height you need.** A Playwright `fullPage`
-  capture of a page taller than the viewport resizes the viewport mid-capture;
-  anything laid out from a `ResizeObserver` (charts) can be caught half
-  re-rendered — blank or stretched — even though the app is fine. Use a viewport
-  tall enough for the page, or `clip`.
-- **Keep the class names your specs query** (`.TodosList-empty`, `.TodoForm-title`,
-  `mat-button-toggle button`) when restyling.
-- **Tests that stub a store's `me()`**: `Object.defineProperty(store, 'me', { value: () => … })`
-  works because `me` is a class field.
-
-### 7. Verifying and reviewing a screen
-
-Before merging a screen, check it at **390px and 1280px, light and dark**.
-Because most screens sit behind sign-in, verify visually with a throwaway harness
-rather than by hand: a scratch copy of the app (outside the repo) whose `AuthStore`
-is replaced by a stub that reports "signed in", `environment.apiUrl = ''`, and
-Playwright `page.route('**/api/**', …)` returning fixture envelopes; take
-screenshots at both widths and in both colour schemes
-(`browser.newContext({ colorScheme: 'dark', viewport: … })`). Also script the
-behavioural checks screenshots can't show: drawer focus trap / Escape / focus
-restore, rail active state and `aria-current`, resize across 600px, no console
-errors with view transitions on.
-
-Review checklist:
-
-- [ ] Only `--mat-sys-*` tokens and `--app-*` variables; no hex, no raw radii, no shadows.
-- [ ] Every container has its `on-` pair; reads in dark.
-- [ ] One filled button; create action is a FAB; rare actions in an overflow menu.
-- [ ] Lists are grouped surfaces with hairlines; rows ≥ 56px; touch targets ≥ 48px.
-- [ ] `h1` present once; landmarks and labels correct; icon-only buttons labelled.
-- [ ] Visible focus on custom interactive elements (`ui.focus-ring` / `ui.state-layer`).
-- [ ] Error `role="alert"`, results `role="status"`; empty state written; loading state
-      is an `ngx-media` skeleton, not "Loading…" text.
-- [ ] Nothing re-implements a shared library (API client, form fields, loaders, charts,
-      AI surfaces, sockets); no `--ngx-*` variable set to a hex value.
-- [ ] Dates: string models in the right kind (business date / time / instant), `Temporal`
-      for any arithmetic, no `Date` maths.
-- [ ] Mobile-first (`bp.up`), no horizontal scroll at 390px, content capped on wide screens —
-      check at 1920px and 2560px too, not just 1280px.
-- [ ] Motion only in response to the user or a route change; reduced motion respected.
-- [ ] Copy: sentence case, action verbs, same word through the flow.
-- [ ] Error state checked by failing the request (500), not only the happy path.
-- [ ] Error banners use `apiErrorMessage()`; nothing reads `error.error.detail` by hand.
+How it works: `mat.theme()` still emits every `--mat-sys-*` token, so Angular Material and the
+`@wiltech-labs/ngx-*` packages (which read those tokens) keep working. The tokens that carry the
+look are then pointed at the brand tokens (`--mat-sys-primary: var(--brand)`), and the heading
+type tokens are redefined in the brand face at 600. So there are two ways to read a value in a
+component, and both are fine:
+
+- a **brand token** (`var(--ink)`, `var(--line)`, `var(--brand)`, `var(--radius)`) in hand-built
+  chrome;
+- a **`--mat-sys-*` token** (`font: var(--mat-sys-title-large)`,
+  `background: var(--mat-sys-surface-container-low)`), as the shared mixins in `ngx-styles`'
+  `ui` do.
+
+Sizes that depend on the app (`--app-page-max-width`, the bar's height) are yours to change.
+
+### 4. Themes
+
+A theme is **a block of brand tokens**. Everything else follows it: hand-built chrome, Material
+controls and the `ngx-*` packages.
+
+- **An app's own brand** (the usual case): change `--brand`, `--brand-strong`, `--brand-tint`,
+  and the accent pair, in `:root`. Pick a brand colour that passes 4.5:1 against `--on-brand`
+  and against `--surface`; make the tint about 8-10% of the brand on white.
+- **Several themes at run time**: one `html[data-theme='name'] { ... }` block per theme, as at
+  the end of `styles.scss`. `@wiltech-labs/ngx-themes` sets the attribute, offers the switcher
+  and remembers the choice.
+- **Dark**: an app that offers it adds a dark block that redefines the neutrals as well (the
+  commented example), and sets `color-scheme: dark` so the remaining Material tokens follow.
+  Check contrast in it; don't offer a dark theme nobody has looked at.
+- **A tenant's colours** (white-label): set the same tokens from the tenant's settings at start
+  up, on `document.documentElement.style`.
+
+Because a theme can change any colour, **components never contain a colour value**: no hex, no
+`rgb()`, except inside the token blocks of `styles.scss`. Translucent variants come from
+`color-mix(in srgb, var(--brand) 12%, transparent)`.
+
+### 5. Guidelines
+
+Defaults that make a screen read as Ink & Signal. Depart from one when the design is better for
+it (section 1).
+
+**Colour**
+
+- Brand for anything that responds to the pointer; brand tint for the selected or current
+  thing. One primary (filled, brand) button per view.
+- The accent keeps its one meaning. If a screen seems to need a third colour, it is probably
+  doing too much.
+- Errors use Material's error tokens (`--mat-sys-error`, `--mat-sys-error-container`), with
+  words and an icon, never colour alone.
+
+**Type**
+
+| Job | Use |
+| --- | --- |
+| Landing or hero headline | `--mat-sys-display-medium` (one per page at most) |
+| Page title (`h1`) | `--mat-sys-headline-large` |
+| Section, card or panel title | `--mat-sys-title-large`; denser rows `--mat-sys-title-medium` |
+| Body and lists | the body default (Inter 15px / 1.55); `--mat-sys-body-large` for a lead |
+| Hints, captions, metadata | `--mat-sys-body-small` or `-medium` in `var(--muted)` |
+| Buttons, chips, tabs | `--mat-sys-label-large` |
+| A number that is information | Space Grotesk, tabular (`.App-numeric`) |
+
+Set `letter-spacing` to the token's `-tracking` partner. Keep running text to 55-70 characters.
+Sentence case everywhere. An uppercase tracked label is for status or position ("Step 2 of 5")
+only; never stack one above a heading as decoration.
+
+**Shape and depth**
+
+- `--radius` for cards and containers, `--radius-sm` for controls, a pill for stand-alone
+  buttons and status markers. Borders are 1px: `--line` for structure, `--line-strong` for
+  things you can press.
+- Flat with a hairline at rest. `--shadow-md` belongs to the one surface being worked on (the
+  current step, the open form), not to every card.
+- No glass or blur as decoration, no gradient text, no coloured side-stripe on cards.
+
+**Layout and navigation**
+
+- Mobile first; one centred column capped at `--app-page-max-width`; forms and reading columns
+  narrower (about 640-720px). More space above a heading than below it.
+- The bar is hand-built: sticky, on the paper, with a hairline under it. An app with a handful
+  of destinations puts them in the bar; one with many (Crewly) uses a rail from medium windows
+  and a drawer on a phone. Shape the navigation the app needs rather than copying another
+  app's.
+- Lists of records are rows on one surface with hairlines between them. Use cards when each
+  item is a thing to pick or open, not as the default container. Never nest cards.
+
+**Angular Material, themed to match**
+
+| Control | Use |
+| --- | --- |
+| Primary action | `matButton="filled"`; secondary `matButton="outlined"`; tertiary plain `matButton` |
+| Fields | `mat-form-field appearance="outline"`, through `ngx-forms` |
+| Cards | `mat-card appearance="outlined"` (or `ngx-components`' `Card`): border, no shadow |
+| Choices | chips, button toggles and radios; a radio "card" row for choices that need a sentence |
+| Menus, dialogs, progress | Material's, as they come |
+
+Theme Material only through tokens in `styles.scss` (system tokens, or a component's own
+`--mat-*` tokens on a wrapper). Don't reach into Material's internal classes from a component.
+
+**Motion**
+
+- State changes about 150ms; an entrance about 280ms on `--app-ease-decelerate`, opacity with a
+  short upward settle.
+- One authored moment per view (a step completing, a result arriving), not an animation on
+  every element, and nothing that loops on its own. The exception is the rotating gradient of
+  `ngx-ai-tools` surfaces, which marks AI at work.
+
+**Copy**
+
+- **Minimal.** A page intro is one short line. Extra explanation goes in an info tooltip, not a
+  paragraph. A hint appears under a field only when it prevents a mistake; a subtitle only when
+  the title can't carry the meaning alone.
+- Sentence case. Buttons name the action (**Save**, **Add app**, **Delete**), and the same word
+  runs through the flow.
+- Empty states say what to do next. Errors say what happened and what to try, and don't
+  apologise.
+- Nothing invented: no made-up customers, numbers or claims in interface or marketing copy.
+
+### 6. The floor
+
+Whatever the look, every screen meets these.
+
+**Spacing**
+
+- Two spaces between components, as Sass tokens in `src/styles/_space.scss` (`@use 'space';`):
+  `space.$group` (20px) between things that belong together (a form's fields, the cards of a
+  list, the blocks of a panel, a section heading and its content) and `space.$section` (40px)
+  between things that don't (a page's header, its panels, its lists). A page root and every
+  panel holding more than one block are flex columns with one of the two as their `gap`;
+  nothing adds margins on top. `ngx-forms` spaces fields by `--ngx-form-gap`, set to the group
+  space.
+- Group before you space: a page is a few groups a section apart, each a flex column with the
+  group space inside. Seven blocks all a section apart read as seven unrelated things.
+- Controls belong with the block they act on (a filter, a date range, a create button, tabs): a
+  group's space from it, not a section's.
+- Inside a component (a title and its line, an icon and its label) spacing stays tight on the
+  4px grid. Buttons side by side are 8px apart.
+- Render nothing rather than an empty element in a stack: it still takes a `gap` on each side.
+- A long form flows into columns once there is room (`--ngx-form-columns`, `ngx-forms` 1.0.7+),
+  with the fields ordered so each row reads as a group.
+
+**Responsive**
+
+- Mobile first: base styles are the phone, `bp.up()` layers on the rest. No horizontal scroll at
+  390px; content capped on wide screens (check 1920px as well as 1280px).
+- Touch targets at least 48px. A list row's actions sit under its text on a phone.
+
+**Accessibility**
+
+- Text contrast at least 4.5:1 (3:1 for large text), in every theme the app offers.
+- Visible keyboard focus on everything interactive: Material draws its own; hand-built elements
+  get the global `:focus-visible` outline or `ui.focus-ring`.
+- Current destination: `routerLinkActive` + `ariaCurrentWhenActive="page"`.
+- Icon-only buttons need `aria-label` and `title`. Never put meaning only in an icon or only in
+  a colour.
+- Errors `role="alert"`; progress and results `role="status"`.
+- Landmarks: `header`, `nav` with a label, `main`, sections with a heading. One `h1` per page.
+- A modal traps focus, restores it, and closes on Escape.
+- `prefers-reduced-motion` is honoured (the global rule in `styles.scss`).
+
+**Tokens and libraries**
+
+- Colour, radius, shadow and type come from tokens (section 3). No colour values in components.
+- Nothing re-implements a shared library (API client, form fields, loaders, charts, AI
+  surfaces, sockets); see "Shared libraries".
+- Component classes follow "Component SCSS class naming".
+
+### 7. Designing a screen
+
+1. `/impeccable init` once per app, so `PRODUCT.md` says who it is for and what it must never
+   claim.
+2. For a new screen or a redesign, describe it and let `/impeccable` (or `/impeccable shape
+   <screen>` for a plan first) and the `frontend-design` plugin set the direction. Start from
+   the house look unless `DESIGN.md` says otherwise.
+3. Build it on the tokens. When the app has a few real screens, `/impeccable document` records
+   its look in `DESIGN.md`.
+4. Look at it before calling it done: 390px and 1280px, each theme the app offers, with real
+   data, the empty state and a failed request. Then `/impeccable critique` or `polish`.
+
+Because most screens sit behind sign-in, look at them with a throwaway harness rather than by
+hand: a scratch copy of the app (outside the repo) whose `AuthStore` is replaced by a stub that
+reports "signed in", against the real API run locally or Playwright routes returning fixture
+envelopes.
+
+### 8. Moving a Material 3 app to this look
+
+The older apps were built on the previous section (Roboto, a generated palette in
+`_theme-colors.scss`, tonal surfaces). Most of the change is the stylesheet:
+
+1. Swap the fonts in `index.html` and replace `styles.scss` with the one above, keeping the
+   app's own `.App-*` helpers and `--app-*` variables. Delete `_theme-colors.scss`.
+2. Components that read `--mat-sys-*` tokens pick up the new look as they are. Then fix what
+   the old look hid:
+   - `--mat-sys-outline` is now a border colour: text that used it (a footer, a caption) moves
+     to `var(--muted)`;
+   - the bar and navigation move from `--mat-sys-surface` (now white) to `var(--paper)` with a
+     hairline;
+   - grouped lists and panels on `surface-container-low` usually read better as white surfaces
+     with a `--line` border.
+3. Cut the text: intros to one line, hints only where they prevent a mistake.
+4. Run a `/impeccable critique` on the main screens and decide what deserves a real redesign.
+
+### 9. Gotchas
+
+- **`matIconButton` has no filled appearance**; `matButton` has `"filled" | "tonal" |
+  "outlined" | "elevated"` (text is the default).
+- **Button colours come from component tokens.** A plain `color: var(--mat-sys-error)` on a
+  `matButton` doesn't reliably win: set the button's tokens (`ui.danger-button`). Menu items
+  likewise: `--mat-menu-item-label-text-color` / `-icon-color`.
+- **`mat-tab-nav-bar` requires `[tabPanel]`** (a `mat-tab-nav-panel`).
+- **A routed component's host element is the flex item**, not the root `div` inside it. If its
+  content must scroll inside a fixed-height shell, give the host
+  `:host { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }`.
+- **Put `position: sticky` on the component's host**, not an element inside it: a sticky
+  element only stays put within its parent's box.
+- **`white-space: pre-wrap` shows the template's leading space.** For user text use `pre-line`,
+  or keep the interpolation tight.
+- **Component style budget** (4 kB warning per stylesheet): delete dead rules and lean on the
+  shared mixins.
+- **Icons:** Material Symbols names, never the legacy aliases; a filled state with `is-filled`.
+- **A failed `httpResource` throws from `value()`.** Read through a guard
+  (`res.hasValue() ? res.value() : undefined`); `ngx-api-client`'s `resource()` and
+  `collectionResource()` already do.
+- **Unit tests run without `matchMedia`**, so `BreakpointObserver` never reports a phone. Stub
+  the auth store with a provider rather than patching it.
+- **Screenshot full pages at the height you need.** A Playwright `fullPage` capture of a page
+  taller than the viewport draws sticky and fixed elements in the wrong place; use a viewport
+  tall enough, or `clip`.
+- **Keep the class names your specs query** when restyling.
+
+### 10. Review checklist
+
+- [ ] Looks right at 390px and 1280px, in each theme the app offers, with real data, an empty
+      state and a failed request (500).
+- [ ] No colour values in components; brand or `--mat-sys-*` tokens only.
+- [ ] One primary button per view; brand means "you can act here"; the accent keeps its meaning.
+- [ ] Headings in the brand face at 600; body in Inter; no thin default-weight headings.
+- [ ] Hairlines at rest; at most one lifted surface.
+- [ ] Spacing is the two tokens (20px grouped, 40px between groups); no stray margins.
+- [ ] Copy: one-line intro, hints only where they prevent a mistake, sentence case, buttons
+      name the action.
+- [ ] `h1` once; landmarks and labels correct; icon-only buttons labelled; visible focus.
+- [ ] Errors `role="alert"`, results `role="status"`; banners use `apiErrorMessage()`.
+- [ ] Nothing re-implements a shared library; no `--ngx-*` variable set to a colour value.
+- [ ] Dates: string models in the right kind, `Temporal` for arithmetic.
+- [ ] Reduced motion respected; nothing animates on its own.
 - [ ] Production build shows no new budget warnings; Prettier clean on touched files.
-- [ ] `npm run docs:check` passes.
 
 ## Component SCSS class naming
 
@@ -2885,9 +1467,8 @@ reverse), and content never stretches edge-to-edge on a wide monitor.
   button don't end up at opposite edges of the screen. Surfaces (the app bar's
   background) still run edge to edge; only their contents are capped.
   `--app-page-max-width` caps a page's content inside that column.
-- `styles.scss` defines `--app-page-max-width` (`900px`) and
-  `--app-gutter` (`16px` on compact windows, `24px` from `sm` up — M3's
-  margins) as the one shared source of truth, plus an
+- `styles.scss` defines `--app-page-max-width` (`1120px`) and
+  `--app-gutter` (`16px` on compact windows, `24px` from `sm` up) as the one shared source of truth, plus an
   `.App-page` utility class (`max-width: var(--app-page-max-width);
 margin: 0 auto; padding: var(--app-gutter);`) and an `.App-spacer`
   utility (`flex: 1 1 auto`, for pushing a flex sibling to the far end —
@@ -2925,8 +1506,7 @@ That import style — `@use 'breakpoints' as bp;` / `@use 'spacing';` —
 works from any stylesheet once wired. Adjust the specific values below
 per app.
 
-- `breakpoints` (`sm: 600px`, `md: 840px`, `lg: 1200px` — the M3 window size
-  classes) exposes
+- `breakpoints` (`sm: 600px`, `md: 840px`, `lg: 1200px`) exposes
   `bp.up($bp)` (min-width — the one to reach for, since layout is
   mobile-first) and `bp.down($bp)` (max-width, for the rare case a style
   needs to be capped instead of grown). Both accept a scale key or a raw
@@ -2936,12 +1516,12 @@ per app.
 - `spacing` exposes `spacing.space($n)` — a 4px-unit multiplier
   (`spacing.space(2)` = 8px, `spacing.space(4)` = 16px) for paddings,
   margins and gaps instead of ad hoc pixel values.
-- `ui` — the Material 3 building blocks (page/section titles, supporting text,
-  banner, state layer, focus ring, FAB position, empty state, filled icon button,
-  danger button). Full source and usage in "Design system: Material 3" above;
-  `@use 'ui';` then `@include ui.page-title;` on the component's own class.
-- `theme-colors` — the generated M3 tonal palettes, `@use`d only by
-  `styles.scss`.
+- `ui` — building blocks from `ngx-styles` (page/section titles, supporting text,
+  banner, state layer, focus ring, empty state, filled icon button, danger button).
+  They read the theme's tokens, so they follow the house look; `@use 'ui';` then
+  `@include ui.page-title;` on the component's own class.
+- `space` — the app's two spaces between components (`space.$group`, `space.$section`;
+  "Design system: Ink & Signal", section 6).
 - No `forms` partial: form field layout and styling come from
   `ngx-forms` (see "Shared libraries"). Don't add a local
   `mat-form-field` layout partial.
