@@ -3,7 +3,17 @@
 Working notes on what's outstanding across the monorepo. Not published anywhere, just a
 scratchpad so we don't lose track between sessions. Update as items land or priorities shift.
 
-## `ngx-organization` 1.0.1: people hold jobs for a time, not as nodes — built 2026-11-15, not published
+## `ngx-organization` 1.0.2: the app's own content in the detail panel — built 2026-11-17, not published
+
+- `detailTemplate` (`TemplateRef<OrgDetailContext>`: `let-item`, `card`) renders the app's content
+  below the details in the left panel, so editing happens beside the chart. Crewly puts its
+  Add/Change actions and forms there; before, they sat above the chart (scroll up, panel on top).
+- `panelClose` output. When `items` reload, the open panel stays on its item and shows it fresh,
+  or closes if it's gone.
+- `OrgNodeDetail`'s data is now `OrgDetailData` (`card`, `template`); it's internal.
+- [ ] Publish 1.0.2; Crewly: `npm i @wiltech-labs/ngx-organization@^1.0.2`.
+
+## `ngx-organization` 1.0.1: people hold jobs for a time, not as nodes — published 2026-11-15
 
 - The user's rules (2026-11-15): one organization at the top; org entities under it or under a
   department, never inside another entity; departments under the org, an entity or a department
@@ -20,9 +30,8 @@ scratchpad so we don't lose track between sessions. Update as items land or prio
 - Docs: the rules table in the README and `OrgItem`'s doc comment ("at most one reporting job",
   not "exactly one"). Showcase and Storybook samples send the new shape.
 - Python side: new `wiltech-labs-organization` 1.0.0 (py-libraries), the same rules and this shape.
-- Needed by Crewly's org chart (Admin → Org chart), which installs 1.0.1 from a local build
-  (`npm i --no-save`) until it's on npm.
-- [ ] Publish 1.0.1; Crewly: `npm i @wiltech-labs/ngx-organization@^1.0.1` to record it.
+- Crewly's org chart (Admin → Org chart) is the first real consumer.
+- [x] Published 1.0.1 (2026-11-15); Crewly depends on `^1.0.1` from npm.
 
 ## `ngx-styles` 1.0.2: the `ui` mixins in the Ink & Signal look — published 2026-11-15
 

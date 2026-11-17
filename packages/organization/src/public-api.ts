@@ -8,7 +8,11 @@ export type {
   OrgNodeType,
   OrgOccupancy,
 } from './lib/models/org-item.model';
-export type { OrgCard } from './lib/models/org-chart-node.model';
+export type {
+  OrgCard,
+  OrgDetailContext,
+  OrgDetailData,
+} from './lib/models/org-chart-node.model';
 
 export { OrgChartStore } from './lib/stores/org-chart.store';
 export { buildOrgTree } from './lib/utils/org-tree.utils';

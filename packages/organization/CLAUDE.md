@@ -28,8 +28,11 @@ src/lib/
 - **People are not nodes** (the user, 2026-11-15): an occupancy is a person holding a job for a
   date range. Since 1.0.1 it travels on the job (`OrgItem.occupancies`, with `startDate`/
   `endDate`); 1.0.0's `OCCUPANCY` items are still read (deprecated), a job's own list wins.
-- **Read-only.** `OrgItem.links` is carried through for the app to offer as actions (Crewly reads
-  them on `nodeSelect`).
+- **The chart never edits; the app can, inside the panel.** `OrgItem.links` is carried through for
+  the app to offer as actions. Since 1.0.2 `detailTemplate` puts the app's content (actions, the
+  forms they open) in the detail panel below the details: Crewly's forms first sat above the
+  chart, which meant scrolling up and the panel covering them (the user, 2026-11-17). The panel
+  refreshes on reload and emits `panelClose`.
 - **Department + reporting job = one card.** `buildOrgTree` absorbs the reporting job into its
   department and lifts the jobs filed under that job onto the department card.
 - **Depends on `ngx-api-client`, `ngx-auth`, `ngx-modals`** (all sanctioned) via `file:../x/dist`.

@@ -6,12 +6,16 @@ import {
   Injector,
   afterNextRender,
   computed,
+  effect,
   inject,
   input,
   output,
   signal,
+  untracked,
   viewChild,
+  type TemplateRef,
 } from '@angular/core';
+import type { OrgChartNode } from 'ngx-interactive-org-chart';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatIconButton } from '@angular/material/button';
@@ -25,7 +29,7 @@ import {
 } from 'ngx-interactive-org-chart';
 
 import { NGX_ORGANIZATION_TEXT } from '../../config/organization-text.token';
-import type { OrgCard } from '../../models/org-chart-node.model';
+import type { OrgCard, OrgDetailContext, OrgDetailData } from '../../models/org-chart-node.model';
 import type { OrgItem } from '../../models/org-item.model';
 import { buildOrgTree } from '../../utils/org-tree.utils';
 import { OrgNodeCard } from '../org-node-card/org-node-card';
@@ -88,6 +92,17 @@ interface PanZoom {
   zoomAbs(x: number, y: number, scale: number): void;
 }
 
+/** The card drawn for `id`, anywhere in the tree (collapsed branches included). */
+function findCard(node: OrgChartNode<OrgCard>, id: string): OrgCard | undefined {
+  if (String(node.id) === id) return node.data;
+  // The wrapped chart types children loosely; they are the same cards.
+  for (const child of (node.children ?? []) as OrgChartNode<OrgCard>[]) {
+    const found = findCard(child, id);
+    if (found) return found;
+  }
+  return undefined;
+}
+
 /** Scale phones open at: the wrapped chart's fit-to-width leaves cards too small to read. */
 const PHONE_SCALE = 0.8;
 
@@ -123,8 +138,17 @@ export class OrganizationChart {
   /** Shows the overview map in the bottom corner (never on phones, where it would cover the chart). */
   public readonly showMiniMap = input(true);
 
+  /**
+   * The app's own content for the detail panel, shown below the item's details: its actions and
+   * the forms they open, say, so editing happens beside the chart instead of above it. The
+   * context is the chosen item (`let-item`) and its `card`.
+   */
+  public readonly detailTemplate = input<TemplateRef<OrgDetailContext> | null>(null);
+
   /** The item behind the card the user clicked. */
   public readonly nodeSelect = output<OrgItem>();
+  /** The detail panel closed (its close button, or Escape). */
+  public readonly panelClose = output<void>();
 
   private readonly modals = inject(ModalService);
   /** The panel is created with the chart's injector, so what the page provides (a translated
@@ -163,6 +187,13 @@ export class OrganizationChart {
   constructor() {
     const host = this.host;
     const destroyRef = inject(DestroyRef);
+    // A reload (an edit saved, say) redraws the tree: the open panel stays on the same item and
+    // shows it as it is now, or closes if the item is gone.
+    effect(() => {
+      const tree = this.tree();
+      untracked(() => this.refreshPanel(tree));
+    });
+
     afterNextRender(() => {
       // After the wrapped chart's own fit-to-screen has settled.
       const timer = setTimeout(() => this.compact() && this.focusRootOnPhone(), 400);
@@ -197,7 +228,7 @@ export class OrganizationChart {
     this.selectedId.set(card.item.id);
 
     if (this.panel) {
-      this.modals.update(this.panel, { title: card.item.name, data: card });
+      this.modals.update(this.panel, { title: card.item.name, data: this.detailData(card) });
       this.keepClearOfPanel(card.item.id, this.panel.id);
       return;
     }
@@ -207,7 +238,7 @@ export class OrganizationChart {
       side: 'left',
       backdrop: false,
       minimizable: true,
-      data: card,
+      data: this.detailData(card),
       injector: this.injector,
     });
     this.panel = panel;
@@ -216,7 +247,20 @@ export class OrganizationChart {
       if (this.panel !== panel) return;
       this.panel = null;
       this.selectedId.set(null);
+      this.panelClose.emit();
     });
+  }
+
+  private detailData(card: OrgCard): OrgDetailData {
+    return { card, template: this.detailTemplate() };
+  }
+
+  private refreshPanel(tree: OrgChartNode<OrgCard> | null): void {
+    const id = this.selectedId();
+    if (!this.panel || !id) return;
+    const card = tree ? findCard(tree, id) : undefined;
+    if (card) this.modals.update(this.panel, { title: card.item.name, data: this.detailData(card) });
+    else this.panel.close();
   }
 
   private panZoom(): PanZoom | undefined {

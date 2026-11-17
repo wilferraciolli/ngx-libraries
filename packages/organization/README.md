@@ -46,9 +46,33 @@ import { OrganizationChart, type OrgItem } from '@wiltech-labs/ngx-organization'
 | `items`         | `OrgItem[]` (required) |         | The API's flat list.                             |
 | `expandedDepth` | `number`               | `2`     | Levels below the organization expanded at first. |
 | `showMiniMap`   | `boolean`              | `true`  |                                                  |
+| `detailTemplate` | `TemplateRef<OrgDetailContext>` | none | The app's own panel content, below the details (1.0.2). |
 | `nodeSelect`    | output `OrgItem`       |         | The item behind the clicked card.                |
+| `panelClose`    | output `void`          |         | The detail panel closed (1.0.2).                 |
 
 The chart is `clamp(480px, 75dvh, 960px)` tall; set `--ngx-organization-chart-height` to change it.
+
+### The app's own content in the panel (1.0.2)
+
+Pass `detailTemplate` to show the app's actions, and the forms they open, inside the detail panel,
+below the details. Editing then happens beside the chart: no form above it to scroll to, nothing
+for the panel to cover. The template's context is the chosen item (`let-item`) and its `card`; it
+keeps the page's injector and bindings, so it reads the page's own store.
+
+```html
+<ngx-organization-chart
+  [items]="store.items()"
+  [detailTemplate]="actions"
+  (nodeSelect)="chosen.set($event)"
+  (panelClose)="store.cancel()"
+/>
+<ng-template #actions let-item>
+  @if (store.editing()) { <app-department-form ... /> } @else { <button ...>Add a job</button> }
+</ng-template>
+```
+
+When `items` reload (after a save), the open panel stays on the same item and shows it as it is
+now; it closes if the item is gone.
 
 ### Data
 
@@ -128,9 +152,10 @@ a dot grid; override it with `--ngx-organization-canvas`, and cards with `--ngx-
 
 ## Status
 
-`1.0.0` published; `1.0.1` (occupancies on the job, with dates) built 2026-11-15, not published.
-Consumed by `apps/showcase` (`/organization`) and, from 1.0.1, Crewly's org chart, whose API sends
-this shape through `wiltech-labs-organization`.
+`1.0.1` published (2026-11-15): occupancies on the job, with dates. `1.0.2` (2026-11-17, not
+published): `detailTemplate` and `panelClose`, so an app edits inside the panel. Consumed by `apps/showcase`
+(`/organization`) and Crewly's org chart, whose API sends this shape through
+`wiltech-labs-organization`.
 
 ## Publishing
 

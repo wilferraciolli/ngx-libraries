@@ -1,4 +1,4 @@
-import { DOCUMENT } from '@angular/common';
+import { DOCUMENT, NgTemplateOutlet } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 
@@ -6,7 +6,7 @@ import {
   DEFAULT_ORGANIZATION_TEXT,
   NGX_ORGANIZATION_TEXT,
 } from '../../config/organization-text.token';
-import type { OrgCard } from '../../models/org-chart-node.model';
+import type { OrgDetailData } from '../../models/org-chart-node.model';
 import { initials } from '../../utils/org-tree.utils';
 
 /** An ISO date (`2026-03-01`) as the page's language writes a day, e.g. "1 Mar 2026". */
@@ -26,31 +26,33 @@ function formatDay(iso: string, locale: string | undefined): string {
 @Component({
   selector: 'ngx-org-node-detail',
   standalone: true,
-  imports: [MatIcon],
+  imports: [MatIcon, NgTemplateOutlet],
   templateUrl: './org-node-detail.html',
   styleUrl: './org-node-detail.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OrgNodeDetail {
-  public readonly data = input.required<OrgCard>();
+  public readonly data = input.required<OrgDetailData>();
 
   protected readonly text = inject(NGX_ORGANIZATION_TEXT)();
 
-  protected readonly typeLabel = computed(() => this.text.types[this.data().type]);
+  protected readonly typeLabel = computed(() => this.text.types[this.data().card.type]);
   protected readonly job = computed(() =>
-    this.data().type === 'JOB' ? this.data().item : this.data().reportingJob,
+    this.data().card.type === 'JOB' ? this.data().card.item : this.data().card.reportingJob,
   );
-  protected readonly personInitials = computed(() => initials(this.data().occupancy?.name ?? ''));
+  protected readonly personInitials = computed(() =>
+    initials(this.data().card.occupancy?.name ?? ''),
+  );
 
   private readonly locale = inject(DOCUMENT).documentElement.lang || undefined;
 
   /** "Since 1 Mar 2026" while the person still holds the job, "1 Mar – 31 Aug 2026" once it ends. */
   protected readonly dates = computed(() => {
-    const held = this.data().occupancy;
+    const held = this.data().card.occupancy;
     if (!held?.startDate) return '';
     const start = formatDay(held.startDate, this.locale);
     if (!held.endDate) return `${this.text.since ?? DEFAULT_ORGANIZATION_TEXT.since} ${start}`;
     return `${start} – ${formatDay(held.endDate, this.locale)}`;
   });
-  protected readonly showCounts = computed(() => this.data().type !== 'JOB');
+  protected readonly showCounts = computed(() => this.data().card.type !== 'JOB');
 }

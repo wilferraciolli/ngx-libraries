@@ -118,6 +118,12 @@
     }
   }
 
+  // The app's own content (its actions, the form they open), set apart from the details.
+  &-app {
+    padding-top: 20px;
+    border-top: 1px solid var(--mat-sys-outline-variant, #cac4d0);
+  }
+
   &-description {
     margin: 0;
     max-width: 65ch;

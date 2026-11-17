@@ -1,3 +1,5 @@
+import type { TemplateRef } from '@angular/core';
+
 import type { OrgItem, OrgNodeType, OrgOccupancy } from './org-item.model';
 
 /** What each card on the chart is drawn from. */
@@ -12,4 +14,17 @@ export interface OrgCard {
   path: string[];
   jobCount: number;
   departmentCount: number;
+}
+
+/** The context of the app's own panel content (`detailTemplate`): the chosen item, and the card
+ *  drawn from it. */
+export interface OrgDetailContext {
+  $implicit: OrgItem;
+  card: OrgCard;
+}
+
+/** What the detail panel is given: the card, and the app's template to show below the details. */
+export interface OrgDetailData {
+  card: OrgCard;
+  template?: TemplateRef<OrgDetailContext> | null;
 }

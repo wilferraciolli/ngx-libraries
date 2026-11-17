@@ -1,4 +1,4 @@
-@let card = data();
+@let card = data().card;
 <div class="OrgNodeDetail">
   <p class="OrgNodeDetail-type">{{ typeLabel() }}</p>
 
@@ -56,5 +56,11 @@
 
   @if (card.item.description) {
     <p class="OrgNodeDetail-description">{{ card.item.description }}</p>
+  }
+
+  @if (data().template; as template) {
+    <div class="OrgNodeDetail-app">
+      <ng-container *ngTemplateOutlet="template; context: { $implicit: card.item, card: card }" />
+    </div>
   }
 </div>
