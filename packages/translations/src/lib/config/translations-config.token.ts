@@ -23,9 +23,9 @@ export type LazyTranslation = () => Promise<Translation>;
  * the first download, e.g. `{ 'en-GB': () => import('./time/en-GB').then((m) => m.TIME_EN_GB) }`.
  * The area's routes load it with `translationArea()`, the first time someone opens one of them, in
  * the locale they're using; a later language switch loads that locale's too. Its keys are merged
- * into the locale's dictionary as they are, so keep each area's top-level keys its own. Give every
- * locale the app supports: a locale left out shows its fallback locale's text only when that one is
- * loaded too.
+ * into the locale's dictionary as they are, so keep each area's top-level keys its own. A locale
+ * may translate an area in part, or be left out: the default locale's strings for the area load
+ * beside it, and fill in what it doesn't say.
  */
 export type TranslationArea = Readonly<Record<string, LazyTranslation>>;
 

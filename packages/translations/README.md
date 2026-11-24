@@ -91,6 +91,10 @@ language switch loads every area opened so far in the new locale before switchin
 can't load (offline) are logged, and their keys show; the page still opens.
 `TranslationsService.loadArea(area)` does the same outside a route.
 
+A locale may translate an area in part, or not at all (an app adding a language one area at a
+time): the default locale's strings for the area load beside it and fill in what it doesn't say
+(1.0.6). Before 1.0.6 a missing key showed bare unless the default's area had loaded too.
+
 ### Many locales, or translations served by the backend
 
 Provide a `loader` instead of `dictionaries` — a class implementing Transloco's `TranslocoLoader`

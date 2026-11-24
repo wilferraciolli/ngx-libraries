@@ -108,6 +108,17 @@ export class TranslationsService {
   }
 
   private loadAreaIn(area: TranslationArea, locale: string): Promise<void> {
+    // A key the locale leaves out shows the default locale's text (Transloco's fallback), so the
+    // default's strings for the area load beside it: a locale can translate an area in part, or
+    // not at all, and still show no bare keys.
+    const fallback: string = this.config.defaultLocale;
+    const own: Promise<void> = this.loadOneArea(area, locale);
+    return locale === fallback
+      ? own
+      : Promise.all([own, this.loadOneArea(area, fallback)]).then((): void => undefined);
+  }
+
+  private loadOneArea(area: TranslationArea, locale: string): Promise<void> {
     let byLocale = this.areaLoads.get(area);
     if (!byLocale) {
       byLocale = new Map<string, Promise<void>>();

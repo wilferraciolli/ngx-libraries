@@ -3,13 +3,23 @@
 Working notes on what's outstanding across the monorepo. Not published anywhere, just a
 scratchpad so we don't lose track between sessions. Update as items land or priorities shift.
 
-## `ngx-translations` 1.0.5: the API answers in the user's language — drafted 2026-11-21, not published
+## `ngx-translations` 1.0.6: a language can translate an area in part — drafted 2026-11-24, not published
+
+- An area loaded in a locale other than the default also loads the default's strings for it, so a
+  key the locale leaves out shows the default's text (Transloco's fallback), never the bare key,
+  and an area the locale doesn't translate at all shows in the default. `TranslationsService`'s
+  `loadAreaIn` / `loadOneArea`; the `TranslationArea` docs and the README say so.
+- [ ] Review, build, publish 1.0.6. Crewly (build plan 2.6, employee screens in Nepali) keeps a
+  `TEMPORARY` stand-in, `withEnglishUnderneath` in `crewly-ui/src/app/core/translations/`, until
+  it is on npm. No package here has unit tests; checked by building the package.
+
+## `ngx-translations` 1.0.5: the API answers in the user's language — published 2026-11-24
 
 - `languageInterceptor`: the current locale as `Accept-Language` on every request (one the request
   doesn't set itself), so an API answers in the app's language. CORS-safelisted, so no preflight.
   The Python side is `wiltech-labs-core` 1.1.3's `register_translations`.
-- [ ] Build, publish 1.0.5. Crewly (build plan 2.9, Greek API text) keeps a `TEMPORARY` copy in
-  `crewly-ui/src/app/core/api/language.interceptor.ts` until it is on npm.
+- [x] Built and published 1.0.5. Crewly imports it from the package (^1.0.5); its `TEMPORARY` copy
+  is deleted.
 
 ## `ngx-organization` 1.0.2: the app's own content in the detail panel — published 2026-11-17
 
