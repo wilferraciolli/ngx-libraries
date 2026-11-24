@@ -22,6 +22,9 @@ export { TranslationsService } from './lib/services/translations.service';
 // Pipe
 export { TPipe } from './lib/pipes/t.pipe';
 
+// HTTP interceptor
+export { languageInterceptor } from './lib/interceptors/language.interceptor';
+
 // Types for a custom `loader` (see `NgxTranslationsConfig.loader`) — re-exported so a consumer never
 // needs to import from `@jsverse/transloco` directly.
 export type { Translation, TranslocoLoader } from '@jsverse/transloco';

@@ -3,7 +3,15 @@
 Working notes on what's outstanding across the monorepo. Not published anywhere, just a
 scratchpad so we don't lose track between sessions. Update as items land or priorities shift.
 
-## `ngx-organization` 1.0.2: the app's own content in the detail panel — built 2026-11-17, not published
+## `ngx-translations` 1.0.5: the API answers in the user's language — drafted 2026-11-21, not published
+
+- `languageInterceptor`: the current locale as `Accept-Language` on every request (one the request
+  doesn't set itself), so an API answers in the app's language. CORS-safelisted, so no preflight.
+  The Python side is `wiltech-labs-core` 1.1.3's `register_translations`.
+- [ ] Build, publish 1.0.5. Crewly (build plan 2.9, Greek API text) keeps a `TEMPORARY` copy in
+  `crewly-ui/src/app/core/api/language.interceptor.ts` until it is on npm.
+
+## `ngx-organization` 1.0.2: the app's own content in the detail panel — published 2026-11-17
 
 - `detailTemplate` (`TemplateRef<OrgDetailContext>`: `let-item`, `card`) renders the app's content
   below the details in the left panel, so editing happens beside the chart. Crewly puts its
@@ -11,7 +19,7 @@ scratchpad so we don't lose track between sessions. Update as items land or prio
 - `panelClose` output. When `items` reload, the open panel stays on its item and shows it fresh,
   or closes if it's gone.
 - `OrgNodeDetail`'s data is now `OrgDetailData` (`card`, `template`); it's internal.
-- [ ] Publish 1.0.2; Crewly: `npm i @wiltech-labs/ngx-organization@^1.0.2`.
+- [x] Published 1.0.2 (2026-11-17); Crewly depends on `^1.0.2`.
 
 ## `ngx-organization` 1.0.1: people hold jobs for a time, not as nodes — published 2026-11-15
 

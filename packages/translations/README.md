@@ -134,6 +134,17 @@ provideTranslations({
 });
 ```
 
+### An API that answers in the user's language
+
+`languageInterceptor` sends the current locale as `Accept-Language` on every request, so an API
+that writes its own words (error messages, notifications, exported files) answers in the language
+the app is in; Python apps read it with `wiltech-labs-core`'s `register_translations`. A request
+that sets its own `Accept-Language` keeps it.
+
+```ts
+provideHttpClient(withInterceptors([authInterceptor, languageInterceptor]));
+```
+
 ## Usage
 
 ```ts
