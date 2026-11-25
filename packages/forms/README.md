@@ -359,6 +359,22 @@ Three CSS custom properties, set on any ancestor of the form (or app-wide on `:r
 Order the fields so each row reads as a group (first name and surname, postcode and city). A field
 with `maxWidth` keeps it inside its column.
 
+## Turnstile
+
+`NgxTurnstile` (1.0.8) shows Cloudflare Turnstile's check that a person is filling in the form.
+It loads Cloudflare's script once per page, only where it's used, and hands over its token:
+
+```html
+<ngx-turnstile [siteKey]="siteKey" action="sign-up" language="el" (token)="token.set($event)" />
+```
+
+`token` gives the token once the check passes, and `null` when it expires (five minutes) or fails;
+send the latest with the form, and verify it on the server (`wiltech-labs-core`'s
+`get_turnstile`). A token is good once, so after a refused submit call `reset()` for another.
+`failed` fires when the widget can't load or run (offline, blocked by an extension). Inputs:
+`siteKey` (public, from the Cloudflare dashboard), `action` (checked by the server), `language`
+(`auto`, the default, or one Turnstile has) and `theme` (`auto`, `light`, `dark`).
+
 ## Other exports
 
 - `toSchema(fields)` — field definitions to Signals Forms rules

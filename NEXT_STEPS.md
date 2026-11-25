@@ -3,15 +3,27 @@
 Working notes on what's outstanding across the monorepo. Not published anywhere, just a
 scratchpad so we don't lose track between sessions. Update as items land or priorities shift.
 
-## `ngx-translations` 1.0.6: a language can translate an area in part — drafted 2026-11-24, not published
+## `ngx-auth` 1.0.4 and `ngx-forms` 1.0.8: sign-up — built 2026-11-25, not published
+
+- `ngx-auth`: `AuthStore.signUp(redirectUrl = this page)`, the Account Portal's sign-up page (Clerk's
+  `redirectToSignUp`), beside `signIn()`. README: Sign in / sign out.
+- `ngx-forms`: `NgxTurnstile` (`<ngx-turnstile [siteKey] [action] [language] [theme] (token) (failed)>`),
+  Cloudflare Turnstile's widget, the script loaded once per page and rendered explicitly; `token`
+  emits the token, then `null` when it expires or fails; `reset()` after a refused submit. README:
+  Turnstile. The server side is `wiltech-labs-core` 1.1.5's `get_turnstile`.
+- For Crewly's self-serve sign-up (build plan 3.1), which carries `TEMPORARY` stand-ins:
+  `crewly-ui/src/app/core/auth/sign-up.ts` (`signUp`) and `crewly-ui/src/app/shared/turnstile/`.
+- [ ] Review, build and publish both; then Crewly requires `^1.0.4` and `^1.0.8` and deletes the
+  stand-ins.
+
+## `ngx-translations` 1.0.6: a language can translate an area in part — published 2026-11-24
 
 - An area loaded in a locale other than the default also loads the default's strings for it, so a
   key the locale leaves out shows the default's text (Transloco's fallback), never the bare key,
   and an area the locale doesn't translate at all shows in the default. `TranslationsService`'s
   `loadAreaIn` / `loadOneArea`; the `TranslationArea` docs and the README say so.
-- [ ] Review, build, publish 1.0.6. Crewly (build plan 2.6, employee screens in Nepali) keeps a
-  `TEMPORARY` stand-in, `withEnglishUnderneath` in `crewly-ui/src/app/core/translations/`, until
-  it is on npm. No package here has unit tests; checked by building the package.
+- [x] Built and published 1.0.6. Crewly requires ^1.0.6 for its employee screens in Nepali (build
+  plan 2.6); its `TEMPORARY` stand-in (`withEnglishUnderneath`) is deleted.
 
 ## `ngx-translations` 1.0.5: the API answers in the user's language — published 2026-11-24
 

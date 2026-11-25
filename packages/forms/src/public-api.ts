@@ -44,6 +44,9 @@ export type { FormsLocaleResolver } from './lib/dynamic-form/config/forms-locale
 export { ZonedDateTimeService } from './lib/dynamic-form/services/zoned-date-time.service';
 export type { ZonedInstantResult } from './lib/dynamic-form/services/zoned-date-time.service';
 
+// Turnstile: Cloudflare's check that a person filled in the form (1.0.8)
+export { NgxTurnstile, TURNSTILE_SCRIPT_URL } from './lib/turnstile/turnstile';
+
 // Dynamic Form Utils
 export {
   createEmptyEntity,
