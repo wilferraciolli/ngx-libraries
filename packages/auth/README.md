@@ -154,6 +154,10 @@ export class NavBar {
 }
 ```
 
+For someone without an account yet, `auth.signUp()` opens the Account Portal's sign-up page
+instead (1.0.4), and comes back to this page, or to the URL it's given, once they have one. Each
+page links to the other, so a single button works for both; two buttons skip a step.
+
 `AuthStore.user`/`AuthStore.session` are `Signal`s holding Clerk's own `user`/`session` objects
 directly — not a hand-rolled DTO. Read fields off them directly:
 `auth.user()?.primaryEmailAddress?.emailAddress`.

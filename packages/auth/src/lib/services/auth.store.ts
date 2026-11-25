@@ -140,6 +140,16 @@ export class AuthStore {
     await this.clerk?.redirectToSignIn({ redirectUrl: window.location.href });
   }
 
+  /**
+   * Full-page redirect to the Account Portal's sign-up page, for someone without an account yet,
+   * then back to `redirectUrl` (this page by default) once they have one. The same hosted pages as
+   * `signIn()`, so Clerk's own bot check and email verification run there; each page links to the
+   * other. Does nothing when Clerk couldn't load.
+   */
+  public async signUp(redirectUrl: string = window.location.href): Promise<void> {
+    await this.clerk?.redirectToSignUp({ redirectUrl });
+  }
+
   public async signOut(): Promise<void> {
     await this.clerk?.signOut();
   }
